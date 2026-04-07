@@ -20,4 +20,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/dashboard";
     }
+
+    @GetMapping("/ambulatorQebul")
+    public String ambulatorQebul(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/pasienQebulu/ambulator/ambulatorQebul";
+    }
 }
+

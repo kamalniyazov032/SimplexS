@@ -46,7 +46,7 @@
                         <span class="menu-arrow"></span>
                     </a>
                     <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Ambulator</a></li>
+                        <li><a th:href="@{/ambulatorQebul}">Ambulator</a></li>
                         <li><a href="javascript:void(0);">Stasionar</a></li>
                     </ul>
                 </li>
@@ -68,7 +68,7 @@
                         <span class="menu-arrow"></span>
                     </a>
                     <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Poliknika</a></li>
+                        <li><a th:href="@{/ambulatorQebul}">Poliknika</a></li>
                         <li><a href="javascript:void(0);">Stasionar</a></li>
                         <li><a href="javascript:void(0);">Əməliyyatxana</a></li>
                         <li><a href="javascript:void(0);">Radiologiya</a></li>

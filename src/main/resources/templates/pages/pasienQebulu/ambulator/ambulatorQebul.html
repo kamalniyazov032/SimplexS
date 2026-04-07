@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Pasientlər</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Pasientlər</h4>
+            <p class="mb-0 text-muted">Qeydiyyatda olan pasient siyahısı</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="input-icon-start position-relative">
+                <span class="input-icon-addon">
+                    <i class="ti ti-search"></i>
+                </span>
+                <input type="text" class="form-control ps-5" placeholder="Axtar...">
+            </div>
+
+            <button type="button"
+                    class="btn btn-primary d-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addCustomerModal">
+                <i class="ti ti-plus me-1"></i> Qeydçi / Əlavə et
+            </button>
+        </div>
+    </div>
+    <!-- /Page Header -->
+
+    <!-- Customer Table Card -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-1">Ambulator pasient siyahısı</h5>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-soft-success text-success">Aktiv: 124</span>
+                <span class="badge bg-soft-info text-info">Yeni: 8</span>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-top mb-3">
+                <div class="search-set">
+                    <div class="search-input">
+                        <a href="javascript:void(0);" class="btn btn-searchset">
+                            <i class="isax isax-search-normal"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-nowrap datatable border align-middle">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ş/V nömrəsi</th>
+                        <th>Ad Soyad</th>
+                        <th>FİN</th>
+                        <th>Mobil telefon</th>
+                        <th>Doğum tarixi</th>
+                        <th>İş yeri</th>
+                        <th class="text-center">Əməliyyat</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>AA1234567</td>
+                        <td>Nigar Hüseynova</td>
+                        <td>7X4K2LM</td>
+                        <td>+994 50 555 22 11</td>
+                        <td>12.08.2023</td>
+                        <td>Azerbaycanlı</td>
+                        <td class="text-center">
+                            <div class="action-icon d-inline-flex">
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-eye"></i></a>
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-edit"></i></a>
+                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB2345678</td>
+                        <td>Emil Quliyev</td>
+                        <td>4J8P9TR</td>
+                        <td>+994 51 444 11 00</td>
+                        <td>23.08.2019</td>
+                        <td>Medline MMC</td>
+                        <td class="text-center">
+                            <div class="action-icon d-inline-flex">
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-eye"></i></a>
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-edit"></i></a>
+                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>CC3456789</td>
+                        <td>Vüsal Məmmədov</td>
+                        <td>8D2M5KP</td>
+                        <td>+994 70 777 66 55</td>
+                        <td>18.08.2009</td>
+                        <td>Referans Klinik</td>
+                        <td class="text-center">
+                            <div class="action-icon d-inline-flex">
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-eye"></i></a>
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-edit"></i></a>
+                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>DD4567891</td>
+                        <td>Kamran Əliyev</td>
+                        <td>3S1L6QR</td>
+                        <td>+994 55 321 45 67</td>
+                        <td>26.01.2008</td>
+                        <td>Demo Company</td>
+                        <td class="text-center">
+                            <div class="action-icon d-inline-flex">
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-eye"></i></a>
+                                <a href="javascript:void(0);" class="me-2"><i class="ti ti-edit"></i></a>
+                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /Customer Table Card -->
+
+
+    <!-- Add Customer Modal -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 overflow-hidden">
+                <div class="modal-header border-bottom">
+                    <h4 class="modal-title" id="addCustomerModalLabel">Yeni ambulator pasient</h4>
+                    <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form action="#" method="post">
+                    <div class="modal-body p-3">
+                        <div class="row g-2">
+
+                            <div class="col-md-4">
+                                <label class="form-label">Ş/V Nömrəsi</label>
+                                <input type="text" class="form-control" name="svNomresi" placeholder="Ş/V nömrəsi">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">FİN nömrəsi</label>
+                                <input type="text" class="form-control" name="fin" placeholder="FİN nömrəsi">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Pasport nömrəsi</label>
+                                <input type="text" class="form-control" name="passportNo" placeholder="Pasport nömrəsi">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Ad</label>
+                                <input type="text" class="form-control" name="ad" placeholder="Ad">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Soyad</label>
+                                <input type="text" class="form-control" name="soyad" placeholder="Soyad">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Ata adı</label>
+                                <input type="text" class="form-control" name="ataAdi" placeholder="Ata adı">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Cinsi</label>
+                                <select class="form-select" name="cins">
+                                    <option value="">Seçin</option>
+                                    <option>Kişi</option>
+                                    <option>Qadın</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Ailə vəziyyəti</label>
+                                <select class="form-select" name="aileVeziyyeti">
+                                    <option value="">Seçin</option>
+                                    <option>Subay</option>
+                                    <option>Evli</option>
+                                    <option>Boşanmış</option>
+                                    <option>Dul</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Qan qrupu</label>
+                                <select class="form-select" name="qanQrupu">
+                                    <option value="">Seçin</option>
+                                    <option>A Rh+</option>
+                                    <option>A Rh-</option>
+                                    <option>B Rh+</option>
+                                    <option>B Rh-</option>
+                                    <option>AB Rh+</option>
+                                    <option>AB Rh-</option>
+                                    <option>0 Rh+</option>
+                                    <option>0 Rh-</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Mobil telefon</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+994</span>
+                                    <input type="text" class="form-control" name="telefon" placeholder="50 000 00 00">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">E-poçt</label>
+                                <input type="email" class="form-control" name="email" placeholder="E-poçt">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Doğum tarixi</label>
+                                <input type="date" class="form-control" name="dogumTarixi">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">İş yeri</label>
+                                <input type="text" class="form-control" name="isYeri" placeholder="İş yeri">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Milliyyəti</label>
+                                <input type="text" class="form-control" name="milliyyet" placeholder="Milliyyəti">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Ünvan</label>
+                                <textarea class="form-control" rows="2" name="unvan" placeholder="Ünvan"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Yaşadığı ünvan</label>
+                                <textarea class="form-control" rows="2" name="yasadigiUnvan" placeholder="Yaşadığı ünvan"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
+                        <div class="d-flex gap-2">
+                            <button type="reset" class="btn btn-outline-secondary">Təmizlə</button>
+                            <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- /Add Customer Modal -->
+</div>
+</body>
+</html>
