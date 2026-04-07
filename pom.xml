@@ -63,6 +63,8 @@
 		</dependency>
 	</dependencies>
 
+
+
 	<build>
 		<plugins>
 			<plugin>
@@ -114,6 +116,8 @@
 				</executions>
 			</plugin>
 		</plugins>
+
+		<finalName>SimplexS</finalName>
 	</build>
 
 </project>
