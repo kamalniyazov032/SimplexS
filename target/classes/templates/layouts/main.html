@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      data-layout="mini"
+      data-bs-theme="light"
+      data-sidebar="sidebar4"
+      data-topbar="white"
+      data-color="primary">
+
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+
+<body class="mini-sidebar" style="overflow-y: auto; padding-right: 0px;">
+
+<div class="main-wrapper">
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="page-wrapper">
+        <div class="content" layout:fragment="content">
+            <!-- page content -->
+        </div>
+
+<!--
+        <div th:replace="~{fragments/footer :: footer}"></div>
+-->
+    </div>
+</div>
+
+<!-- jQuery -->
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+
+<!-- Bootstrap Core JS -->
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+
+<!-- Simplebar JS -->
+<script th:src="@{/assets/plugins/simplebar/simplebar.min.js}"></script>
+
+<!-- Daterangepicker JS -->
+<script th:src="@{/assets/js/moment.min.js}"></script>
+<script th:src="@{/assets/plugins/daterangepicker/daterangepicker.js}"></script>
+
+<!-- Flatpickr JS -->
+<script th:src="@{/assets/plugins/flatpickr/flatpickr.min.js}"></script>
+
+<!-- Select2 JS -->
+<script th:src="@{/assets/plugins/select2/js/select2.min.js}"></script>
+
+<!-- Apex Chart JS -->
+<script th:src="@{/assets/plugins/apexchart/apexcharts.min.js}"></script>
+<script th:src="@{/assets/plugins/apexchart/chart-data.js}"></script>
+
+<!-- Chart JS -->
+<script th:src="@{/assets/plugins/chartjs/chart.min.js}"></script>
+<script th:src="@{/assets/plugins/chartjs/chart-data.js}"></script>
+
+<!-- Main JS -->
+<script th:src="@{/assets/js/script.js}"></script>
+
+</body>
+</html>

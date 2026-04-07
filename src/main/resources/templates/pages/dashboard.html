@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+
+        <div layout:fragment="content">
+
+
+            <!-- Page Header -->
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+                <div class="breadcrumb-arrow">
+                    <h4 class="mb-1">Xoş gəlmisiz, Admin</h4>
+                    <p class="mb-0">Ümumi visit məlumatları</p>
+                </div>
+                <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center">
+                    <i class="ti ti-calendar text-body fs-14 me-1"></i><span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+                </div>
+            </div>
+            <!-- End Page Header -->
+
+            <!-- row start -->
+            <div class="row">
+
+                <!-- col start -->
+                <div class="col-xl-3 col-md-6 d-flex">
+                    <div class="card pb-2 flex-fill">
+                        <div class="d-flex align-items-center justify-content-between gap-1 card-body pb-0 mb-1">
+                            <div class="d-flex align-items-center overflow-hidden">
+                                <span class="avatar bg-primary rounded-circle flex-shrink-0"><i class="ti ti-user-exclamation fs-20"></i></span>
+                                <div class="ms-2 overflow-hidden">
+                                    <p class="mb-1 text-truncate">Kişi</p>
+                                    <h5 class="mb-0">108</h5>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge badge-soft-success">+20%</span>
+                            </div>
+                        </div>
+                        <div id="chart-1" class="chart-set"></div>
+                    </div>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-3 col-md-6 d-flex">
+                    <div class="card pb-2 flex-fill">
+                        <div class="d-flex align-items-center justify-content-between gap-1 card-body pb-0 mb-1">
+                            <div class="d-flex align-items-center overflow-hidden">
+                                <span class="avatar bg-orange rounded-circle flex-shrink-0"><i class="ti ti-calendar-check fs-20"></i></span>
+                                <div class="ms-2 overflow-hidden">
+                                    <p class="mb-1 text-truncate">Qadın</p>
+                                    <h5 class="mb-0">658</h5>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge badge-soft-danger">-15%</span>
+                            </div>
+                        </div>
+                        <div id="chart-2" class="chart-set"></div>
+                    </div>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-3 col-md-6 d-flex">
+                    <div class="card pb-2 flex-fill">
+                        <div class="d-flex align-items-center justify-content-between gap-1 card-body pb-0 mb-1">
+                            <div class="d-flex align-items-center overflow-hidden">
+                                <span class="avatar bg-purple rounded-circle flex-shrink-0"><i class="ti ti-stethoscope fs-20"></i></span>
+                                <div class="ms-2 overflow-hidden">
+                                    <p class="mb-1 text-truncate">Toplam</p>
+                                    <h5 class="mb-0">565</h5>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge badge-soft-success">+18%</span>
+                            </div>
+                        </div>
+                        <div id="chart-3" class="chart-set"></div>
+                    </div>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-3 col-md-6 d-flex">
+                    <div class="card pb-2 flex-fill">
+                        <div class="d-flex align-items-center justify-content-between gap-1 card-body pb-0 mb-1">
+                            <div class="d-flex align-items-center overflow-hidden">
+                                <span class="avatar bg-pink rounded-circle flex-shrink-0"><i class="ti ti-calendar-check fs-20"></i></span>
+
+                                <div class="ms-2 overflow-hidden">
+                                    <p class="mb-1 text-truncate">Randevu toplam</p>
+                                    <h5 class="mb-0">$5,523.56</h5>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge badge-soft-success">+12%</span>
+                            </div>
+                        </div>
+                        <div id="chart-4" class="chart-set"></div>
+                    </div>
+                </div>
+                <!-- col end -->
+
+            </div>
+            <!-- row end -->
+
+            <!-- row start -->
+            <div class="row">
+
+                <!-- col start -->
+                <div class="col-xl-6 d-flex">
+                    <div class="card flex-fill w-100">
+                        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <h5 class="fw-bold mb-0">İşdə olmayan həkimlər</h5>
+                            <a href="appointments.html" class="btn btn-sm btn-white flex-shrink-0">All Appointments</a>
+                        </div>
+                        <div class="card-body p-1 py-2">
+                            <!-- table start -->
+                            <div class="table-responsive table-nowrap">
+                                <table class="table table-borderless mb-0">
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="assets/img/avatars/avatar-23.jpg" alt="patient" class="rounded">
+                                                </a>
+                                                <div>
+                                                    <h6 class="fs-14 mb-1 fw-semibold"><a href="patient-details.html">Dominic Foster</a></h6>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-calendar me-1"></i>12 Aug 2025</p>
+                                                        <span><i class="ti ti-minus-vertical text-light fs-14"></i></span>
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-clock-hour-7 me-1"></i>11:35 PM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-soft-success">Urology</span></td>
+                                        <td class="text-end border-0">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-xbox-x"></i></a>
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-check"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="assets/img/avatars/avatar-08.jpg" alt="patient" class="rounded">
+                                                </a>
+                                                <div>
+                                                    <h6 class="fs-14 mb-1 fw-semibold"><a href="patient-details.html">Charlotte Bennett</a></h6>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-calendar me-1"></i>06 Aug 2025</p>
+                                                        <span><i class="ti ti-minus-vertical text-light fs-14"></i></span>
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-clock-hour-7 me-1"></i>09:58 AM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-soft-info">Cardiology</span></td>
+                                        <td class="text-end border-0">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-xbox-x"></i></a>
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-check"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="assets/img/avatars/avatar-21.jpg" alt="patient" class="rounded">
+                                                </a>
+                                                <div>
+                                                    <h6 class="fs-14 mb-1 fw-semibold"><a href="patient-details.html">Ethan Sullivan</a></h6>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-calendar me-1"></i>01 Aug 2025</p>
+                                                        <span><i class="ti ti-minus-vertical text-light fs-14"></i></span>
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-clock-hour-7 me-1"></i>12:10 PM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-soft-teal">Dermatology</span></td>
+                                        <td class="text-end border-0">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-xbox-x"></i></a>
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-check"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="assets/img/avatars/avatar-55.jpg" alt="patient" class="rounded">
+                                                </a>
+                                                <div>
+                                                    <h6 class="fs-14 mb-1 fw-semibold"><a href="patient-details.html">Brianna Thompson</a></h6>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-calendar me-1"></i>26 Jul 2025</p>
+                                                        <span><i class="ti ti-minus-vertical text-light fs-14"></i></span>
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-clock-hour-7 me-1"></i>08:20 AM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-soft-purple">ENT Surgery</span></td>
+                                        <td class="text-end border-0">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-xbox-x"></i></a>
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-check"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <a href="patient-details.html" class="avatar me-2">
+                                                    <img src="assets/img/avatars/avatar-28.jpg" alt="patient" class="rounded">
+                                                </a>
+                                                <div>
+                                                    <h6 class="fs-14 mb-1 fw-semibold"><a href="patient-details.html">Braun Tucker</a></h6>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-calendar me-1"></i>23 Jul 2025</p>
+                                                        <span><i class="ti ti-minus-vertical text-light fs-14"></i></span>
+                                                        <p class="mb-0 fs-13 d-inline-flex align-items-center text-body"><i class="ti ti-clock-hour-7 me-1"></i>10:30 AM</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-soft-info">Radiology</span></td>
+                                        <td class="text-end border-0">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-xbox-x"></i></a>
+                                                <a href="javascript:void(0);" class="btn btn-icon btn-light"><i class="ti ti-check"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- table start -->
+                        </div>
+                    </div>
+                </div>
+                <!-- col end -->
+                <div class="col-xl-6 d-flex">
+                    <!-- card start -->
+                    <div class="card flex-fill w-100">
+                        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <h5 class="mb-0">Ad günü olanlar</h5>
+                            <a href="medical-results.html" class="btn btn-sm btn-white flex-shrink-0">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <!-- table start -->
+                            <div class="table-responsive table-nowrap">
+                                <table class="table border mb-0">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Patient Name</th>
+                                        <th>Diagnosis</th>
+                                        <th>Department</th>
+                                        <th>Last Visit</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <h6 class="fs-14 mb-0 fw-medium"><a href="patient-details.html">James Carter</a></h6>
+                                        </td>
+                                        <td>Male</td>
+                                        <td><span class="badge badge-soft-info">Cardiology</span></td>
+                                        <td>17 Jun 2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h6 class="fs-14 mb-0 fw-medium"><a href="patient-details.html">Emily Davis</a></h6>
+                                        </td>
+                                        <td>Female</td>
+                                        <td><span class="badge badge-soft-success">Urology</span></td>
+                                        <td>10 Jun 2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h6 class="fs-14 mb-0 fw-medium"><a href="patient-details.html">Michael John</a></h6>
+                                        </td>
+                                        <td>Male</td>
+                                        <td><span class="badge badge-soft-info">Radiology</span></td>
+                                        <td>22 May 2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h6 class="fs-14 mb-0 fw-medium"><a href="patient-details.html">Olivia Miller</a></h6>
+                                        </td>
+                                        <td>Female</td>
+                                        <td><span class="badge badge-soft-purple">ENT Surgery</span></td>
+                                        <td>15 May 2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h6 class="fs-14 mb-0 fw-medium"><a href="patient-details.html">David Smith</a></h6>
+                                        </td>
+                                        <td>Male</td>
+                                        <td><span class="badge badge-soft-teal">Dermatology</span></td>
+                                        <td>30 Apr 2025</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- table start -->
+                        </div>
+                    </div>
+                    <!-- card end -->
+                </div>
+                <!-- col end -->
+
+            </div>
+
+
+            <!-- row start -->
+            <div class="row">
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="patients.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-primary rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-users"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">All Patient</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="doctors.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-success rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-topology-bus"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">Doctors</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="lab-results.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-warning rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-test-pipe-2"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">Labs Results</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="pharmacy.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-danger rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-prescription"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">Prescriptions</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="visits.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-purple rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-e-passport"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">Visits</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+                <!-- col start -->
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <a href="medical-results.html" class="card">
+                        <div class="card-body text-center">
+                            <span class="badge-soft-teal rounded w-100 d-flex p-3 justify-content-center fs-32 mb-2"><i class="ti ti-file-description"></i></span>
+                            <h6 class="fs-14 fw-semibold text-truncate mb-0">Medical Results</h6>
+                        </div>
+                    </a>
+                </div>
+                <!-- col end -->
+
+            </div>
+            <!-- row end -->
+
+        </div>
+
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+
+    <!-- META -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${title != null ? title + ' | SimplexS' : 'SimplexS'}">SimplexS</title>
+
+    <meta name="description" content="SimplexS tətbiqi">
+    <meta name="keywords" content="SimplexS, dashboard, management">
+    <meta name="author" content="SimplexS">
+
+    <!-- ICONS -->
+    <link rel="icon" type="image/png" th:href="@{/custom/logo/icons/SS-Icon-White.png}">
+    <link rel="apple-touch-icon" th:href="@{/custom/logo/icons/SS-Icon-White.png}">
+
+    <!-- THEME SCRIPT -->
+    <script th:src="@{/assets/js/theme-script.js}"></script>
+
+    <!-- CORE CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/tabler-icons/tabler-icons.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/simplebar/simplebar.min.css}">
+
+    <!-- TEMPLATE PLUGINS -->
+    <link rel="stylesheet" th:href="@{/assets/plugins/fontawesome/css/fontawesome.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/fontawesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/daterangepicker/daterangepicker.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/flatpickr/flatpickr.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/plugins/select2/css/select2.min.css}">
+
+    <!-- MAIN STYLE -->
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" id="app-style">
+
+    <!-- CUSTOM -->
+    <link rel="stylesheet" th:href="@{/custom/css/main.css}">
+
+</head>
+</html>
