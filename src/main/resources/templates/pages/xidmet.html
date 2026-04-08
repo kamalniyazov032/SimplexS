@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Xidmətlər</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1">Xidmətlər</h4>
+            <p class="mb-0">Xidmət məlumatları və şöbə təyinatı</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center">
+                <i class="ti ti-calendar text-body fs-14 me-1"></i>
+                <span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+            </div>
+        </div>
+    </div>
+    <!-- End Page Header -->
+
+    <!-- Top Tabs -->
+    <div class="card mb-4">
+        <div class="card-body py-3">
+            <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <ul class="nav nav-pills gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link active rounded-pill px-4" href="javascript:void(0);">Xidmətlər</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill px-4" href="javascript:void(0);">Paketlər</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill px-4" href="javascript:void(0);">Qiymətlər</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill px-4" href="javascript:void(0);">Qruplar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill px-4" href="javascript:void(0);">Mühasibat</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center" style="min-width: 280px;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Axtarış...">
+                        <span class="input-group-text">
+                            <i class="ti ti-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Top Tabs -->
+
+    <div class="row">
+        <!-- Left Tree -->
+        <div class="col-12 col-xl-3 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="accordion accordion-bordered" id="serviceCategoryAccordion">
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Poliklinik xidmətlər
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show"
+                                 aria-labelledby="headingOne" data-bs-parent="#serviceCategoryAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Pediatri</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Nevrologiya</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Kardiologiya</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Ginekologiya</a></li>
+                                        <li><a href="javascript:void(0);" class="text-dark">- Fizioterapiya</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Stasionar xidmətlər
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse"
+                                 aria-labelledby="headingTwo" data-bs-parent="#serviceCategoryAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Ümumi cərrahiyyə</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Neyrocərrahiyyə</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Kardiologiya şöbəsi</a></li>
+                                        <li><a href="javascript:void(0);" class="text-dark">- Reanimasiya</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Laborator xidmətlər
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse"
+                                 aria-labelledby="headingThree" data-bs-parent="#serviceCategoryAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Biokimyəvi analizlər</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Hematoloji testlər</a></li>
+                                        <li class="mb-2"><a href="javascript:void(0);" class="text-dark">- Mikrobioloji təhlillər</a></li>
+                                        <li><a href="javascript:void(0);" class="text-dark">- İmmunoassay analizlər</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Left Tree -->
+
+        <!-- Right Content -->
+        <div class="col-12 col-xl-9 col-lg-8">
+
+            <!-- Services Table -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap">
+                        <h5 class="mb-0">Xidmət siyahısı</h5>
+                        <button type="button" class="btn btn-primary"
+                                data-bs-toggle="modal" data-bs-target="#newServiceModal">
+                            Yeni xidmət
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">No</th>
+                                <th style="width: 110px;">Kod</th>
+                                <th>Xidmət adı</th>
+                                <th style="width: 160px;">Nazirlik kodu</th>
+                                <th style="width: 220px;">Nazirlik adı</th>
+                                <th style="width: 180px;">Xidmət qrupu</th>
+                                <th style="width: 140px;">Aktiv / Passiv</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>POL001</td>
+                                <td>Kardioloqun müayinəsi</td>
+                                <td>2.3.6.9</td>
+                                <td>Həkim müayinəsi</td>
+                                <td>Poliklinik xidmətlər</td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>POL002</td>
+                                <td>Pediatrın müayinəsi</td>
+                                <td>2.3.6.10</td>
+                                <td>Həkim müayinəsi</td>
+                                <td>Poliklinik xidmətlər</td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>POL003</td>
+                                <td>Uroloqun müayinəsi</td>
+                                <td>2.3.6.11</td>
+                                <td>Həkim müayinəsi</td>
+                                <td>Poliklinik xidmətlər</td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /Services Table -->
+
+
+            <!-- Bottom Tabs -->
+            <div class="card">
+                <div class="card-body">
+
+                    <ul class="nav nav-tabs nav-tabs-bottom mb-4" id="serviceDetailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="umumi-tab" data-bs-toggle="tab"
+                                    data-bs-target="#umumi-tab-pane" type="button" role="tab"
+                                    aria-controls="umumi-tab-pane" aria-selected="false">
+                                Ümumi ayarlar
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="paket-tab" data-bs-toggle="tab"
+                                    data-bs-target="#paket-tab-pane" type="button" role="tab"
+                                    aria-controls="paket-tab-pane" aria-selected="false">
+                                Paket içi
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="shobe-tab" data-bs-toggle="tab"
+                                    data-bs-target="#shobe-tab-pane" type="button" role="tab"
+                                    aria-controls="shobe-tab-pane" aria-selected="true">
+                                Xidmətin şöbəsi
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="serviceDetailTabsContent">
+
+                        <!-- Umumi -->
+                        <div class="tab-pane fade show active" id="umumi-tab-pane" role="tabpanel" aria-labelledby="umumi-tab" tabindex="0">
+                            <div class="row g-3">
+                                <!-- Left form block -->
+                                <div class="col-12 col-xl-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="muhKodBos">
+                                                    <label class="form-check-label" for="muhKodBos">
+                                                        Mühasibat kodu boş olanlar
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="shobesiBos">
+                                                    <label class="form-check-label" for="shobesiBos">
+                                                        Şöbəsi boş olan xidmətlər
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+
+                                                <label class="form-label mb-1">Xidmət kodu</label>
+                                                <input type="text" class="form-control">
+
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <label class="form-label mb-1">Xidmət adı</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label mb-1">Nazirlik kodu</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <label class="form-label mb-1">Nazirlik adı</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label mb-1">Mühasibat kodu</label>
+                                                <select class="form-select select2">
+                                                    <option></option>
+                                                    <option>Kod 1</option>
+                                                    <option>Kod 2</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label mb-1">Mühasibat adı</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 col-xl-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="paketXidmeti">
+                                                    <label class="form-check-label" for="paketXidmeti">
+                                                        Paket xidməti
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="cavabMecburi">
+                                                    <label class="form-check-label" for="cavabMecburi">
+                                                        Cavab yazılması məcburi
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">Cins</label>
+                                                <select class="form-select select2">
+                                                    <option selected>Seçin</option>
+                                                    <option>Kişi</option>
+                                                    <option>Qadın</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">Rapor tipi</label>
+                                                <select class="form-select select2">
+                                                    <option selected>Seçin</option>
+                                                    <option>Standart</option>
+                                                    <option>Ətraflı</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">ICD9</label>
+                                                <select class="form-select select2">
+                                                    <option></option>
+                                                    <option>ICD9-001</option>
+                                                    <option>ICD9-002</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">ICD10</label>
+                                                <select class="form-select select2">
+                                                    <option></option>
+                                                    <option>ICD10-001</option>
+                                                    <option>ICD10-002</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">Üst qrup</label>
+                                                <select class="form-select select2">
+                                                    <option></option>
+                                                    <option>Qrup 1</option>
+                                                    <option>Qrup 2</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label mb-1">Alt qrup</label>
+                                                <select class="form-select select2">
+                                                    <option></option>
+                                                    <option>Alt 1</option>
+                                                    <option>Alt 2</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right form block -->
+
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary">
+                                            Axtar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paket -->
+                        <div class="tab-pane fade" id="paket-tab-pane" role="tabpanel" aria-labelledby="paket-tab" tabindex="0">
+                            <div class="border rounded p-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Paket kodu</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Paket adı</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Xidmət</label>
+                                        <select class="form-select select2">
+                                            <option></option>
+                                            <option>Xidmət 1</option>
+                                            <option>Xidmət 2</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Status</label>
+                                        <select class="form-select">
+                                            <option selected>Seçin</option>
+                                            <option>Aktiv</option>
+                                            <option>Passiv</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary">
+                                                Axtar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Xidmətin şöbəsi -->
+                        <div class="tab-pane fade" id="shobe-tab-pane" role="tabpanel" aria-labelledby="shobe-tab" tabindex="0">
+                            <div class="border rounded p-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Şöbə</label>
+                                        <select class="form-select select2">
+                                            <option></option>
+                                            <option>Şöbə 1</option>
+                                            <option>Şöbə 2</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Xidmət adı</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Şöbə kodu</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label mb-1">Status</label>
+                                        <select class="form-select">
+                                            <option selected>Seçin</option>
+                                            <option>Aktiv</option>
+                                            <option>Passiv</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary">
+                                                Axtar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /Xidmətin şöbəsi -->
+
+                    </div>
+
+                </div>
+            </div>
+            <!-- /Bottom Tabs -->
+            <!-- Yeni Xidmət Modal -->
+            <div class="modal fade" id="newServiceModal" tabindex="-1" aria-labelledby="newServiceModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="newServiceModalLabel">Yeni xidmət əlavə et</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row g-3">
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label mb-1">Xidmət kodu</label>
+                                    <input type="text" class="form-control" name="xidmetKodu">
+                                </div>
+
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label mb-1">Xidmət adı</label>
+                                    <input type="text" class="form-control" name="xidmetAdi">
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label mb-1">Aktiv qiymət</label>
+                                    <input type="text" class="form-control" name="aktivQiymet">
+                                </div>
+
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label mb-1">ƏDV</label>
+                                    <select class="form-select select2-modal" name="edv">
+                                        <option value="">Seçin</option>
+                                        <option value="0">0</option>
+                                        <option value="18">18</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label mb-1">Mühasibat kodu</label>
+                                    <select class="form-select select2-modal" name="muhasibatKodu">
+                                        <option value="">Seçin</option>
+                                        <option value="1">Mühasibat kodu 1</option>
+                                        <option value="2">Mühasibat kodu 2</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label mb-1">Qrup</label>
+                                    <select class="form-select select2-modal" name="qrup">
+                                        <option value="">Seçin</option>
+                                        <option value="1">Qrup 1</option>
+                                        <option value="2">Qrup 2</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label mb-1">Alt qrup</label>
+                                    <select class="form-select select2-modal" name="altQrup">
+                                        <option value="">Seçin</option>
+                                        <option value="1">Alt qrup 1</option>
+                                        <option value="2">Alt qrup 2</option>
+                                    </select>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button>
+                            <button type="button" class="btn btn-primary">Yadda saxla</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Yeni Xidmət Modal -->
+
+        </div>
+        <!-- /Right Content -->
+    </div>
+
+</div>
+
+
+
+</body>
+</html>

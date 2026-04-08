@@ -27,5 +27,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/pasienQebulu/ambulator/ambulatorQebul";
     }
+
+    @GetMapping("/parXidmet")
+    public String parXidemt(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/xidmet";
+    }
 }
 
