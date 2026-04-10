@@ -34,5 +34,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/xidmet";
     }
+
+    @GetMapping("/parPaket")
+    public String parPaket(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/paket";
+    }
 }
 

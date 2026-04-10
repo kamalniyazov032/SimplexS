@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+<div layout:fragment="content">
+
+    <style>
+        /* Cədvəl üçün xüsusi skrol zonası */
+        .table-scroll-container {
+            max-height: 400px; /* Bura istədiyin hündürlüyü yaza bilərsən */
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+
+        /* Başlığın yuxarıda sabit qalması üçün (Sticky Header) */
+        .table-scroll-container thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: #f8f9fa; /* table-light rəngi ilə eyni */
+            border-bottom: 2px solid #dee2e6;
+        }
+    </style>
+
+
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Paketlərin İdarəedilməsi</h4>
+            <p class="mb-0">Mövcud paketlər və onlara daxil olan xidmətlərin tənzimlənməsi</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPackageModal">
+            <i class="ti ti-plus me-1"></i> Yeni Paket Əlavə Et
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-transparent border-bottom">
+                    <h5 class="card-title mb-0">Paketlər</h5>
+                </div>
+                <div class="card-body p-0" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="list-group list-group-flush">
+                        <a href="javascript:void(0);" class="list-group-item list-group-item-action p-3 active">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <h6 class="mb-0 text-white">PAK001</h6>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <p class="small mb-0 opacity-75">Yeni doğulmuş paketi</p>
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger">91 AZN</span>
+                                <span class="small opacity-75">Status: Aktiv</span>
+                            </div>
+                        </a>
+
+                        <a href="javascript:void(0);" class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <h6 class="mb-0 text-dark font-weight-bold">PAK002</h6>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox">
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0">Qurban qayrami paketi</p>
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger">120 AZN</span>
+                                <span class="small text-muted">Status: Passiv</span>
+                            </div>
+                        </a>
+                        <a href="javascript:void(0);" class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <h6 class="mb-0 text-white">PAK003</h6>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <p class="small mb-0 opacity-75">Əməliyyat paketi</p>
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger">91 AZN</span>
+                                <span class="small opacity-75">Status: Aktiv</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-9 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <span class="badge bg-primary mb-1">PAK001</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end">
+                            <p class="small text-muted mb-0">Ümumi Məbləğ</p>
+                            <h5 class="mb-0">91.00 AZN</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-2 mb-4 align-items-end bg-light p-3 rounded">
+                        <div class="col-md-8">
+                            <select class="form-select select2" data-placeholder="Xidmət adı yazın...">
+                                <option>Xidmət Seçin (Kod və ya ad ilə axtar)</option>
+                                <option value="1">EKQ - 5 AZN</option>
+                                <option value="2">Anti-HCV (ekspres) - 6 AZN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" value="1" placeholder="Sayı">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-75">
+                                <i class="ti ti-plus me-1"></i> Əlavə et
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive table-scroll-container">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="bg-light sticky-top">
+                            <tr>
+                                <th class="border-0">Xidmət</th>
+                                <th class="border-0 text-center">Qiymət</th>
+                                <th class="border-0 text-center" style="width: 120px;">Sayı</th>
+                                <th class="border-0 text-center">Məbləğ</th>
+                                <th class="border-0 text-end"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>EKQ</td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <input type="text" class="form-control text-center border-1 w-25"
+                                               style="width: 50px;" value="">
+                                        <span class="small fw-semibold">AZN</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control text-center border-1 w-50" value="1">
+                                </td>
+                                <td class="text-center fw-bold">5 AZN</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm "><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="input-group input-group-sm" style="width: 200px;">
+                            <span class="input-group-text bg-transparent">Endirim %</span>
+                            <input type="number" class="form-control" placeholder="0">
+                        </div>
+                        <button class="btn btn-primary px-2">
+                            <i class="ti ti-device-floppy me-1"></i> Tətbiq et
+                        </button>
+                    </div>
+                    <button class="btn btn-primary px-2">
+                        <i class="ti ti-device-floppy me-1"></i> Paketi Yadda Saxla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="newPackageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title">Yeni Paket Başlığı</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Paket Adı</label>
+                        <input type="text" class="form-control" placeholder="Məs: Check-up Paketi">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Paket Kodu</label>
+                        <input type="text" class="form-control" placeholder="Məs: PAK005">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="button" class="btn btn-primary">Yarat və Davam et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+
+</html>
