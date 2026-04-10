@@ -471,45 +471,66 @@
                         </div>
 
                         <!-- Paket -->
-                        <div class="tab-pane fade" id="paket-tab-pane" role="tabpanel" aria-labelledby="paket-tab"
-                             tabindex="0">
-                            <div class="border rounded p-3">
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label mb-1">Paket kodu</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label mb-1">Paket adı</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label mb-1">Xidmət</label>
-                                        <select class="form-select select2">
-                                            <option></option>
-                                            <option>Xidmət 1</option>
-                                            <option>Xidmət 2</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label mb-1">Status</label>
-                                        <select class="form-select">
-                                            <option selected>Seçin</option>
-                                            <option>Aktiv</option>
-                                            <option>Passiv</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="d-flex justify-content-end">
-                                            <button type="button" class="btn btn-primary">
-                                                Axtar
+                        <div class="tab-pane fade" id="paket-tab-pane" role="tabpanel" aria-labelledby="paket-tab" tabindex="0">
+                            <div class="border rounded p-3 bg-white">
+
+                                <div class="bg-light p-3 rounded mb-4">
+                                    <h6 class="mb-3 d-flex align-items-center text-success">
+                                        <i class="ti ti-circle-plus me-2 fs-18"></i> Xidmət əlavə et
+                                    </h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-12 col-md-9">
+                                            <label class="form-label mb-1 small fw-medium">Xidmət</label>
+                                            <select class="form-select select2" data-placeholder="Seçin">
+                                                <option></option>
+                                                <option>Ümumi anesteziya 0-2 saat</option>
+                                                <option>Stasionarda yatış (1 Gün)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-md-1">
+                                            <label class="form-label mb-1 small fw-medium">Ədəd</label>
+                                            <input type="number" class="form-control  text-center" value="1">
+                                        </div>
+                                        <div class="col-12 col-md-2">
+                                            <button type="button" class="btn btn-primary  w-100 py-2">
+                                                <i class="ti ti-plus me-1"></i> Əlavə et
                                             </button>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="table-responsive border rounded">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead class="bg-soft-primary">
+                                        <tr>
+                                            <th class="py-2 px-3" style="font-size: 12px;">Xidmət kodu</th>
+                                            <th class="py-2 px-3" style="font-size: 12px;">Xidmət adı</th>
+                                            <th class="py-2 px-3 text-center" style="width: 80px; font-size: 12px;">Ədəd</th>
+                                            <th class="py-2 px-3 text-end" style="width: 50px;"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td class="px-3">ANS007</td>
+                                            <td class="px-3 text-dark fw-medium">Ümumi anesteziya 0-2 saat (tibbi sərf xaric)</td>
+                                            <td class="px-3 text-center">1</td>
+                                            <td class="px-3 text-end">
+                                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash fs-16"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3">STY001</td>
+                                            <td class="px-3 text-dark fw-medium">Stasionarda yatış (1 Gün)</td>
+                                            <td class="px-3 text-center">1</td>
+                                            <td class="px-3 text-end">
+                                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash fs-16"></i></a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-
                         <!-- Xidmətin şöbəsi -->
                         <div class="tab-pane fade" id="shobe-tab-pane" role="tabpanel" aria-labelledby="shobe-tab"
                              tabindex="0">
