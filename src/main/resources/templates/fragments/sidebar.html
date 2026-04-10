@@ -37,8 +37,7 @@
                         <i class="ti ti-layout-board"></i><span>Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-title"><span>Qəbul sistemi</span></li>
-
+                <li class="menu-title"><span>Klinik məlumat sistemi</span></li>
 
                 <li class="submenu">
                     <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
@@ -60,7 +59,6 @@
                         <li><a href="javascript:void(0);">Qəbul vaxt təyini</a></li>
                     </ul>
                 </li>
-                <li class="menu-title"><span>Klinik məlumat sistemi</span></li>
 
                 <li class="submenu">
                     <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
@@ -75,6 +73,21 @@
 
                     </ul>
                 </li>
+
+                <li class="submenu">
+                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
+                        <i class="fa-solid fa-flask-vial"></i><span>Laboratoriya</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
+                        <li><a href="javascript:void(0);">Xəstə barkod çapı</a></li>
+                        <li><a href="javascript:void(0);">Nümunə qəbulu</a></li>
+                        <li><a href="javascript:void(0);">Laborator nəticələr</a></li>
+                        <li><a href="javascript:void(0);">Nəticə təsdiqlənməsi</a></li>
+
+                    </ul>
+                </li>
+
 
                 <li class="menu-title"><span>Maliyyə sistemi</span></li>
 
@@ -114,22 +127,7 @@
                     </ul>
                 </li>
 
-                <li class="menu-title"><span>Laboratoriya sistemi</span></li>
 
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-flask-vial"></i><span>Laboratoriya</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Xəstə barkod çapı</a></li>
-                        <li><a href="javascript:void(0);">Nümunə qəbulu</a></li>
-                        <li><a href="javascript:void(0);">Laborator nəticələr</a></li>
-                        <li><a href="javascript:void(0);">Nəticə təsdiqlənməsi</a></li>
-
-                    </ul>
-                </li>
 
                 <li class="menu-title"><span>Parametrlər</span></li>
 
@@ -151,14 +149,10 @@
                     </ul>
                 </li>
 
-
-                <li class="menu-title"><span>Əlavələr</span></li>
-
-
                 <li class="submenu">
                     <a href="javascript:void(0);">
                         <i class="ti ti-stack"></i>
-                        <span>Klinika məlumat sistemi</span>
+                        <span>Əlavələr</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
