@@ -306,17 +306,22 @@
                 <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center py-3">
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="input-group input-group-sm" style="width: 200px;">
-                            <span class="input-group-text bg-transparent">Endirim %</span>
-                            <input type="number" class="form-control" placeholder="0">
+                            <div class="input-group input-group-sm" style="width: 180px;">
+                                <span class="input-group-text bg-light fw-semibold text-muted" style="font-size: 11px;">Endirim %</span>
+                                <input type="number" class="form-control text-center fw-bold" value="0">
+                            </div>
+
+                            <div class="btn-group shadow-sm">
+                                <button type="button" class="btn btn-primary btn-sm d-flex align-items-center px-3">
+                                    <span class="me-1">Artır</span>
+                                    <i class="ti ti-plus fs-14"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm d-flex align-items-center px-3">
+                                    <i class="ti ti-minus fs-14 me-1"></i>
+                                    <span>Azalt</span>
+                                </button>
+                            </div>
                         </div>
-                        <button class="btn btn-primary px-2">
-                            Artır<i class="ti ti-plus me-1"></i>
-                        </button>
-                        <button class="btn btn-primary px-2">
-                            <i class="ti ti-minus me-1"></i> Azalt
-                        </button>
-                    </div>
                     <button class="btn btn-primary px-2">
                         <i class="ti ti-device-floppy me-1"></i> Paketi Yadda Saxla
                     </button>
