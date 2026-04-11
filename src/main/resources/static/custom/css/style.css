@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+
+/* Cədvəl üçün xüsusi skrol zonası */
+.table-scroll-container_ka {
+  max-height: 400px; /* Bura istədiyin hündürlüyü yaza bilərsən */
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+/* Başlığın yuxarıda sabit qalması üçün (Sticky Header) */
+.table-scroll-container_ka thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f8f9fa; /* table-light rəngi ilə eyni */
+  border-bottom: 2px solid #dee2e6;
+}
+
+.offcanvas-top_ka {
+  height: 150px !important; /* Hündürlüyü məzmuna görə tənzimləyir */
+  border-bottom: 2px solid #3d5ee1; /* Şablonun ana rəngi */
+}
+
+  /* Mövcud stillərin davamı */
+.custom-tree-table .head-row td {
+  background-color: #1f6db2 !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.custom-tree-table .sub-row td {
+  background-color: #f0f4ff !important;
+  color: #334155 !important;
+  border-bottom: 2px solid #ffffff !important;
+}
+
+.custom-tree-table .sub-row:hover td {
+  background-color: #e2e8f0 !important;
+}
+
+.tree-icon {
+  opacity: 0.5;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+/* Yeni sütunlar üçün əlavə stillər */
+.transfer-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.action-btns {
+  font-size: 12px;
+  padding: 2px 8px;
+}
+
+ .service-tree {
+   list-style: none;
+   padding-left: 0;
+ }
+
+/* Ana Kateqoriya (Qovluq) */
+.tree-item-main {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-weight: 700;
+  color: #1f6db2;
+  background-color: #f8faff;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* Alt Şöbələr */
+.tree-sub-list {
+  list-style: none;
+  padding-left: 25px;
+  margin-bottom: 10px;
+  border-left: 2px dashed #dee2e6;
+  margin-left: 22px;
+}
+
+.tree-item-sub {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #4b5563;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tree-item-sub:hover {
+  background-color: #f1f5f9;
+  color: #3d5ee1;
+}
+
+/* Seçilmiş (Aktiv) Şöbə */
+.tree-item-sub.active {
+  background-color: #1f6db2;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.tree-item-sub i {
+  font-size: 16px;
+  margin-right: 10px;
+  opacity: 0.7;
+}

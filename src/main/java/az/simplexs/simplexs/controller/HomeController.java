@@ -41,5 +41,11 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/paket";
     }
+    @GetMapping("/parShobeXidmet")
+    public String parShobeXidmet(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/shobeXidmet";
+    }
 }
 

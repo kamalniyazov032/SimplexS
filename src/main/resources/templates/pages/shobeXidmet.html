@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+
+<div layout:fragment="content">
+
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-1 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1">Xidmət</h4>
+            <p class="mb-0 text-muted small">Xidmət detal məlumatları</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap" style="min-width: 150px; flex-grow: 0.5;">
+            <select class="form-select border-primary select2">
+                <option selected disabled>Şöbə seçin...</option>
+                <option value="1">Kardiologiya şöbəsi</option>
+                <option value="2">Pediatri şöbəsi</option>
+                <option value="3">Nevrologiya şöbəsi</option>
+                <option value="4">Ginekologiya və Mamalıq</option>
+            </select>
+        </div>
+    </div>
+    <!-- End Page Header -->
+
+
+    <div class="row g-3 mb-2">
+        <div class="col-md-4">
+
+        </div>
+    </div>
+    <div class="row g-3">
+
+
+        <div class="col-12 col-xl-3 col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3">
+                    <h6 class="fw-bold mb-3">Bölmə / Şöbə İyerarxiyası</h6>
+
+                    <ul class="service-tree">
+                        <li>
+                            <div class="tree-item-main">
+                                <i class="ti ti-folder-filled me-2"></i> Poliklinik Xidmətlər
+                            </div>
+                            <ul class="tree-sub-list">
+                                <li class="tree-item-sub active">
+                                    <i class="ti ti-activity"></i> Pediatri
+                                </li>
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Nevrologiya
+                                </li>
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Kardiologiya
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <div class="tree-item-main">
+                                <i class="ti ti-folder-filled me-2"></i> Stasionar Xidmətlər
+                            </div>
+                            <ul class="tree-sub-list">
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Ümumi cərrahiyyə
+                                </li>
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Reanimasiya
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <div class="tree-item-main">
+                                <i class="ti ti-folder-filled me-2"></i> Laborator Xidmətlər
+                            </div>
+                            <ul class="tree-sub-list">
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Biokimyəvi analizlər
+                                </li>
+                                <li class="tree-item-sub">
+                                    <i class="ti ti-activity"></i> Hematoloji testlər
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-xl-9 col-lg-9">
+            <div class="row align-items-center">
+
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                            <div class="icon-box bg-soft-primary text-primary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="ti ti-building-hospital fs-1"></i> </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">Ümumi Xidmət Kataloqu</h6>
+                                <small class="text-muted" style="font-size: 11px;">Mərkəzi siyahıdan seçim edin</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover datatable_ka_tam mb-0 w-100">
+                                <thead>
+                                <tr>
+                                    <th width="30"><input type="checkbox" class="form-check-input"></th>
+                                    <th>Kod</th>
+                                    <th>Xidmət Adı</th>
+                                </tr>
+                                </thead>
+                                <tbody class="small">
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-102</td>
+                                    <td>Exo-KQ (Ürəyin USM müayinəsi)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-205</td>
+                                    <td>EEG (Elektroensefaloqrafiya)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-001</td>
+                                    <td>Qanın ümumi analizi (18 parametr)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-042</td>
+                                    <td>Şəkərli hemoqlobin (HbA1c)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-301</td>
+                                    <td>Döş qəfəsinin rentgenoqrafiyası</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-505</td>
+                                    <td>Qarın boşluğunun MRT-si</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">EYE-012</td>
+                                    <td>Göz dibinin müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PHY-220</td>
+                                    <td>Elektrofarez (1 seans)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">DEN-101</td>
+                                    <td>Diş daşlarının təmizlənməsi (Airflow)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PED-003</td>
+                                    <td>Uşaqların profilaktik peyvənd müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">TRA-099</td>
+                                    <td>Gips sarğısının qoyulması</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-001</td>
+                                    <td>Həkim-terapevtin ilkin qəbulu</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-102</td>
+                                    <td>Exo-KQ (Ürəyin USM müayinəsi)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-205</td>
+                                    <td>EEG (Elektroensefaloqrafiya)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-001</td>
+                                    <td>Qanın ümumi analizi (18 parametr)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-042</td>
+                                    <td>Şəkərli hemoqlobin (HbA1c)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-301</td>
+                                    <td>Döş qəfəsinin rentgenoqrafiyası</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-505</td>
+                                    <td>Qarın boşluğunun MRT-si</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">EYE-012</td>
+                                    <td>Göz dibinin müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PHY-220</td>
+                                    <td>Elektrofarez (1 seans)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">DEN-101</td>
+                                    <td>Diş daşlarının təmizlənməsi (Airflow)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PED-003</td>
+                                    <td>Uşaqların profilaktik peyvənd müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">TRA-099</td>
+                                    <td>Gips sarğısının qoyulması</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-001</td>
+                                    <td>Həkim-terapevtin ilkin qəbulu</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-102</td>
+                                    <td>Exo-KQ (Ürəyin USM müayinəsi)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-205</td>
+                                    <td>EEG (Elektroensefaloqrafiya)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-001</td>
+                                    <td>Qanın ümumi analizi (18 parametr)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-042</td>
+                                    <td>Şəkərli hemoqlobin (HbA1c)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-301</td>
+                                    <td>Döş qəfəsinin rentgenoqrafiyası</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-505</td>
+                                    <td>Qarın boşluğunun MRT-si</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">EYE-012</td>
+                                    <td>Göz dibinin müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PHY-220</td>
+                                    <td>Elektrofarez (1 seans)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">DEN-101</td>
+                                    <td>Diş daşlarının təmizlənməsi (Airflow)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PED-003</td>
+                                    <td>Uşaqların profilaktik peyvənd müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">TRA-099</td>
+                                    <td>Gips sarğısının qoyulması</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-001</td>
+                                    <td>Həkim-terapevtin ilkin qəbulu</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-102</td>
+                                    <td>Exo-KQ (Ürəyin USM müayinəsi)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-205</td>
+                                    <td>EEG (Elektroensefaloqrafiya)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-001</td>
+                                    <td>Qanın ümumi analizi (18 parametr)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">LAB-042</td>
+                                    <td>Şəkərli hemoqlobin (HbA1c)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-301</td>
+                                    <td>Döş qəfəsinin rentgenoqrafiyası</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">RAD-505</td>
+                                    <td>Qarın boşluğunun MRT-si</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">EYE-012</td>
+                                    <td>Göz dibinin müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PHY-220</td>
+                                    <td>Elektrofarez (1 seans)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">DEN-101</td>
+                                    <td>Diş daşlarının təmizlənməsi (Airflow)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">PED-003</td>
+                                    <td>Uşaqların profilaktik peyvənd müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">TRA-099</td>
+                                    <td>Gips sarğısının qoyulması</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-dark">SRV-001</td>
+                                    <td>Həkim-terapevtin ilkin qəbulu</td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-1 text-center">
+                    <div class="d-flex flex-md-column justify-content-center gap-3 py-3">
+                        <button class="btn btn-white shadow-sm btn-icon rounded-circle border p-3 mx-auto hover-primary"
+                                id="moveRight">
+                            <i class="ti ti-arrow-right fs-20"></i>
+                        </button>
+                        <button class="btn btn-white shadow-sm btn-icon rounded-circle border p-3 mx-auto hover-danger"
+                                id="moveLeft">
+                            <i class="ti ti-arrow-left fs-20"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-soft-success text-success rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                    <i class="ti ti-clipboard-check fs-1"></i>
+                                </div>
+
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">Şöbəyə Aid Edilmişlər</h6>
+                                    <small class="text-success" style="font-size: 11px;">Aktiv xidmət siyahısı</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-outline-danger btn-sm border-0" title="Hamısını siyahıdan çıxar">
+                                <i class="ti ti-trash-x fs-5"></i>
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover datatable_ka_tam mb-0 w-100">
+                                <thead>
+                                <tr>
+                                    <th width="30"><input type="checkbox" class="form-check-input"></th>
+                                    <th>Kod</th>
+                                    <th>Xidmət Adı</th>
+                                </tr>
+                                </thead>
+                                <tbody class="small">
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">SRV-101</td>
+                                    <td>Həkim-terapevtin ilkin qəbulu</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">SRV-102</td>
+                                    <td>Kardioloqun təkrar müayinəsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">SRV-201</td>
+                                    <td>EKG (12 kanal üzrə)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">SRV-205</td>
+                                    <td>Exo-KQ (Ürəyin rəngli doppler müayinəsi)</td>
+                                </tr>
+
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">LAB-001</td>
+                                    <td>Qanın ümumi analizi (Genişləndirilmiş)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">LAB-005</td>
+                                    <td>Qanda qlyukoza (şəkər) təyini</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">LAB-012</td>
+                                    <td>Lipid paneli (Xolesterin, Triqliserid)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">LAB-088</td>
+                                    <td>Qaraciyər funksional testləri (ALT, AST)</td>
+                                </tr>
+
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">RAD-301</td>
+                                    <td>Döş qəfəsinin rentgenoqrafiyası</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">RAD-402</td>
+                                    <td>Qarın boşluğunun kompleks USM-i</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">RAD-501</td>
+                                    <td>Baş beynin MRT müayinəsi</td>
+                                </tr>
+
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">MAN-101</td>
+                                    <td>İntravenoz infuziya (Sistem quraşdırılması)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">MAN-202</td>
+                                    <td>Əzələdaxili inyeksiya (I.M.)</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">MAN-305</td>
+                                    <td>Yaranın birincili cərrahi işlənməsi</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input"></td>
+                                    <td class="fw-bold text-primary">MAN-410</td>
+                                    <td>Qanın qrup və rezus amilinin təyini</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <style>
+            /* Düymələr üçün kiçik bir effekt */
+            .hover-primary:hover {
+                background-color: #3d5ee1 !important;
+                color: white !important;
+                border-color: #3d5ee1 !important;
+            }
+
+            .hover-danger:hover {
+                background-color: #e84646 !important;
+                color: white !important;
+                border-color: #e84646 !important;
+            }
+
+        </style>
+
+
+    </div>
+</div>
+</body>
+
+</html>

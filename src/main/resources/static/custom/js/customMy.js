@@ -17,3 +17,18 @@ $(document).ready(function () {
 	});
 
 });
+
+
+$(document).ready(function() {
+	$('.datatable_ka_tam').DataTable({
+		"paging": false,          // Səhifələməni tamamilə söndürür
+		"scrollY": "65vh",       // Cədvəlin hündürlüyünü təyin edir (istədiyin qədər dəyişə bilərsən)
+		"scrollCollapse": true,   // Əgər data azdırsa, cədvəlin boş sahə saxlamayıb daralmasını təmin edir
+		"fixedHeader": true,      // Başlığın yerində qalmasını qarantiləyir
+		"dom": 'ft',              // 'f' - search box, 't' - table. Paging və info hissələrini yığışdırır.
+		"language": {
+			"search": "",
+			"searchPlaceholder": "Axtarış..."
+		}
+	});
+});
