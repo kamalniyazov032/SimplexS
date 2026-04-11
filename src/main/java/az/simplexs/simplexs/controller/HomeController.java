@@ -47,5 +47,11 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/shobeXidmet";
     }
+    @GetMapping("/kassa")
+    public String kassa(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/kassa";
+    }
 }
 

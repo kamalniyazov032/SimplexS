@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1 fw-bold text-dark text-uppercase">Kassa Əməliyyat Mərkəzi</h4>
+            <p class="mb-0 text-muted small">Bütün kassa növləri üzrə maliyyə hərəkətlərinin mərkəzləşdirilmiş idarəolunması</p>        </div>
+    </div>
+
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-5 text-center">
+            <select class="form-select select2 border-0 shadow-none text-center fw-bold fs-4 bg-transparent">
+                <option value="1" selected>ÜMUMİ KASSA</option>
+                <option value="2">FİLİAL 1 KASSASI</option>
+                <option value="3">TƏCİLİ YARDIM KASSASI</option>
+                <option value="4">STOMATOLOGİYA KASSASI</option>
+            </select>
+            <div class="mx-auto" style="width: 60px; height: 3px; background-color: #3d5ee1; border-radius: 10px; margin-top: -5px;"></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #f0fdf4 !important; border: 1px solid #dcfce7 !important;">
+                <h6 class="fw-bold text-success mb-3 text-uppercase">
+                    <i class="ti ti-arrow-down-left me-1"></i> Kassa Giriş
+                </h6>
+
+                <div class="card mb-2 border-0 shadow-sm rounded-3">
+                    <div class="card-body p-3">
+                        <a href="#" class="d-flex align-items-center justify-content-between text-dark hov-link">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
+                                    <i class="ti ti-credit-card text-success fs-20"></i>
+                                </div>
+                                <span class="fw-semibold">Xəstə xidmət ödənişi</span>
+                            </div>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card mb-2 border-0 shadow-sm rounded-3">
+                    <div class="card-body p-3">
+                        <a href="#" class="d-flex align-items-center justify-content-between text-dark">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
+                                    <i class="ti ti-moneybag text-success fs-20"></i>
+                                </div>
+                                <span class="fw-semibold">Xəstədən avans al</span>
+                            </div>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card mb-0 border-0 shadow-sm rounded-3">
+                    <div class="card-body p-3">
+                        <a href="#" class="d-flex align-items-center justify-content-between text-dark">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
+                                    <i class="ti ti-plus text-success fs-20"></i>
+                                </div>
+                                <span class="fw-semibold">Digər xərc giriş</span>
+                            </div>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #eff6ff !important; border: 1px solid #dbeafe !important;">
+                <h6 class="fw-bold text-primary mb-3 text-uppercase">
+                    <i class="ti ti-arrows-left-right me-1"></i> Kassa Əməliyyatlar
+                </h6>
+
+                <div class="card mb-0 border-0 shadow-sm rounded-3">
+                    <div class="card-body p-3">
+                        <a href="#" class="d-flex align-items-center justify-content-between text-dark">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-md bg-primary-light rounded-circle me-3">
+                                    <i class="ti ti-refresh text-primary fs-20"></i>
+                                </div>
+                                <span class="fw-semibold">Kassadan kassaya köçürmə</span>
+                            </div>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #fef2f2 !important; border: 1px solid #fee2e2 !important;">
+                <h6 class="fw-bold text-danger mb-3 text-uppercase">
+                    <i class="ti ti-arrow-up-right me-1"></i> Kassa Çıxış
+                </h6>
+
+                <div class="card mb-0 border-0 shadow-sm rounded-3">
+                    <div class="card-body p-3">
+                        <a href="#" class="d-flex align-items-center justify-content-between text-dark">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-md bg-danger-light rounded-circle me-3">
+                                    <i class="ti ti-minus text-danger fs-20"></i>
+                                </div>
+                                <span class="fw-semibold">Digər xərc çıxış</span>
+                            </div>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
