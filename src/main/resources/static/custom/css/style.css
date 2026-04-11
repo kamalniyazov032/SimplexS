@@ -18,9 +18,22 @@
   border-bottom: 2px solid #dee2e6;
 }
 
+/* CSS hissəsində bu kodu tap və dəyiş */
 .offcanvas-top_ka {
-  height: 150px !important; /* Hündürlüyü məzmuna görə tənzimləyir */
-  border-bottom: 2px solid #3d5ee1; /* Şablonun ana rəngi */
+  /* Ekran boyu olmasını ləğv edirik */
+  height: auto !important;
+  /* İçindəki elementlərin hündürlüyünə uyğunlaşdırırıq */
+  min-height: fit-content !important;
+  /* Maksimum ekranın 80%-i qədər ola bilsin (ehtiyat üçün) */
+  max-height: 85vh !important;
+  border-bottom: 3px solid #3d5ee1;
+  visibility: hidden; /* İlkin vəziyyətdə gizli qalsın */
+  transition: transform .3s ease-in-out;
+}
+
+/* Offcanvas açılanda hündürlüyün düzgün hesablanması üçün */
+.offcanvas.show {
+  height: auto !important;
 }
 
   /* Mövcud stillərin davamı */

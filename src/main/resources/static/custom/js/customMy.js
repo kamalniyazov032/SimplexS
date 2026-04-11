@@ -32,3 +32,26 @@ $(document).ready(function() {
 		}
 	});
 });
+
+
+
+$(document).ready(function() {
+	// Əvvəlcə köhnəni silirik (xəta verməsin deyə)
+	if ($.fn.DataTable.isDataTable('#kassaTable')) {
+		$('#kassaTable').DataTable().destroy();
+	}
+
+	$('#kassaTable').DataTable({
+		"paging": false,
+		"scrollY": "65vh",
+		"scrollX": true,
+		"searching": true,
+		"info": false,
+		"autoWidth": false,
+		"dom": 'ft',
+		"language": {
+			"search": "",
+			"searchPlaceholder": "Cədvəldə axtar..."
+		}
+	});
+});

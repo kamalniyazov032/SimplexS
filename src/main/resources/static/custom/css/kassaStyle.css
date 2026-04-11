@@ -1,0 +1,59 @@
+@charset "UTF-8";
+
+
+
+  /* Bütün stilləri .custom-ka daxilinə salırıq */
+.custom-ka .widget-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  display: flex;
+  align-items: center;
+  border: none !important;
+}
+
+.custom-ka .widget-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+/* Rəng tonları yalnız .custom-ka içində işləyəcək */
+.custom-ka .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1) !important; color: #0d6efd; }
+.custom-ka .bg-soft-info { background-color: rgba(13, 202, 240, 0.1) !important; color: #0dcaf0; }
+.custom-ka .bg-soft-success { background-color: rgba(25, 135, 84, 0.1) !important; color: #198754; }
+.custom-ka .bg-soft-danger { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545; }
+.custom-ka .bg-soft-secondary { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d; }
+
+/* Yazı stilləri */
+.custom-ka .widget-label {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.custom-ka .widget-amount {
+  font-weight: 700;
+  margin-bottom: 0;
+  letter-spacing: -0.5px;
+}
+
+.custom-ka .unit {
+  font-weight: 400;
+  font-size: 0.9rem;
+  margin-left: 4px;
+}
+
+/* Ayırıcı xətt */
+.custom-ka hr {
+  margin: 15px 0;
+  opacity: 0.1;
+}

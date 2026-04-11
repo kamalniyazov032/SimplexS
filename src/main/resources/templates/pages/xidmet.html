@@ -21,7 +21,7 @@
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"> <i class="fa-solid fa-filter me-1"></i>Filter
+                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><i class="fa-solid fa-filter me-1"></i>Filter
             </button>
             <div class="dropdown">
                 <button type="button" class="btn btn-primary dropdown-toggle w-100" data-bs-toggle="dropdown">
@@ -33,7 +33,8 @@
                     <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box me-2"></i>Paketlər</a></li>
                     <li><a class="dropdown-item" href="#"><i class="fa-solid fa-money-bill-wave me-2"></i>Qiymətlər</a>
                     </li>
-                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-sitemap me-2"></i>Şöbə xidmətləri</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-sitemap me-2"></i>Şöbə xidmətləri</a>
+                    </li>
 
                 </ul>
             </div>
@@ -42,11 +43,14 @@
     <!-- End Page Header -->
 
 
-    <div class="offcanvas offcanvas-top_ka" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
-        <div class="offcanvas-header">
-            <h4 id="offcanvasTopLabel mb-0">Axtarış filterləri</h4>
+    <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="offcanvasTop"
+         style="visibility: visible; top: 0;">
+        <div class="offcanvas-header border-bottom bg-light">
+            <h4 id="offcanvasTopLabel" class="mb-0 fw-bold text-primary">
+                <i class="ti ti-filter me-2"></i>Xidmət Əməliyyatları üzrə Ətraflı Axtarış
+            </h4>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div> <!-- end offcanvas header -->
+        </div>
 
         <div class="offcanvas-body">
             <div class="row g-2 align-items-end">
@@ -85,12 +89,11 @@
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-primary">
-                         Axtar
+                        Axtar
                     </button>
                 </div>
             </div>
         </div>
-        <!-- end offcanvas body -->
     </div>
 
 
@@ -423,7 +426,8 @@
                         </div>
 
                         <!-- Paket -->
-                        <div class="tab-pane fade" id="paket-tab-pane" role="tabpanel" aria-labelledby="paket-tab" tabindex="0">
+                        <div class="tab-pane fade" id="paket-tab-pane" role="tabpanel" aria-labelledby="paket-tab"
+                             tabindex="0">
                             <div class="border rounded p-3 bg-white">
 
                                 <div class="bg-light p-3 rounded mb-4">
@@ -457,17 +461,22 @@
                                         <tr>
                                             <th class="py-2 px-3" style="font-size: 12px;">Xidmət kodu</th>
                                             <th class="py-2 px-3" style="font-size: 12px;">Xidmət adı</th>
-                                            <th class="py-2 px-3 text-center" style="width: 80px; font-size: 12px;">Ədəd</th>
+                                            <th class="py-2 px-3 text-center" style="width: 80px; font-size: 12px;">
+                                                Ədəd
+                                            </th>
                                             <th class="py-2 px-3 text-end" style="width: 50px;"></th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
                                             <td class="px-3">ANS007</td>
-                                            <td class="px-3 text-dark fw-medium">Ümumi anesteziya 0-2 saat (tibbi sərf xaric)</td>
+                                            <td class="px-3 text-dark fw-medium">Ümumi anesteziya 0-2 saat (tibbi sərf
+                                                xaric)
+                                            </td>
                                             <td class="px-3 text-center">1</td>
                                             <td class="px-3 text-end">
-                                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash fs-16"></i></a>
+                                                <a href="javascript:void(0);" class="text-danger"><i
+                                                        class="ti ti-trash fs-16"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -475,7 +484,8 @@
                                             <td class="px-3 text-dark fw-medium">Stasionarda yatış (1 Gün)</td>
                                             <td class="px-3 text-center">1</td>
                                             <td class="px-3 text-end">
-                                                <a href="javascript:void(0);" class="text-danger"><i class="ti ti-trash fs-16"></i></a>
+                                                <a href="javascript:void(0);" class="text-danger"><i
+                                                        class="ti ti-trash fs-16"></i></a>
                                             </td>
                                         </tr>
                                         </tbody>

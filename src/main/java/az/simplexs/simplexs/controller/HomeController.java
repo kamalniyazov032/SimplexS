@@ -53,5 +53,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/kassa";
     }
+    @GetMapping("/qebz")
+    public String qebz(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/kassaQebz";
+    }
+
 }
 
