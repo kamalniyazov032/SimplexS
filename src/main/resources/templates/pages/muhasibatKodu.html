@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Muhasibat Kodları</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1">Muhasibat Kodları</h4>
+            <p class="mb-0">Giriş və çıxış məlumatlarının idarə edilməsi</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>Gelirlere Aid Muhasibat Kodları
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addInputModal">
+                        <i class="fa-solid fa-plus me-1"></i> Əlavə et
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Kod</th>
+                                <th>Ad</th>
+                                <th>Növ</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>6001</code></td>
+                                <td>Məhsul satışı</td>
+                                <td><span class="badge bg-primary">Gelir</span></td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><code>6110</code></td>
+                                <td>Xidmət satışı</td>
+                                <td><span class="badge bg-primary">Gelir</span></td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Xərclərə Aid Muhasibat Kodları
+                    </h5>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addOutputModal">
+                        <i class="fa-solid fa-plus me-1"></i> Əlavə et
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Kod</th>
+                                <th>Ad</th>
+                                <th>Növ</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>7001</code></td>
+                                <td>Məhsul alışı</td>
+                                <td><span class="badge bg-success">Xərc</span></td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><code>7110</code></td>
+                                <td>Xidmət alışı</td>
+                                <td><span class="badge bg-success">Xərc</span></td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addInputModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Giriş Parametri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Kod</label>
+                            <input type="text" class="form-control" placeholder="Məsələn: 6001">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ad</label>
+                            <input type="text" class="form-control" placeholder="Parametrin adı">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Növ</label>
+                            <select class="form-select">
+                                <option value="0">Gəlir</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                        <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addOutputModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-top-success">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Çıxış Parametri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Kod</label>
+                            <input type="text" class="form-control" placeholder="Məsələn: 7001">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ad</label>
+                            <input type="text" class="form-control" placeholder="Parametrin adı">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Növ</label>
+                            <select class="form-select">
+                                <option value="1">Xərc</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                        <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

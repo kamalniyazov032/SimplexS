@@ -60,5 +60,14 @@ public class HomeController {
         return "pages/kassaQebz";
     }
 
+    @GetMapping("/muhasibatKodu")
+    public String muhasibatKodu(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/muhasibatKodu";
+    }
+
+
+
 }
 
