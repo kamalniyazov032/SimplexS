@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1">Xidmət Qruplarının İdarə Edilməsi</h4>
+            <p class="mb-0">Xidmətləri kateqoriya və alt qruplar üzrə iyerarxik qaydada tənzimləyin.</p>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 border-top border-primary border-3">
+                <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3">
+                    <h6 class="card-title mb-0 text-primary">
+                        <i class="ti ti-folder-share me-2 fs-18"></i>Əsas Qrup
+                    </h6>
+                    <button class="btn btn-primary btn-sm btn-icon"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#detailedGroupModal"
+                            title="Yeni Qrup Əlavə Et">
+                        <i class="ti ti-plus"></i>
+                    </button>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-nowrap mb-0">
+                            <tbody>
+                            <tr class="cursor-pointer bg-light-primary">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ti ti-chevron-right me-2 text-primary fs-12"></i>
+                                            <span class="fw-medium text-primary">Poliklinik Xidmətlər</span>
+                                        </div>
+                                        <button class="btn btn-ghost-danger btn-sm btn-icon border-0" title="Sil">
+                                            <i class="ti ti-trash fs-15"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="cursor-pointer">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ti ti-chevron-right me-2 text-muted fs-12"></i>
+                                            <span>Stasionar Xidmətlər</span>
+                                        </div>
+                                        <button class="btn btn-ghost-danger btn-sm btn-icon border-0" title="Sil">
+                                            <i class="ti ti-trash fs-15"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="cursor-pointer">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ti ti-chevron-right me-2 text-muted fs-12"></i>
+                                            <span>Laborator Xidmətlər</span>
+                                        </div>
+                                        <button class="btn btn-ghost-danger btn-sm btn-icon border-0" title="Sil">
+                                            <i class="ti ti-trash fs-15"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="detailedGroupModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title text-light">Yeni Əsas Qrup</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Qrup Kodu</label>
+                                <input type="text" class="form-control" placeholder="Məs: G-100">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Qrup Adı</label>
+                                <input type="text" class="form-control" placeholder="Məs: Xidmət">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
+                        <button type="button" class="btn btn-primary">Yadda saxla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 border-top border-success border-3">
+                <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3">
+                    <h6 class="card-title mb-0 text-success">
+                        <i class="ti ti-list-details me-2 fs-18"></i>Alt Qrup
+                    </h6>
+                    <button class="btn btn-success btn-sm btn-icon text-white"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSubGroupModal">
+                        <i class="ti ti-plus"></i>
+                    </button>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-nowrap mb-0">
+                            <tbody>
+                            <tr class="cursor-pointer">
+                                <td class="ps-3">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-muted fs-11 fw-normal text-uppercase">Poliklinik Xidmətlər</span>
+                                        <span class="fw-bold text-dark fs-14 mt-n1">Pediatriya</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-ghost-danger btn-sm btn-icon me-1" title="Sil">
+                                        <i class="ti ti-trash fs-16"></i>
+                                    </button>
+                                    <i class="ti ti-chevron-right text-muted fs-14"></i>
+                                </td>
+                            </tr>
+
+                            <tr class="cursor-pointer">
+                                <td class="ps-3">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-muted fs-11 fw-normal text-uppercase">Poliklinik Xidmətlər</span>
+                                        <span class="fw-bold text-dark fs-14 mt-n1">Nevrologiya</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-ghost-danger btn-sm btn-icon me-1">
+                                        <i class="ti ti-trash fs-16"></i>
+                                    </button>
+                                    <i class="ti ti-chevron-right text-muted fs-14"></i>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addSubGroupModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title text-white">Yeni Alt Qrup Əlavə Et</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addSubGroupForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Əsas Qrupu Seçin</label>
+                                <select class="form-select border-2" required>
+                                    <option value="" selected disabled>Siyahıdan seçin...</option>
+                                    <option value="1">Poliklinik Xidmətlər</option>
+                                    <option value="2">Stasionar Xidmətlər</option>
+                                    <option value="3">Laborator Xidmətlər</option>
+                                </select>
+                                <small class="text-muted">Bu alt qrup seçdiyiniz əsas qrupa bağlanacaq.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Alt Qrup Adı</label>
+                                <input type="text" class="form-control" placeholder="Məs: Kardiologiya" required>
+                            </div>
+
+                            <div class="mb-0">
+                                <label class="form-label fw-bold">Alt Qrup Kodu</label>
+                                <input type="text" class="form-control" placeholder="Məs: A-101">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
+                        <button type="submit" form="addSubGroupForm" class="btn btn-success px-4">
+                            <i class="ti ti-device-floppy me-1"></i>Yadda saxla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 border-top border-warning border-3">
+                <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3">
+                    <h6 class="card-title mb-0 text-warning">
+                        <i class="ti ti-list-details me-2 fs-18"></i>Ən Alt Qrup
+                    </h6>
+                    <button class="btn btn-warning btn-sm btn-icon text-white"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addFinalGroupModal">
+                        <i class="ti ti-plus"></i>
+                    </button>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-nowrap mb-0">
+                            <tbody>
+                            <tr class="cursor-pointer">
+                                <td class="ps-3 text-start">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-muted fs-11 fw-normal text-uppercase">Pediatriya</span>
+                                        <span class="fw-bold text-dark fs-14 mt-n1">Vaksinasiya xidməti</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-ghost-danger btn-sm btn-icon border-0" title="Sil">
+                                        <i class="ti ti-trash fs-16"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addFinalGroupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title text-white">Yeni Element Əlavə Et</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFinalGroupForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Bağlı Olduğu Alt Qrupu Seçin</label>
+                            <select class="form-select border-2" required>
+                                <option value="" selected disabled>Siyahıdan seçin...</option>
+                                <option value="101">Pediatriya</option>
+                                <option value="102">Nevrologiya</option>
+                                <option value="103">Kardiologiya</option>
+                            </select>
+                            <small class="text-muted">Bu məlumat seçdiyiniz alt qrupun tərkibinə əlavə ediləcək.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Elementin Adı</label>
+                            <input type="text" class="form-control" placeholder="Məs: Qan analizi" required>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-bold">Element Kodu</label>
+                            <input type="text" class="form-control" placeholder="Məs: E-5005">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="submit" form="addFinalGroupForm" class="btn btn-warning text-white px-4">
+                        <i class="ti ti-device-floppy me-1"></i>Yadda saxla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</body>
+
+</html>

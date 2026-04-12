@@ -66,7 +66,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/muhasibatKodu";
     }
-
+    @GetMapping("/xidmetQruplari")
+    public String xidmetQruplari(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/xidmetQruplari";
+    }
 
 
 }
