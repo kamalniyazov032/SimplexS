@@ -1,6 +1,7 @@
 @charset "UTF-8";
 
 
+
 /* Cədvəl üçün xüsusi skrol zonası */
 .table-scroll-container_ka {
   max-height: 400px; /* Bura istədiyin hündürlüyü yaza bilərsən */
@@ -132,3 +133,5 @@
   margin-right: 10px;
   opacity: 0.7;
 }
+
+
