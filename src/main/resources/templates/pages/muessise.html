@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Müəssisələr</h4>
+            <p class="mb-0">Müəssisələrin siyahısı və tənzimlənməsi</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal"
+                data-bs-target="#addEnterpriseModal">
+            <i class="ti ti-plus me-2"></i>Yeni Müəssisə
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-top mb-3">
+                        <div class="search-set">
+                            <div class="search-input">
+                                <a href="javascript:void(0);" class="btn btn-searchset">
+                                    <i class="isax isax-search-normal"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-nowrap table-hover datatable_ka_tam border align-middle">
+                            <thead>
+                            <tr>
+                                <th>Kodu</th>
+                                <th>Qısa Adı / Tam Adı</th>
+                                <th>Qrupu</th>
+                                <th>Telefon No</th>
+                                <th>Mail Adress</th>
+                                <th>Direktoru</th>
+                                <th>Ünvanı</th>
+                                <th class="text-end no-sort">Status</th>
+                                <th class="text-end no-sort" data-orderable="false"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-001</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">MK</span>
+                                        <small class="text-muted">Mərkəzi Klinika Xəstəxanası</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Özəl</td>
+                                <td class="text-black">+994 12 400 00 01</td>
+                                <td><a href="mailto:info@mk.az" class="text-black text-decoration-none">info@mk.az</a></td>
+                                <td class="text-black">Dr. Əliyev R.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Parlament pr. 76</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox">
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black">ENT-002</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-black">ŞX-1</span>
+                                        <small class="text-muted">Şəhər Xəstəxanası №1</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dövlət</td>
+                                <td class="text-black">+994 12 500 11 22</td>
+                                <td><a href="mailto:contact@shx1.az" class="text-black text-decoration-none">contact@shx1.az</a></td>
+                                <td class="text-black">Məmmədov H.</td>
+                                <td><span class="text-truncate text-black" style="max-width: 150px; display: inline-block;">Bakı ş., Mirəli Qaşqay küç.</span></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked >
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light" title="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card  shadow-sm border-start ">
+                <div class="card-header border-bottom py-3">
+                    <h6 class="card-title mb-0">Əlavə Parametrlər</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4 text-muted" id="noSelection">
+                        <i class="ti ti-info-circle fs-24 mb-2"></i>
+                        <p class="mb-0">Məlumat üçün cədvəldən müəssisə seçin</p>
+                    </div>
+                    <div id="parameterContent" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Ümumi Parametr 1</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox">
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-sm w-100 mt-3">Təsdiqlə (OK)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="addEnterpriseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-light border-bottom">
+                    <h5 class="modal-title">Yeni Müəssisə Əlavə Et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="enterpriseForm">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kodu</label>
+                                <input type="text" class="form-control" name="code">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Adı</label>
+                                <input type="text" class="form-control" name="name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Müəssisə Qrupu</label>
+                                <select class="form-control select2" name="group">
+                                    <option value="1">Ödənişli</option>
+                                    <option value="2">Dövlət</option>
+                                    <option value="3">Özəl</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Telefon No</label>
+                                <input type="text" class="form-control" name="phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mail Adress</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Direktoru</label>
+                                <input type="text" class="form-control" name="director">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ünvanı</label>
+                                <input type="text" class="form-control" name="address">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Qısa Adı</label>
+                                <input type="text" class="form-control" name="shortName">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="submit" form="enterpriseForm" class="btn btn-primary">Yadda saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

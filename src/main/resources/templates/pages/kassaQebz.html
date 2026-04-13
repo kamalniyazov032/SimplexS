@@ -10,14 +10,7 @@
 <body>
 <div layout:fragment="content">
 
-    <style>
-        /* Axtarış qutusunun ətrafındakı boşluqlar */
-        .dataTables_filter {
-            margin-bottom: 10px !important; /* Cədvəllə məsafəni artırır */
-            margin-top: 5px !important;
-        }
 
-    </style>
 
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
@@ -94,7 +87,7 @@
                         <input type="text" class="form-control" placeholder="ID">
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label small fw-bold">EDV çək No</label>
+                        <label class="form-label small fw-bold">EDV çek No</label>
                         <input type="text" class="form-control">
                     </div>
                 </div>
@@ -112,7 +105,7 @@
                         </select>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label small fw-bold">Terminal cihazı</label>
+                        <label class="form-label small fw-bold">Pos cihazı</label>
                         <select class="form-select select2">
                             <option>- Seçin -</option>
                         </select>
@@ -124,23 +117,23 @@
                     <div class="col-md-12 d-flex flex-wrap gap-4">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="c12">
-                            <label class="form-check-label small" for="c12">12. Sadəcə ləğvlər</label>
+                            <label class="form-check-label small" for="c12">Sadəcə ləğvlər</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="c13">
-                            <label class="form-check-label small" for="c13">13. Lağvları göstərmə</label>
+                            <label class="form-check-label small" for="c13">Lağvları göstərmə</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="c15" checked>
-                            <label class="form-check-label small" for="c15">15. Avans axtarış</label>
+                            <label class="form-check-label small" for="c15">Avans axtarış</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="c17f">
-                            <label class="form-check-label small" for="c17f">17. Fiskal göndərilən</label>
+                            <label class="form-check-label small" for="c17f">Fiskal göndərilən</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="c23">
-                            <label class="form-check-label small" for="c23">23. Digər kassadan gələnlər</label>
+                            <label class="form-check-label small" for="c23">Digər kassadan gələnlər</label>
                         </div>
                     </div>
                 </div>
@@ -175,14 +168,14 @@
         <div class="col-lg-10">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-0">
-                    <table id="kassaTable"  class="table table-bordered w-100" style="font-size: small">
+                    <table  class="table datatable_ka_tam table-bordered w-100" style="font-size: small">
                             <thead style="font-size: small">
                             <tr>
                                 <th>Ödəniş tarixi</th>
                                 <th>Kimdən</th>
                                 <th>Kart No</th>
                                 <th>Qəbz No</th>
-                                <th>EDV çək No</th>
+                                <th>EDV çek No</th>
                                 <th class="text-center">Hesab</th>
                                 <th class="text-end">Ödənilən</th>
                                 <th class="text-end">Qaytarılan</th>
@@ -691,7 +684,7 @@
                 </div>
             </div>
 
-            <div class="widget-card">
+    <!--        <div class="widget-card">
                 <div class="widget-icon bg-soft-success">
                     <i class="ti ti-cash fs-4"></i>
                 </div>
@@ -701,7 +694,7 @@
                         450.00<span class="unit">AZN</span>
                     </h4>
                 </div>
-            </div>
+            </div>-->
 
             <div class="widget-card">
                 <div class="widget-icon bg-soft-info">
@@ -718,7 +711,7 @@
                     <i class="ti ti-device-floppy fs-4"></i>
                 </div>
                 <div>
-                    <div class="widget-label">E-manat ödənişləri</div>
+                    <div class="widget-label">Terminal odenisleri</div>
                     <h4 class="widget-amount text-dark">370.00<span class="unit">AZN</span></h4>
                 </div>
             </div>

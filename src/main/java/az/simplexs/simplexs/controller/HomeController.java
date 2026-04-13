@@ -80,7 +80,12 @@ public class HomeController {
         return "pages/xidmetQiymetleri";
     }
 
-
+    @GetMapping("/muessise")
+    public String muessise(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/muessise";
+    }
 
 
 }

@@ -135,3 +135,8 @@
 }
 
 
+.dataTables_filter {
+  margin-bottom: 10px !important; /* Cədvəllə məsafəni artırır */
+  margin-top: 5px !important;
+}
+

@@ -1,49 +1,4 @@
-/*
-$(document).ready(function () {
 
-    // Normal səhifədə olan select2-lər
-    $('.select2').not('#addCustomerModal .select2').select2({
-        width: '100%',
-        placeholder: 'Seçin'
-    });
-
-    // Modal açılanda yalnız modal içindəkilər init olunur
-    $('#addCustomerModal').on('shown.bs.modal', function () {
-        $(this).find('.select2').select2({
-            dropdownParent: $(this),
-            width: '100%',
-            placeholder: 'Seçin',
-            allowClear: true
-        });
-    });
-
-});
-*/
-/*
-
-$(document).ready(function () {
-
-	// 2. MODAL ÜÇÜN UNIVERSAL QAYDA (Həm təkli, həm multi)
-	$(document).on('shown.bs.modal', '.modal', function () {
-		const currentModal = $(this);
-
-		currentModal.find('.select2, .mul-select2').each(function () {
-			const isMultiple = $(this).prop('multiple');
-			$(this).select2({
-				placeholder: "Buradan bir neçə seçim edin...",
-				allowClear: true,
-				width: '100%',
-				closeOnSelect: false // Sən istəyən "içində qalsın" məntiqi
-			});
-		});
-	});
-
-	// 3. MODAL BAĞLANDIQA (Yaddaş təmizliyi və bug qarşısını almaq üçün)
-	$(document).on('hidden.bs.modal', '.modal', function () {
-		$(this).find('.select2, .mul-select2').select2('destroy');
-	});
-});
-*/
 $(document).on('shown.bs.modal', '.modal', function () {
 	$(this).find('.select2').each(function () {
 		if ($(this).hasClass('select2-hidden-accessible')) return;
