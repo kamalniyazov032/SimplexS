@@ -73,6 +73,15 @@ public class HomeController {
         return "pages/xidmetQruplari";
     }
 
+    @GetMapping("/xidmetQiymetleri")
+    public String xidmetQiymetleri(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/xidmetQiymetleri";
+    }
+
+
+
 
 }
 
