@@ -86,7 +86,18 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/muessise";
     }
-
+    @GetMapping("/emekdash")
+    public String emekdash(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/emekdash";
+    }
+    @GetMapping("/shobe")
+    public String shobe(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/shobe";
+    }
 
 }
 

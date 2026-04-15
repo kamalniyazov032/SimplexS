@@ -14,10 +14,17 @@
             <h4 class="mb-1">Müəssisələr</h4>
             <p class="mb-0">Müəssisələrin siyahısı və tənzimlənməsi</p>
         </div>
-        <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal"
-                data-bs-target="#addEnterpriseModal">
-            <i class="ti ti-plus me-2"></i>Yeni Müəssisə
-        </button>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#groupModal">
+                <i class="fa-solid fa-layer-group me-2"></i> Qruplar
+            </button>
+            <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal"
+                    data-bs-target="#addEnterpriseModal">
+                <i class="ti ti-plus me-2"></i>Yeni Müəssisə
+            </button>
+        </div>
     </div>
 
     <div class="row">
@@ -433,6 +440,122 @@
         </div>
     </div>
 
+    <div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold text-dark" id="groupModalLabel">
+                        <i class="fa-solid fa-layer-group text-primary me-2"></i> Qrupların Tənzimlənməsi
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label for="groupName" class="form-label fw-semibold text-muted small">Yeni Qrup Adı</label>
+                        <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fa-solid fa-tag text-muted"></i>
+                        </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" id="groupName" placeholder="Qrup adı yazın...">
+                            <button class="btn btn-primary px-4" id="addGroupBtn">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3 d-flex align-items-center text-secondary">
+                            <i class="fa-solid fa-list-ul me-2"></i> Mövcud Qruplar
+                        </h6>
+
+                        <div id="groupList" class="custom-list-group pe-2" style="max-height: 280px; overflow-y: auto;">
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked title="Aktiv/Deaktiv">
+                                    </div>
+                                    <span class="text-dark fw-medium">Ödənişli Müəssisələr</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none" title="Sil">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Dövlət Agentlikləri</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch">
+                                    </div>
+                                    <span class="text-muted fw-medium text-decoration-line-through">Köhnə Filiallar</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Özəl Klinikalar</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Sığorta Tərəfdaşları</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Region Müəssisələri</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 p-3">
+                    <button type="button" class="btn btn-light-secondary px-4" data-bs-dismiss="modal">Bağla</button>
+                    <button type="button" class="btn btn-primary px-4 shadow-sm">Yadda Saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="addEnterpriseModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -490,6 +613,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 </body>

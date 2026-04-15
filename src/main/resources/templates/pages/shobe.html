@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Şöbələr</h4>
+            <p class="mb-0">Şöbələrin siyahısı və tabeliyin tənzimlənməsi</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#deptGroupModal">
+                <i class="fa-solid fa-layer-group me-2"></i> Şöbə Növləri
+            </button>
+            <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal"
+                    data-bs-target="#addDepartmentModal">
+                <i class="ti ti-plus me-2"></i>Yeni Şöbə
+            </button>
+        </div>
+    </div>
+
+    <div class="row align-items-stretch">
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-nowrap table-hover datatable_ka_tam border align-middle">
+                            <thead>
+                            <tr>
+                                <th>Kod</th>
+                                <th>Şöbə Adı</th>
+                                <th>Şöbə Rəhbəri</th>
+                                <th class="text-end no-sort">Status</th>
+                                <th class="text-end no-sort"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr style="cursor: pointer;">
+                                <td class="text-black fw-bold">DEPT-101</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-black fw-medium">Kardiologiya</span>
+                                        <small class="text-muted">Cərrahiyyə bloku</small>
+                                    </div>
+                                </td>
+                                <td class="text-black">Dr. Həsənov A.</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-icon btn-light"><i class="ti ti-edit"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h6 class="card-title mb-0">Şöbə Ayarları</h6>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div id="noSelectionDept" class="text-center py-5 text-muted">
+                        <i class="ti ti-building-hospital fs-1 mb-2"></i>
+                        <p class="small">Ayarları görmək üçün şöbə seçin</p>
+                    </div>
+
+                    <div id="deptParameterContent" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Növbəli iş rejimi</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Təcili yardım çıxışı</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-auto">Yadda Saxla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-bottom">
+                    <h5 class="modal-title fw-bold">Yeni Şöbə Əlavə Et</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="deptForm">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Şöbə Kodu</label>
+                                <input type="text" class="form-control shadow-none" name="deptCode" placeholder="Məs: KARD-01">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold text-muted">Şöbənin Tam Adı</label>
+                                <input type="text" class="form-control shadow-none" name="deptName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Şöbə Növü</label>
+                                <select class="form-control select2" name="deptType">
+                                    <option value="1">Cərrahiyyə</option>
+                                    <option value="2">Terapiya</option>
+                                    <option value="3">Laboratoriya</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Şöbə Rəhbəri</label>
+                                <select class="form-control select2" name="deptManager">
+                                    <option value="1">Dr. Əliyev R.</option>
+                                    <option value="2">Dr. Məmmədov H.</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-light-secondary px-4" data-bs-dismiss="modal">Ləğv et</button>
+                    <button type="submit" form="deptForm" class="btn btn-primary px-4">Yadda saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deptGroupModal" tabindex="-1" aria-labelledby="deptGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold text-dark" id="deptGroupModalLabel">
+                        <i class="fa-solid fa-layer-group text-primary me-2"></i> Şöbə Növlərinin Tənzimlənməsi
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label for="deptTypeName" class="form-label fw-semibold text-muted small">Yeni Şöbə Növü</label>
+                        <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fa-solid fa-tag text-muted"></i>
+                        </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" id="deptTypeName" placeholder="Məsələn: Laboratoriya">
+                            <button class="btn btn-primary px-4" id="addDeptTypeBtn">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3 d-flex align-items-center text-secondary">
+                            <i class="fa-solid fa-list-ul me-2"></i> Mövcud Növlər
+                        </h6>
+
+                        <div id="deptTypeList" class="custom-list-group pe-2" style="max-height: 280px; overflow-y: auto;">
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Cərrahiyyə</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded-2 border border-white shadow-sm">
+                                <div class="d-flex align-items-center gap-3 ps-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" checked>
+                                    </div>
+                                    <span class="text-dark fw-medium">Terapiya</span>
+                                </div>
+                                <button class="btn btn-sm text-danger shadow-none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 p-3">
+                    <button type="button" class="btn btn-light-secondary px-4" data-bs-dismiss="modal">Bağla</button>
+                    <button type="button" class="btn btn-primary px-4 shadow-sm">Yadda Saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
