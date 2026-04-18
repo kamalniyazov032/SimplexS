@@ -591,7 +591,10 @@
 
                 <div class="card mb-0 border-0 shadow-sm rounded-3">
                     <div class="card-body p-3">
-                        <a href="#" class="d-flex align-items-center justify-content-between text-dark">
+                        <a href="javascript:void(0);"
+                           class="d-flex align-items-center justify-content-between text-dark"
+                           data-bs-toggle="modal"
+                           data-bs-target="#otherExitModal">
                             <div class="d-flex align-items-center">
                                 <div class="avatar avatar-md bg-danger-light rounded-circle me-3">
                                     <i class="ti ti-minus text-danger fs-20"></i>
@@ -600,6 +603,123 @@
                             </div>
                             <i class="ti ti-chevron-right text-muted"></i>
                         </a>
+                    </div>
+                </div>
+                <div class="modal fade" id="otherExitModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg">
+
+                            <div class="modal-header bg-danger-light">
+                                <h5 class="modal-title d-flex align-items-center fw-bold text-danger">
+                                    <i class="fa-solid fa-circle-minus me-2"></i>
+                                    DİGƏR ÇIXIŞ
+                                </h5>
+                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="bg-light rounded-3 p-3 mb-4 border border-dashed border-danger border-opacity-25">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
+                                        <span class="fw-bold text-dark h5 mb-0">15,200.00 AZN</span>
+                                    </div>
+                                </div>
+
+                                <form id="otherExitForm">
+                                    <div class="row g-3">
+
+                                        <div class="col-6">
+                                            <label class="form-label fw-medium">Ödəniş Növü</label>
+                                            <div class="input-group">
+                                                <select class="form-select select2">
+                                                    <option value="" selected disabled>-- Seçin --</option>
+                                                    <option value="nağd">Nağd</option>
+                                                    <option value="kart">Kart</option>
+                                                    <option value="köçürmə">Bank Köçürməsi</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <label class="form-label fw-medium">Ödənilən Məbləğ</label>
+                                            <div class="input-group shadow-xs">
+                                                <span class="input-group-text bg-white text-danger"><i class="fa-solid fa-money-bill-trend-up"></i></span>
+                                                <input type="number" class="form-control fw-bold fs-16" placeholder="0.00" step="0.01" min="0">
+                                                <span class="input-group-text bg-light fw-bold text-muted small">AZN</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium">Tarix</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-xmark text-muted"></i></span>
+                                                <input type="text" class="form-control datetimepicker" value="25.04.2024">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium">Saat</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
+                                                <input type="text" class="form-control timepicker" value="14:30">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <label class="form-label fw-medium">Hesab Qrup Kodu</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-layer-group text-muted"></i></span>
+                                                <select class="form-select select2">
+                                                    <option value="">-- Qrup seçin --</option>
+                                                    <option value="1">Xərc Qrupu 1</option>
+                                                    <option value="2">Xərc Qrupu 2</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <label class="form-label fw-medium">Hesab Kodu</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
+                                                <select class="form-select select2">
+                                                    <option value="">-- Kod seçin --</option>
+                                                    <option value="701">701 - İnzibati Xərclər</option>
+                                                    <option value="702">702 - Təsərrüfat</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">Kimə Ödənildi</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user-tag text-muted"></i></span>
+                                                <select class="form-select select2">
+                                                    <option value="">-- Şəxs və ya Firma seçin --</option>
+                                                    <option value="1">Tədarükçü A</option>
+                                                    <option value="2">Əməkdaş B</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">Qeyd</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
+                                                <textarea class="form-control" rows="3" placeholder="Çıxışın səbəbi barədə qeyd..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="modal-footer border-0 p-4 pt-0">
+                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
+                                <button type="button" class="btn btn-danger px-4 shadow-sm fw-bold">
+                                    <i class="fa-solid fa-check-double me-2"></i>
+                                    Çıxışı Təsdiqlə
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
