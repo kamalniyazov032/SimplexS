@@ -98,6 +98,19 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/shobe";
     }
+    @GetMapping("/pasientAvans")
+    public String pasientAvans(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/pasientAvans";
+    }
+    @GetMapping("/poliklinikHekim")
+    public String poliklinikHekim(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/poliklinikHekim";
+    }
+
 
 }
 

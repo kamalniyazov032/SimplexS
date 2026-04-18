@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div class="breadcrumb-arrow">
+            <h4 class="mb-1">Xoş gəlmisiz, Admin</h4>
+            <p class="mb-0">Maliyyə Əməliyyatları / Avans Alışı</p>
+        </div>
+        <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center">
+            <i class="ti ti-calendar text-body fs-14 me-1"></i><span class="reportrange-picker-field">25 Apr 24 - 25 Apr 24</span>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-xl-7 col-lg-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fa-solid fa-money-bill-transfer me-2 text-primary"></i>
+                        Xəstədən Avans Al
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="bg-light-primary rounded-3 p-3 mb-4 border border-primary border-opacity-10">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 border-end-md">
+                                <label class="text-muted small d-block mb-1">Kassadakı Ümumi Məbləğ</label>
+                                <h4 class="text-success fw-bold mb-0">15,200.00 AZN</h4>
+                            </div>
+                            <div class="col-md-6 ps-md-4 mt-3 mt-md-0">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted small">Protokol No:</span>
+                                    <span class="fw-semibold">AID26000001</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small">Fayl No:</span>
+                                    <span class="fw-semibold text-primary">SID26000029</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="advancePaymentForm">
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center py-2">
+                                <i class="fa-solid fa-magnifying-glass me-2"></i>
+                                Xəstə Axtarış
+                            </button>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-secondary">Hesab Kodu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-barcode text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0" id="hesabKodu" placeholder="______">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-secondary">Alınacaq Məbləğ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-coins text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0 bg-light fw-bold" value="0.00 AZN" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-medium text-secondary">Ödəniş Növü</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-credit-card text-muted"></i></span>
+                                    <select class="form-select border-start-0 select2" id="odenisNovu">
+                                        <option value="">-- Ödəniş növü seçin --</option>
+                                        <option value="nağd">Nağd</option>
+                                        <option value="kart">Kart</option>
+                                        <option value="bank_tranfer">Bank köçürməsi</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-secondary">Tarix</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-check text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0" value="25.04.2024">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-secondary">Saat</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0" value="14:30">
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-medium text-secondary">Qeyd</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-pen-to-square text-muted"></i></span>
+                                    <textarea class="form-control border-start-0" rows="3" placeholder="Qeyd əlavə edin..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button type="button" class="btn btn-light px-4">Ləğv et</button>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="fa-solid fa-check-double me-2"></i>
+                                Avansı Al
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+</html>
