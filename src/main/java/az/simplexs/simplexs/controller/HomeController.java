@@ -53,6 +53,14 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/kassa";
     }
+
+    @GetMapping("/patientService")
+    public String patientService(Model model) {
+        model.addAttribute("pageTitle", "Xəstə Xidmət Ödənişi");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/patientService";
+    }
+
     @GetMapping("/qebz")
     public String qebz(Model model) {
         model.addAttribute("pageTitle", "Home");

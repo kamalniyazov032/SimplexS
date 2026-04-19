@@ -13,8 +13,8 @@
     <!-- Page Header -->
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
-            <h4 class="mb-1">Xoş gəlmisiz, Admin</h4>
-            <p class="mb-0 text-muted">Ümumi visit məlumatları</p>
+            <h4 class="mb-1">Qaimə hərəkətləri</h4>
+            <p class="mb-0 text-muted">Qaimə əməliyyatlarının monitorinqi və hesabatlığı</p>
         </div>
         <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center shadow-sm rounded-pill px-3 py-2">
             <i class="ti ti-calendar text-primary fs-14 me-1"></i>
@@ -38,7 +38,7 @@
                     <label class="form-label fw-bold small text-muted">Qaimə Tarixi</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="ti ti-calendar-event text-muted"></i></span>
-                        <input type="text" class="form-control datetimepicker" value="01.01.2024 - 01.01.2024">
+                        <input type="text" class="form-control" data-provider="flatpickr" data-range-date="true" data-date-format="d.m.Y" placeholder="Başlanma - Bitmə" value="01.01.2024 - 01.01.2024" readonly>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -53,7 +53,7 @@
                     <label class="form-label fw-bold small text-muted">Qaimə No</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="ti ti-hash text-muted"></i></span>
-                        <input type="text" class="form-control" placeholder="Qaimə No...">
+                        <input type="text" class="form-control" name="qaimeno" placeholder="Qaimə No...">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -61,6 +61,11 @@
                     <select class="form-select select2" name="firma">
                         <option>-- Firma seçin --</option>
                     </select>
+                </div>
+                <div class="col-md-1 d-grid align-self-end">
+                    <button type="button" class="btn btn-primary btn-search-firma">
+                        <i class="ti ti-search me-1"></i> Axtar
+                    </button>
                 </div>
             </div>
         </div>

@@ -47,4 +47,64 @@ $(document).ready(function () {
             "searchPlaceholder": "Cədvəldə axtar..."
         }
     });
+
+    $('.btn-search-firma').on('click', function () {
+        const year = $.trim($('[name="year"]').val());
+        const dateRange = $.trim($('[data-provider="flatpickr"]').val());
+        const workType = $.trim($('[name="isleyis_novu"] option:selected').text());
+        const invoiceNo = $.trim($('[name="qaimeno"]').val()).toLowerCase();
+        const firma = $.trim($('[name="firma"] option:selected').text());
+
+        const dateRangeParts = dateRange.split(' - ').map(function (value) {
+            return $.trim(value);
+        });
+        const startDate = parseDate(dateRangeParts[0]);
+        const endDate = parseDate(dateRangeParts[1]);
+
+        $('.table tbody tr').each(function () {
+            const $cells = $(this).find('td');
+            const rowDateText = $cells.eq(0).text().replace('▼', '').trim();
+            const rowDate = parseDate(rowDateText);
+            const rowInvoice = $cells.eq(1).text().trim().toLowerCase();
+            const rowYear = $cells.eq(2).text().trim();
+            const rowType = $cells.eq(3).text().trim();
+            const rowFirma = $cells.eq(4).text().trim();
+
+            let visible = true;
+            if (year && year !== '') {
+                visible = visible && rowYear === year;
+            }
+            if (workType && workType !== '-- Seçin --') {
+                visible = visible && rowType === workType;
+            }
+            if (invoiceNo) {
+                visible = visible && rowInvoice.indexOf(invoiceNo) !== -1;
+            }
+            if (firma && firma !== '-- Firma seçin --') {
+                visible = visible && rowFirma === firma;
+            }
+            if (startDate && endDate && rowDate) {
+                visible = visible && rowDate >= startDate && rowDate <= endDate;
+            }
+
+            $(this).toggle(visible);
+        });
+    });
+
+    function parseDate(dateText) {
+        if (!dateText) {
+            return null;
+        }
+        const parts = dateText.split('.');
+        if (parts.length !== 3) {
+            return null;
+        }
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        if (isNaN(day) || isNaN(month) || isNaN(year)) {
+            return null;
+        }
+        return new Date(year, month, day);
+    }
 });

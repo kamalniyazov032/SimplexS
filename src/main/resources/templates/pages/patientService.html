@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+<div layout:fragment="content">
+<div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+    <div class="breadcrumb-arrow">
+        <h4 class="mb-1 text-uppercase">FR0045 - Tələb Qarşılama</h4>
+        <p class="mb-0 text-muted">Xidmət və Material Təminatı Modulu</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary shadow-sm"><i class="ti ti-printer me-1"></i> Çap et</button>
+        <button class="btn btn-primary shadow-sm"><i class="ti ti-check me-1"></i> Tələbi Tamamla</button>
+    </div>
+</div>
+
+<div class="card mb-4 border-0 shadow-sm overflow-hidden">
+    <div class="card-body bg-light-primary border-start border-primary border-4">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar avatar-lg bg-white shadow-sm rounded-circle p-2 me-3 text-primary">
+                        <i class="ti ti-user fs-24"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">POLADXAN BAYRAMOV</h5>
+                        <span class="text-muted small">Ata adı: <strong>ƏHMƏDALI</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="row text-center text-md-start">
+                    <div class="col-6 col-md-3 border-end">
+                        <p class="text-muted mb-0 small">Protokol</p>
+                        <span class="fw-bold text-primary">A260025700</span>
+                    </div>
+                    <div class="col-6 col-md-3 border-end">
+                        <p class="text-muted mb-0 small">Fəyi No</p>
+                        <span class="fw-bold">L0437178</span>
+                    </div>
+                    <div class="col-6 col-md-3 border-end">
+                        <p class="text-muted mb-0 small">Şəxsiyyət</p>
+                        <span class="fw-bold small">U1000424822</span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <p class="text-muted mb-0 small">Müəssisə</p>
+                        <span class="badge bg-outline-info">Ödənişli xəstələr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-primary"><i class="ti ti-activity me-2"></i>Göstərilən Xidmətlər</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-center mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Tarix</th>
+                                <th>Kodu</th>
+                                <th>Xidmət Adı</th>
+                                <th>Bölmə</th>
+                                <th>Məbləğ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>19/04/2026</td>
+                                <td><span class="badge bg-light text-dark">TTY034</span></td>
+                                <td class="fw-bold">Serum taxılması</td>
+                                <td class="small text-muted">Təcili tibbi yardım (TTYP)</td>
+                                <td class="fw-bold text-dark">15.00 AZN</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-success"><i class="ti ti-pill me-2"></i>Dərman / Sərf Materialı</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Plaster hipoallergik 10x5m</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Ketonal 100mq 2ml N910</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Natrium xlorid 0.9% 500ml</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Vazofix 22 G (Braun)</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Xəstəaltı bez 90x180</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="ti ti-package me-2 text-muted"></i>Salfet steril 16x14</span>
+                                <span class="badge bg-light text-dark">1 ədəd</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="mb-3 border-start border-primary border-4 ps-3">
+                    <p class="text-muted small mb-0 fw-bold text-uppercase">Cəmi Tələb</p>
+                    <h3 class="mb-0 fw-bold">27.29 <span class="fs-14 fw-normal">AZN</span></h3>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <p class="text-muted small mb-1">Xidmət</p>
+                            <h6 class="mb-0 fw-bold">15.00 <span class="fs-12">AZN</span></h6>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <p class="text-muted small mb-1">Material</p>
+                            <h6 class="mb-0 fw-bold text-success">12.29 <span class="fs-12">AZN</span></h6>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 border border-dashed rounded-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Alınan Avans:</span>
+                        <span class="fw-bold text-danger">0.00 AZN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm bg-primary-light">
+            <div class="card-body">
+                <h6 class="mb-3 fw-bold text-primary"><i class="ti ti-wallet me-2"></i>Ödəniş Əməliyyatı</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Ödəmə Növü</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="payType" id="cash" checked>
+                        <label class="btn btn-outline-primary" for="cash">Nəğd</label>
+                        <input type="radio" class="btn-check" name="payType" id="card">
+                        <label class="btn btn-outline-primary" for="card">Kartsız</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Alınan Məbləğ</label>
+                    <div class="input-group input-group-lg">
+                        <input type="text" class="form-control fw-bold text-end" value="27.29">
+                        <span class="input-group-text bg-white">AZN</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Mətn/Qeyd</label>
+                    <textarea class="form-control" rows="2" placeholder="Ödəniş qeydi daxil edin..."></textarea>
+                </div>
+
+                <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm">
+                    <i class="ti ti-receipt-check me-1"></i> ÖDƏNİŞİ TƏSDİQLƏ
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-3 text-center">
+            <p class="small text-muted"><i class="ti ti-user-check me-1"></i> Həkim: <strong>İlqar Cəfərov (DR0602)</strong></p>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>
