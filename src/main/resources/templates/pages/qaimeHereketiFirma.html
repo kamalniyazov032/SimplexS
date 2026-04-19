@@ -14,10 +14,122 @@
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
             <h4 class="mb-1">Xoş gəlmisiz, Admin</h4>
-            <p class="mb-0">Ümumi visit məlumatları</p>
+            <p class="mb-0 text-muted">Ümumi visit məlumatları</p>
         </div>
-        <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center">
-            <i class="ti ti-calendar text-body fs-14 me-1"></i><span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+        <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center shadow-sm rounded-pill px-3 py-2">
+            <i class="ti ti-calendar text-primary fs-14 me-1"></i>
+            <span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+        </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body bg-light rounded-3">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted">İlə görə axtar</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="ti ti-calendar-stats text-muted"></i></span>
+                        <select class="form-select select2" name="year">
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted">Qaimə Tarixi</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="ti ti-calendar-event text-muted"></i></span>
+                        <input type="text" class="form-control datetimepicker" value="01.01.2024 - 01.01.2024">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted">İşləyış Növü</label>
+                    <select class="form-select select2" name="isleyis_novu">
+                        <option>-- Seçin --</option>
+                        <option value="1">Malların alınması</option>
+                        <option value="2">Xidmətlər</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted">Qaimə No</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="ti ti-hash text-muted"></i></span>
+                        <input type="text" class="form-control" placeholder="Qaimə No...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted">Firma Seçimi</label>
+                    <select class="form-select select2" name="firma">
+                        <option>-- Firma seçin --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-primary border-4">
+                <div class="card-body py-3">
+                    <p class="text-muted mb-1 small fw-bold">Cəmi Qaimə Dəyəri</p>
+                    <h5 class="mb-0 fw-bold text-dark">15,950.00 <span class="fs-13 fw-normal">AZN</span></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-success border-4">
+                <div class="card-body py-3">
+                    <p class="text-muted mb-1 small fw-bold">Ödənən Məbləğlər</p>
+                    <h5 class="mb-0 fw-bold text-success">14,200.00 <span class="fs-13 fw-normal text-dark">AZN</span></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-danger border-4">
+                <div class="card-body py-3">
+                    <p class="text-muted mb-1 small fw-bold">Qalan Məbləğlər</p>
+                    <h5 class="mb-0 fw-bold text-danger">1,750.00 <span class="fs-13 fw-normal text-dark">AZN</span></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover datatable table-center mb-0">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Qaimə Tarixi</th>
+                        <th>Qaimə No</th>
+                        <th>Qaimə ili</th>
+                        <th>İşləyış Növü</th>
+                        <th>Firma Adı</th>
+                        <th>Qaimə Dəyəri</th>
+                        <th>Ödənən Məbləğ</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><span class="text-muted me-1">▼</span> 24.04.2024</td>
+                        <td><span class="fw-bold text-primary">IN-01065</span></td>
+                        <td>2024</td>
+                        <td><span class="badge bg-outline-info">Malların alınması</span></td>
+                        <td>MedServis MMC</td>
+                        <td class="fw-bold">1,250.00 AZN</td>
+                        <td class="text-success fw-bold">1,250.00 AZN</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-muted me-1">▼</span> 08.04.2024</td>
+                        <td><span class="fw-bold text-primary">IN-00921</span></td>
+                        <td>2024</td>
+                        <td><span class="badge bg-outline-info">Malların alınması</span></td>
+                        <td>BioMed MMC</td>
+                        <td class="fw-bold">500.00 AZN</td>
+                        <td class="text-warning fw-bold">300.00 AZN</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <!-- End Page Header -->

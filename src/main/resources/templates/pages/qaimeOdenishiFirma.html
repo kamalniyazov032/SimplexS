@@ -10,17 +10,194 @@
 <body>
 <div layout:fragment="content">
 
-    <!-- Page Header -->
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
-            <h4 class="mb-1">Xoş gəlmisiz, Admin</h4>
-            <p class="mb-0">Ümumi visit məlumatları</p>
+            <h4 class="mb-1 text-uppercase fw-bold">QAİMƏ ÖDƏNİŞİ</h4>
+            <p class="mb-0">Kassa və qaimə hərəkətlərinin idarə edilməsi</p>
         </div>
-        <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center">
-            <i class="ti ti-calendar text-body fs-14 me-1"></i><span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+        <div class="d-flex align-items-center gap-2">
+            <div class="bg-success-light p-2 px-3 rounded-3 border border-success-subtle d-flex align-items-center shadow-sm">
+                <i class="ti ti-wallet text-success fs-20 me-2"></i>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 10px;">KASSADAKİ MƏBLƏĞ</small>
+                    <span class="fw-bold text-success">15,200.00 AZN</span>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- End Page Header -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="bg-light p-3 rounded-3 mb-4 border border-light-subtle">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Ödəniş Növü</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="ti ti-credit-card"></i></span>
+                            <select class="form-select select2" name="odeme_novu">
+                                <option selected disabled>-- Seçin --</option>
+                                <option>Nağd ödəniş</option>
+                                <option>Bank köçürməsi</option>
+                                <option>Kartla ödəniş</option>
+                                <option>Çek</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Qaimə Seçin</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="ti ti-receipt-2"></i></span>
+                            <select class="form-select select2" name="qaime_sec">
+                                <option selected disabled>-- Qaimə seçin --</option>
+                                <option>IN-01056 - MedServis MMC</option>
+                                <option>IN-01055 - Sağlam Hayat Şirkəti</option>
+                                <option>IN-00987 - Diagnostika LTD</option>
+                                <option>IN-00952 - Tachizat Group MMC</option>
+                                <option>IN-00921 - BioMed MMC</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Hesab Kodu</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="ti ti-hash"></i></span>
+                            <select class="form-select select2" name="hesab_kodu">
+                                <option selected disabled>-- Kod --</option>
+                                <option>1001 - Kredit borcları</option>
+                                <option>2002 - Təchizat hesabları</option>
+                                <option>3010 - Xidmət xərcləri</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 fw-bold py-2">
+                            <i class="ti ti-search me-1"></i> AXTAR
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-center datatable custom-table">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" id="checkAll">
+                            </div>
+                        </th>
+                        <th>Qaimə Tarixi</th>
+                        <th>Qaimə No</th>
+                        <th>Gəldiyi Yer</th>
+                        <th>İşləyici Növü</th>
+                        <th class="text-end">Firmaya Borc</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" value="IN-01056">
+                            </div>
+                        </td>
+                        <td>19.04.2024</td>
+                        <td><span class="badge bg-primary-light text-primary">IN-01056</span></td>
+                        <td>MedServis MMC</td>
+                        <td>Mallarin alınması</td>
+                        <td class="text-end fw-bold">1,200.00 AZN</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" value="IN-01055">
+                            </div>
+                        </td>
+                        <td>17.04.2024</td>
+                        <td><span class="badge bg-primary-light text-primary">IN-01055</span></td>
+                        <td>Sağlam Hayat Şirkəti</td>
+                        <td>Mallarin alınması</td>
+                        <td class="text-end fw-bold">2,500.00 AZN</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" value="IN-00987">
+                            </div>
+                        </td>
+                        <td>12.04.2024</td>
+                        <td><span class="badge bg-primary-light text-primary">IN-00987</span></td>
+                        <td>Diagnostika LTD</td>
+                        <td>Xidmətlər</td>
+                        <td class="text-end fw-bold">750.00 AZN</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" value="IN-00952">
+                            </div>
+                        </td>
+                        <td>10.04.2024</td>
+                        <td><span class="badge bg-primary-light text-primary">IN-00952</span></td>
+                        <td>Tachizat Group MMC</td>
+                        <td>Mallarin alınması</td>
+                        <td class="text-end fw-bold">1,700.00 AZN</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-check check-tables">
+                                <input class="form-check-input" type="checkbox" value="IN-00921">
+                            </div>
+                        </td>
+                        <td>08.04.2024</td>
+                        <td><span class="badge bg-primary-light text-primary">IN-00921</span></td>
+                        <td>BioMed MMC</td>
+                        <td>Mallarin alınması</td>
+                        <td class="text-end fw-bold">500.00 AZN</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-4 g-4 align-items-stretch">
+                <div class="col-md-7">
+                    <div class="d-flex flex-column h-100">
+                        <label class="form-label fw-bold small text-muted d-flex align-items-center">
+                            <i class="ti ti-notes me-1 fs-16"></i> ƏLAVƏ QEYD
+                        </label>
+                        <textarea class="form-control flex-fill border-2" rows="3"
+                                  placeholder="Bura ödənişlə bağlı xüsusi qeydlərinizi daxil edin..."
+                                  style="resize: none; border-style: dashed;"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card bg-light-subtle border-0 shadow-none mb-0 h-100">
+                        <div class="card-body p-3 border-start border-4 border-danger rounded-end-3 bg-white shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-semibold text-uppercase">Yekun Borc:</span>
+                                <span class="badge bg-danger-light text-danger">Ödənilməyib</span>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-1">
+                                <h2 class="fw-bold text-dark mb-0">3,700.00</h2>
+                                <span class="fw-semibold text-muted">AZN</span>
+                            </div>
+
+                            <hr class="my-3 opacity-50">
+
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="ti ti-device-floppy fs-18"></i>
+                                <span>ÖDƏNİŞİ TƏSDİQLƏ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
 </div>
 

@@ -110,6 +110,18 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/poliklinikHekim";
     }
+    @GetMapping("/qaimeOdenishiFirma")
+    public String qaimeOdenishiFirma(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/qaimeOdenishiFirma";
+    }
+    @GetMapping("/qaimeHereketiFirma")
+    public String qaimeHereketiFirma(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/qaimeHereketiFirma";
+    }
 
 
 }
