@@ -130,7 +130,12 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/qaimeHereketiFirma";
     }
-
+    @GetMapping("/xesteTarixcesi")
+    public String xesteTarixcesi(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/xesteTarixcesi";
+    }
 
 }
 

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+    <div layout:fragment="content">
+
+
+        <div class="row g-4 mb-3">
+            <div class="col-xl-7 col-lg-12">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-user-circle text-primary me-2"></i> <span class="fw-bold text-primary">Rəşad
+                                Məmmədov Vüqar oğlu</span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+
+                                <p class="mb-2"><i class="ti ti-calendar-time text-muted me-2"></i> <span
+                                        class="text-muted">Doğum tarixi:</span>
+                                    <span class="fw-bold">15.05.1990</span>
+                                </p>
+                                <p class="mb-2"><i class="ti ti-building text-muted me-2"></i> <span
+                                        class="text-muted">Təşkilat:</span> <span class="fw-bold">Azərbaycan Dəmir
+                                        Yolları QSC</span></p>
+                                          <p class="mb-0"><i class="ti ti-mail text-muted me-2"></i> <span
+                                        class="text-muted">E-mail:</span> <span
+                                        class="fw-bold">resad.mammadov@mail.com</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><i class="ti ti-id text-muted me-2"></i> <span class="text-muted">Ş.V /
+                                        Fin:</span> <span class="fw-bold">AZE1234567</span> <span
+                                        class="fw-bold">1ABCD2345</span></p>
+
+                                <p class="mb-2"><i class="ti ti-briefcase text-muted me-2"></i> <span
+                                        class="text-muted">Vəzifəsi:</span> <span class="fw-bold">Mühəndis</span></p>
+                                         <p class="mb-0"><i class="ti ti-phone text-muted me-2"></i> <span
+                                        class="text-muted">Telefon No:</span> <span class="fw-bold">+994 50 123 45
+                                        67</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-5 col-lg-12">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-file-description text-primary me-2"></i> Protokol Kartı
+                            <span class="fw-bold text-danger">100325</span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+
+                                <p class="mb-2"><i class="ti ti-calendar-time text-muted me-2"></i> <span
+                                        class="text-muted">Açılma:</span> <span class="fw-bold text-success">15.02.2024
+                                        / 09:30</span></p>
+                                <p class="mb-2"><i class="ti ti-user-plus text-muted me-2"></i> <span
+                                        class="text-muted">Açan şəxs:</span> <span class="fw-bold small">Sevinc
+                                        Quliyeva </span></p>
+                                <p class="mb-0"><i class="ti ti-credit-card text-muted me-2"></i> <span
+                                        class="text-muted">Kart növü:</span> <span class="badge bg-primary">Yatan
+                                        kart</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><i class="ti ti-calendar-time text-muted me-2"></i> <span
+                                        class="text-muted">Çıxış:</span> <span class="fw-bold text-danger">20.02.2024 /
+                                        14:45</span></p>
+                                <p class="mb-2"><i class="ti ti-user-check text-muted me-2"></i> <span
+                                        class="text-muted">Çıxış edən:</span> <span class="fw-bold small">Rauf
+                                        İsmayılov</span></p>
+                                <p class="mb-0"><i class="ti ti-shield-check text-muted me-2"></i> <span
+                                        class="text-muted">Ödəniş növü:</span> <span
+                                        class="badge bg-success">Sığortalı</span></p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-0">
+            <div class="col-10">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table  class="table datatable_ka_tam_30 table-bordered w-100" style="font-size: small">
+                            <thead style="font-size: small">
+                                    <tr>
+                                        <th>Protokol No</th>
+                                        <th>Tarix / Saat</th>
+                                        <th>Əməliyyat</th>
+                                        <th>Edən şəxs</th>
+                                        <th>Qeyd</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı açıldı</span></td>
+                                        <td>Sevinc Quliyeva</td>
+                                        <td class="text-muted">Protokol kartı yaradıldı.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Terapiya şöbəsinə qəbul</span></td>
+                                        <td>Dr. Elçin Həsənov</td>
+                                        <td class="text-muted">İlkin müayinə aparıldı.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                      <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                      <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                      <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                          <tr>
+                                        <td class="fw-bold text-primary">100325</td>
+                                        <td>15.02.2024 09:30</td>
+                                        <td><span class="badge bg-primary">Protokol kartı çıxış edildi</span></td>
+                                        <td>Rauf İsmayılov</td>
+                                        <td class="text-muted">Xəstə evə buraxıldı.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="col-xl-2 col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-file-description text-primary me-2"></i> Protokol Kartı
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <a href="javascript:void(0);"
+                                    class="btn btn-outline-primary d-flex align-items-center justify-content-start shadow-sm card-hover w-100 rounded-3 py-2 text-start">
+                                    <i class="ti ti-file-text fs-4 me-2"></i>
+                                    <span class="fw-bold">Radioloji Cavablar</span>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="javascript:void(0);"
+                                    class="btn btn-outline-info d-flex align-items-center justify-content-start shadow-sm card-hover w-100 rounded-3 py-2 text-start">
+                                    <i class="ti ti-user-question fs-4 me-2"></i>
+                                    <span class="fw-bold">Anamnez Məlumatı</span>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="javascript:void(0);"
+                                    class="btn btn-outline-warning d-flex align-items-center justify-content-start shadow-sm card-hover w-100 rounded-3 py-2 text-start">
+                                    <i class="ti ti-report-medical fs-4 me-2"></i>
+                                    <span class="fw-bold">Çək Raporu</span>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="javascript:void(0);"
+                                    class="btn btn-outline-primary d-flex align-items-center justify-content-start shadow-sm card-hover w-100 rounded-3 py-2 text-start">
+                                    <i class="ti ti-flask fs-4 me-2"></i>
+                                    <span class="fw-bold">Laborator Cavablar</span>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="javascript:void(0);"
+                                    class="btn btn-outline-success d-flex align-items-center justify-content-start shadow-sm card-hover w-100 rounded-3 py-2 text-start">
+                                    <i class="ti ti-pill fs-4 me-2"></i>
+                                    <span class="fw-bold">Dərmanlar</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-2">
+
+            <div class="col-xl-4 col-lg-12">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-building-hospital text-info me-2"></i> Şöbələr
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Tarix</th>
+                                        <th>Şöbə</th>
+                                        <th>Həkim</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15.02.2024</td>
+                                        <td>Terapiya</td>
+                                        <td>Dr. Elçin Həsənov</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16.02.2024</td>
+                                        <td>Kardiologiya</td>
+                                        <td>Dr. Pərvin Əlizadə</td>
+                                    </tr>
+                                    <tr>
+                                        <td>17.02.2024</td>
+                                        <td>Radiologiya</td>
+                                        <td>Dr. Rüfət Məmmədli</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-12">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-stethoscope text-primary me-2"></i> Xidmətlər
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Tarix</th>
+                                        <th>Xidmətin adı</th>
+                                        <th>Şöbə</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15.02.2024</td>
+                                        <td class="fw-bold">Ümumi qan analizi</td>
+                                        <td>Laboratoriya</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16.02.2024</td>
+                                        <td class="fw-bold">EKQ</td>
+                                        <td>Kardiologiya</td>
+                                    </tr>
+                                    <tr>
+                                        <td>17.02.2024</td>
+                                        <td class="fw-bold">MRT - Beyin</td>
+                                        <td>Radiologiya</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-12">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="ti ti-notes-medical text-danger me-2"></i> Diaqnozlar
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Tarix</th>
+                                        <th>Diaqnoz</th>
+                                        <th>Növü</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15.02.2024</td>
+                                        <td><span class="text-primary fw-bold" data-bs-toggle="tooltip"
+                                                title="Essensial (birincili) hipertoniya">I10</span></td>
+                                        <td><span class="badge bg-secondary-light">İlkin</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>16.02.2024</td>
+                                        <td><span class="text-primary fw-bold" data-bs-toggle="tooltip"
+                                                title="Essensial (birincili) hipertoniya">I10</span></td>
+                                        <td><span class="badge bg-success-light">Əsas</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>19.02.2024</td>
+                                        <td><span class="text-primary fw-bold" data-bs-toggle="tooltip"
+                                                title="Kəskin xolesistit">K80.0</span></td>
+                                        <td><span class="badge bg-success-light">Əsas</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
