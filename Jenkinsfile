@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    
+    tools {
+        jdk 'JDK-21'
+    }
 
     stages {
 
@@ -23,8 +27,8 @@ pipeline {
 
         stage('Restart Service') {
             steps {
-                bat 'net stop SimplexS'
-                bat 'net start SimplexS'
+                bat 'net stop SImplexS'
+                bat 'net start SImplexS'
             }
         }
     }
