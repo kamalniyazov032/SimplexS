@@ -1,357 +1,500 @@
 <!DOCTYPE html>
-<html lang="az"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main}">
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
 
 <head>
 
 
 <body>
-<div layout:fragment="content">
+    <div layout:fragment="content">
 
-    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
-        <div class="breadcrumb-arrow">
-            <h4 class="mb-1 text-primary fw-bold">Həkim poliklinik</h4>
-            <p class="mb-0">Ümumi qəbul məlumatları.</p>
-        </div>
-        <div class="d-flex align-items-center flex-wrap gap-2">
-
-            <div id="reportrange" class="reportrange-picker bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1">
-                <i class="ti ti-calendar text-primary fs-14 me-1"></i>
-                <span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+            <div class="breadcrumb-arrow">
+                <h4 class="mb-1 text-primary fw-bold">Həkim poliklinik</h4>
+                <p class="mb-0">Ümumi qəbul məlumatları.</p>
             </div>
+            <div class="d-flex align-items-center flex-wrap gap-2">
 
-            <div class="department-filter bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1" style="min-width: 200px;">
-                <i class="ti ti-building-hospital text-primary fs-14 me-2"></i>
-                <select class="form-select border-0 p-0 fs-13 select2" data-placeholder="Şöbə seçimi">
-                    <option></option>
-                    <option value="1">Kardiologiya</option>
-                    <option value="2">Nevrologiya</option>
-                    <option value="3">Pediatriya</option>
-                    <option value="4">Təcili Yardım</option>
-                </select>
+                <div id="reportrange"
+                    class="reportrange-picker bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1">
+                    <i class="ti ti-calendar text-primary fs-14 me-1"></i>
+                    <span class="reportrange-picker-field">16 Apr 25 - 16 Apr 25</span>
+                </div>
+
+                <div class="department-filter bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1"
+                    style="min-width: 200px;">
+                    <i class="ti ti-building-hospital text-primary fs-14 me-2"></i>
+                    <select class="form-select border-0 p-0 fs-13 select2" data-placeholder="Şöbə seçimi">
+                        <option></option>
+                        <option value="1">Kardiologiya</option>
+                        <option value="2">Nevrologiya</option>
+                        <option value="3">Pediatriya</option>
+                        <option value="4">Təcili Yardım</option>
+                    </select>
+                </div>
+
+
+
             </div>
-
-
-
         </div>
-    </div>
-    <div class="row g-3">
+        <div class="row g-3">
 
-        <div class="col-xl-3 col-lg-4">
-            <div class="card border-0  shadow-sm rounded-3">
-                <div class="card-header bg-primary py-3">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div class="d-flex align-items-center text-white">
-                            <div class="avatar avatar-md bg-white-transparent rounded-circle me-3 d-flex align-items-center justify-content-center">
-                                <i class="ti ti-users fs-20"></i>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <div class="patient-filter bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1" style="min-width: 250px;">
-                                    <i class="ti ti-search text-primary fs-14 me-2"></i>
-                                    <input type="text" class="form-control border-0 p-0 fs-13" placeholder="Xəstə kartı və ya ad..." style="box-shadow: none; background: transparent;">
+            <div class="col-xl-3 col-lg-4">
+                <div class="card border-0  shadow-sm rounded-3">
+                    <div class="card-header bg-primary py-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center text-white">
+                                <div
+                                    class="avatar avatar-md bg-white-transparent rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-users fs-20"></i>
                                 </div>
-                                <span class="badge text-light fs-13 fw-bold px-2 py-1 shadow-sm">1,284</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="patient-filter bg-white d-flex align-items-center shadow-sm border rounded-pill px-3 py-1"
+                                        style="min-width: 250px;">
+                                        <i class="ti ti-search text-primary fs-14 me-2"></i>
+                                        <input type="text" class="form-control border-0 p-0 fs-13"
+                                            placeholder="Xəstə kartı və ya ad..."
+                                            style="box-shadow: none; background: transparent;">
+                                    </div>
+                                    <span class="badge text-light fs-13 fw-bold px-2 py-1 shadow-sm">1,284</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center table-bordered table-nowrap mb-0 align-middle">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="p-0 border-0">
+                                            <div class="card shadow-none border-0 m-0" style="background: transparent;">
+                                                <div class="card-body p-1">
+                                                    <div class="d-flex align-items-center" style="line-height: 1.2;">
+                                                        <div class="d-flex flex-column align-items-center px-2"
+                                                            style="min-width: 50px;">
+                                                            <div
+                                                                class="avatar avatar-md bg-primary-light text-primary rounded-circle">
+                                                                <i class="ti ti-man fs-4"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-start"
+                                                            style="height: 32px; border-color: #e5e5e5 !important;">
+                                                        </div>
+                                                        <div class="ps-2">
+                                                            <h6 class="mb-0 fw-bold text-dark"
+                                                                style="font-size: 13px; margin-bottom: 1px !important;">
+                                                                Niyazov Kamal Namiq</h6>
+                                                            <span class="fw-bold text-muted"
+                                                                style="font-size: 11px; display: block;">A00010110</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="p-0 border-0">
+                                            <div class="card shadow-none border-0 m-0" style="background: transparent;">
+                                                <div class="card-body p-1">
+                                                    <div class="d-flex align-items-center" style="line-height: 1.2;">
+                                                        <div class="d-flex flex-column align-items-center px-2"
+                                                            style="min-width: 50px;">
+                                                            <div
+                                                                class="avatar avatar-md bg-danger-light text-danger rounded-circle">
+                                                                <i class="ti ti-woman fs-4"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-start"
+                                                            style="height: 32px; border-color: #e5e5e5 !important;">
+                                                        </div>
+                                                        <div class="ps-2">
+                                                            <h6 class="mb-0 fw-bold text-dark"
+                                                                style="font-size: 13px; margin-bottom: 1px !important;">
+                                                                Əliyeva Leyla Murad</h6>
+                                                            <span class="fw-bold text-muted"
+                                                                style="font-size: 11px; display: block;">A00010111</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="p-0 border-0">
+                                            <div class="card shadow-none border-0 m-0" style="background: transparent;">
+                                                <div class="card-body p-1">
+                                                    <div class="d-flex align-items-center" style="line-height: 1.2;">
+                                                        <div class="d-flex flex-column align-items-center px-2"
+                                                            style="min-width: 50px;">
+                                                            <div
+                                                                class="avatar avatar-md bg-info-light text-info rounded-circle">
+                                                                <i class="ti ti-mood-boy fs-4"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-start"
+                                                            style="height: 32px; border-color: #e5e5e5 !important;">
+                                                        </div>
+                                                        <div class="ps-2">
+                                                            <h6 class="mb-0 fw-bold text-dark"
+                                                                style="font-size: 13px; margin-bottom: 1px !important;">
+                                                                Məmmədov Əli Vüqar</h6>
+                                                            <span class="fw-bold text-muted"
+                                                                style="font-size: 11px; display: block;">A00010112</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="p-0 border-0">
+                                            <div class="card shadow-none border-0 m-0" style="background: transparent;">
+                                                <div class="card-body p-1">
+                                                    <div class="d-flex align-items-center" style="line-height: 1.2;">
+                                                        <div class="d-flex flex-column align-items-center px-2"
+                                                            style="min-width: 50px;">
+                                                            <div
+                                                                class="avatar avatar-md bg-warning-light text-warning rounded-circle">
+                                                                <i class="ti ti-mood-kid fs-4"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-start"
+                                                            style="height: 32px; border-color: #e5e5e5 !important;">
+                                                        </div>
+                                                        <div class="ps-2">
+                                                            <h6 class="mb-0 fw-bold text-dark"
+                                                                style="font-size: 13px; margin-bottom: 1px !important;">
+                                                                Sultanova Fidan Elmar</h6>
+                                                            <span class="fw-bold text-muted"
+                                                                style="font-size: 11px; display: block;">A00010113</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+
+                <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                    <div class="card-header bg-light-gray border-0 py-2">
+                        <h6 class="fw-bold mb-0 small text-muted">Genişləndirilmiş Naviqasiya</h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex flex-wrap gap-3">
+                            <button
+                                class="btn btn-outline-info rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-clock-rotate-left mb-2 fs-2"></i>
+                                <span class="fw-bold">Tarixçə</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-notes-medical mb-2 fs-2"></i>
+                                <span class="fw-bold">Anamnez</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-success rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-clipboard-check mb-2 fs-2"></i>
+                                <span class="fw-bold">Müşahidə</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-danger rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-pills mb-2 fs-2"></i>
+                                <span class="fw-bold">Dərman</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-info rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-file-waveform mb-2 fs-2"></i>
+                                <span class="fw-bold">Epikriz</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-info rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;" data-bs-toggle="modal"
+                                data-bs-target="#diagnosisModal">
+                                <i class="fa-solid fa-stethoscope mb-2 fs-2"></i>
+                                <span class="fw-bold">İlkin Diaqnoz</span>
+                            </button>
+                            <div class="modal fade" id="diagnosisModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title fw-bold">
+                                                <i class="fa-solid fa-stethoscope me-2 text-info"></i> İlkin Diaqnoz
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="bg-light p-1 rounded-3 mb-0">
+                                                <div class="bg-light p-1 rounded-3 mb-0">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                                                        </span>
+
+                                                        <div class="flex-grow-1">
+                                                            <select class="form-control select2"
+                                                                data-placeholder="Diaqnoz adı və ya koduna görə axtar...">
+                                                                <option></option>
+                                                                <option value="I10">I10 - Esensial (birincili)
+                                                                    hipertoniya</option>
+                                                                <option value="I11.0">I11.0 - Hipertenziv ürək xəstəliyi
+                                                                </option>
+                                                            </select>
+                                                        </div>
+
+                                                        <button class="btn btn-primary px-4 fw-bold" type="button">
+                                                            <i class="fa-solid fa-plus me-1"></i> Əlavə et
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-center mb-0 datatable">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th style="width: 100px;">Kod</th>
+                                                            <th>Diaqnoz adı</th>
+                                                            <th class="text-end">Seçim</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><span
+                                                                    class="badge bg-primary-light text-primary">I10</span>
+                                                            </td>
+                                                            <td class="fw-medium">Esensial (birincili) hipertoniya</td>
+                                                            <td class="text-end">
+                                                                <button class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fa-solid fa-trash-can"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span
+                                                                    class="badge bg-primary-light text-primary">I11.0</span>
+                                                            </td>
+                                                            <td class="fw-medium">Hipertenziv ürək xəstəliyi
+                                                                (hipertoniya ilə ürək xəstəliyi)</td>
+                                                            <td class="text-end">
+                                                                <button class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fa-solid fa-trash-can"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span
+                                                                    class="badge bg-primary-light text-primary">I12.9</span>
+                                                            </td>
+                                                            <td class="fw-medium">Hipertoniya ilə xroniki böyrək
+                                                                xəstəliyi, təyin olunmamış</td>
+                                                            <td class="text-end">
+                                                                <button class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fa-solid fa-trash-can"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                class="btn btn-outline-secondary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-heart-pulse mb-2 fs-2"></i>
+                                <span class="fw-bold">Əsas Diaqnoz</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-dark rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-hand-holding-medical mb-2 fs-2"></i>
+                                <span class="fw-bold">Xidmət</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px; color: #6f42c1; border-color: #6f42c1;">
+                                <i class="fa-solid fa-barcode mb-2 fs-2"></i>
+                                <span class="fw-bold">Barkod</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-success rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-microscope mb-2 fs-2"></i>
+                                <span class="fw-bold">Lab Nəticələri</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-warning rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-x-ray mb-2 fs-2"></i>
+                                <span class="fw-bold">Radiologiya</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-danger rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-bed-pulse mb-2 fs-2"></i>
+                                <span class="fw-bold">Yatış Təsdiqi</span>
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
+                                style="width: 110px; height: 90px;">
+                                <i class="fa-solid fa-user-doctor mb-2 fs-2"></i>
+                                <span class="fw-bold">Həkim təyinatı</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 mb-3">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h6 class="fw-bold mb-0 text-dark"><i
+                                class="ti ti-heart-rate-monitor me-2 text-success"></i>Xəstəyə
+                            Görülən Xidmətlər</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0 align-middle border-top">
+                                <thead class="bg-light-gray border-bottom small">
+                                    <tr>
+                                        <th class="ps-3">Tarix</th>
+                                        <th>Xidmətin Adı</th>
+                                        <th class="text-center">Miqdar</th>
+                                        <th class="text-end pe-3">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="ps-3 small">25.04.2024</td>
+                                        <td><span class="fw-bold small">Terapevt qəbulu</span></td>
+                                        <td class="text-center"><span
+                                                class="badge bg-outline-info rounded-pill">1</span></td>
+                                        <td class="text-end pe-3"><i class="fa-solid fa-circle-check text-success"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-3 small">25.04.2024</td>
+                                        <td><span class="fw-bold small">Ümumi qan analizi</span></td>
+                                        <td class="text-center"><span
+                                                class="badge bg-outline-info rounded-pill">1</span></td>
+                                        <td class="text-end pe-3"><i class="fa-solid fa-circle-check text-success"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-xl-3">
+                <div class="card border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+                    <div class="card-header bg-primary py-3">
+                        <div class="d-flex align-items-center text-white">
+                            <div class="avatar avatar-md bg-white-transparent rounded-circle me-3">
+                                <i class="ti ti-user-circle fs-24"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h6 class="mb-0 fw-bold text-light">Əliyev Tural Məmməd</h6>
+                                <small class="opacity-75 d-block">FIN: 1ABCD1234 / Prot: AID2600001</small>
                             </div>
                         </div>
-
                     </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-center table-bordered table-nowrap mb-0 align-middle">
-                            <thead>
+                    <div class="card-body p-3">
+                        <div class="patient-info-list">
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Doğum Tarixi:</span>
+                                <span class="fw-bold text-dark small">15.03.1990 (34 yaş)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Cins / Şəxsiyyət:</span>
+                                <span class="fw-bold text-dark small">Kişi / AA1234567</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Mobil:</span>
+                                <span class="fw-bold text-dark small">+994 50 123 45 67</span>
+                            </div>
 
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="p-0 border-0">
-                                    <div class="card shadow-none border-0 m-0" style="background: transparent;">
-                                        <div class="card-body p-1">
-                                            <div class="d-flex align-items-center" style="line-height: 1.2;">
-                                                <div class="d-flex flex-column align-items-center px-2" style="min-width: 50px;">
-                                                    <div class="avatar avatar-md bg-primary-light text-primary rounded-circle">
-                                                        <i class="ti ti-man fs-4"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="border-start" style="height: 32px; border-color: #e5e5e5 !important;"></div>
-                                                <div class="ps-2">
-                                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px; margin-bottom: 1px !important;">Niyazov Kamal Namiq</h6>
-                                                    <span class="fw-bold text-muted" style="font-size: 11px; display: block;">A00010110</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div class="mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small d-block">İş yeri:</span>
+                                <span class="fw-bold text-primary small">Mərkəzi Klinik Xəstəxana</span>
+                            </div>
 
-                            <tr>
-                                <td class="p-0 border-0">
-                                    <div class="card shadow-none border-0 m-0" style="background: transparent;">
-                                        <div class="card-body p-1">
-                                            <div class="d-flex align-items-center" style="line-height: 1.2;">
-                                                <div class="d-flex flex-column align-items-center px-2" style="min-width: 50px;">
-                                                    <div class="avatar avatar-md bg-danger-light text-danger rounded-circle">
-                                                        <i class="ti ti-woman fs-4"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="border-start" style="height: 32px; border-color: #e5e5e5 !important;"></div>
-                                                <div class="ps-2">
-                                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px; margin-bottom: 1px !important;">Əliyeva Leyla Murad</h6>
-                                                    <span class="fw-bold text-muted" style="font-size: 11px; display: block;">A00010111</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Həkim:</span>
+                                <span class="fw-bold text-dark small text-truncate">Dr. Rauf Əhmədov</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Qiymət Qrupu:</span>
+                                <span class="fw-bold text-dark small">Əsas</span>
+                            </div>
 
-                            <tr>
-                                <td class="p-0 border-0">
-                                    <div class="card shadow-none border-0 m-0" style="background: transparent;">
-                                        <div class="card-body p-1">
-                                            <div class="d-flex align-items-center" style="line-height: 1.2;">
-                                                <div class="d-flex flex-column align-items-center px-2" style="min-width: 50px;">
-                                                    <div class="avatar avatar-md bg-info-light text-info rounded-circle">
-                                                        <i class="ti ti-mood-boy fs-4"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="border-start" style="height: 32px; border-color: #e5e5e5 !important;"></div>
-                                                <div class="ps-2">
-                                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px; margin-bottom: 1px !important;">Məmmədov Əli Vüqar</h6>
-                                                    <span class="fw-bold text-muted" style="font-size: 11px; display: block;">A00010112</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div class="mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i>Ünvan:</span>
+                                <span class="fw-bold text-dark small">Bakı ş., Nəsimi r., 28 may küç., 15</span>
+                            </div>
 
-                            <tr>
-                                <td class="p-0 border-0">
-                                    <div class="card shadow-none border-0 m-0" style="background: transparent;">
-                                        <div class="card-body p-1">
-                                            <div class="d-flex align-items-center" style="line-height: 1.2;">
-                                                <div class="d-flex flex-column align-items-center px-2" style="min-width: 50px;">
-                                                    <div class="avatar avatar-md bg-warning-light text-warning rounded-circle">
-                                                        <i class="ti ti-mood-kid fs-4"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="border-start" style="height: 32px; border-color: #e5e5e5 !important;"></div>
-                                                <div class="ps-2">
-                                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px; margin-bottom: 1px !important;">Sultanova Fidan Elmar</h6>
-                                                    <span class="fw-bold text-muted" style="font-size: 11px; display: block;">A00010113</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-6">
-
-            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                <div class="card-header bg-light-gray border-0 py-2">
-                    <h6 class="fw-bold mb-0 small text-muted">Genişləndirilmiş Naviqasiya</h6>
-                </div>
-                <div class="card-body p-3">
-                    <div class="d-flex flex-wrap gap-3">
-                        <button class="btn btn-outline-info rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-clock-rotate-left mb-2 fs-2"></i>
-                            <span class="fw-bold">Tarixçə</span>
-                        </button>
-
-                        <button class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-notes-medical mb-2 fs-2"></i>
-                            <span class="fw-bold">Anamnez</span>
-                        </button>
-
-                        <button class="btn btn-outline-success rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-clipboard-check mb-2 fs-2"></i>
-                            <span class="fw-bold">Müşahidə</span>
-                        </button>
-
-                        <button class="btn btn-outline-danger rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-pills mb-2 fs-2"></i>
-                            <span class="fw-bold">Dərman</span>
-                        </button>
-
-                        <button class="btn btn-outline-info rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-file-waveform mb-2 fs-2"></i>
-                            <span class="fw-bold">Epikriz</span>
-                        </button>
-
-                        <button class="btn btn-outline-warning rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-stethoscope mb-2 fs-2"></i>
-                            <span class="fw-bold">İlkin Diaqnoz</span>
-                        </button>
-
-                        <button class="btn btn-outline-secondary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-heart-pulse mb-2 fs-2"></i>
-                            <span class="fw-bold">Əsas Diaqnoz</span>
-                        </button>
-
-                        <button class="btn btn-outline-dark rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-hand-holding-medical mb-2 fs-2"></i>
-                            <span class="fw-bold">Xidmət</span>
-                        </button>
-
-                        <button class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px; color: #6f42c1; border-color: #6f42c1;">
-                            <i class="fa-solid fa-barcode mb-2 fs-2"></i>
-                            <span class="fw-bold">Barkod</span>
-                        </button>
-
-                        <button class="btn btn-outline-success rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-microscope mb-2 fs-2"></i>
-                            <span class="fw-bold">Lab Nəticələri</span>
-                        </button>
-
-                        <button class="btn btn-outline-warning rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-x-ray mb-2 fs-2"></i>
-                            <span class="fw-bold">Radiologiya</span>
-                        </button>
-
-                        <button class="btn btn-outline-danger rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-bed-pulse mb-2 fs-2"></i>
-                            <span class="fw-bold">Yatış Təsdiqi</span>
-                        </button>
-
-                        <button class="btn btn-outline-primary rounded-3 p-0 shadow-sm d-flex flex-column align-items-center justify-content-center"
-                                style="width: 110px; height: 90px;">
-                            <i class="fa-solid fa-user-doctor mb-2 fs-2"></i>
-                            <span class="fw-bold">Həkim təyinatı</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm rounded-3 mb-3">
-                <div class="card-header bg-white py-3 border-0">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="ti ti-heart-rate-monitor me-2 text-success"></i>Xəstəyə
-                        Görülən Xidmətlər</h6>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-center mb-0 align-middle border-top">
-                            <thead class="bg-light-gray border-bottom small">
-                            <tr>
-                                <th class="ps-3">Tarix</th>
-                                <th>Xidmətin Adı</th>
-                                <th class="text-center">Miqdar</th>
-                                <th class="text-end pe-3">İşlem</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="ps-3 small">25.04.2024</td>
-                                <td><span class="fw-bold small">Terapevt qəbulu</span></td>
-                                <td class="text-center"><span class="badge bg-outline-info rounded-pill">1</span></td>
-                                <td class="text-end pe-3"><i class="fa-solid fa-circle-check text-success"></i></td>
-                            </tr>
-                            <tr>
-                                <td class="ps-3 small">25.04.2024</td>
-                                <td><span class="fw-bold small">Ümumi qan analizi</span></td>
-                                <td class="text-center"><span class="badge bg-outline-info rounded-pill">1</span></td>
-                                <td class="text-end pe-3"><i class="fa-solid fa-circle-check text-success"></i></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col-xl-3">
-            <div class="card border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
-                <div class="card-header bg-primary py-3">
-                    <div class="d-flex align-items-center text-white">
-                        <div class="avatar avatar-md bg-white-transparent rounded-circle me-3">
-                            <i class="ti ti-user-circle fs-24"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <h6 class="mb-0 fw-bold text-light">Əliyev Tural Məmməd</h6>
-                            <small class="opacity-75 d-block">FIN: 1ABCD1234 / Prot: AID2600001</small>
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
+                                <span class="text-muted small">Vəziyyət:</span>
+                                <span class="badge bg-warning-light text-warning px-2 py-1 rounded-pill small">Təkrar
+                                    Gələn</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-0">
+                                <span class="text-muted small">Giriş Tarixi:</span>
+                                <span class="fw-bold text-success small">25.04.2024 14:10</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-3">
-                    <div class="patient-info-list">
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Doğum Tarixi:</span>
-                            <span class="fw-bold text-dark small">15.03.1990 (34 yaş)</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Cins / Şəxsiyyət:</span>
-                            <span class="fw-bold text-dark small">Kişi / AA1234567</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Mobil:</span>
-                            <span class="fw-bold text-dark small">+994 50 123 45 67</span>
-                        </div>
 
-                        <div class="mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small d-block">İş yeri:</span>
-                            <span class="fw-bold text-primary small">Mərkəzi Klinik Xəstəxana</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Həkim:</span>
-                            <span class="fw-bold text-dark small text-truncate">Dr. Rauf Əhmədov</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Qiymət Qrupu:</span>
-                            <span class="fw-bold text-dark small">Əsas</span>
-                        </div>
-
-                        <div class="mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i>Ünvan:</span>
-                            <span class="fw-bold text-dark small">Bakı ş., Nəsimi r., 28 may küç., 15</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small">Vəziyyət:</span>
-                            <span class="badge bg-warning-light text-warning px-2 py-1 rounded-pill small">Təkrar Gələn</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-0">
-                            <span class="text-muted small">Giriş Tarixi:</span>
-                            <span class="fw-bold text-success small">25.04.2024 14:10</span>
-                        </div>
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-light-gray py-2">
+                        <h6 class="fw-bold mb-0 small text-dark"><i
+                                class="ti ti-user-edit me-2 text-danger"></i>Qeydiyyat Məlumatı</h6>
                     </div>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-header bg-light-gray py-2">
-                    <h6 class="fw-bold mb-0 small text-dark"><i class="ti ti-user-edit me-2 text-danger"></i>Qeydiyyat Məlumatı</h6>
-                </div>
-                <div class="card-body p-3">
-                    <div class="bg-light rounded p-2 border-start border-danger border-3 shadow-xs">
-                        <div class="d-flex align-items-center">
-                            <i class="ti ti-id-badge fs-3 me-2 text-muted"></i>
-                            <div>
-                                <small class="text-muted d-block">Əlavə edən qeydiyyatçı:</small>
-                                <span class="fw-bold text-dark small">Günel S.</span>
+                    <div class="card-body p-3">
+                        <div class="bg-light rounded p-2 border-start border-danger border-3 shadow-xs">
+                            <div class="d-flex align-items-center">
+                                <i class="ti ti-id-badge fs-3 me-2 text-muted"></i>
+                                <div>
+                                    <small class="text-muted d-block">Əlavə edən qeydiyyatçı:</small>
+                                    <span class="fw-bold text-dark small">Günel S.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -359,7 +502,6 @@
             </div>
         </div>
     </div>
-</div>
 
 </body>
 
