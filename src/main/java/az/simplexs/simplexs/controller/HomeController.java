@@ -12,8 +12,6 @@ public class HomeController {
         return "redirect:/dashboard";
     }
 
-
-
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("pageTitle", "Home");
@@ -41,12 +39,14 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/paket";
     }
+
     @GetMapping("/parShobeXidmet")
     public String parShobeXidmet(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/shobeXidmet";
     }
+
     @GetMapping("/kassa")
     public String kassa(Model model) {
         model.addAttribute("pageTitle", "Home");
@@ -74,6 +74,7 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/muhasibatKodu";
     }
+
     @GetMapping("/xidmetQruplari")
     public String xidmetQruplari(Model model) {
         model.addAttribute("pageTitle", "Home");
@@ -94,42 +95,49 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/muessise";
     }
+
     @GetMapping("/emekdash")
     public String emekdash(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/emekdash";
     }
+
     @GetMapping("/shobe")
     public String shobe(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/shobe";
     }
+
     @GetMapping("/pasientAvans")
     public String pasientAvans(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/pasientAvans";
     }
+
     @GetMapping("/poliklinikHekim")
     public String poliklinikHekim(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/poliklinikHekim";
     }
+
     @GetMapping("/qaimeOdenishiFirma")
     public String qaimeOdenishiFirma(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/qaimeOdenishiFirma";
     }
+
     @GetMapping("/qaimeHereketiFirma")
     public String qaimeHereketiFirma(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/qaimeHereketiFirma";
     }
+
     @GetMapping("/xesteTarixcesi")
     public String xesteTarixcesi(Model model) {
         model.addAttribute("pageTitle", "Home");
@@ -137,5 +145,11 @@ public class HomeController {
         return "pages/xesteTarixcesi";
     }
 
-}
+    @GetMapping("/anamnez")
+    public String anamnez(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/anamnez";
+    }
 
+}
