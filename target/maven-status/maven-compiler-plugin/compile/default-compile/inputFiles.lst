@@ -1,12 +1,2 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/SImplexSApplication.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/AppointmentController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/HomeController.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/entity/Appointment.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/entity/Doctor.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/entity/DoctorSchedule.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/entity/Patient.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/AppointmentRepository.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/DoctorRepository.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/DoctorScheduleRepository.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/PatientRepository.java
-/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/service/AppointmentService.java

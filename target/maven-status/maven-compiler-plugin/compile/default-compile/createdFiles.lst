@@ -1,12 +1,2 @@
-az/simplexs/simplexs/repository/DoctorScheduleRepository.class
-az/simplexs/simplexs/entity/Doctor.class
-az/simplexs/simplexs/entity/Patient.class
-az/simplexs/simplexs/repository/PatientRepository.class
 az/simplexs/simplexs/controller/HomeController.class
-az/simplexs/simplexs/service/AppointmentService.class
-az/simplexs/simplexs/repository/DoctorRepository.class
-az/simplexs/simplexs/controller/AppointmentController.class
-az/simplexs/simplexs/repository/AppointmentRepository.class
 az/simplexs/simplexs/SImplexSApplication.class
-az/simplexs/simplexs/entity/DoctorSchedule.class
-az/simplexs/simplexs/entity/Appointment.class
