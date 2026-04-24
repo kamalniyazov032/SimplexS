@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+<head>
+
+
+<body>
+    <div layout:fragment="content">
+
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="javascript:history.back();" class="btn btn-white btn-icon shadow-sm">
+                    <i class="ti ti-arrow-left"></i>
+                </a>
+                <div>
+                    <h4 class="mb-0">ƏsasDiaqnoz</h4>
+                    <p class="text-muted small mb-0">Xəstənin əvvəlki və yeni diaqnozlarının idarə edilməsi</p>
+                </div>
+            </div>
+             <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary shadow-primary" data-bs-toggle="modal" data-bs-target="#addDiagnosisModal">
+    <i class="ti ti-plus me-1"></i> Yeni diaqnoz əlavə et
+</button>
+            </div>
+        </div>
+         
+
+        <div class="modal fade" id="addDiagnosisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary-light">
+                <h5 class="modal-title text-primary"><i class="fa-solid fa-notes-medical me-2"></i>Yeni Diaqnoz Əlavə Et</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="diagnosisForm">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Diaqnoz tarixi *</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-calendar-days"></i></span>
+                                <input type="date" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Diaqnoz *</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-stethoscope"></i></span>
+                                <div class="flex-grow-1">
+                                    <select class="form-control select2" data-placeholder="Diaqnoz seçin">
+                                        <option></option>
+                                        <option value="1">Kəskin respirator infeksiya</option>
+                                        <option value="2">Hipertoniya xəstəliyi</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Ölüm sinifi</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-skull"></i></span>
+                                <div class="flex-grow-1">
+                                    <select class="form-control select2" data-placeholder="Seçin">
+                                        <option></option>
+                                        <option value="1">I dərəcə</option>
+                                        <option value="2">II dərəcə</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Diaqnoz sinifi</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-layer-group"></i></span>
+                                <div class="flex-grow-1">
+                                    <select class="form-control select2" data-placeholder="Seçin">
+                                        <option></option>
+                                        <option value="1">İlkin diaqnoz</option>
+                                        <option value="2">Əsas diaqnoz</option>
+                                        <option value="3">Müşayiətedici</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Diaqnoz açıqlaması</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-comment-medical"></i></span>
+                                <textarea class="form-control" rows="3" placeholder="Əlavə qeydlər..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Ləğv et</button>
+                <button type="submit" form="diagnosisForm" class="btn btn-primary btn-sm px-4 shadow-primary">
+                    <i class="fa-solid fa-check me-1"></i> Təsdiqlə
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                  <table  class="table datatable_ka_tam table-bordered w-100" style="font-size: small">
+                            <thead style="font-size: small">
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fa-solid fa-calendar-day me-1"></i> Tarix</th>
+                                <th><i class="fa-solid fa-barcode me-1"></i> Kod</th>
+                                <th><i class="fa-solid fa-notes-medical me-1"></i> Diaqnoz adı</th>
+                                <th><i class="fa-solid fa-layer-group me-1"></i> Sinif</th>
+                                <th><i class="fa-solid fa-user-doctor me-1"></i> Həkim</th>
+                                <th>Açıqlama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>15.05.2024</td>
+                                <td><span class="badge bg-primary-light text-primary">I10</span></td>
+                                <td class="fw-bold">İlkin (essensial) hipertenziya</td>
+                                <td><span class="badge bg-success-light text-success">İlkin diaqnoz</span></td>
+                                <td>Dr. İlqar Məmmədov</td>
+                                <td class="text-muted small">Arterial hipertoniya mövcuddur.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

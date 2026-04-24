@@ -151,5 +151,18 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "pages/anamnez";
     }
+      @GetMapping("/esasDiaqnoz")
+    public String esasDiaqnoz(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/esasDiaqnoz";
+    }
+
+          @GetMapping("/randevu")
+    public String randevu(Model model) {
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/randevu";
+    }
 
 }

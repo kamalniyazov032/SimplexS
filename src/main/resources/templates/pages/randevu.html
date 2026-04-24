@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+
+<body>
+    <div layout:fragment="content">
+
+        <!-- Start Content -->
+
+
+        <!-- Page Header -->
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+            <div class="breadcrumb-arrow">
+                <h4 class="mb-1 text-primary fw-bold">Randevu</h4>
+                <p class="mb-0">Hakim randevu</p>
+            </div>
+        </div>
+        <!-- End Page Header -->
+
+        <div class="row g-3">
+            <div class="col-xl-3 col-lg-4 d-flex">
+
+                <div class="mt-3">
+                    <label class="form-label mb-0">Teqvim</label>
+                    <input type="text" class="form-control d-none" data-provider="flatpickr" data-date-format="d M, Y"
+                        data-deafult-date="today" data-inline-date="true">
+                </div>
+            </div>
+
+            <div class="col-xl-9 col-lg-8 d-flex">
+                <div class="card w-100 mb-0" style="height: 750px;">
+                    <div class="card-body p-2" style="height: 100%; overflow: hidden;">
+                        <div id="calendar-wrapper" style="height: 100%; overflow: hidden;">
+                            <div id="calendar" style="height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 overflow-hidden">
+                    <div class="modal-header border-bottom">
+                        <h4 class="modal-title" id="addCustomerModalLabel">Yeni ambulator pasient
+                        </h4> <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <form action="#" method="post">
+                        <div class="modal-body p-3">
+                            <div class="row g-2">
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Təşkilat</label>
+                                    <select class="form-control select2" name="teskilat">
+                                        <option>UCR</option>
+                                        <option>A-Grup</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ş/V Nömrəsi</label>
+                                    <input type="text" class="form-control" name="svNomresi" placeholder="Ş/V nömrəsi">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">FİN nömrəsi</label>
+                                    <input type="text" class="form-control" name="fin" placeholder="FİN nömrəsi">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Pasport nömrəsi</label>
+                                    <input type="text" class="form-control" name="passportNo"
+                                        placeholder="Pasport nömrəsi">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Ad</label>
+                                    <input type="text" class="form-control" name="ad" placeholder="Ad">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Soyad</label>
+                                    <input type="text" class="form-control" name="soyad" placeholder="Soyad">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Ata adı</label>
+                                    <input type="text" class="form-control" name="ataAdi" placeholder="Ata adı">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Cinsi</label>
+                                    <select class="form-select" name="cins">
+                                        <option value="">Seçin</option>
+                                        <option>Kişi</option>
+                                        <option>Qadın</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Ailə vəziyyəti</label>
+                                    <select class="form-select" name="aileVeziyyeti">
+                                        <option value="">Seçin</option>
+                                        <option>Subay</option>
+                                        <option>Evli</option>
+                                        <option>Boşanmış</option>
+                                        <option>Dul</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Qan qrupu</label>
+                                    <select class="form-select" name="qanQrupu">
+                                        <option value="">Seçin</option>
+                                        <option>A Rh+</option>
+                                        <option>A Rh-</option>
+                                        <option>B Rh+</option>
+                                        <option>B Rh-</option>
+                                        <option>AB Rh+</option>
+                                        <option>AB Rh-</option>
+                                        <option>0 Rh+</option>
+                                        <option>0 Rh-</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Mobil telefon</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+994</span>
+                                        <input type="text" class="form-control" name="telefon"
+                                            placeholder="50 000 00 00">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">E-poçt</label>
+                                    <input type="email" class="form-control" name="email" placeholder="E-poçt">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Doğum tarixi</label>
+                                    <input type="date" class="form-control" name="dogumTarixi">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">İş yeri</label>
+                                    <input type="text" class="form-control" name="isYeri" placeholder="İş yeri">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Milliyyəti</label>
+                                    <input type="text" class="form-control" name="milliyyet" placeholder="Milliyyəti">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Ünvan</label>
+                                    <textarea class="form-control" rows="2" name="unvan" placeholder="Ünvan"></textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Yaşadığı ünvan</label>
+                                    <textarea class="form-control" rows="2" name="yasadigiUnvan"
+                                        placeholder="Yaşadığı ünvan"></textarea>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv
+                                et</button>
+                            <div class="d-flex gap-2">
+                                <button type="reset" class="btn btn-outline-secondary">Təmizlə</button>
+                                <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="appointmentDetailModal" tabindex="-1" aria-labelledby="appointmentDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-md modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 overflow-hidden">
+                    <div class="modal-header border-bottom">
+                        <h5 class="modal-title" id="appointmentDetailModalLabel">Randevu məlumatı
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                    </div>
+
+                    <div class="modal-body p-3">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="form-label">Pasiyent</label>
+                                <input type="text" class="form-control" id="detailPatient" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Təşkilat</label>
+                                <input type="text" class="form-control" id="detailOrganization" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Telefon</label>
+                                <input type="text" class="form-control" id="detailPhone" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">FİN</label>
+                                <input type="text" class="form-control" id="detailFin" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Ş/V</label>
+                                <input type="text" class="form-control" id="detailSv" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Pasport</label>
+                                <input type="text" class="form-control" id="detailPassport" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Başlama</label>
+                                <input type="text" class="form-control" id="detailStart" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Bitmə</label>
+                                <input type="text" class="form-control" id="detailEnd" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button>
+                        <button type="button" class="btn btn-danger" id="deleteAppointmentBtn">
+                            <i class="ti ti-trash me-1"></i>Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>
