@@ -67,9 +67,9 @@
                     </a>
                     <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
                         <li><a th:href="@{/poliklinikHekim}">Poliknika</a></li>
-                        <li><a href="javascript:void(0);">Stasionar</a></li>
+                        <li><a th:href="@{/stasionar}">Stasionar</a></li>
                         <li><a href="javascript:void(0);">Əməliyyatxana</a></li>
-                        <li><a href="javascript:void(0);">Radiologiya</a></li>
+                        <li><a th:href="@{/radiologiya}">Radiologiya</a></li>
 
                     </ul>
                 </li>

@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
+    @GetMapping("/login")
+    public String login() {
+        return "pages/login";
+    }
+
     @GetMapping("/")
     public String home() {
         return "redirect:/dashboard";
@@ -110,6 +115,13 @@ public class HomeController {
         return "pages/shobe";
     }
 
+    @GetMapping("/stasionar")
+    public String stasionar(Model model) {
+        model.addAttribute("pageTitle", "Stasionar");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/stasionar";
+    }
+
     @GetMapping("/pasientAvans")
     public String pasientAvans(Model model) {
         model.addAttribute("pageTitle", "Home");
@@ -163,6 +175,13 @@ public class HomeController {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/randevu";
+    }
+
+    @GetMapping("/radiologiya")
+    public String radiologiya(Model model) {
+        model.addAttribute("pageTitle", "Radiologiya");
+        model.addAttribute("activeMenu", "dashboard");
+        return "pages/radiologiya";
     }
 
 }
