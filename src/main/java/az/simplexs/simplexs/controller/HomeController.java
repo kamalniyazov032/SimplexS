@@ -122,6 +122,18 @@ public class HomeController {
         return "pages/stasionar";
     }
 
+    @GetMapping("/stasionar/teyinat")
+    public String stasionarTeyinat(Model model) {
+        model.addAttribute("pageTitle", "Həkim təyinatı");
+        return "pages/stasionarTeyinat";
+    }
+
+    @GetMapping("/stasionar/teyinat-yaz")
+    public String stasionarTeyinatYaz(Model model) {
+        model.addAttribute("pageTitle", "Həkim təyinat yaz");
+        return "pages/stasionarTeyinatYaz";
+    }
+
     @GetMapping("/pasientAvans")
     public String pasientAvans(Model model) {
         model.addAttribute("pageTitle", "Home");

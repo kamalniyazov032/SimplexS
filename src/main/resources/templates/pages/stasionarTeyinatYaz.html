@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/blank}">
+
+<head></head>
+
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap">
+        <div>
+            <h4 class="mb-1 text-primary fw-bold">
+                <i class="fa-solid fa-file-prescription me-2"></i>Həkim təyinat yaz
+            </h4>
+            <p class="mb-0 text-muted">Stasionar pasient üçün dərman təyinatı yaradın.</p>
+        </div>
+        <button type="button" class="btn btn-light border" onclick="window.close();">
+            <i class="fa-solid fa-xmark me-1"></i>Bağla
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-3">
+            <ul class="nav nav-tabs mb-3" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#medicineAssignment"
+                            type="button" role="tab">
+                        Dərman Təyinat
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#nurseInstruction"
+                            type="button" role="tab">
+                        Tibb bacısına həkimin tapşırığı
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="medicineAssignment" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-xl-5">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+                                    <span class="fw-bold">Növ:</span>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="remainingDrug" checked>
+                                        <label class="form-check-label" for="remainingDrug">Qalığı olan.Dər</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="patientDrug" checked>
+                                        <label class="form-check-label" for="patientDrug">Xəstənin.Öz.D</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="mixedDrugs" checked>
+                                        <label class="form-check-label" for="mixedDrugs">Qarışıq Dərmanlar</label>
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <label class="form-label fw-bold mb-0">Depo:</label>
+                                    </div>
+                                    <div class="col">
+                                        <select class="form-select">
+                                            <option selected>-- Depo seçin --</option>
+                                            <option>Mərkəzi depo</option>
+                                            <option>KFO deposu</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive border rounded-3">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light">
+                                        <tr>
+                                            <th>Kodu</th>
+                                            <th>Mal Adı</th>
+                                            <th class="text-center">Qalıq Miqdarı</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td class="fw-bold">100001</td>
+                                            <td class="fw-bold">Paracetamol 500 mg tablet</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary-light text-primary px-3 py-2">1,250</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">100002</td>
+                                            <td class="fw-bold">Amoksisillin 500 mg kapsul</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary-light text-primary px-3 py-2">850</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">100003</td>
+                                            <td class="fw-bold text-muted">NaCl 0.9% 100 ml flakon</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-light text-danger px-3 py-2">0</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">100004</td>
+                                            <td class="fw-bold">Ranitidin 50 mg/2 ml ampul</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary-light text-primary px-3 py-2">32</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">100005</td>
+                                            <td class="fw-bold text-muted">Metamizol 1 g/2 ml ampul</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-light text-danger px-3 py-2">0</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">100006</td>
+                                            <td class="fw-bold">Dekametazon 4 mg/1 ml ampul</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary-light text-primary px-3 py-2">120</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">100007</td>
+                                            <td class="fw-bold">Qlukoza 5% 500 ml flakon</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary-light text-primary px-3 py-2">15</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">100008</td>
+                                            <td class="fw-bold text-muted">Ketorolak 30 mg/ml ampul</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-light text-danger px-3 py-2">0</span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="border border-top-0 rounded-bottom p-2 fw-bold">Cəmi: 8</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-7">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Qarışıq Qrupu:</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                            <option>Qarışıq 1</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="newMixture">
+                                            <label class="form-check-label fw-semibold" for="newMixture">Yeni Qarışıq Hazırla</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Doza:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <select class="form-select">
+                                            <option selected>-- Doza seçin --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Doza Vahidi:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">İstifadə Miqdarı:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control" placeholder="Miqdar daxil edin">
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Gün:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control" value="1">
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Yerdilmə Sürəti:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">İstifadə Şəkli:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                            <option>Ağızdan</option>
+                                            <option>İV</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Ac - Tox Vəziyyəti:</label>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                            <option>Tox</option>
+                                            <option>Ac</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label class="form-label fw-bold mb-0">Başlanğıc tarixi:</label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" value="24.05.2025">
+                                            <span class="input-group-text bg-white"><i class="fa-regular fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="manyDates">
+                                            <label class="form-check-label" for="manyDates">Çoxlu Tarix Seç</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">İstifadə Saatı:</label>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <select class="form-select">
+                                            <option selected>-- Seçin --</option>
+                                            <option>08:00</option>
+                                            <option>12:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-7">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="timeLocked">
+                                                <label class="form-check-label" for="timeLocked">Saat Dəyişdirilməsin</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="citoStatus">
+                                                <label class="form-check-label" for="citoStatus">CİTO</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="exactTime">
+                                                <label class="form-check-label" for="exactTime">Dəqiq vaxtında istifadə edilsin</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Həkim Qeydi:</label>
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <textarea class="form-control" rows="3" placeholder="Qeyd daxil edin..."></textarea>
+                                    </div>
+
+                                    <div class="col-lg-3">
+                                        <label class="form-label fw-bold mb-0">Ehtiyac Növü:</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="d-flex gap-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="needType" id="continuousNeed" checked>
+                                                <label class="form-check-label" for="continuousNeed">Davamlı</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="needType" id="whenNeeded">
+                                                <label class="form-check-label" for="whenNeeded">Ehtiyac olanda</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="d-flex justify-content-lg-end gap-2">
+                                            <button type="button" class="btn btn-primary px-4">
+                                                <i class="fa-solid fa-download me-1"></i>Yüklə
+                                            </button>
+                                            <button type="button" class="btn btn-light border px-4">
+                                                <i class="fa-regular fa-trash-can me-1"></i>Təmizlə
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h5 class="fw-bold mb-2">Seçilən Dərmanlar</h5>
+                        <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                            <div class="input-group" style="max-width: 420px;">
+                                <input type="text" class="form-control" placeholder="Dərman adı və ya kodu ilə axtarış edin...">
+                                <button class="btn btn-outline-secondary" type="button" aria-label="Axtar">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                            <button class="btn btn-light border fw-bold" type="button">Təmizlə</button>
+                            <div class="form-check ms-lg-4">
+                                <input class="form-check-input" type="checkbox" id="selectedMixedDrugs">
+                                <label class="form-check-label" for="selectedMixedDrugs">Qarışıq Dərmanlar</label>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive border rounded-3">
+                            <table class="table table-bordered align-middle mb-0 text-center">
+                                <thead class="bg-light">
+                                <tr>
+                                    <th>Başlama tarixi</th>
+                                    <th>Saat</th>
+                                    <th>Dərmanın adı</th>
+                                    <th>Kodu</th>
+                                    <th>Miqdarı</th>
+                                    <th>Dozası</th>
+                                    <th>Təyin olan vahid</th>
+                                    <th>Verilən miqdar</th>
+                                    <th>Verilən vahid</th>
+                                    <th>Sürəti</th>
+                                    <th>Yerdilmə sürət vahidi (ml/saat)</th>
+                                    <th>İstifadə şəkli</th>
+                                    <th>Ac - Tox vəziyyəti</th>
+                                    <th>Həkim qeydi</th>
+                                    <th>Ehtiyac növü</th>
+                                    <th>Mərkəz depomun qeydi</th>
+                                    <th>CİTO statusu</th>
+                                    <th>Dəqiq vaxtında istifadə edilsin</th>
+                                    <th>Xəstənin öz dərmanı statusu</th>
+                                    <th>Sil</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>24.05.2025</td>
+                                    <td class="fw-bold">08:00</td>
+                                    <td class="text-start fw-semibold">Paracetamol<br><span class="small text-muted">500 mg tablet</span></td>
+                                    <td>100001</td>
+                                    <td>500</td>
+                                    <td>1</td>
+                                    <td>tablet</td>
+                                    <td>500</td>
+                                    <td>mg</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>Ağızdan</td>
+                                    <td>Tox</td>
+                                    <td>Ağrıkəsici</td>
+                                    <td>Davamlı</td>
+                                    <td>Qeyd yoxdur</td>
+                                    <td><i class="fa-regular fa-circle-check text-success fs-4"></i></td>
+                                    <td><i class="fa-regular fa-circle-check text-success fs-4"></i></td>
+                                    <td><i class="fa-regular fa-circle-xmark text-danger fs-4"></i></td>
+                                    <td>
+                                        <button class="btn btn-link text-danger p-0" type="button" aria-label="Sil">
+                                            <i class="fa-regular fa-trash-can fs-4"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="border border-top-0 rounded-bottom p-2 fw-bold">Cəmi: 1</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+                        <button type="button" class="btn btn-primary px-4">
+                            <i class="fa-regular fa-floppy-disk me-1"></i>Saxla
+                        </button>
+                        <button type="button" class="btn btn-light border px-4" onclick="window.close();">
+                            <i class="fa-solid fa-xmark me-1"></i>Bağla
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="nurseInstruction" role="tabpanel">
+                    <div class="border rounded-3 p-4 text-muted">
+                        Tibb bacısına həkimin tapşırığı forması üçün boş sahə.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      data-layout="mini" data-bs-theme="light" data-color="primary">
+
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+
+<body style="overflow-y: auto; padding-right: 0;">
+<div class="content p-3 p-lg-4" layout:fragment="content">
+    <!-- page content -->
+</div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/moment.min.js}"></script>
+<script th:src="@{/assets/plugins/daterangepicker/daterangepicker.js}"></script>
+<script th:src="@{/assets/plugins/flatpickr/flatpickr.min.js}"></script>
+<script th:src="@{/assets/plugins/select2/js/select2.min.js}"></script>
+<script th:src="@{/custom/js/customMy.js}"></script>
+<script th:src="@{/assets/plugins/datatables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/plugins/datatables/js/dataTables.bootstrap5.min.js}"></script>
+<script th:src="@{/assets/js/script.js}"></script>
+</body>
+
+</html>

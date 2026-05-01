@@ -241,9 +241,12 @@
         </div>
 
         <div class="col-xl-6 col-lg-8">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body pb-0">
-                    <div class="d-flex flex-wrap gap-2 mb-3">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-3">
+                <div class="card-header bg-light-gray border-0 py-2">
+                    <h6 class="fw-bold mb-0 small text-muted">Genişləndirilmiş Naviqasiya</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-flex flex-wrap gap-2">
                         <a th:href="@{/xesteTarixcesi}"
                            class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center p-2"
                            style="width: 86px; height: 74px; text-decoration: none;">
@@ -373,7 +376,21 @@
                             <i class="fa-solid fa-lungs mb-1 fs-4"></i>
                             <span class="small fw-bold">Radiologiya</span>
                         </a>
+                        <a th:href="@{/stasionar/teyinat}" target="_blank"
+                           class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center p-2"
+                           style="width: 86px; height: 74px; text-decoration: none;">
+                            <i class="fa-solid fa-clipboard-list mb-1 fs-4"></i>
+                            <span class="small fw-bold">Təyinat</span>
+                        </a>
+                        <a th:href="@{/stasionar/teyinat-yaz}" target="_blank"
+                           class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center p-2"
+                           style="width: 86px; height: 74px; text-decoration: none;">
+                            <i class="fa-solid fa-file-prescription mb-1 fs-4"></i>
+                            <span class="small fw-bold">Təyinat yaz</span>
+                        </a>
                     </div>
+                </div>
+            </div>
 
                     <div class="card border-0 shadow-sm rounded-3 mb-3">
                         <div class="card-header bg-white py-3 border-0">
@@ -437,8 +454,6 @@
                             <span class="text-muted">Cəmi: 6 xidmət</span>
                         </div>
                     </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-xl-3 col-lg-12">
