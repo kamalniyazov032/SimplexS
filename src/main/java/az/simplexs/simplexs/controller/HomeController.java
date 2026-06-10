@@ -31,6 +31,14 @@ public class HomeController {
         return "pages/pasienQebulu/ambulator/ambulatorQebul";
     }
 
+    @GetMapping("/xesteKarti")
+    public String xesteKarti(Model model) {
+        model.addAttribute("pageTitle", "Xəstə Kartı");
+        model.addAttribute("activeMenuGroup", "pasientQebulu");
+        model.addAttribute("activeMenu", "xesteKarti");
+        return "pages/pasienQebulu/xesteKarti";
+    }
+
     @GetMapping("/parXidmet")
     public String parXidemt(Model model) {
         model.addAttribute("pageTitle", "Home");

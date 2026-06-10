@@ -40,13 +40,17 @@
                 <li class="menu-title"><span>Klinik məlumat sistemi</span></li>
 
                 <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
+                    <a href="javascript:void(0);"
+                       th:classappend="${activeMenuGroup == 'pasientQebulu'} ? 'active subdrop' : ''">
                         <i class="fa-solid fa-clipboard-user"></i><span>Pasiyent qəbulu</span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/ambulatorQebul}">Ambulator</a></li>
+                    <ul th:style="${activeMenuGroup == 'pasientQebulu'} ? 'display:block;' : ''">
+                        <li><a th:href="@{/ambulatorQebul}"
+                               th:classappend="${activeMenu == 'ambulatorQebul'} ? 'active' : ''">Ambulator</a></li>
                         <li><a href="javascript:void(0);">Stasionar</a></li>
+                        <li><a th:href="@{/xesteKarti}"
+                               th:classappend="${activeMenu == 'xesteKarti'} ? 'active' : ''">Xəstə Kartı</a></li>
                     </ul>
                 </li>
 

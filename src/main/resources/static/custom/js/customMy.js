@@ -1,16 +1,40 @@
+function initSelect2Fields(context) {
+    if (!$.fn.select2) return;
 
-$(document).on('shown.bs.modal', '.modal', function () {
-    $(this).find('.select2').each(function () {
-        if ($(this).hasClass('select2-hidden-accessible')) return;
+    const $context = context ? $(context) : $(document);
+    $context.find('.select2').each(function () {
+        const $select = $(this);
+        if ($select.hasClass('select2-hidden-accessible')) return;
 
-        $(this).select2({
-            dropdownParent: $(this).closest('.modal'),
+        const $modalParent = $select.closest('.modal');
+        const $offcanvasParent = $select.closest('.offcanvas');
+        const options = {
             width: '100%',
-            placeholder: 'Seçin',
-            allowClear: false,
+            placeholder: $select.data('placeholder') || 'Seçin',
+            allowClear: false
+        };
 
-        });
+        if ($modalParent.length) {
+            options.dropdownParent = $modalParent;
+        }
+
+        // Qeyd: offcanvas daxilində olan .select2 elementləri ID-yə bağlı deyil.
+        // Gələcək səhifələrdə offcanvas içində select-ə sadəcə .select2 class-ı verilsə,
+        // dropdown həmin offcanvas parent-in içindən açılacaq.
+        if ($offcanvasParent.length) {
+            options.dropdownParent = $offcanvasParent;
+        }
+
+        $select.select2(options);
     });
+}
+
+$(document).ready(function () {
+    initSelect2Fields(document);
+});
+
+$(document).on('shown.bs.modal shown.bs.offcanvas', '.modal, .offcanvas', function () {
+    initSelect2Fields(this);
 });
 
 $(document).ready(function () {

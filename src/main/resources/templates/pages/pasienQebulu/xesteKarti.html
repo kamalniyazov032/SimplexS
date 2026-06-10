@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Xəstə Kartı</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <style>
+        .patient-card-page {
+            --xk-primary: #2f6df6;
+            --xk-border: #e8edf5;
+            --xk-muted: #7b8497;
+            --xk-soft: #f7f9fd;
+            --xk-title: #20243a;
+        }
+
+        .patient-card-page .xk-title-icon,
+        .patient-card-page .xk-section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--xk-primary);
+            background: rgba(47, 109, 246, 0.1);
+            flex: 0 0 auto;
+        }
+
+        .patient-card-page .xk-panel {
+            background: #fff;
+            border: 1px solid var(--xk-border);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+        }
+
+        .patient-card-page .xk-panel-header {
+            min-height: 44px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--xk-border);
+            background: #fbfcff;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .patient-card-page .xk-panel-body {
+            padding: 14px 16px;
+        }
+
+        .patient-card-page .xk-filter-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 1fr) minmax(320px, .9fr) minmax(420px, 1.25fr) 190px;
+            gap: 0;
+        }
+
+        .patient-card-page .xk-filter-cell {
+            padding: 16px 18px;
+            border-right: 1px solid var(--xk-border);
+        }
+
+        .patient-card-page .xk-filter-actions {
+            padding: 16px 18px;
+        }
+
+        .patient-card-page .xk-form-row {
+            display: grid;
+            grid-template-columns: 155px minmax(0, 1fr);
+            align-items: center;
+            gap: 12px;
+            min-height: 40px;
+            margin-bottom: 8px;
+        }
+
+        .patient-card-page .xk-form-row label {
+            color: var(--xk-title);
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.25;
+        }
+
+        .patient-card-page .xk-control {
+            min-height: 38px;
+            border-color: var(--xk-border);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .patient-card-page .xk-control:focus {
+            border-color: rgba(47, 109, 246, .65);
+            box-shadow: 0 0 0 .15rem rgba(47, 109, 246, .12);
+        }
+
+        .patient-card-page .xk-date-range {
+            display: grid;
+            grid-template-columns: 1fr 16px 1fr;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .patient-card-page .xk-input-icon {
+            position: relative;
+        }
+
+        .patient-card-page .xk-input-icon i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--xk-primary);
+            pointer-events: none;
+        }
+
+        .patient-card-page .xk-input-icon .form-control,
+        .patient-card-page .xk-input-icon .form-select {
+            padding-right: 38px;
+        }
+
+        .patient-card-page .xk-radio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(90px, 1fr));
+            gap: 12px 18px;
+            align-items: center;
+        }
+
+        .patient-card-page .xk-table th {
+            background: #fbfcff;
+            color: #2f3447;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .patient-card-page .xk-table td {
+            vertical-align: middle;
+            color: #343849;
+        }
+
+        .patient-card-page .xk-table tbody tr.active-row td {
+            background: #f5f8ff;
+        }
+
+        .patient-card-page .xk-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .patient-card-page .xk-info-grid {
+            display: grid;
+            grid-template-columns: minmax(145px, 1fr) minmax(110px, auto);
+            gap: 7px 14px;
+            align-items: center;
+        }
+
+        .patient-card-page .xk-info-grid dt,
+        .patient-card-page .xk-info-grid dd {
+            margin: 0;
+        }
+
+        .patient-card-page .xk-info-grid dt {
+            font-weight: 700;
+            color: #25293d;
+            font-size: 13px;
+        }
+
+        .patient-card-page .xk-info-grid dd {
+            color: #25293d;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .patient-card-page .xk-action-footer {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .patient-card-page .xk-action-footer .btn {
+            min-height: 58px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1599px) {
+            .patient-card-page .xk-filter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .patient-card-page .xk-filter-cell:nth-child(2) {
+                border-right: 0;
+            }
+
+            .patient-card-page .xk-filter-cell:nth-child(3) {
+                border-top: 1px solid var(--xk-border);
+            }
+
+            .patient-card-page .xk-filter-actions {
+                border-top: 1px solid var(--xk-border);
+            }
+        }
+
+        @media (max-width: 991px) {
+            .patient-card-page .xk-filter-grid,
+            .patient-card-page .xk-action-footer {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-card-page .xk-filter-cell {
+                border-right: 0;
+                border-bottom: 1px solid var(--xk-border);
+            }
+
+            .patient-card-page .xk-filter-cell:nth-child(3) {
+                border-top: 0;
+            }
+
+            .patient-card-page .xk-filter-actions {
+                border-top: 0;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .patient-card-page .xk-form-row,
+            .patient-card-page .xk-date-range,
+            .patient-card-page .xk-radio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="patient-card-page">
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+            <div class="d-flex align-items-center gap-3">
+                <span class="xk-title-icon">
+                    <i class="fa-solid fa-id-card-clip fs-20"></i>
+                </span>
+                <div>
+                    <h4 class="mb-1 fw-bold text-dark">Xəstə Kartları</h4>
+                    <p class="mb-0 text-muted">Pasiyent protokolları, kart məlumatları və çıxış əməliyyatları</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#xesteKartiSearchOffcanvas" aria-controls="xesteKartiSearchOffcanvas">
+                    <i class="fa-solid fa-filter me-1"></i>Filter
+                </button>
+            </div>
+        </div>
+
+        <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="xesteKartiSearchOffcanvas"
+             style="visibility: visible; top: 0;">
+            <div class="offcanvas-header border-bottom bg-light">
+                <h4 id="xesteKartiSearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
+                    <i class="ti ti-filter me-2"></i>Xəstə Kartı üzrə Ətraflı Axtarış
+                </h4>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body">
+            <div class="xk-filter-grid">
+                <div class="xk-filter-cell">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="xk-section-icon"><i class="ti ti-search fs-18"></i></span>
+                        <h6 class="mb-0 fw-bold">Axtarış meyarları</h6>
+                    </div>
+
+                    <div class="xk-form-row">
+                        <label>Tarix aralığı</label>
+	                        <div class="xk-date-range">
+	                            <div class="xk-input-icon">
+	                                <input type="text" class="form-control xk-control" data-provider="flatpickr"
+	                                       data-date-format="d.m.Y" data-default-date="01.05.2025"
+	                                       placeholder="Başlanğıc tarix">
+	                                <i class="ti ti-calendar"></i>
+	                            </div>
+	                            <span class="text-muted text-center">-</span>
+	                            <div class="xk-input-icon">
+	                                <input type="text" class="form-control xk-control" data-provider="flatpickr"
+	                                       data-date-format="d.m.Y" data-default-date="31.05.2025"
+	                                       placeholder="Bitmə tarixi">
+	                                <i class="ti ti-calendar"></i>
+	                            </div>
+	                        </div>
+                    </div>
+
+                    <div class="xk-form-row">
+                        <label><i class="fa-solid fa-user me-2 text-muted"></i>Protokol</label>
+                        <input type="text" class="form-control xk-control" placeholder="Protokol nömrəsi">
+                    </div>
+                    <div class="xk-form-row">
+                        <label><i class="fa-solid fa-user me-2 text-muted"></i>Fayl No</label>
+                        <input type="text" class="form-control xk-control" placeholder="Fayl nömrəsi">
+                    </div>
+                    <div class="xk-form-row">
+                        <label><i class="fa-solid fa-user me-2 text-muted"></i>Adı, soyadı, ata adı</label>
+                        <input type="text" class="form-control xk-control" placeholder="Adı, soyadı, ata adı daxil edin">
+                    </div>
+                    <div class="xk-form-row">
+                        <label><i class="fa-regular fa-id-card me-2 text-muted"></i>Şəxsiyyət nömrəsi</label>
+                        <input type="text" class="form-control xk-control" placeholder="Şəxsiyyət nömrəsi">
+                    </div>
+                    <div class="xk-form-row mb-0">
+                        <label><i class="fa-solid fa-passport me-2 text-muted"></i>Fin. No</label>
+                        <input type="text" class="form-control xk-control" placeholder="Fin. No daxil edin">
+                    </div>
+                </div>
+
+                <div class="xk-filter-cell">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="xk-section-icon"><i class="ti ti-filter fs-18"></i></span>
+                        <h6 class="mb-0 fw-bold">Əlavə axtarışlar</h6>
+                    </div>
+
+	                    <div class="xk-form-row">
+	                        <label>Gəlir qrupu</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Gəlir qrupu seçin">
+	                            <option></option>
+	                            <option>Ödənişli xəstələr</option>
+	                            <option>Sığorta xəstələri</option>
+	                            <option>Korporativ xəstələr</option>
+	                        </select>
+	                    </div>
+	                    <div class="xk-form-row">
+	                        <label>Müəssisə</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Müəssisə seçin">
+	                            <option></option>
+	                            <option>Referans Klinika MMC</option>
+	                            <option>Simplex Hospital</option>
+	                            <option>Medline MMC</option>
+	                        </select>
+	                    </div>
+	                    <div class="xk-form-row">
+	                        <label>Həkim</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Həkim seçin">
+	                            <option></option>
+	                            <option>Dr. Rauf Quliyev</option>
+	                            <option>Dr. Aygün Məmmədova</option>
+	                            <option>Dr. Tural Həsənov</option>
+	                        </select>
+	                    </div>
+	                    <div class="xk-form-row">
+	                        <label>Qeyd edən</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Qeyd edən seçin">
+	                            <option></option>
+	                            <option>Operator 1</option>
+	                            <option>Operator 2</option>
+	                            <option>Qeydiyyat şöbəsi</option>
+	                        </select>
+	                    </div>
+	                    <div class="xk-form-row">
+	                        <label>Müraciət səbəbi</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Müraciət səbəbi seçin">
+	                            <option></option>
+	                            <option>Müayinə</option>
+	                            <option>Təcili müraciət</option>
+	                            <option>Kontrol baxış</option>
+	                        </select>
+	                    </div>
+	                    <div class="xk-form-row mb-0">
+	                        <label>Prioritet səbəbi</label>
+	                        <select class="form-select xk-control select2" data-placeholder="Prioritet səbəbi seçin">
+	                            <option></option>
+	                            <option>Təcili</option>
+	                            <option>Planlı</option>
+	                            <option>Növbədənkənar</option>
+	                        </select>
+	                    </div>
+	                </div>
+
+                <div class="xk-filter-cell">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="xk-section-icon"><i class="ti ti-settings fs-18"></i></span>
+                        <h6 class="mb-0 fw-bold">Status və digər seçimlər</h6>
+                    </div>
+
+	                    <div class="xk-form-row">
+	                        <label>Xəstə tipi:</label>
+	                        <div class="xk-radio-grid">
+	                            <div class="form-check"><input class="form-check-input" type="radio" name="xesteTipi" id="xesteTipiHamisi" checked><label class="form-check-label" for="xesteTipiHamisi">Hamısı</label></div>
+	                            <div class="form-check"><input class="form-check-input" type="radio" name="xesteTipi" id="xesteTipiAmbulator"><label class="form-check-label" for="xesteTipiAmbulator">Ambulator</label></div>
+	                            <div class="form-check"><input class="form-check-input" type="radio" name="xesteTipi" id="xesteTipiYatan"><label class="form-check-label" for="xesteTipiYatan">Yatan</label></div>
+	                        </div>
+	                    </div>
+
+                    <div class="xk-form-row">
+                        <label>Statusu:</label>
+                        <div class="xk-radio-grid">
+                            <div class="form-check"><input class="form-check-input" type="radio" name="status" id="statusAll" checked><label class="form-check-label" for="statusAll">Hamısı</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="status" id="statusInsurance"><label class="form-check-label" for="statusInsurance">Sığorta</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="status" id="statusPaid"><label class="form-check-label" for="statusPaid">Ödənişli</label></div>
+                        </div>
+                    </div>
+                    <div class="xk-form-row">
+                        <label>Çıxışı:</label>
+                        <div class="xk-radio-grid">
+                            <div class="form-check"><input class="form-check-input" type="radio" name="cixis" id="cixisAll" checked><label class="form-check-label" for="cixisAll">Hamısı</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="cixis" id="cixisDone"><label class="form-check-label" for="cixisDone">Olmuş</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="cixis" id="cixisOpen"><label class="form-check-label" for="cixisOpen">Olmamış</label></div>
+                        </div>
+                    </div>
+                    <div class="xk-form-row">
+                        <label>Faktura:</label>
+                        <div class="xk-radio-grid">
+                            <div class="form-check"><input class="form-check-input" type="radio" name="faktura" id="fakturaAll" checked><label class="form-check-label" for="fakturaAll">Hamısı</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="faktura" id="fakturaVar"><label class="form-check-label" for="fakturaVar">Var</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="faktura" id="fakturaYox"><label class="form-check-label" for="fakturaYox">Yox</label></div>
+                        </div>
+                    </div>
+                    <div class="xk-form-row mb-0">
+                        <label>Prov. Onay:</label>
+                        <div class="xk-radio-grid">
+                            <div class="form-check"><input class="form-check-input" type="radio" name="prov" id="provAll" checked><label class="form-check-label" for="provAll">Hamısı</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="prov" id="provYes"><label class="form-check-label" for="provYes">Provizyonlu</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="prov" id="provWait"><label class="form-check-label" for="provWait">Gözləyən</label></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xk-filter-actions d-flex flex-column justify-content-center gap-3">
+                    <button type="button" class="btn btn-primary btn-lg fw-bold">
+                        <i class="ti ti-search me-2"></i>Axtar
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-lg fw-bold">
+                        <i class="ti ti-refresh me-2"></i>Təmizlə
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12 col-xxl-8">
+                <div class="xk-panel h-100">
+                    <div class="xk-panel-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="xk-section-icon"><i class="fa-solid fa-user-group"></i></span>
+                            <h6 class="mb-0 fw-bold">Xəstə siyahısı</h6>
+                        </div>
+                        <span class="badge bg-primary-light text-primary">142 nəticə</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table xk-table table-hover table-nowrap mb-0">
+	                            <thead>
+	                            <tr>
+	                                <th>Adı, Soyadı, Ata adı</th>
+	                                <th>Protokol No</th>
+	                                <th>Fayl No</th>
+	                                <th>Gəliş Tarixi</th>
+                                <th>Çıxış tarixi</th>
+                                <th>Xəstə tipi</th>
+                                <th class="text-center">Əməliyyatlar</th>
+                            </tr>
+                            </thead>
+	                            <tbody>
+	                            <tr class="active-row">
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Əliyev Rəşad Vüqar oğlu</td>
+	                                <td>A26000084</td>
+	                                <td>L0040469</td>
+	                                <td>23.05.2025 13:20</td>
+                                <td>-</td>
+                                <td><span class="xk-badge bg-success-light text-success">Ambulator</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Məmmədova Nigar Arif qızı</td>
+	                                <td>A26000083</td>
+	                                <td>L0040458</td>
+	                                <td>23.05.2025 11:05</td>
+                                <td>-</td>
+                                <td><span class="xk-badge bg-success-light text-success">Ambulator</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Həsənov Tural Elçin oğlu</td>
+	                                <td>A26000082</td>
+	                                <td>L0040432</td>
+	                                <td>23.05.2025 10:18</td>
+                                <td>23.05.2025 16:40</td>
+                                <td><span class="xk-badge bg-primary-light text-primary">Yatan</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Quliyeva Sevil İntiqam qızı</td>
+	                                <td>A26000081</td>
+	                                <td>L0067242</td>
+	                                <td>22.05.2025 10:30</td>
+                                <td>-</td>
+                                <td><span class="xk-badge bg-success-light text-success">Ambulator</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Mustafayev Orxan Rauf oğlu</td>
+	                                <td>A26000080</td>
+	                                <td>L0064525</td>
+	                                <td>22.05.2025 09:45</td>
+                                <td>22.05.2025 15:20</td>
+                                <td><span class="xk-badge bg-primary-light text-primary">Yatan</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Kazımova Ləman Vüqar qızı</td>
+	                                <td>A26000079</td>
+	                                <td>L0067242</td>
+	                                <td>21.05.2025 16:19</td>
+                                <td>-</td>
+                                <td><span class="xk-badge bg-success-light text-success">Ambulator</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>İbrahimov Samir Yadigar oğlu</td>
+	                                <td>A26000078</td>
+	                                <td>L0062530</td>
+	                                <td>21.05.2025 15:14</td>
+                                <td>21.05.2025 17:10</td>
+                                <td><span class="xk-badge bg-primary-light text-primary">Yatan</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+	                            </tr>
+	                            <tr>
+	                                <td><i class="fa-solid fa-user text-muted me-2"></i>Əhmədov İlkin Mətin oğlu</td>
+	                                <td>A26000077</td>
+	                                <td>L0061349</td>
+	                                <td>20.05.2025 12:33</td>
+                                <td>-</td>
+                                <td><span class="xk-badge bg-success-light text-success">Ambulator</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" aria-label="Düzəliş et"><i class="ti ti-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" aria-label="Sil"><i class="ti ti-trash"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="xk-panel-body border-top d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                        <div class="btn-group" role="group" aria-label="Səhifələmə">
+                            <button class="btn btn-outline-primary btn-sm"><i class="ti ti-chevrons-left"></i></button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="ti ti-chevron-left"></i></button>
+                            <button class="btn btn-primary btn-sm">1</button>
+                            <button class="btn btn-outline-primary btn-sm">2</button>
+                            <button class="btn btn-outline-primary btn-sm">3</button>
+                            <button class="btn btn-outline-primary btn-sm">4</button>
+                            <button class="btn btn-outline-primary btn-sm">5</button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="ti ti-dots"></i></button>
+                            <button class="btn btn-outline-primary btn-sm">15</button>
+                            <button class="btn btn-outline-primary btn-sm"><i class="ti ti-chevron-right"></i></button>
+                        </div>
+                        <span class="text-muted fw-semibold">Göstərilən 1 - 10 / 142</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xxl-4">
+                <div class="xk-panel mb-3">
+                    <div class="xk-panel-header d-flex align-items-center gap-2">
+                        <span class="xk-section-icon"><i class="ti ti-info-circle fs-18"></i></span>
+                        <h6 class="mb-0 fw-bold">Əlavə məlumat</h6>
+	                    </div>
+	                    <div class="xk-panel-body">
+	                        <dl class="xk-info-grid mb-0">
+	                            <dt>Ambulatora bağlı olan Yatış Kart:</dt>
+	                            <dd>YK-2025-0158</dd>
+	                            <dt>Doğum tarixi:</dt>
+	                            <dd>15.08.1985</dd>
+	                            <dt>Faktura No:</dt>
+	                            <dd>F-2025-03452</dd>
+	                            <dt>Müəssisə:</dt>
+	                            <dd>Referans Klinika MMC</dd>
+	                            <dt>Xəstə status:</dt>
+	                            <dd><span class="xk-badge bg-success-light text-success">Sığortalı</span></dd>
+	                            <dt>Xəstə tipi:</dt>
+	                            <dd><span class="xk-badge bg-primary-light text-primary">Yatan</span></dd>
+	                        </dl>
+
+	                        <button type="button"
+	                                class="btn btn-outline-primary w-100 fw-bold mt-2"
+	                                data-bs-toggle="modal"
+	                                data-bs-target="#selectedDepartmentsModal">
+	                            <i class="fa-solid fa-hospital-user me-2"></i>Protokolun seçilmiş olduğu şöbələr
+	                        </button>
+
+	                        <label class="form-label fw-bold mt-3">Protokol Açıqlama:</label>
+	                        <textarea class="form-control xk-control" rows="3">Pasiyent baş ağrısı və halsızlıq şikayəti ilə müraciət edib.
+Həkim müayinəsi olunub, laborator analizlər təyin edilib.</textarea>
+	                    </div>
+	                </div>
+
+                <div class="xk-panel">
+                    <div class="xk-panel-header d-flex align-items-center gap-2">
+                        <span class="xk-section-icon"><i class="ti ti-info-circle fs-18"></i></span>
+                        <h6 class="mb-0 fw-bold">Çıxış əməliyyatları</h6>
+                    </div>
+                    <div class="xk-panel-body">
+                        <div class="xk-form-row">
+                            <label>Çıxış tarixi:</label>
+                            <div class="xk-input-icon">
+                                <input type="text" class="form-control xk-control datetimepicker" value="23.05.2025">
+                                <i class="ti ti-calendar"></i>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-outline-success w-100 fw-bold">
+                                    <i class="ti ti-logout me-2"></i>Çıxışı (tək) et
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-outline-success w-100 fw-bold">
+                                    <i class="fa-solid fa-users me-2"></i>Çıxışları (cəm) et
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-outline-warning w-100 fw-bold">
+                                    <i class="ti ti-arrow-back-up me-2"></i>Çıxışı (tək) geri al
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-outline-warning w-100 fw-bold">
+                                    <i class="fa-solid fa-users-gear me-2"></i>Çıxışları (cəm) geri al
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+	            </div>
+	        </div>
+
+	        <div class="modal fade" id="selectedDepartmentsModal" tabindex="-1"
+	             aria-labelledby="selectedDepartmentsModalLabel" aria-hidden="true">
+	            <div class="modal-dialog modal-xl modal-dialog-centered">
+	                <div class="modal-content border-0 shadow-lg">
+	                    <div class="modal-header border-bottom bg-light">
+	                        <h5 class="modal-title fw-bold text-primary" id="selectedDepartmentsModalLabel">
+	                            <i class="fa-solid fa-hospital-user me-2"></i>Protokolun seçilmiş olduğu şöbələr
+	                        </h5>
+	                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Bağla"></button>
+	                    </div>
+	                    <div class="modal-body" style="min-height: 420px;"></div>
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="xk-action-footer mt-3">
+            <button type="button" class="btn btn-light border shadow-sm">
+                <i class="ti ti-history fs-24 text-primary me-2"></i>Tarixçə
+            </button>
+            <button type="button" class="btn btn-light border shadow-sm">
+                <i class="ti ti-printer fs-24 text-primary me-2"></i>Çek çap et
+            </button>
+            <button type="button" class="btn btn-light border shadow-sm">
+                <i class="ti ti-file-invoice fs-24 text-primary me-2"></i>Tələblər çap et
+            </button>
+            <button type="button" class="btn btn-light border shadow-sm">
+                <i class="ti ti-circle-plus fs-24 text-primary me-2"></i>Xidmət
+            </button>
+            <button type="button" class="btn btn-light border shadow-sm">
+                <i class="fa-regular fa-hospital fs-24 text-primary me-2"></i>Başqa müəssisəyə köçürmə
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
