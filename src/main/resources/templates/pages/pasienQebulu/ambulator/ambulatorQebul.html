@@ -36,6 +36,16 @@
     </div>
     <!-- /Page Header -->
 
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <!-- Customer Table Card -->
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -44,8 +54,8 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-soft-success text-success">Aktiv: 124</span>
-                <span class="badge bg-soft-info text-info">Yeni: 8</span>
+                <span class="badge bg-soft-success text-success" th:text="'Aktiv: ' + ${activePatientCount}">Aktiv: 0</span>
+                <span class="badge bg-soft-info text-info" th:text="'Yeni: ' + ${todayPatientCount}">Yeni: 0</span>
             </div>
         </div>
 
@@ -75,115 +85,28 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>AA1234567</td>
-                        <td>Nigar Hüseynova</td>
-                        <td>7X4K2LM</td>
-                        <td>+994 50 555 22 11</td>
-                        <td>12.08.2023</td>
-                        <td>Azerbaycanlı</td>
-                        <td class="text-center">
-                            <div class="d-inline-flex align-items-center gap-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-primary ambulator-card-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#ambulatorCardModal"
-                                        data-patient="Nigar Hüseynova"
-                                        data-id-card="AA1234567"
-                                        data-fin="7X4K2LM"
-                                        data-phone="+994 50 555 22 11"
-                                        data-work="Azerbaycanlı">
-                                    <i class="ti ti-user-circle me-1"></i>Ambulator kart
-                                </button>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" aria-label="Düzəliş et">
-                                    <i class="ti ti-edit"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" aria-label="Sil">
-                                    <i class="ti ti-trash"></i>
-                                </a>
-                            </div>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(patientDocuments)}">
+                        <td colspan="8" class="text-center text-muted py-4">Pasient tapılmadı</td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>BB2345678</td>
-                        <td>Emil Quliyev</td>
-                        <td>4J8P9TR</td>
-                        <td>+994 51 444 11 00</td>
-                        <td>23.08.2019</td>
-                        <td>Medline MMC</td>
+                    <tr th:each="patient : ${patientDocuments}">
+                        <td th:text="${patient.id()}">1</td>
+                        <td th:text="${patient.idNumber()}">AA1234567</td>
+                        <td th:text="${patient.fullName()}">Nigar Hüseynova</td>
+                        <td th:text="${patient.finCode()}">7X4K2LM</td>
+                        <td th:text="${patient.mobilePhone()}">+994 50 555 22 11</td>
+                        <td th:text="${patient.birthDate() != null ? #temporals.format(patient.birthDate(), 'dd.MM.yyyy') : ''}">12.08.2023</td>
+                        <td th:text="${patient.workplace()}">Medline MMC</td>
                         <td class="text-center">
                             <div class="d-inline-flex align-items-center gap-2">
                                 <button type="button"
                                         class="btn btn-sm btn-outline-primary ambulator-card-btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#ambulatorCardModal"
-                                        data-patient="Emil Quliyev"
-                                        data-id-card="BB2345678"
-                                        data-fin="4J8P9TR"
-                                        data-phone="+994 51 444 11 00"
-                                        data-work="Medline MMC">
-                                    <i class="ti ti-user-circle me-1"></i>Ambulator kart
-                                </button>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" aria-label="Düzəliş et">
-                                    <i class="ti ti-edit"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" aria-label="Sil">
-                                    <i class="ti ti-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>CC3456789</td>
-                        <td>Vüsal Məmmədov</td>
-                        <td>8D2M5KP</td>
-                        <td>+994 70 777 66 55</td>
-                        <td>18.08.2009</td>
-                        <td>Referans Klinik</td>
-                        <td class="text-center">
-                            <div class="d-inline-flex align-items-center gap-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-primary ambulator-card-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#ambulatorCardModal"
-                                        data-patient="Vüsal Məmmədov"
-                                        data-id-card="CC3456789"
-                                        data-fin="8D2M5KP"
-                                        data-phone="+994 70 777 66 55"
-                                        data-work="Referans Klinik">
-                                    <i class="ti ti-user-circle me-1"></i>Ambulator kart
-                                </button>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" aria-label="Düzəliş et">
-                                    <i class="ti ti-edit"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" aria-label="Sil">
-                                    <i class="ti ti-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>DD4567891</td>
-                        <td>Kamran Əliyev</td>
-                        <td>3S1L6QR</td>
-                        <td>+994 55 321 45 67</td>
-                        <td>26.01.2008</td>
-                        <td>Demo Company</td>
-                        <td class="text-center">
-                            <div class="d-inline-flex align-items-center gap-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-primary ambulator-card-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#ambulatorCardModal"
-                                        data-patient="Kamran Əliyev"
-                                        data-id-card="DD4567891"
-                                        data-fin="3S1L6QR"
-                                        data-phone="+994 55 321 45 67"
-                                        data-work="Demo Company">
+                                        th:data-patient="${patient.fullName()}"
+                                        th:data-id-card="${patient.idNumber()}"
+                                        th:data-fin="${patient.finCode()}"
+                                        th:data-phone="${patient.mobilePhone()}"
+                                        th:data-work="${patient.workplace()}">
                                     <i class="ti ti-user-circle me-1"></i>Ambulator kart
                                 </button>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" aria-label="Düzəliş et">
@@ -205,125 +128,205 @@
 
     <!-- Add Customer Modal -->
     <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 rounded-4 overflow-hidden">
                 <div class="modal-header border-bottom">
                     <h4 class="modal-title" id="addCustomerModalLabel">Yeni ambulator pasient</h4>
                     <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form action="#" method="post">
-                    <div class="modal-body p-3">
-                        <div class="row g-2">
+                <form th:action="@{/ambulatorQebul/patient}" th:object="${patientDocumentForm}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
 
-                            <div class="col-md-12">
-                                <label class="form-label">Təşkilat</label>
-                                <select class="form-control select2" name="teskilat">
-                                    <option>UCR</option>
-                                    <option>A-Grup</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Ş/V Nömrəsi</label>
-                                <input type="text" class="form-control" name="svNomresi" placeholder="Ş/V nömrəsi">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">FİN nömrəsi</label>
-                                <input type="text" class="form-control" name="fin" placeholder="FİN nömrəsi">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Pasport nömrəsi</label>
-                                <input type="text" class="form-control" name="passportNo" placeholder="Pasport nömrəsi">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Ad</label>
-                                <input type="text" class="form-control" name="ad" placeholder="Ad">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Soyad</label>
-                                <input type="text" class="form-control" name="soyad" placeholder="Soyad">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Ata adı</label>
-                                <input type="text" class="form-control" name="ataAdi" placeholder="Ata adı">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Cinsi</label>
-                                <select class="form-select" name="cins">
-                                    <option value="">Seçin</option>
-                                    <option>Kişi</option>
-                                    <option>Qadın</option>
+                            <div class="col-lg-6">
+                                <label class="visually-hidden" for="buildingId">Bina</label>
+                                <select class="form-select select2" th:field="*{buildingId}" data-placeholder="Bina seçin" required>
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.buildings()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Ailə vəziyyəti</label>
-                                <select class="form-select" name="aileVeziyyeti">
-                                    <option value="">Seçin</option>
-                                    <option>Subay</option>
-                                    <option>Evli</option>
-                                    <option>Boşanmış</option>
-                                    <option>Dul</option>
+                            <div class="col-lg-6">
+                                <label class="visually-hidden" for="organizationId">Təşkilat</label>
+                                <select class="form-select select2" th:field="*{organizationId}" data-placeholder="Təşkilat seçin" required>
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.organizations()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.shortName() != null ? item.shortName() + ' - ' + item.name() : item.name()}"></option>
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Qan qrupu</label>
-                                <select class="form-select" name="qanQrupu">
-                                    <option value="">Seçin</option>
-                                    <option>A Rh+</option>
-                                    <option>A Rh-</option>
-                                    <option>B Rh+</option>
-                                    <option>B Rh-</option>
-                                    <option>AB Rh+</option>
-                                    <option>AB Rh-</option>
-                                    <option>0 Rh+</option>
-                                    <option>0 Rh-</option>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="idTypeId">Sənəd növü</label>
+                                <select class="form-select select2" th:field="*{idTypeId}" data-placeholder="Sənəd növü seçin" required>
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.idTypes()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.code() != null ? item.code() + ' - ' + item.name() : item.name()}"></option>
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Mobil telefon</label>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="idNumber">Ş/V nömrəsi</label>
+                                <input type="text" class="form-control" th:field="*{idNumber}" placeholder="Ş/V nömrəsi" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="finCode">FİN kod</label>
+                                <input type="text" class="form-control" th:field="*{finCode}" placeholder="FİN kod" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="firstName">Ad</label>
+                                <input type="text" class="form-control" th:field="*{firstName}" placeholder="Ad" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="lastName">Soyad</label>
+                                <input type="text" class="form-control" th:field="*{lastName}" placeholder="Soyad" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="fatherName">Ata adı</label>
+                                <input type="text" class="form-control" th:field="*{fatherName}" placeholder="Ata adı" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="genderId">Cinsi</label>
+                                <select class="form-select select2" th:field="*{genderId}" data-placeholder="Cinsi seçin" required>
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.genders()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="maritalStatusId">Ailə vəziyyəti</label>
+                                <select class="form-select select2" th:field="*{maritalStatusId}" data-placeholder="Ailə vəziyyəti seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.maritalStatuses()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="bloodGroupId">Qan qrupu</label>
+                                <select class="form-select select2" th:field="*{bloodGroupId}" data-placeholder="Qan qrupu seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.bloodGroups()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="birthDate">Doğum tarixi</label>
+                                <input type="date" class="form-control" th:field="*{birthDate}" aria-label="Doğum tarixi" required>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="birthPlace">Doğum yeri</label>
+                                <input type="text" class="form-control" th:field="*{birthPlace}" placeholder="Doğum yeri">
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="birthCountryId">Doğulduğu ölkə</label>
+                                <select class="form-select select2" th:field="*{birthCountryId}" data-placeholder="Doğulduğu ölkəni seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.countries()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="birthCityId">Doğulduğu şəhər</label>
+                                <select class="form-select select2" th:field="*{birthCityId}" data-placeholder="Doğulduğu şəhəri seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.cities()}"
+                                            th:value="${item.id()}"
+                                            th:data-country-id="${item.countryId()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="livingCountryId">Yaşadığı ölkə</label>
+                                <select class="form-select select2" th:field="*{livingCountryId}" data-placeholder="Yaşadığı ölkəni seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.countries()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="nationalityId">Milliyyəti</label>
+                                <select class="form-select select2" th:field="*{nationalityId}" data-placeholder="Milliyyəti seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.nationalities()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="educationId">Təhsili</label>
+                                <select class="form-select select2" th:field="*{educationId}" data-placeholder="Təhsili seçin">
+                                    <option value=""></option>
+                                    <option th:each="item : ${lookups.educations()}"
+                                            th:value="${item.id()}"
+                                            th:text="${item.name()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="mobilePhone">Mobil telefon</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+994</span>
-                                    <input type="text" class="form-control" name="telefon" placeholder="50 000 00 00">
+                                    <input type="text" class="form-control" th:field="*{mobilePhone}" placeholder="50 000 00 00">
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">E-poçt</label>
-                                <input type="email" class="form-control" name="email" placeholder="E-poçt">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="homePhone">Ev telefonu</label>
+                                <input type="text" class="form-control" th:field="*{homePhone}" placeholder="Ev telefonu">
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Doğum tarixi</label>
-                                <input type="date" class="form-control" name="dogumTarixi">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="workPhone">İş telefonu</label>
+                                <input type="text" class="form-control" th:field="*{workPhone}" placeholder="İş telefonu">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">İş yeri</label>
-                                <input type="text" class="form-control" name="isYeri" placeholder="İş yeri">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="socialSecurityNumber">Sosial kart No</label>
+                                <input type="text" class="form-control" th:field="*{socialSecurityNumber}" placeholder="Sosial kart No">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Milliyyəti</label>
-                                <input type="text" class="form-control" name="milliyyet" placeholder="Milliyyəti">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="occupation">Peşəsi</label>
+                                <input type="text" class="form-control" th:field="*{occupation}" placeholder="Peşəsi">
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="workplace">İş yeri</label>
+                                <input type="text" class="form-control" th:field="*{workplace}" placeholder="İş yeri">
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="visually-hidden" for="position">Vəzifəsi</label>
+                                <input type="text" class="form-control" th:field="*{position}" placeholder="Vəzifəsi">
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label">Ünvan</label>
-                                <textarea class="form-control" rows="2" name="unvan" placeholder="Ünvan"></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label">Yaşadığı ünvan</label>
-                                <textarea class="form-control" rows="2" name="yasadigiUnvan" placeholder="Yaşadığı ünvan"></textarea>
+                                <label class="visually-hidden" for="address">Cari ünvanı</label>
+                                <textarea class="form-control" rows="2" th:field="*{address}" placeholder="Cari ünvanı"></textarea>
                             </div>
 
                         </div>

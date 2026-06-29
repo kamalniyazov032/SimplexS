@@ -1,17 +1,21 @@
-function initSelect2Fields(context) {
+function initSelect2Fields(context, forceReinit) {
     if (!$.fn.select2) return;
 
     const $context = context ? $(context) : $(document);
     $context.find('.select2').each(function () {
         const $select = $(this);
-        if ($select.hasClass('select2-hidden-accessible')) return;
+        if ($select.hasClass('select2-hidden-accessible')) {
+            if (!forceReinit) return;
+            $select.select2('destroy');
+        }
 
         const $modalParent = $select.closest('.modal');
         const $offcanvasParent = $select.closest('.offcanvas');
         const options = {
             width: '100%',
             placeholder: $select.data('placeholder') || 'Seçin',
-            allowClear: false
+            allowClear: false,
+            minimumResultsForSearch: 0
         };
 
         if ($modalParent.length) {
@@ -34,7 +38,7 @@ $(document).ready(function () {
 });
 
 $(document).on('shown.bs.modal shown.bs.offcanvas', '.modal, .offcanvas', function () {
-    initSelect2Fields(this);
+    initSelect2Fields(this, true);
 });
 
 $(document).ready(function () {

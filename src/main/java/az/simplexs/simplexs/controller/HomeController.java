@@ -24,13 +24,6 @@ public class HomeController {
         return "pages/dashboard";
     }
 
-    @GetMapping("/ambulatorQebul")
-    public String ambulatorQebul(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/pasienQebulu/ambulator/ambulatorQebul";
-    }
-
     @GetMapping("/xesteKarti")
     public String xesteKarti(Model model) {
         model.addAttribute("pageTitle", "Xəstə Kartı");
