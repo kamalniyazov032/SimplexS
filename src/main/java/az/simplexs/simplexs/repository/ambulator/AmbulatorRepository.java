@@ -88,6 +88,23 @@ public class AmbulatorRepository {
         return count == null ? 0 : count;
     }
 
+    public boolean patientDocumentExists(Long patientDocumentId) {
+        String sql = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM public.rn_patient_documents
+                WHERE id = :patientDocumentId
+                  AND is_active IS TRUE
+            )
+            """;
+        Boolean exists = jdbcTemplate.queryForObject(
+            sql,
+            new MapSqlParameterSource("patientDocumentId", patientDocumentId),
+            Boolean.class
+        );
+        return Boolean.TRUE.equals(exists);
+    }
+
     public List<Map<String, Object>> createPatientDocument(PatientDocumentForm form, String createdBy) {
         String sql = """
             SELECT *

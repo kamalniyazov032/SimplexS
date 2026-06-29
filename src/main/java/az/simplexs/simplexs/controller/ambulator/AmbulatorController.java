@@ -2,6 +2,7 @@ package az.simplexs.simplexs.controller.ambulator;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
@@ -43,10 +44,17 @@ public class AmbulatorController {
     ) {
         String createdBy = principal == null ? "admin" : principal.getName();
         try {
-            ambulatorService.createPatientDocument(patientDocumentForm, createdBy);
-            redirectAttributes.addFlashAttribute("successMessage", "Yeni ambulator pasient yaradıldı.");
+            Map<String, Object> result = ambulatorService.createPatientDocument(patientDocumentForm, createdBy);
+            String patientCode = ambulatorService.toText(result.get("patient_code"));
+            String message = patientCode.isBlank()
+                ? "Yeni ambulator pasient yaradıldı."
+                : "Yeni ambulator pasient yaradıldı. Pasient kodu: " + patientCode;
+            redirectAttributes.addFlashAttribute("successMessage", message);
         } catch (DataAccessException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMostSpecificCause().getMessage());
+            redirectAttributes.addFlashAttribute("patientDocumentForm", patientDocumentForm);
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             redirectAttributes.addFlashAttribute("patientDocumentForm", patientDocumentForm);
         }
         return "redirect:/ambulatorQebul";
