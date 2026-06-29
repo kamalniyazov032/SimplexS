@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import az.simplexs.simplexs.dto.ambulator.AmbulatorLookups;
+import az.simplexs.simplexs.dto.ambulator.PatientDocumentFilter;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentForm;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentListItem;
 import az.simplexs.simplexs.repository.ambulator.AmbulatorRepository;
@@ -22,8 +23,8 @@ public class AmbulatorService {
         return ambulatorRepository.getLookups();
     }
 
-    public List<PatientDocumentListItem> getPatientDocuments() {
-        return ambulatorRepository.getPatientDocuments();
+    public List<PatientDocumentListItem> getPatientDocuments(PatientDocumentFilter filter) {
+        return ambulatorRepository.getPatientDocuments(filter);
     }
 
     public int countActivePatientDocuments() {

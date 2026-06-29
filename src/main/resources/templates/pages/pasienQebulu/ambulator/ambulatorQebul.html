@@ -19,12 +19,13 @@
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="input-icon-start position-relative">
-                <span class="input-icon-addon">
-                    <i class="ti ti-search"></i>
-                </span>
-                <input type="text" class="form-control ps-5" placeholder="Axtar...">
-            </div>
+            <button class="btn btn-primary d-flex align-items-center"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#ambulatorSearchOffcanvas"
+                    aria-controls="ambulatorSearchOffcanvas">
+                <i class="ti ti-filter me-1"></i>Filter
+            </button>
 
             <button type="button"
                     class="btn btn-primary d-flex align-items-center"
@@ -35,6 +36,48 @@
         </div>
     </div>
     <!-- /Page Header -->
+
+    <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="ambulatorSearchOffcanvas">
+        <div class="offcanvas-header border-bottom bg-light">
+            <h4 id="ambulatorSearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
+                <i class="ti ti-filter me-2"></i>Ambulator pasient üzrə ətraflı axtarış
+            </h4>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <form th:action="@{/ambulatorQebul}" th:object="${patientFilter}" method="get">
+                <div class="row g-2 align-items-end">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="visually-hidden" for="q">Ümumi axtarış</label>
+                        <input type="text"
+                               class="form-control"
+                               name="q"
+                               th:value="*{q}"
+                               placeholder="Ad, soyad, ata adı, FİN, Ş/V, telefon...">
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label class="visually-hidden" for="idNumber">Ş/V nömrəsi</label>
+                        <input type="text" class="form-control" name="idNumber" th:value="*{idNumber}" placeholder="Ş/V nömrəsi">
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label class="visually-hidden" for="finCode">FİN kod</label>
+                        <input type="text" class="form-control" name="finCode" th:value="*{finCode}" placeholder="FİN kod">
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label class="visually-hidden" for="mobilePhone">Mobil telefon</label>
+                        <input type="text" class="form-control" name="mobilePhone" th:value="*{mobilePhone}" placeholder="Mobil telefon">
+                    </div>
+                    <div class="col-lg-2 col-md-12">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary flex-fill" type="submit">Axtar</button>
+                            <a class="btn btn-light flex-fill" th:href="@{/ambulatorQebul}">Təmizlə</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:text="${successMessage}"></span>
@@ -51,6 +94,10 @@
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <div>
                 <h5 class="card-title mb-1">Ambulator pasient siyahısı</h5>
+                <p class="mb-0 text-muted small"
+                   th:text="${filterApplied} ? |Filter nəticəsi: ən çox ${patientResultLimit} qeyd göstərilir| : |Son ${patientResultLimit} qeyd göstərilir|">
+                    Son 100 qeyd göstərilir
+                </p>
             </div>
 
             <div class="d-flex align-items-center gap-2">
@@ -71,7 +118,9 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-nowrap table-hover datatable border align-middle">
+                <table class="table table-nowrap table-hover datatable border align-middle"
+                       data-order-column="0"
+                       data-order-dir="desc">
                     <thead>
                     <tr>
                         <th>ID</th>

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import az.simplexs.simplexs.dto.ambulator.AmbulatorLookups;
 import az.simplexs.simplexs.dto.ambulator.LookupOption;
+import az.simplexs.simplexs.dto.ambulator.PatientDocumentFilter;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentForm;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentListItem;
 
@@ -38,8 +39,12 @@ public class AmbulatorRepository {
         );
     }
 
-    public List<PatientDocumentListItem> getPatientDocuments() {
-        String sql = """
+    public List<PatientDocumentListItem> getPatientDocuments(PatientDocumentFilter filter) {
+        PatientDocumentFilter safeFilter = filter == null ? new PatientDocumentFilter() : filter;
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("limit", safeFilter.getLimit());
+
+        StringBuilder sql = new StringBuilder("""
             SELECT
                 pd.id,
                 pd.patient_code,
@@ -53,11 +58,16 @@ public class AmbulatorRepository {
                 pd.workplace
             FROM public.rn_patient_documents pd
             WHERE pd.is_active IS TRUE
-            ORDER BY pd.id DESC
-            LIMIT 200
-            """;
+            """);
 
-        return jdbcTemplate.getJdbcTemplate().query(sql, (rs, rowNum) -> new PatientDocumentListItem(
+        addFilters(sql, params, safeFilter);
+
+        sql.append("""
+            ORDER BY pd.created_at DESC NULLS LAST, pd.id DESC
+            LIMIT :limit
+            """);
+
+        return jdbcTemplate.query(sql.toString(), params, (rs, rowNum) -> new PatientDocumentListItem(
             toLong(rs.getObject("id")),
             rs.getString("patient_code"),
             rs.getString("id_number"),
@@ -69,6 +79,48 @@ public class AmbulatorRepository {
             rs.getString("mobile_phone"),
             rs.getString("workplace")
         ));
+    }
+
+    private void addFilters(StringBuilder sql, MapSqlParameterSource params, PatientDocumentFilter filter) {
+        String q = filter.normalizedQ();
+        if (!q.isBlank()) {
+            params.addValue("q", containsPattern(q));
+            sql.append("""
+                AND (
+                    pd.patient_code ILIKE :q
+                    OR pd.id_number ILIKE :q
+                    OR pd.fin_code ILIKE :q
+                    OR pd.first_name ILIKE :q
+                    OR pd.last_name ILIKE :q
+                    OR pd.father_name ILIKE :q
+                    OR CONCAT_WS(' ', pd.first_name, pd.last_name, pd.father_name) ILIKE :q
+                    OR pd.mobile_phone ILIKE :q
+                    OR pd.workplace ILIKE :q
+                )
+                """);
+        }
+
+        addContainsFilter(sql, params, "idNumber", "pd.id_number", filter.normalizedIdNumber());
+        addContainsFilter(sql, params, "finCode", "pd.fin_code", filter.normalizedFinCode());
+        addContainsFilter(sql, params, "mobilePhone", "pd.mobile_phone", filter.normalizedMobilePhone());
+    }
+
+    private void addContainsFilter(
+        StringBuilder sql,
+        MapSqlParameterSource params,
+        String paramName,
+        String columnName,
+        String value
+    ) {
+        if (value.isBlank()) {
+            return;
+        }
+        params.addValue(paramName, containsPattern(value));
+        sql.append(" AND ").append(columnName).append(" ILIKE :").append(paramName).append('\n');
+    }
+
+    private String containsPattern(String value) {
+        return "%" + value + "%";
     }
 
     public int countActivePatientDocuments() {

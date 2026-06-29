@@ -314,28 +314,41 @@ Template Name: Dreams EMR - Bootstrap Admin Template
 
 	// Datatable
 	if($('.datatable').length > 0) {
-		$('.datatable').DataTable({
-			"bFilter": true,
-			"sDom": 'fBtlpi',  
-			"ordering": true,
-			"language": {
-				search: ' ',
-				searchPlaceholder: "Search",
-				emptyTable: "Pasient tapılmadı",
-				zeroRecords: "Pasient tapılmadı",
-				sLengthMenu: 'Showing _MENU_ Results',
-				info: "_START_ - _END_ of _TOTAL_ items",
-				paginate: {
-					next: 'Next',
-					previous: 'Prev'
+		$('.datatable').each(function () {
+			const $table = $(this);
+			const orderColumn = $table.data('order-column');
+			const orderDir = $table.data('order-dir') || 'asc';
+			$table.DataTable({
+				"bFilter": true,
+				"sDom": 'fBtlpi',
+				"ordering": true,
+				"order": orderColumn !== undefined ? [[Number(orderColumn), orderDir]] : [],
+				"language": {
+					search: ' ',
+					searchPlaceholder: "Search",
+					emptyTable: "Pasient tapılmadı",
+					zeroRecords: "Pasient tapılmadı",
+					sLengthMenu: 'Showing _MENU_ Results',
+					info: "_START_ - _END_ of _TOTAL_ items",
+					paginate: {
+						next: 'Next',
+						previous: 'Prev'
+					},
 				},
-			},
-			"responsive": true,
-			"autoWidth": false,
-			initComplete: (settings, json)=>{
-				$('.dataTables_filter').appendTo('#tableSearch');
-				$('.dataTables_filter').appendTo('.search-input');
-			},	
+				"responsive": true,
+				"autoWidth": false,
+				initComplete: function () {
+					const filter = $(this.api().table().container()).find('.dataTables_filter');
+					const globalSearch = $('#tableSearch');
+					const localSearch = $table.closest('.card-body').find('.search-input').first();
+					if (globalSearch.length) {
+						filter.appendTo(globalSearch);
+					}
+					if (localSearch.length) {
+						filter.appendTo(localSearch);
+					}
+				},
+			});
 		});
 	}	
 

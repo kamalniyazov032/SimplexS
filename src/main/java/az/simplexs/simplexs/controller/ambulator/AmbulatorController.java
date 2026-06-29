@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import az.simplexs.simplexs.dto.ambulator.AmbulatorLookups;
+import az.simplexs.simplexs.dto.ambulator.PatientDocumentFilter;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentForm;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentListItem;
 import az.simplexs.simplexs.service.ambulator.AmbulatorService;
@@ -26,10 +27,10 @@ public class AmbulatorController {
     }
 
     @GetMapping("/ambulatorQebul")
-    public String ambulatorQebul(Model model) {
+    public String ambulatorQebul(@ModelAttribute("patientFilter") PatientDocumentFilter patientFilter, Model model) {
         addPageAttributes(model);
         addLookups(model);
-        addPatientDocuments(model);
+        addPatientDocuments(model, patientFilter);
         if (!model.containsAttribute("patientDocumentForm")) {
             model.addAttribute("patientDocumentForm", new PatientDocumentForm());
         }
@@ -91,14 +92,18 @@ public class AmbulatorController {
         );
     }
 
-    private void addPatientDocuments(Model model) {
+    private void addPatientDocuments(Model model, PatientDocumentFilter patientFilter) {
         try {
-            List<PatientDocumentListItem> patientDocuments = ambulatorService.getPatientDocuments();
+            List<PatientDocumentListItem> patientDocuments = ambulatorService.getPatientDocuments(patientFilter);
             model.addAttribute("patientDocuments", patientDocuments);
+            model.addAttribute("filterApplied", patientFilter != null && patientFilter.hasFilters());
+            model.addAttribute("patientResultLimit", patientFilter == null ? PatientDocumentFilter.DEFAULT_LIMIT : patientFilter.getLimit());
             model.addAttribute("activePatientCount", ambulatorService.countActivePatientDocuments());
             model.addAttribute("todayPatientCount", ambulatorService.countTodayPatientDocuments());
         } catch (DataAccessException ex) {
             model.addAttribute("patientDocuments", List.of());
+            model.addAttribute("filterApplied", patientFilter != null && patientFilter.hasFilters());
+            model.addAttribute("patientResultLimit", PatientDocumentFilter.DEFAULT_LIMIT);
             model.addAttribute("activePatientCount", 0);
             model.addAttribute("todayPatientCount", 0);
             if (!model.containsAttribute("errorMessage")) {
