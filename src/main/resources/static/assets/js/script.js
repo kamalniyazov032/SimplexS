@@ -321,6 +321,8 @@ Template Name: Dreams EMR - Bootstrap Admin Template
 			"language": {
 				search: ' ',
 				searchPlaceholder: "Search",
+				emptyTable: "Pasient tapılmadı",
+				zeroRecords: "Pasient tapılmadı",
 				sLengthMenu: 'Showing _MENU_ Results',
 				info: "_START_ - _END_ of _TOTAL_ items",
 				paginate: {

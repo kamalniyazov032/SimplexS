@@ -85,9 +85,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${#lists.isEmpty(patientDocuments)}">
-                        <td colspan="8" class="text-center text-muted py-4">Pasient tapılmadı</td>
-                    </tr>
                     <tr th:each="patient : ${patientDocuments}">
                         <td th:text="${patient.id()}">1</td>
                         <td th:text="${patient.idNumber()}">AA1234567</td>
