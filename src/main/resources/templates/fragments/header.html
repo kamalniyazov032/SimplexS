@@ -41,12 +41,21 @@
 
                     <i class="ti ti-building-hospital text-primary fs-18 me-2"></i>
 
-                    <select class="form-select form-select-sm border-0 bg-transparent shadow-none fw-bold p-0"
-                            style="font-size: 13px; color: #3d5ee1; width: auto; min-width: 150px; cursor: pointer;">
-                        <option value="1">Caspian Hospital</option>
-                        <option value="2">Baku Medical Center</option>
-                        <option value="3">Medera Hospital</option>
-                    </select>
+                    <form th:action="@{/klinika-sec}" method="post" class="m-0">
+                        <input type="hidden" name="redirectUrl" th:value="${currentRequestUri}">
+                        <select name="klinikaId"
+                                aria-label="Klinika seçimi"
+                                class="form-select form-select-sm border-0 bg-transparent shadow-none fw-bold p-0"
+                                style="font-size: 13px; color: #3d5ee1; width: auto; min-width: 150px; cursor: pointer;"
+                                th:disabled="${#lists.isEmpty(klinikalar)}"
+                                onchange="this.form.submit()">
+                            <option th:if="${#lists.isEmpty(klinikalar)}" value="">Aktiv klinika yoxdur</option>
+                            <option th:each="klinika : ${klinikalar}"
+                                    th:value="${klinika.klinikaId}"
+                                    th:text="${klinika.klinikaAdi}"
+                                    th:selected="${klinika.klinikaId == selectedKlinikaId}"></option>
+                        </select>
+                    </form>
 
                     <div class="vr mx-2 text-primary opacity-25" style="height: 15px;"></div>
 

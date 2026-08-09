@@ -3,7 +3,7 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Run SImplexS",
+            "name": "SimplexS Spring Boot",
             "request": "launch",
             "mainClass": "az.simplexs.simplexs.SImplexSApplication",
             "projectName": "SImplexS",

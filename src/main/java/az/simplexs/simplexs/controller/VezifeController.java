@@ -1,0 +1,6 @@
+package az.simplexs.simplexs.controller;
+import org.springframework.stereotype.Controller;import org.springframework.ui.Model;import org.springframework.web.bind.annotation.*;import org.springframework.web.servlet.mvc.support.RedirectAttributes;import az.simplexs.simplexs.repository.vezife.VezifeRepository;
+@Controller public class VezifeController{private final VezifeRepository repo;public VezifeController(VezifeRepository r){repo=r;}
+ @GetMapping("/vezifeler") public String list(Model m){m.addAttribute("pageTitle","Vəzifələr");m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu","vezifeler");m.addAttribute("vezifeler",repo.findAll());return "pages/vezifeler";}
+ @PostMapping("/vezifeler/yeni") public String create(@RequestParam String kod,@RequestParam String ad,@RequestParam(required=false)String aciqlama,RedirectAttributes a){repo.create(kod,ad,aciqlama);a.addFlashAttribute("successMessage","Vəzifə yaradıldı.");return "redirect:/vezifeler";}
+ @PostMapping("/vezifeler/yenile") public String update(@RequestParam Long vezifeId,@RequestParam String ad,@RequestParam(required=false)String aciqlama,@RequestParam(defaultValue="false")boolean aktiv,RedirectAttributes a){repo.update(vezifeId,ad,aciqlama,aktiv);a.addFlashAttribute("successMessage","Vəzifə yeniləndi.");return "redirect:/vezifeler";}}

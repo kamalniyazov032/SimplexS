@@ -1,0 +1,2 @@
+package az.simplexs.simplexs.dto.personal;
+public record PersonalListItem(Long personalKlinikaId,Long personalId,String personalKodu,Long klinikaId,String klinikaAdi,Long vezifeId,String vezifeKodu,String vezifeAdi,String ad,String soyad,String ataAdi,String tamAd,Boolean hekimdir,String mobilNomre,String daxiliNomre,String isNomresi,String email,Boolean personalAktiv,Boolean klinikaElagesiAktiv,Integer siraNo,java.time.LocalDateTime klinikayaBaglanmaTarixi,java.time.LocalDateTime personalYaranmaTarixi){}

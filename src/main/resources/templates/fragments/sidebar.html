@@ -138,20 +138,24 @@
                 <li class="menu-title"><span>Parametrlər</span></li>
 
                 <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
+                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'adminPanel'} ? 'active subdrop' : ''">
                         <i class="fa-solid fa-screwdriver-wrench"></i><span>Admin panel</span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/emekdash}">Əməkdaş və Həkim</a></li>
-                        <li><a th:href="@{/parXidmet}">Xidmətlər</a></li>
-                        <li><a th:href="@{/xidmetQruplari}">Xidmət qrupları</a></li>
-                        <li><a th:href="@{/xidmetQiymetleri}">Qiymət</a></li>
+                    <ul th:style="${activeMenuGroup == 'adminPanel'} ? 'display:block;' : ''">
+                        <li><a th:href="@{/emekdash}" th:classappend="${activeMenu == 'emekdash'} ? 'active' : ''">Əməkdaş və Həkim</a></li>
+                        <li><a th:href="@{/parXidmet}" th:classappend="${activeMenu == 'xidmetler'} ? 'active' : ''">Xidmətlər</a></li>
+                        <li><a th:href="@{/xidmetQruplari}" th:classappend="${activeMenu == 'xidmetQruplari'} ? 'active' : ''">Xidmət qrupları</a></li>
+                        <li><a th:href="@{/xidmetQiymetleri}" th:classappend="${activeMenu == 'xidmetQiymetleri'} ? 'active' : ''">Qiymət</a></li>
                         <li><a th:href="@{/parPaket}">Paket</a></li>
-                        <li><a th:href="@{/muhasibatKodu}">Mühasibat kodları</a></li>
-                        <li><a th:href="@{/parShobeXidmet}">Şöbə xidmətləri</a></li>
+                        <li><a th:href="@{/muhasibatKodu}" th:classappend="${activeMenu == 'muhasibatKodlari'} ? 'active' : ''">Mühasibat kodları</a></li>
+                        <li><a th:href="@{/parShobeXidmet}" th:classappend="${activeMenu == 'sobeXidmetleri'} ? 'active' : ''">Şöbə xidmətləri</a></li>
                         <li><a th:href="@{/shobe}">Şöbələr</a></li>
-                        <li><a th:href="@{/muessise}">Müəssisələr</a></li>
+                        <li><a th:href="@{/vezifeler}" th:classappend="${activeMenu == 'vezifeler'} ? 'active' : ''">Vəzifələr</a></li>
+                        <li><a th:href="@{/teskilatlar}" th:classappend="${activeMenu == 'teskilatlar'} ? 'active' : ''">Təşkilatlar</a></li>
+                        <li><a th:href="@{/binalar}" th:classappend="${activeMenu == 'binalar'} ? 'active' : ''">Binalar</a></li>
+                        <li><a th:href="@{/bina-parametrleri}" th:classappend="${activeMenu == 'binaParametrleri'} ? 'active' : ''">Ümumi parametrlər</a></li>
+                        <li><a th:href="@{/rollar}" th:classappend="${activeMenu == 'rollar'} ? 'active' : ''">Rollar və səlahiyyətlər</a></li>
 
 
                         <li><a href="javascript:void(0);">Anbar</a></li>

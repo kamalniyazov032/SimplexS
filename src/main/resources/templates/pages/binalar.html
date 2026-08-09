@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Binalar</h4>
+            <p class="mb-0">Binaların siyahısı və bina növləri</p>
+        </div>
+        <span class="badge bg-primary-subtle text-primary px-3 py-2">
+            <i class="ti ti-building me-1"></i><span th:text="${#lists.size(binalar)}">0</span> bina
+        </span>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla"></button>
+    </div>
+
+    <div class="row align-items-stretch">
+        <div class="col-xl-12">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h6 class="card-title mb-0"><i class="ti ti-buildings me-2 text-primary"></i>Binaların siyahısı</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-nowrap table-hover datatable_ka_tam border align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Sıra</th>
+                                <th>Adı</th>
+                                <th>Ünvan</th>
+                                <th>Telefon</th>
+                                <th>Mobil nömrə</th>
+                                <th>Bina növü</th>
+                                <th>Mərtəbə</th>
+                                <th>Status</th>
+                                <th>Yaranma tarixi</th>
+                                <th class="text-end">Əməliyyat</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="bina : ${binalar}">
+                                <td th:text="${bina.siraNo ?: '—'}">—</td>
+                                <td class="fw-semibold text-dark" th:text="${bina.binaAdi ?: '—'}">Bina adı</td>
+                                <td th:text="${bina.unvan ?: '—'}">Ünvan</td>
+                                <td th:text="${bina.telefon ?: '—'}">—</td>
+                                <td th:text="${bina.mobilNomre ?: '—'}">—</td>
+                                <td><span class="badge bg-light text-dark border" th:text="${bina.binaNovuAdi ?: '—'}">Növ</span></td>
+                                <td th:text="${bina.mertebeSayi ?: '—'}">—</td>
+                                <td>
+                                    <span th:if="${bina.aktiv}" class="badge bg-success-subtle text-success">Aktiv</span>
+                                    <span th:unless="${bina.aktiv}" class="badge bg-danger-subtle text-danger">Passiv</span>
+                                </td>
+                                <td th:text="${bina.yaranmaTarixi != null ? #temporals.format(bina.yaranmaTarixi, 'dd.MM.yyyy HH:mm') : '—'}">—</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal" th:data-bs-target="|#binaEditModal${bina.binaId}|">
+                                        <i class="ti ti-edit me-1"></i>Dəyiş
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(binalar)}">
+                                <td colspan="10" class="text-center text-muted py-5">
+                                    <i class="ti ti-building-off fs-3 d-block mb-2"></i>Seçilmiş klinikaya aid bina tapılmadı.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div th:each="bina : ${binalar}" class="modal fade" th:id="|binaEditModal${bina.binaId}|"
+         tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <form th:action="@{/binalar/yenile}" method="post">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title">Bina məlumatlarını dəyiş</h5>
+                            <small class="text-muted" th:text="${bina.binaAdi}">Bina adı</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="binaId" th:value="${bina.binaId}">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Ünvan</label>
+                                <input type="text" name="unvan" class="form-control" maxlength="500"
+                                       th:value="${bina.unvan}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Sıra nömrəsi</label>
+                                <input type="number" name="siraNo" class="form-control" min="1"
+                                       th:value="${bina.siraNo}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Telefon</label>
+                                <input type="text" name="telefon" class="form-control" maxlength="30"
+                                       th:value="${bina.telefon}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mobil nömrə</label>
+                                <input type="text" name="mobilNomre" class="form-control" maxlength="30"
+                                       th:value="${bina.mobilNomre}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mərtəbə sayı</label>
+                                <input type="number" name="mertebeSayi" class="form-control" min="0"
+                                       th:value="${bina.mertebeSayi}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bina növü</label>
+                                <select name="binaNovuId" class="form-select" required>
+                                    <option value="" disabled>Bina növünü seçin</option>
+                                    <option th:each="nov : ${binaNovleri}"
+                                            th:value="${nov.id}"
+                                            th:text="${nov.ad}"
+                                            th:selected="${nov.id == bina.binaNovuId}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">İmtina</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy me-1"></i>Yadda saxla
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

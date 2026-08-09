@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="az"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+            <h4 class="mb-1">Ümumi parametrlər</h4>
+            <p class="mb-0">Parametrlər header-də seçilmiş klinikaya tətbiq edilir.</p>
+        </div>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="ti ti-circle-check me-2"></i><span th:text="${successMessage}">Uğurlu</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="ti ti-alert-circle me-2"></i><span th:text="${errorMessage}">Xəta</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${selectedKlinikaId == null}" class="card border-0 shadow-sm">
+        <div class="card-body text-center text-muted py-5">
+            <i class="ti ti-building-hospital fs-1 d-block mb-3"></i>
+            Ümumi parametrləri görmək üçün header-dən klinika seçin.
+        </div>
+    </div>
+
+    <div th:if="${selectedKlinikaId != null}" class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0"><i class="ti ti-adjustments me-2 text-primary"></i>Ümumi parametr siyahısı</h6>
+            <span class="badge bg-primary-subtle text-primary" th:text="${#lists.size(parametrler)} + ' parametr'">0 parametr</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                    <tr><th class="ps-3">Parametr</th><th>Tip</th><th>Dəyər</th><th>Son yenilənmə</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="parametr : ${parametrler}">
+                        <td class="ps-3">
+                            <div class="fw-semibold" th:text="${parametr.parametrAdi}">Parametr adı</div>
+                            <small class="text-muted"><span th:text="${parametr.parametrKodu}">KOD</span><span th:if="${parametr.aciqlama}" th:text="${' — ' + parametr.aciqlama}"></span></small>
+                        </td>
+                        <td><span class="badge bg-light text-dark border" th:text="${parametr.parametrTipi}">Tip</span></td>
+                        <td style="min-width: 260px;">
+                            <form method="post" th:action="@{/bina-parametrleri/yadda-saxla}" class="d-flex align-items-center gap-2">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <input type="hidden" name="parametrId" th:value="${parametr.parametrId}">
+                                <input th:if="${parametr.controlType() == 'boolean'}" type="hidden" name="booleanDeyer" value="false">
+                                <div th:if="${parametr.controlType() == 'boolean'}" class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="booleanDeyer" value="true" th:checked="${parametr.booleanDeyer}">
+                                </div>
+                                <input th:if="${parametr.controlType() == 'text'}" class="form-control form-control-sm" name="textDeyer" th:value="${parametr.textDeyer}" placeholder="Dəyəri daxil edin">
+                                <select th:if="${parametr.controlType() == 'select'}" class="form-select form-select-sm" name="secimId">
+                                    <option value="">Seçin...</option>
+                                    <option th:each="secim : ${parametr.secimler}" th:value="${secim.secimId}" th:text="${secim.secimAdi}" th:selected="${secim.secimId == parametr.secimId}">Seçim</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary" title="Yadda saxla"><i class="ti ti-device-floppy"></i></button>
+                            </form>
+                        </td>
+                        <td>
+                            <span th:if="${parametr.yenilenmeTarixi != null}"
+                                  th:text="${#temporals.format(parametr.yenilenmeTarixi, 'dd.MM.yyyy HH:mm')}">—</span>
+                            <span th:unless="${parametr.yenilenmeTarixi != null}" class="text-muted">—</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(parametrler)}"><td colspan="4" class="text-center text-muted py-5">Seçilmiş klinika üçün parametr tapılmadı.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -3,9 +3,23 @@ package az.simplexs.simplexs.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import az.simplexs.simplexs.repository.bina.BinaRepository;
+import az.simplexs.simplexs.repository.parametr.ParametrRepository;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class HomeController {
+    private final BinaRepository binaRepository;
+    private final ParametrRepository parametrRepository;
+
+    public HomeController(BinaRepository binaRepository, ParametrRepository parametrRepository) {
+        this.binaRepository = binaRepository;
+        this.parametrRepository = parametrRepository;
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -32,25 +46,11 @@ public class HomeController {
         return "pages/pasienQebulu/xesteKarti";
     }
 
-    @GetMapping("/parXidmet")
-    public String parXidemt(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/xidmet";
-    }
-
     @GetMapping("/parPaket")
     public String parPaket(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
         return "pages/paket";
-    }
-
-    @GetMapping("/parShobeXidmet")
-    public String parShobeXidmet(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/shobeXidmet";
     }
 
     @GetMapping("/kassa")
@@ -74,46 +74,83 @@ public class HomeController {
         return "pages/kassaQebz";
     }
 
-    @GetMapping("/muhasibatKodu")
-    public String muhasibatKodu(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/muhasibatKodu";
+    @GetMapping("/binalar")
+    public String binalar(Model model, HttpSession session) {
+        Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+        model.addAttribute("pageTitle", "Binalar");
+        model.addAttribute("activeMenuGroup", "adminPanel");
+        model.addAttribute("activeMenu", "binalar");
+        model.addAttribute("binalar", binaRepository.findByKlinikaId(klinikaId));
+        model.addAttribute("binaNovleri", binaRepository.findBinaNovleri());
+        return "pages/binalar";
     }
 
-    @GetMapping("/xidmetQruplari")
-    public String xidmetQruplari(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/xidmetQruplari";
+    @PostMapping("/binalar/yenile")
+    public String binaYenile(
+        @RequestParam Long binaId,
+        @RequestParam(required = false) String unvan,
+        @RequestParam(required = false) String telefon,
+        @RequestParam(required = false) String mobilNomre,
+        @RequestParam(required = false) Integer mertebeSayi,
+        @RequestParam Long binaNovuId,
+        @RequestParam(required = false) Integer siraNo,
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
+        Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+        boolean belongsToSelectedClinic = binaRepository.findByKlinikaId(klinikaId).stream()
+            .anyMatch(bina -> bina.binaId().equals(binaId));
+
+        if (!belongsToSelectedClinic) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bina seçilmiş klinikaya aid deyil.");
+            return "redirect:/binalar";
+        }
+
+        var result = binaRepository.update(binaId, unvan, telefon, mobilNomre, mertebeSayi, binaNovuId, siraNo);
+        if (result.statusKodu() != null && result.statusKodu() > 0) {
+            redirectAttributes.addFlashAttribute("successMessage", result.mesaj());
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", result.mesaj());
+        }
+        return "redirect:/binalar";
     }
 
-    @GetMapping("/xidmetQiymetleri")
-    public String xidmetQiymetleri(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/xidmetQiymetleri";
+    @GetMapping("/bina-parametrleri")
+    public String binaParametrleri(Model model, HttpSession session) {
+        Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+        model.addAttribute("pageTitle", "Ümumi parametrlər");
+        model.addAttribute("activeMenuGroup", "adminPanel");
+        model.addAttribute("activeMenu", "binaParametrleri");
+        model.addAttribute("parametrler", parametrRepository.findByKlinikaId(klinikaId));
+        return "pages/binaParametrleri";
     }
 
-    @GetMapping("/muessise")
-    public String muessise(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/muessise";
-    }
+    @PostMapping("/bina-parametrleri/yadda-saxla")
+    public String klinikaParametriniYaddaSaxla(
+        @RequestParam Long parametrId,
+        @RequestParam(required = false) Boolean booleanDeyer,
+        @RequestParam(required = false) String textDeyer,
+        @RequestParam(required = false) Long secimId,
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
+        Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+        boolean parametrIsAvailable = parametrRepository.findByKlinikaId(klinikaId).stream()
+            .anyMatch(parametr -> parametr.parametrId().equals(parametrId));
 
-    @GetMapping("/emekdash")
-    public String emekdash(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/emekdash";
-    }
+        if (!parametrIsAvailable) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Parametr seçilmiş klinika üçün mövcud deyil.");
+            return "redirect:/bina-parametrleri";
+        }
 
-    @GetMapping("/shobe")
-    public String shobe(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/shobe";
+        var result = parametrRepository.save(
+            klinikaId, parametrId, booleanDeyer, textDeyer, secimId, 17L);
+        if (result.statusKodu() != null && result.statusKodu() > 0) {
+            redirectAttributes.addFlashAttribute("successMessage", result.mesaj());
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", result.mesaj());
+        }
+        return "redirect:/bina-parametrleri";
     }
 
     @GetMapping("/stasionar")
