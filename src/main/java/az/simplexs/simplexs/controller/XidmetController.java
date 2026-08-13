@@ -16,7 +16,7 @@ public class XidmetController {
     public XidmetController(XidmetRepository repo){this.repo=repo;}
 
     @GetMapping("/xidmetQruplari")
-    public String qruplar(@RequestParam(required=false)String q,@RequestParam(required=false)String status,
+    public String qruplar(@RequestParam(required=false)String q,@RequestParam(defaultValue="aktiv")String status,
             @RequestParam(required=false)String qrupTipi,Model m,HttpSession session){
         base(m,"Xidmət qrupları","xidmetQruplari");
         var all=repo.qruplar(klinikaId(session));
@@ -27,7 +27,7 @@ public class XidmetController {
                 .filter(x->!hasText(qrupTipi)||("esas".equals(qrupTipi)==Boolean.TRUE.equals(x.kokQrupdur())))
                 .toList();
         m.addAttribute("qruplar",filtered);m.addAttribute("allQruplar",all);m.addAttribute("qrupCount",filtered.size());
-        m.addAttribute("filterApplied",hasText(q)||hasText(status)||hasText(qrupTipi));
+        m.addAttribute("filterApplied",hasText(q)||!"aktiv".equals(status)||hasText(qrupTipi));
         m.addAttribute("q",q);m.addAttribute("selectedStatus",status);m.addAttribute("selectedQrupTipi",qrupTipi);
         return "pages/xidmetQruplari";
     }
@@ -40,7 +40,7 @@ public class XidmetController {
     public String xidmetler(@RequestParam(required=false)Long qrupId,
             @RequestParam(required=false)Long xidmetTipiId,
             @RequestParam(required=false)Long muhasibatKoduId,
-            @RequestParam(required=false)String status,
+            @RequestParam(defaultValue="aktiv")String status,
             @RequestParam(required=false)String q,Model m,HttpSession session){
         base(m,"Xidmətlər","xidmetler");
         Long kid=klinikaId(session);var all=repo.xidmetler(kid,qrupId);
@@ -50,7 +50,7 @@ public class XidmetController {
                 .filter(x->status==null||status.isBlank()||("aktiv".equals(status)==Boolean.TRUE.equals(x.aktiv())))
                 .filter(x->matches(x,q)).toList();
         m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",filtered.size());
-        m.addAttribute("filterApplied",qrupId!=null||xidmetTipiId!=null||muhasibatKoduId!=null||hasText(status)||hasText(q));
+        m.addAttribute("filterApplied",qrupId!=null||xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(status)||hasText(q));
         m.addAttribute("qruplar",repo.qruplar(kid));m.addAttribute("selectedQrupId",qrupId);
         m.addAttribute("selectedXidmetTipiId",xidmetTipiId);m.addAttribute("selectedMuhasibatKoduId",muhasibatKoduId);
         m.addAttribute("selectedStatus",status);m.addAttribute("q",q);

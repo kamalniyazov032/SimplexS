@@ -52,7 +52,7 @@ public class PersonalController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) Long vezifeId,
             @RequestParam(required = false) String personalTipi,
-            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "aktiv") String status,
             Model model,
             HttpSession session, Authentication authentication) {
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
@@ -86,7 +86,7 @@ public class PersonalController {
         model.addAttribute("emekdashCount", allPersonals.stream().filter(p -> !Boolean.TRUE.equals(p.hekimdir())).count());
         model.addAttribute("activePersonalCount", allPersonals.stream().filter(p -> Boolean.TRUE.equals(p.personalAktiv())
                 && Boolean.TRUE.equals(p.klinikaElagesiAktiv())).count());
-        model.addAttribute("filterApplied", hasText(q) || vezifeId != null || hasText(personalTipi) || hasText(status));
+        model.addAttribute("filterApplied", hasText(q) || vezifeId != null || hasText(personalTipi) || !"aktiv".equals(status));
         model.addAttribute("q", q);
         model.addAttribute("selectedVezifeId", vezifeId);
         model.addAttribute("selectedPersonalTipi", personalTipi);
