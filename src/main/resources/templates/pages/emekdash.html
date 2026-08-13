@@ -183,6 +183,7 @@
     <div class="modal fade" id="newPersonal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/yeni}">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                 <div class="modal-header border-0 pb-0">
                     <div class="d-flex align-items-center gap-3">
                         <span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
@@ -216,6 +217,7 @@
     <div th:each="p : ${personallar}" class="modal fade" th:id="|editP${p.personalId}|" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/yenile}">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                 <input type="hidden" name="personalId" th:value="${p.personalId}">
                 <div class="modal-header border-0 pb-0">
                     <div class="d-flex align-items-center gap-3">
@@ -261,6 +263,7 @@
                             <div><div class="fw-semibold" th:text="${clinic.klinikaAdi}"></div><small class="text-success">Giriş icazəsi verilib</small></div>
                         </div>
                         <form method="post" th:action="@{/emekdash/klinika}" onsubmit="return confirm('Əməkdaşın bu klinika ilə bağlantısını kəsmək istəyirsiniz?')">
+                            <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                             <input type="hidden" name="personalId" th:value="${p.personalId}">
                             <input type="hidden" name="klinikaId" th:value="${clinic.klinikaId}">
                             <input type="hidden" name="elaveEdilsin" value="false">
@@ -272,6 +275,7 @@
                 <div class="rounded bg-light border p-3">
                     <h6 class="mb-3"><i class="ti ti-building-plus text-primary me-2"></i>Yeni klinika qoş</h6>
                     <form method="post" th:action="@{/emekdash/klinika}">
+                        <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                         <input type="hidden" name="personalId" th:value="${p.personalId}">
                         <input type="hidden" name="elaveEdilsin" value="true">
                         <div class="row g-2 align-items-end">
@@ -318,6 +322,7 @@
                             </div>
                         </div>
                         <form method="post" th:action="@{/emekdash/rol}" onsubmit="return confirm('Bu rolu personaldan silmək istəyirsiniz?')">
+                            <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                             <input type="hidden" name="personalKlinikaId" th:value="${p.personalKlinikaId}">
                             <input type="hidden" name="rolId" th:value="${assigned.rolId}">
                             <input type="hidden" name="elaveEdilsin" value="false">
@@ -333,6 +338,7 @@
                 <div class="rounded bg-light border p-3">
                     <h6 class="mb-3"><i class="ti ti-shield-plus text-primary me-2"></i>Yeni rol əlavə et</h6>
                     <form method="post" th:action="@{/emekdash/rol}">
+                        <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                         <input type="hidden" name="personalKlinikaId" th:value="${p.personalKlinikaId}">
                         <input type="hidden" name="elaveEdilsin" value="true">
                         <div class="row g-3 align-items-end">

@@ -16,19 +16,20 @@ public class XidmetController {
     public XidmetController(XidmetRepository repo){this.repo=repo;}
 
     @GetMapping("/xidmetQruplari")
-    public String qruplar(@RequestParam(required=false)String q,@RequestParam(defaultValue="aktiv")String status,
+    public String qruplar(@RequestParam(required=false)String q,@RequestParam(required=false)String status,
             @RequestParam(required=false)String qrupTipi,Model m,HttpSession session){
+        String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmət qrupları","xidmetQruplari");
         var all=repo.qruplar(klinikaId(session));
         String query=hasText(q)?q.trim().toLowerCase(Locale.forLanguageTag("az")):null;
         var filtered=all.stream()
                 .filter(x->query==null||contains(x.kod(),query)||contains(x.ad(),query)||contains(x.tamYol(),query))
-                .filter(x->!hasText(status)||("aktiv".equals(status)==Boolean.TRUE.equals(x.aktiv())))
+                .filter(x->!hasText(selectedStatus)||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
                 .filter(x->!hasText(qrupTipi)||("esas".equals(qrupTipi)==Boolean.TRUE.equals(x.kokQrupdur())))
                 .toList();
         m.addAttribute("qruplar",filtered);m.addAttribute("allQruplar",all);m.addAttribute("qrupCount",filtered.size());
-        m.addAttribute("filterApplied",hasText(q)||!"aktiv".equals(status)||hasText(qrupTipi));
-        m.addAttribute("q",q);m.addAttribute("selectedStatus",status);m.addAttribute("selectedQrupTipi",qrupTipi);
+        m.addAttribute("filterApplied",hasText(q)||!"aktiv".equals(selectedStatus)||hasText(qrupTipi));
+        m.addAttribute("q",q);m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("selectedQrupTipi",qrupTipi);
         return "pages/xidmetQruplari";
     }
     @PostMapping("/xidmetQruplari/yeni")
@@ -40,20 +41,21 @@ public class XidmetController {
     public String xidmetler(@RequestParam(required=false)Long qrupId,
             @RequestParam(required=false)Long xidmetTipiId,
             @RequestParam(required=false)Long muhasibatKoduId,
-            @RequestParam(defaultValue="aktiv")String status,
+            @RequestParam(required=false)String status,
             @RequestParam(required=false)String q,Model m,HttpSession session){
+        String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
         Long kid=klinikaId(session);var all=repo.xidmetler(kid,qrupId);
         var filtered=all.stream()
                 .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
                 .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
-                .filter(x->status==null||status.isBlank()||("aktiv".equals(status)==Boolean.TRUE.equals(x.aktiv())))
+                .filter(x->selectedStatus.isBlank()||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
                 .filter(x->matches(x,q)).toList();
         m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",filtered.size());
-        m.addAttribute("filterApplied",qrupId!=null||xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(status)||hasText(q));
+        m.addAttribute("filterApplied",qrupId!=null||xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(q));
         m.addAttribute("qruplar",repo.qruplar(kid));m.addAttribute("selectedQrupId",qrupId);
         m.addAttribute("selectedXidmetTipiId",xidmetTipiId);m.addAttribute("selectedMuhasibatKoduId",muhasibatKoduId);
-        m.addAttribute("selectedStatus",status);m.addAttribute("q",q);
+        m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("q",q);
         m.addAttribute("muhasibatKodlari",repo.muhasibatKodlari(kid));m.addAttribute("xidmetTipleri",repo.xidmetTipleri());
         m.addAttribute("hesabatNovleri",repo.hesabatNovleri());m.addAttribute("hesabatMecburiyyetleri",repo.hesabatMecburiyyetleri());
         return "pages/xidmet";

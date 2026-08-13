@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import az.simplexs.simplexs.dto.personal.PersonalListItem;
 import az.simplexs.simplexs.dto.personal.PersonalRol;
@@ -52,16 +53,17 @@ public class PersonalController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) Long vezifeId,
             @RequestParam(required = false) String personalTipi,
-            @RequestParam(defaultValue = "aktiv") String status,
+            @RequestParam(required = false) String status,
             Model model,
             HttpSession session, Authentication authentication) {
+        String selectedStatus = status == null ? "aktiv" : status;
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         List<PersonalListItem> allPersonals = repo.find(klinikaId);
         List<PersonalListItem> filteredPersonals = allPersonals.stream()
                 .filter(personal -> matchesQuery(personal, q))
                 .filter(personal -> vezifeId == null || vezifeId.equals(personal.vezifeId()))
                 .filter(personal -> matchesType(personal, personalTipi))
-                .filter(personal -> matchesStatus(personal, status))
+                .filter(personal -> matchesStatus(personal, selectedStatus))
                 .toList();
         List<Rol> activeRoles = rol.findAll(klinikaId).stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
         List<Long> manageableClinicIds = accessService.clinicIds(authentication);
@@ -86,11 +88,17 @@ public class PersonalController {
         model.addAttribute("emekdashCount", allPersonals.stream().filter(p -> !Boolean.TRUE.equals(p.hekimdir())).count());
         model.addAttribute("activePersonalCount", allPersonals.stream().filter(p -> Boolean.TRUE.equals(p.personalAktiv())
                 && Boolean.TRUE.equals(p.klinikaElagesiAktiv())).count());
-        model.addAttribute("filterApplied", hasText(q) || vezifeId != null || hasText(personalTipi) || !"aktiv".equals(status));
+        model.addAttribute("filterApplied", hasText(q) || vezifeId != null || hasText(personalTipi) || !"aktiv".equals(selectedStatus));
         model.addAttribute("q", q);
         model.addAttribute("selectedVezifeId", vezifeId);
         model.addAttribute("selectedPersonalTipi", personalTipi);
-        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedStatus", selectedStatus);
+        UriComponentsBuilder returnUrl = UriComponentsBuilder.fromPath("/emekdash");
+        if (hasText(q)) returnUrl.queryParam("q", q);
+        if (vezifeId != null) returnUrl.queryParam("vezifeId", vezifeId);
+        if (hasText(personalTipi)) returnUrl.queryParam("personalTipi", personalTipi);
+        if (status != null) returnUrl.queryParam("status", selectedStatus);
+        model.addAttribute("returnUrl", returnUrl.build().encode().toUriString());
         model.addAttribute("personalRoles", personalRoles);
         model.addAttribute("availableRoles", availableRoles);
         var personalKlinikalar = repo.clinicsByPersonal(personalIds, manageableClinicIds);
@@ -117,33 +125,36 @@ public class PersonalController {
             @RequestParam(defaultValue = "false") boolean hekimdir,
             @RequestParam(defaultValue = "true") boolean aktiv,
             @RequestParam(required = false) String sifre,
+            @RequestParam(required = false) String returnUrl,
             HttpSession session, RedirectAttributes attributes) {
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         Map<String, Object> result = repo.create(klinikaId, vezifeId, ad, soyad, ataAdi, mobilNomre,
                 daxiliNomre, isNomresi, email, hekimdir, aktiv, encodePassword(sifre));
         addResultMessage(result, attributes);
-        return "redirect:/emekdash";
+        return redirectToFilter(returnUrl);
     }
 
     @PostMapping("/emekdash/rol")
     public String role(@RequestParam Long personalKlinikaId, @RequestParam Long rolId,
             @RequestParam(defaultValue = "true") boolean elaveEdilsin,
-            @RequestParam(defaultValue = "false") boolean esasRol, HttpSession session, RedirectAttributes attributes) {
+            @RequestParam(defaultValue = "false") boolean esasRol,
+            @RequestParam(required = false) String returnUrl, HttpSession session, RedirectAttributes attributes) {
         repo.role(personalKlinikaId,rolId, elaveEdilsin, esasRol);
         attributes.addFlashAttribute("successMessage", "Personalın rolu yeniləndi.");
-        return "redirect:/emekdash";
+        return redirectToFilter(returnUrl);
     }
 
     @PostMapping("/emekdash/klinika")
     public String clinic(@RequestParam Long personalId, @RequestParam Long klinikaId,
             @RequestParam(defaultValue = "true") boolean elaveEdilsin,
+            @RequestParam(required = false) String returnUrl,
             Authentication authentication, RedirectAttributes attributes) {
         if (!accessService.hasClinic(authentication, klinikaId)) {
             attributes.addFlashAttribute("errorMessage", "Bu klinikanı idarə etmək icazəniz yoxdur.");
-            return "redirect:/emekdash";
+            return redirectToFilter(returnUrl);
         }
         addResultMessage(repo.clinic(personalId, klinikaId, elaveEdilsin), attributes);
-        return "redirect:/emekdash";
+        return redirectToFilter(returnUrl);
     }
 
     @PostMapping("/emekdash/yenile")
@@ -157,11 +168,12 @@ public class PersonalController {
             @RequestParam(defaultValue = "false") boolean hekimdir,
             @RequestParam(defaultValue = "false") boolean aktiv,
             @RequestParam(required = false) String sifre,
+            @RequestParam(required = false) String returnUrl,
             RedirectAttributes attributes) {
         Map<String, Object> result = repo.update(personalId, vezifeId, ad, soyad, ataAdi, mobilNomre,
                 daxiliNomre, isNomresi, email, hekimdir, aktiv, encodePassword(sifre));
         addResultMessage(result, attributes);
-        return "redirect:/emekdash";
+        return redirectToFilter(returnUrl);
     }
 
     private void addResultMessage(Map<String, Object> result, RedirectAttributes attributes) {
@@ -216,5 +228,10 @@ public class PersonalController {
 
     private String encodePassword(String password) {
         return hasText(password) ? passwordEncoder.encode(password) : null;
+    }
+
+    private String redirectToFilter(String returnUrl) {
+        return "redirect:" + (returnUrl != null && (returnUrl.equals("/emekdash")
+                || returnUrl.startsWith("/emekdash?")) ? returnUrl : "/emekdash");
     }
 }
