@@ -48,8 +48,9 @@ public class HomeController {
 
     @GetMapping("/parPaket")
     public String parPaket(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
+        model.addAttribute("pageTitle", "Paketlər");
+        model.addAttribute("activeMenuGroup", "adminPanel");
+        model.addAttribute("activeMenu", "parPaket");
         return "pages/paket";
     }
 
