@@ -17,13 +17,16 @@ public class AccessService {
     public AccessService(NamedParameterJdbcTemplate jdbc) { this.jdbc=jdbc; }
 
     public Long firstClinicId(Authentication authentication) {
-        Long personalId=personalId(authentication); if(personalId==null)return null;
-        return jdbc.query("SELECT klinika_id FROM public.rn_personal_klinikalar WHERE personal_id=:pid AND aktiv ORDER BY sira_no NULLS LAST,id LIMIT 1",
-            new MapSqlParameterSource("pid",personalId), rs->rs.next()?rs.getLong(1):null);
+        List<Long> ids=clinicIds(authentication);
+        return ids.isEmpty()?null:ids.getFirst();
     }
 
     public List<Long> clinicIds(Authentication authentication) {
         Long personalId=personalId(authentication);if(personalId==null)return List.of();
+        if(isSystemAdmin(personalId)){
+            return jdbc.query("SELECT id FROM public.rn_klinikalar WHERE aktiv ORDER BY sira_no NULLS LAST,id",
+                (rs,row)->rs.getLong(1));
+        }
         return jdbc.query("SELECT klinika_id FROM public.rn_personal_klinikalar WHERE personal_id=:pid AND aktiv ORDER BY sira_no NULLS LAST,id",
             new MapSqlParameterSource("pid",personalId),(rs,row)->rs.getLong(1));
     }
@@ -46,6 +49,7 @@ public class AccessService {
 
     public boolean hasPermission(Authentication authentication, Long clinicId, String code) {
         Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return false;
+        if(isSystemAdmin(personalId))return true;
         Boolean result=jdbc.queryForObject("""
             SELECT EXISTS(SELECT 1 FROM public.fn_personal_selahiyyet_siyahisi(:pid,:kid) WHERE selahiyyet_kodu=:code)
             """,new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId).addValue("code",code),Boolean.class);
@@ -62,6 +66,7 @@ public class AccessService {
 
     public boolean canAccessRoute(Authentication authentication, Long clinicId, String path) {
         Long personalId=personalId(authentication);if(personalId==null||clinicId==null)return false;
+        if(isSystemAdmin(personalId))return true;
         Boolean result=jdbc.queryForObject("SELECT public.fn_personal_route_icazesi_var(:pid,:kid,:path)",
             new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId).addValue("path",path),Boolean.class);
         return Boolean.TRUE.equals(result);
@@ -88,5 +93,18 @@ public class AccessService {
 
     private Long personalId(Authentication authentication) {
         return authentication!=null&&authentication.getPrincipal() instanceof AuthenticatedPersonal p?p.personalId():null;
+    }
+
+    private boolean isSystemAdmin(Long personalId) {
+        Boolean result=jdbc.queryForObject("""
+            SELECT EXISTS(
+                SELECT 1 FROM public.rn_personal_klinikalar pk
+                JOIN public.rn_personal_klinika_rollari pr
+                  ON pr.personal_klinika_id=pk.id AND pr.aktiv
+                JOIN public.rn_rollar r ON r.id=pr.rol_id AND r.aktiv AND r.sistem_roludur
+                WHERE pk.personal_id=:pid
+            )
+            """,new MapSqlParameterSource("pid",personalId),Boolean.class);
+        return Boolean.TRUE.equals(result);
     }
 }

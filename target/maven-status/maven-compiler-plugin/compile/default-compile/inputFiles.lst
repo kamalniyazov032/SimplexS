@@ -29,6 +29,7 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/parametr/KlinikaParametr.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/parametr/ParametrSaveResult.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/parametr/ParametrSecim.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/personal/PersonalKlinika.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/personal/PersonalListItem.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/personal/PersonalRol.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/qiymet/QiymetBasligi.java

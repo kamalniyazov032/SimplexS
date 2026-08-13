@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import az.simplexs.simplexs.dto.personal.PersonalListItem;
+import az.simplexs.simplexs.dto.personal.PersonalKlinika;
 import az.simplexs.simplexs.dto.personal.PersonalRol;
 
 @Repository
@@ -125,8 +126,48 @@ public class PersonalRepository {
                 .addValue("add", add).addValue("primary", primary));
     }
 
-    public Map<Long, List<PersonalRol>> rolesByPersonal(Collection<Long> personalIds) {
-        if (personalIds == null || personalIds.isEmpty()) {
+    public Map<String, Object> clinic(Long personalId, Long klinikaId, boolean add) {
+        List<Map<String, Object>> result = jdbc.queryForList("""
+                SELECT * FROM public.fn_personal_klinika_yenile(
+                    p_personal_id=>:personalId, p_klinika_id=>:klinikaId,
+                    p_elave_edilsin=>:add, p_emel_eden_personal_id=>NULL)
+                """, new MapSqlParameterSource().addValue("personalId", personalId)
+                .addValue("klinikaId", klinikaId).addValue("add", add));
+        return result.isEmpty()
+                ? Map.of("status_kodu", "SISTEM_XETASI", "mesaj", "Klinika icazəsi dəyişdirilə bilmədi")
+                : result.getFirst();
+    }
+
+    public Map<Long, List<PersonalKlinika>> clinicsByPersonal(Collection<Long> personalIds,
+            Collection<Long> manageableClinicIds) {
+        if (personalIds == null || personalIds.isEmpty() || manageableClinicIds == null
+                || manageableClinicIds.isEmpty()) {
+            return Map.of();
+        }
+        List<PersonalKlinika> rows = jdbc.query("""
+                SELECT p.id AS personal_id, pk.id AS personal_klinika_id,
+                       k.id AS klinika_id, k.ad AS klinika_adi,
+                       COALESCE(pk.aktiv, false) AS aktiv
+                FROM public.rn_personallar p
+                CROSS JOIN public.rn_klinikalar k
+                LEFT JOIN public.rn_personal_klinikalar pk
+                       ON pk.personal_id=p.id AND pk.klinika_id=k.id
+                WHERE p.id IN (:personalIds) AND k.id IN (:clinicIds) AND k.aktiv=true
+                ORDER BY p.id, k.sira_no NULLS LAST, k.ad, k.id
+                """, new MapSqlParameterSource("personalIds", personalIds)
+                .addValue("clinicIds", manageableClinicIds),
+                (rs, n) -> new PersonalKlinika(l(rs, "personal_id"), l(rs, "personal_klinika_id"),
+                        l(rs, "klinika_id"), rs.getString("klinika_adi"),
+                        rs.getObject("aktiv", Boolean.class)));
+        Map<Long, List<PersonalKlinika>> result = new LinkedHashMap<>();
+        for (PersonalKlinika row : rows) {
+            result.computeIfAbsent(row.personalId(), key -> new ArrayList<>()).add(row);
+        }
+        return result;
+    }
+
+    public Map<Long, List<PersonalRol>> rolesByPersonal(Collection<Long> personalIds, Long klinikaId) {
+        if (personalIds == null || personalIds.isEmpty() || klinikaId == null) {
             return Map.of();
         }
         List<PersonalRol> rows = jdbc.query("""
@@ -134,9 +175,10 @@ public class PersonalRepository {
                 FROM public.rn_personal_klinika_rollari pr
                 JOIN public.rn_personal_klinikalar pk ON pk.id=pr.personal_klinika_id
                 JOIN public.rn_rollar r ON r.id=pr.rol_id
-                WHERE pk.personal_id IN (:ids) AND pr.aktiv=true AND r.aktiv=true
+                WHERE pk.personal_id IN (:ids) AND pk.klinika_id=:klinikaId
+                      AND pk.aktiv=true AND pr.aktiv=true AND r.aktiv=true
                 ORDER BY pk.personal_id, pr.esas_rol DESC, r.sira_no NULLS LAST, r.ad
-                """, new MapSqlParameterSource("ids", personalIds),
+                """, new MapSqlParameterSource("ids", personalIds).addValue("klinikaId", klinikaId),
                 (rs, n) -> new PersonalRol(l(rs, "personal_id"), l(rs, "rol_id"), rs.getString("rol_adi"),
                         rs.getString("aciqlama"), rs.getObject("esas_rol", Boolean.class)));
         Map<Long, List<PersonalRol>> result = new LinkedHashMap<>();

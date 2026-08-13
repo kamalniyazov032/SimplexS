@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +20,10 @@ import az.simplexs.simplexs.dto.personal.PersonalListItem;
 import az.simplexs.simplexs.dto.personal.PersonalRol;
 import az.simplexs.simplexs.dto.rol.Rol;
 import az.simplexs.simplexs.repository.personal.PersonalRepository;
+import az.simplexs.simplexs.repository.klinika.KlinikaRepository;
 import az.simplexs.simplexs.repository.rol.RolRepository;
 import az.simplexs.simplexs.repository.vezife.VezifeRepository;
+import az.simplexs.simplexs.security.AccessService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -31,13 +34,17 @@ public class PersonalController {
     private final VezifeRepository vezife;
     private final RolRepository rol;
     private final PasswordEncoder passwordEncoder;
+    private final KlinikaRepository klinikaRepository;
+    private final AccessService accessService;
 
     public PersonalController(PersonalRepository repo, VezifeRepository vezife, RolRepository rol,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder, KlinikaRepository klinikaRepository, AccessService accessService) {
         this.repo = repo;
         this.vezife = vezife;
         this.rol = rol;
         this.passwordEncoder = passwordEncoder;
+        this.klinikaRepository = klinikaRepository;
+        this.accessService = accessService;
     }
 
     @GetMapping("/emekdash")
@@ -47,7 +54,7 @@ public class PersonalController {
             @RequestParam(required = false) String personalTipi,
             @RequestParam(required = false) String status,
             Model model,
-            HttpSession session) {
+            HttpSession session, Authentication authentication) {
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         List<PersonalListItem> allPersonals = repo.find(klinikaId);
         List<PersonalListItem> filteredPersonals = allPersonals.stream()
@@ -57,8 +64,9 @@ public class PersonalController {
                 .filter(personal -> matchesStatus(personal, status))
                 .toList();
         List<Rol> activeRoles = rol.findAll(klinikaId).stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
-        Map<Long, List<PersonalRol>> personalRoles = new LinkedHashMap<>(repo.rolesByPersonal(
-                filteredPersonals.stream().map(personal -> personal.personalId()).toList()));
+        List<Long> manageableClinicIds = accessService.clinicIds(authentication);
+        List<Long> personalIds = filteredPersonals.stream().map(personal -> personal.personalId()).toList();
+        Map<Long, List<PersonalRol>> personalRoles = new LinkedHashMap<>(repo.rolesByPersonal(personalIds, klinikaId));
         filteredPersonals.forEach(personal -> personalRoles.putIfAbsent(personal.personalId(), List.of()));
         Map<Long, List<Rol>> availableRoles = filteredPersonals.stream().collect(Collectors.toMap(
                 personal -> personal.personalId(),
@@ -85,6 +93,16 @@ public class PersonalController {
         model.addAttribute("selectedStatus", status);
         model.addAttribute("personalRoles", personalRoles);
         model.addAttribute("availableRoles", availableRoles);
+        var personalKlinikalar = repo.clinicsByPersonal(personalIds, manageableClinicIds);
+        model.addAttribute("personalKlinikalar", personalKlinikalar);
+        model.addAttribute("qosulmusKlinikalar", personalIds.stream().collect(Collectors.toMap(
+                id -> id, id -> personalKlinikalar.getOrDefault(id, List.of()).stream()
+                        .filter(k -> Boolean.TRUE.equals(k.aktiv())).toList())));
+        model.addAttribute("qosulmamisKlinikalar", personalIds.stream().collect(Collectors.toMap(
+                id -> id, id -> personalKlinikalar.getOrDefault(id, List.of()).stream()
+                        .filter(k -> !Boolean.TRUE.equals(k.aktiv())).toList())));
+        model.addAttribute("idareOlunanKlinikalar", klinikaRepository.findAll().stream()
+                .filter(k -> Boolean.TRUE.equals(k.aktiv()) && manageableClinicIds.contains(k.klinikaId())).toList());
         model.addAttribute("vezifeler", vezife.findAll().stream().filter(v -> Boolean.TRUE.equals(v.aktiv())).toList());
         return "pages/emekdash";
     }
@@ -113,6 +131,18 @@ public class PersonalController {
             @RequestParam(defaultValue = "false") boolean esasRol, HttpSession session, RedirectAttributes attributes) {
         repo.role(personalKlinikaId,rolId, elaveEdilsin, esasRol);
         attributes.addFlashAttribute("successMessage", "Personalın rolu yeniləndi.");
+        return "redirect:/emekdash";
+    }
+
+    @PostMapping("/emekdash/klinika")
+    public String clinic(@RequestParam Long personalId, @RequestParam Long klinikaId,
+            @RequestParam(defaultValue = "true") boolean elaveEdilsin,
+            Authentication authentication, RedirectAttributes attributes) {
+        if (!accessService.hasClinic(authentication, klinikaId)) {
+            attributes.addFlashAttribute("errorMessage", "Bu klinikanı idarə etmək icazəniz yoxdur.");
+            return "redirect:/emekdash";
+        }
+        addResultMessage(repo.clinic(personalId, klinikaId, elaveEdilsin), attributes);
         return "redirect:/emekdash";
     }
 

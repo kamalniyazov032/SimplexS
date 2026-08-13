@@ -163,6 +163,7 @@
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
                                 <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et"><i class="ti ti-edit"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#clinicP${p.personalId}|"><i class="ti ti-building-hospital"></i>Klinikalar</button>
                                 <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i>Rol</button>
                             </div>
                         </td>
@@ -238,6 +239,56 @@
                 </div></div>
                 <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button><button class="btn btn-primary" type="submit"><i class="ti ti-device-floppy me-1"></i>Yadda saxla</button></div>
             </form>
+        </div></div>
+    </div>
+
+    <div th:each="p : ${personallar}" class="modal fade" th:id="|clinicP${p.personalId}|" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar avatar-lg bg-info-subtle text-info rounded-circle"><i class="ti ti-building-hospital fs-24"></i></span>
+                    <div><h5 class="mb-1">Klinika giriş icazələri</h5><p class="mb-0 text-muted small" th:text="|${p.personalKodu} · ${p.tamAd}|"></p></div>
+                </div>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla"></button>
+            </div>
+            <div class="modal-body pt-4">
+                <div class="alert alert-info d-flex gap-2 align-items-start"><i class="ti ti-info-circle fs-5"></i><span>Aktiv edilən klinikalar əməkdaş daxil olduqda yuxarıdakı klinika seçimində görünəcək.</span></div>
+                <h6 class="mb-2"><i class="ti ti-building-check text-success me-2"></i>Qoşulmuş klinikalar</h6>
+                <div class="border rounded overflow-hidden mb-4">
+                    <div th:each="clinic : ${qosulmusKlinikalar.get(p.personalId)}" class="d-flex align-items-center justify-content-between gap-3 p-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="avatar rounded-circle bg-success-subtle text-success"><i class="ti ti-building-hospital fs-20"></i></span>
+                            <div><div class="fw-semibold" th:text="${clinic.klinikaAdi}"></div><small class="text-success">Giriş icazəsi verilib</small></div>
+                        </div>
+                        <form method="post" th:action="@{/emekdash/klinika}" onsubmit="return confirm('Əməkdaşın bu klinika ilə bağlantısını kəsmək istəyirsiniz?')">
+                            <input type="hidden" name="personalId" th:value="${p.personalId}">
+                            <input type="hidden" name="klinikaId" th:value="${clinic.klinikaId}">
+                            <input type="hidden" name="elaveEdilsin" value="false">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-unlink me-1"></i>Bağlantını kəs</button>
+                        </form>
+                    </div>
+                    <div th:if="${#lists.isEmpty(qosulmusKlinikalar.get(p.personalId))}" class="text-center text-muted py-4"><i class="ti ti-building-off fs-3 d-block mb-2"></i>Qoşulmuş klinika yoxdur.</div>
+                </div>
+                <div class="rounded bg-light border p-3">
+                    <h6 class="mb-3"><i class="ti ti-building-plus text-primary me-2"></i>Yeni klinika qoş</h6>
+                    <form method="post" th:action="@{/emekdash/klinika}">
+                        <input type="hidden" name="personalId" th:value="${p.personalId}">
+                        <input type="hidden" name="elaveEdilsin" value="true">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label small text-muted">Klinikanı seçin</label>
+                                <select class="form-select" name="klinikaId" required th:disabled="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}">
+                                    <option value="" disabled selected>Qoşulacaq klinikanı seçin</option>
+                                    <option th:each="clinic : ${qosulmamisKlinikalar.get(p.personalId)}" th:value="${clinic.klinikaId}" th:text="${clinic.klinikaAdi}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4"><button type="submit" class="btn btn-primary w-100" th:disabled="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}"><i class="ti ti-link me-1"></i>Qoş</button></div>
+                        </div>
+                        <small th:if="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}" class="text-success d-block mt-2"><i class="ti ti-circle-check me-1"></i>Bütün mövcud klinikalar artıq qoşulub.</small>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer border-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button></div>
         </div></div>
     </div>
 
