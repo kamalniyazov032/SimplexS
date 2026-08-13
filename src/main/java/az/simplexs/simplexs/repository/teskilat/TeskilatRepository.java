@@ -1,15 +1,46 @@
 package az.simplexs.simplexs.repository.teskilat;
 
-import java.sql.ResultSet;import java.sql.SQLException;import java.util.*;
-import org.springframework.jdbc.core.namedparam.*;import org.springframework.stereotype.Repository;
-import az.simplexs.simplexs.dto.teskilat.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import az.simplexs.simplexs.dto.teskilat.Teskilat;
+import az.simplexs.simplexs.dto.teskilat.TeskilatTipi;
 
-@Repository public class TeskilatRepository {
- private final NamedParameterJdbcTemplate jdbc;public TeskilatRepository(NamedParameterJdbcTemplate jdbc){this.jdbc=jdbc;}
- public List<TeskilatTipi> tipler(){return jdbc.query("SELECT * FROM public.fn_teskilat_tipi_siyahisi() ORDER BY teskilat_tipi_adi",(r,n)->new TeskilatTipi(l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi")));}
- public List<Teskilat> siyahi(){return jdbc.query("SELECT * FROM public.fn_teskilat_siyahisi(CAST(:aktiv AS boolean)) ORDER BY sira_no NULLS LAST,ad",new MapSqlParameterSource("aktiv",null),(r,n)->new Teskilat(l(r,"teskilat_id"),l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi"),r.getString("kod"),r.getString("ad"),r.getString("qisa_ad"),r.getString("bank_hesab_nomresi"),r.getString("seher_nomresi"),r.getString("mobil_nomre"),r.getString("vergi_nomresi"),r.getString("selahiyyetli_sexs"),i(r,"sira_no"),r.getObject("standartdir",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id")));}
- public Map<String,Object> yarat(Long tipId,String ad,String kod,String qisaAd,String bank,String seher,String mobil,String vergi,String sexs,boolean standart){String sql="SELECT * FROM public.fn_teskilat_yarat(p_teskilat_tipi_id=>:tip,p_ad=>:ad,p_kod=>:kod,p_qisa_ad=>:qisa,p_bank_hesab_nomresi=>:bank,p_seher_nomresi=>:seher,p_mobil_nomre=>:mobil,p_vergi_nomresi=>:vergi,p_selahiyyetli_sexs=>:sexs,p_standartdir=>:standart,p_yaradan_personal_id=>NULL)";return one(sql,params(tipId,ad,kod,qisaAd,bank,seher,mobil,vergi,sexs,null,standart).addValue("aktiv",true));}
- public Map<String,Object> yenile(Long id,Long tipId,String ad,String kod,String qisaAd,String bank,String seher,String mobil,String vergi,String sexs,Integer sira,boolean standart,boolean aktiv){String sql="SELECT * FROM public.fn_teskilat_yenile(p_teskilat_id=>:id,p_teskilat_tipi_id=>:tip,p_ad=>:ad,p_kod=>:kod,p_kod_deyisdirilsin=>true,p_qisa_ad=>:qisa,p_qisa_ad_deyisdirilsin=>true,p_bank_hesab_nomresi=>:bank,p_bank_hesab_nomresi_deyisdirilsin=>true,p_seher_nomresi=>:seher,p_seher_nomresi_deyisdirilsin=>true,p_mobil_nomre=>:mobil,p_mobil_nomre_deyisdirilsin=>true,p_vergi_nomresi=>:vergi,p_vergi_nomresi_deyisdirilsin=>true,p_selahiyyetli_sexs=>:sexs,p_selahiyyetli_sexs_deyisdirilsin=>true,p_sira_no=>:sira,p_sira_no_deyisdirilsin=>true,p_standartdir=>:standart,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)";return one(sql,params(tipId,ad,kod,qisaAd,bank,seher,mobil,vergi,sexs,sira,standart).addValue("id",id).addValue("aktiv",aktiv));}
- private MapSqlParameterSource params(Long tip,String ad,String kod,String qisa,String bank,String seher,String mobil,String vergi,String sexs,Integer sira,boolean standart){return new MapSqlParameterSource().addValue("tip",tip).addValue("ad",ad.trim()).addValue("kod",blank(kod)).addValue("qisa",blank(qisa)).addValue("bank",blank(bank)).addValue("seher",blank(seher)).addValue("mobil",blank(mobil)).addValue("vergi",blank(vergi)).addValue("sexs",blank(sexs)).addValue("sira",sira).addValue("standart",standart);}
- private Map<String,Object> one(String sql,MapSqlParameterSource p){List<Map<String,Object>> rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}private static String blank(String s){return s==null||s.isBlank()?null:s.trim();}private static Long l(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.longValue():null;}private static Integer i(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.intValue():null;}
+@Repository
+public class TeskilatRepository {
+    private final NamedParameterJdbcTemplate jdbc;
+    public TeskilatRepository(NamedParameterJdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    public List<TeskilatTipi> tipler() {
+        return jdbc.query("SELECT * FROM public.fn_teskilat_tipi_siyahisi() ORDER BY teskilat_tipi_adi",
+            (r,n) -> new TeskilatTipi(l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi")));
+    }
+
+    public List<Teskilat> siyahi(Long klinikaId) {
+        return jdbc.query("SELECT * FROM public.fn_teskilat_siyahisi(p_klinika_id=>CAST(:klinika AS bigint),p_aktiv=>CAST(:aktiv AS boolean)) ORDER BY sira_no NULLS LAST,ad",
+            new MapSqlParameterSource("aktiv",null).addValue("klinika",klinikaId),
+            (r,n) -> new Teskilat(l(r,"teskilat_id"),l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi"),null,r.getString("ad"),r.getString("qisa_ad"),r.getString("bank_hesab_nomresi"),r.getString("seher_nomresi"),r.getString("mobil_nomre"),r.getString("vergi_nomresi"),r.getString("selahiyyetli_sexs"),i(r,"sira_no"),r.getObject("standartdir",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id")));
+    }
+
+    public Map<String,Object> yarat(Long klinikaId,Long tipId,String ad,String kod,String qisaAd,String bank,String seher,String mobil,String vergi,String sexs,boolean standart) {
+        String sql="SELECT * FROM public.fn_teskilat_yarat(p_klinika_id=>:klinika,p_teskilat_tipi_id=>:tip,p_ad=>:ad,p_kod=>:kod,p_qisa_ad=>:qisa,p_bank_hesab_nomresi=>:bank,p_seher_nomresi=>:seher,p_mobil_nomre=>:mobil,p_vergi_nomresi=>:vergi,p_selahiyyetli_sexs=>:sexs,p_standartdir=>:standart,p_yaradan_personal_id=>NULL)";
+        return one(sql,params(tipId,ad,kod,qisaAd,bank,seher,mobil,vergi,sexs,standart).addValue("klinika",klinikaId));
+    }
+
+    public Map<String,Object> yenile(Long id,Long tipId,String ad,String kod,String qisaAd,String bank,String seher,String mobil,String vergi,String sexs,boolean standart,boolean aktiv) {
+        String sql="SELECT * FROM public.fn_teskilat_yenile(p_teskilat_id=>:id,p_teskilat_tipi_id=>:tip,p_ad=>:ad,p_kod=>:kod,p_kod_deyisdirilsin=>true,p_qisa_ad=>:qisa,p_qisa_ad_deyisdirilsin=>true,p_bank_hesab_nomresi=>:bank,p_bank_hesab_nomresi_deyisdirilsin=>true,p_seher_nomresi=>:seher,p_seher_nomresi_deyisdirilsin=>true,p_mobil_nomre=>:mobil,p_mobil_nomre_deyisdirilsin=>true,p_vergi_nomresi=>:vergi,p_vergi_nomresi_deyisdirilsin=>true,p_selahiyyetli_sexs=>:sexs,p_selahiyyetli_sexs_deyisdirilsin=>true,p_standartdir=>:standart,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)";
+        return one(sql,params(tipId,ad,kod,qisaAd,bank,seher,mobil,vergi,sexs,standart).addValue("id",id).addValue("aktiv",aktiv));
+    }
+
+    private MapSqlParameterSource params(Long tip,String ad,String kod,String qisa,String bank,String seher,String mobil,String vergi,String sexs,boolean standart) {
+        return new MapSqlParameterSource().addValue("tip",tip).addValue("ad",ad.trim()).addValue("kod",blank(kod)).addValue("qisa",blank(qisa)).addValue("bank",blank(bank)).addValue("seher",blank(seher)).addValue("mobil",blank(mobil)).addValue("vergi",blank(vergi)).addValue("sexs",blank(sexs)).addValue("standart",standart);
+    }
+    private Map<String,Object> one(String sql,MapSqlParameterSource p){List<Map<String,Object>> rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}
+    private static String blank(String s){return s==null||s.isBlank()?null:s.trim();}
+    private static Long l(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.longValue():null;}
+    private static Integer i(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.intValue():null;}
 }

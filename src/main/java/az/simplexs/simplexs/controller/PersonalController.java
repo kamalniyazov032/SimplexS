@@ -52,15 +52,15 @@ public class PersonalController {
                 .filter(personal -> matchesType(personal, personalTipi))
                 .filter(personal -> matchesStatus(personal, status))
                 .toList();
-        List<Rol> activeRoles = rol.findAll().stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
+        List<Rol> activeRoles = rol.findAll(klinikaId).stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
         Map<Long, List<PersonalRol>> personalRoles = new LinkedHashMap<>(repo.rolesByPersonal(
-                filteredPersonals.stream().map(PersonalListItem::personalId).toList()));
+                filteredPersonals.stream().map(personal -> personal.personalId()).toList()));
         filteredPersonals.forEach(personal -> personalRoles.putIfAbsent(personal.personalId(), List.of()));
         Map<Long, List<Rol>> availableRoles = filteredPersonals.stream().collect(Collectors.toMap(
-                PersonalListItem::personalId,
+                personal -> personal.personalId(),
                 personal -> {
                     Set<Long> assignedRoleIds = personalRoles.getOrDefault(personal.personalId(), List.of()).stream()
-                            .map(PersonalRol::rolId).collect(Collectors.toSet());
+                            .map(personalRole -> personalRole.rolId()).collect(Collectors.toSet());
                     return activeRoles.stream().filter(role -> !assignedRoleIds.contains(role.rolId())).toList();
                 }));
 
@@ -87,21 +87,57 @@ public class PersonalController {
 
     @PostMapping("/emekdash/yeni")
     public String create(@RequestParam Long vezifeId, @RequestParam String ad, @RequestParam String soyad,
+            @RequestParam(required = false) String ataAdi,
+            @RequestParam(required = false) String mobilNomre,
+            @RequestParam(required = false) String daxiliNomre,
+            @RequestParam(required = false) String isNomresi,
+            @RequestParam(required = false) String email,
             @RequestParam(defaultValue = "false") boolean hekimdir,
+            @RequestParam(defaultValue = "true") boolean aktiv,
+            @RequestParam(required = false) String sifre,
             HttpSession session, RedirectAttributes attributes) {
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
-        repo.create(klinikaId, vezifeId, ad, soyad, hekimdir);
-        attributes.addFlashAttribute("successMessage", "Personal yaradıldı.");
+        Map<String, Object> result = repo.create(klinikaId, vezifeId, ad, soyad, ataAdi, mobilNomre,
+                daxiliNomre, isNomresi, email, hekimdir, aktiv, sifre);
+        addResultMessage(result, attributes);
         return "redirect:/emekdash";
     }
 
     @PostMapping("/emekdash/rol")
-    public String role(@RequestParam Long personalId, @RequestParam Long rolId,
+    public String role(@RequestParam Long personalKlinikaId, @RequestParam Long rolId,
             @RequestParam(defaultValue = "true") boolean elaveEdilsin,
-            @RequestParam(defaultValue = "false") boolean esasRol, RedirectAttributes attributes) {
-        repo.role(personalId, rolId, elaveEdilsin, esasRol);
+            @RequestParam(defaultValue = "false") boolean esasRol, HttpSession session, RedirectAttributes attributes) {
+        repo.role(personalKlinikaId,rolId, elaveEdilsin, esasRol);
         attributes.addFlashAttribute("successMessage", "Personalın rolu yeniləndi.");
         return "redirect:/emekdash";
+    }
+
+    @PostMapping("/emekdash/yenile")
+    public String update(@RequestParam Long personalId, @RequestParam Long vezifeId,
+            @RequestParam String ad, @RequestParam String soyad,
+            @RequestParam(required = false) String ataAdi,
+            @RequestParam(required = false) String mobilNomre,
+            @RequestParam(required = false) String daxiliNomre,
+            @RequestParam(required = false) String isNomresi,
+            @RequestParam(required = false) String email,
+            @RequestParam(defaultValue = "false") boolean hekimdir,
+            @RequestParam(defaultValue = "false") boolean aktiv,
+            @RequestParam(required = false) String sifre,
+            RedirectAttributes attributes) {
+        Map<String, Object> result = repo.update(personalId, vezifeId, ad, soyad, ataAdi, mobilNomre,
+                daxiliNomre, isNomresi, email, hekimdir, aktiv, sifre);
+        addResultMessage(result, attributes);
+        return "redirect:/emekdash";
+    }
+
+    private void addResultMessage(Map<String, Object> result, RedirectAttributes attributes) {
+        String status = String.valueOf(result.get("status_kodu"));
+        String mesaj = String.valueOf(result.get("mesaj"));
+        if ("UGURLU".equals(status)) {
+            attributes.addFlashAttribute("successMessage", mesaj);
+        } else {
+            attributes.addFlashAttribute("errorMessage", mesaj);
+        }
     }
 
     private boolean matchesQuery(PersonalListItem personal, String query) {

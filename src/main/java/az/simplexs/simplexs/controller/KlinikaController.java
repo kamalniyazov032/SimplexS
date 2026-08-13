@@ -13,6 +13,7 @@ import az.simplexs.simplexs.dto.klinika.KlinikaListItem;
 import az.simplexs.simplexs.repository.klinika.KlinikaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.DispatcherType;
 
 @Controller
 public class KlinikaController {
@@ -54,7 +55,8 @@ class KlinikaHeaderAdvice {
 
     @ModelAttribute
     void addKlinikalar(Model model, HttpServletRequest request, HttpSession session) {
-        if ("/login".equals(request.getRequestURI())) {
+        if ("/login".equals(request.getRequestURI()) || "/error".equals(request.getRequestURI())
+                || request.getDispatcherType() == DispatcherType.ERROR) {
             return;
         }
 

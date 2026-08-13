@@ -26,13 +26,15 @@ public class BinaRepository {
             SELECT bina_id, klinika_id, klinika_adi, sira_no, bina_adi, unvan,
                    telefon, mobil_nomre, mertebe_sayi, bina_novu_id,
                    bina_novu_kodu, bina_novu_adi, aktiv, yaranma_tarixi
-            FROM public.fn_bina_siyahisi()
-            WHERE klinika_id = :klinikaId
+            FROM public.fn_bina_siyahisi(
+                p_aktiv => CAST(:aktiv AS boolean),
+                p_klinika_id => CAST(:klinikaId AS bigint)
+            )
             ORDER BY sira_no NULLS LAST, bina_adi, bina_id
             """;
 
         return jdbcTemplate.query(sql,
-            new org.springframework.jdbc.core.namedparam.MapSqlParameterSource("klinikaId", klinikaId),
+            new org.springframework.jdbc.core.namedparam.MapSqlParameterSource("klinikaId", klinikaId).addValue("aktiv", null),
             (rs, rowNum) -> new BinaListItem(
                 toLong(rs.getObject("bina_id")),
                 toLong(rs.getObject("klinika_id")),
@@ -72,8 +74,7 @@ public class BinaRepository {
         String telefon,
         String mobilNomre,
         Integer mertebeSayi,
-        Long binaNovuId,
-        Integer siraNo
+        Long binaNovuId
     ) {
         String sql = """
             SELECT status_kodu, bina_id, mesaj
@@ -87,9 +88,7 @@ public class BinaRepository {
                 p_mobil_nomre_deyisdirilsin => true,
                 p_mertebe_sayi => :mertebeSayi,
                 p_mertebe_sayi_deyisdirilsin => true,
-                p_bina_novu_id => :binaNovuId,
-                p_sira_no => :siraNo,
-                p_sira_no_deyisdirilsin => true
+                p_bina_novu_id => :binaNovuId
             )
             """;
 
@@ -99,8 +98,7 @@ public class BinaRepository {
             .addValue("telefon", normalized(telefon))
             .addValue("mobilNomre", normalized(mobilNomre))
             .addValue("mertebeSayi", mertebeSayi)
-            .addValue("binaNovuId", binaNovuId)
-            .addValue("siraNo", siraNo);
+            .addValue("binaNovuId", binaNovuId);
 
         return jdbcTemplate.queryForObject(sql, params, (rs, rowNum) -> new BinaUpdateResult(
             toInteger(rs.getObject("status_kodu")),

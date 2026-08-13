@@ -5,7 +5,7 @@
     <div>
       <a class="text-muted text-decoration-none" th:href="@{/xidmetQiymetleri(basliqId=${qrup.basliqId})}"><i class="ti ti-arrow-left me-1"></i>Qiymət qruplarına qayıt</a>
       <h4 class="mt-2 mb-1"><i class="ti ti-currency-manat text-primary me-2"></i><span th:text="${qrup.ad}"></span></h4>
-      <p class="text-muted mb-0" th:text="|${qrup.basliqAdi} • ${qrup.baslamaTarixi} — ${qrup.bitmeTarixi}|"></p>
+      <p class="text-muted mb-0" th:text="|${qrup.basliqAdi} • ${#temporals.format(qrup.baslamaTarixi, 'dd.MM.yyyy')} — ${#temporals.format(qrup.bitmeTarixi, 'dd.MM.yyyy')}|"></p>
     </div>
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#tarifFilter"><i class="ti ti-filter me-1"></i>Filter</button>
   </div>

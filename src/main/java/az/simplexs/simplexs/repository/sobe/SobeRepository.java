@@ -64,8 +64,7 @@ public class SobeRepository {
 
     public SobeOperationResult create(Long klinikaId, String ad, Long sobeTipiId,
                                       Long hekimSecimQaydasiId, Long sobeMudiriPersonalId,
-                                      Long boyukTibbBacisiPersonalId, Long cinsId,
-                                      Integer siraNo, Long personalId) {
+                                      Long boyukTibbBacisiPersonalId, Long cinsId, Long personalId) {
         String sql = """
             SELECT status_kodu, sobe_id, mesaj FROM public.fn_sobe_yarat(
                 p_klinika_id => CAST(:klinikaId AS bigint), p_ad => :ad,
@@ -74,18 +73,17 @@ public class SobeRepository {
                 p_sobe_mudiri_personal_id => CAST(:sobeMudiriPersonalId AS bigint),
                 p_boyuk_tibb_bacisi_personal_id => CAST(:boyukTibbBacisiPersonalId AS bigint),
                 p_cins_id => CAST(:cinsId AS bigint),
-                p_sira_no => :siraNo,
                 p_yaradan_personal_id => CAST(:personalId AS bigint))
             """;
         return result(sql, new MapSqlParameterSource().addValue("klinikaId", klinikaId).addValue("ad", ad.trim())
             .addValue("sobeTipiId", sobeTipiId).addValue("hekimSecimQaydasiId", hekimSecimQaydasiId)
             .addValue("sobeMudiriPersonalId", sobeMudiriPersonalId)
             .addValue("boyukTibbBacisiPersonalId", boyukTibbBacisiPersonalId)
-            .addValue("cinsId", cinsId).addValue("siraNo", siraNo).addValue("personalId", personalId));
+            .addValue("cinsId", cinsId).addValue("personalId", personalId));
     }
 
     public SobeOperationResult update(Long sobeId, Long qaydaId, Long mudirId, Long baciId, Long cinsId,
-                                      boolean aktiv, Integer siraNo, Long personalId) {
+                                      boolean aktiv, Long personalId) {
         String sql = """
             SELECT status_kodu, sobe_id, mesaj FROM public.fn_sobe_yenile(
                 p_sobe_id => CAST(:sobeId AS bigint),
@@ -93,12 +91,12 @@ public class SobeRepository {
                 p_sobe_mudiri_personal_id => CAST(:mudirId AS bigint), p_sobe_mudiri_deyisdirilsin => true,
                 p_boyuk_tibb_bacisi_personal_id => CAST(:baciId AS bigint), p_boyuk_tibb_bacisi_deyisdirilsin => true,
                 p_cins_id => CAST(:cinsId AS bigint), p_cins_deyisdirilsin => true,
-                p_aktiv => :aktiv, p_sira_no => :siraNo, p_sira_no_deyisdirilsin => true,
+                p_aktiv => :aktiv,
                 p_yenileyen_personal_id => CAST(:personalId AS bigint))
             """;
         return result(sql, new MapSqlParameterSource().addValue("sobeId", sobeId).addValue("qaydaId", qaydaId)
             .addValue("mudirId", mudirId).addValue("baciId", baciId).addValue("cinsId", cinsId)
-            .addValue("aktiv", aktiv).addValue("siraNo", siraNo).addValue("personalId", personalId));
+            .addValue("aktiv", aktiv).addValue("personalId", personalId));
     }
 
     private List<SobeOption> options(String sql) { return jdbcTemplate.query(sql, (rs,n) -> new SobeOption(lng(rs.getObject("id")), rs.getString("kod"), rs.getString("ad"))); }

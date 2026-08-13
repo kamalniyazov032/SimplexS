@@ -35,7 +35,6 @@ public class SobeController {
 
     @PostMapping("/shobe/yeni")
     public String create(@RequestParam String ad, @RequestParam Long sobeTipiId,
-                         @RequestParam(defaultValue = "0") Integer siraNo,
                          @RequestParam(required = false) Long hekimSecimQaydasiId,
                          @RequestParam(required = false) Long sobeMudiriPersonalId,
                          @RequestParam(required = false) Long boyukTibbBacisiPersonalId,
@@ -47,7 +46,7 @@ public class SobeController {
             return error(attributes, "Şöbə müdiri və böyük tibb bacısı eyni personal ola bilməz.");
         }
         var result = repository.create(klinikaId, ad, sobeTipiId, hekimSecimQaydasiId,
-            sobeMudiriPersonalId, boyukTibbBacisiPersonalId, cinsId, siraNo, null);
+            sobeMudiriPersonalId, boyukTibbBacisiPersonalId, cinsId, null);
         message(result.ugurludur(), result.mesaj(), attributes);
         return "redirect:/shobe";
     }
@@ -59,13 +58,12 @@ public class SobeController {
                          @RequestParam(required = false) Long boyukTibbBacisiPersonalId,
                          @RequestParam(required = false) Long cinsId,
                          @RequestParam(defaultValue = "false") boolean aktiv,
-                         @RequestParam(required = false) Integer siraNo,
                          HttpSession session, RedirectAttributes attributes) {
         Long klinikaId = klinikaId(session);
         boolean belongs = repository.findByKlinikaId(klinikaId).stream().anyMatch(s -> s.sobeId().equals(sobeId));
         if (!belongs) return error(attributes, "Şöbə seçilmiş klinikaya aid deyil.");
         var result = repository.update(sobeId, hekimSecimQaydasiId, sobeMudiriPersonalId,
-            boyukTibbBacisiPersonalId, cinsId, aktiv, siraNo, null);
+            boyukTibbBacisiPersonalId, cinsId, aktiv, null);
         message(result.ugurludur(), result.mesaj(), attributes);
         return "redirect:/shobe";
     }

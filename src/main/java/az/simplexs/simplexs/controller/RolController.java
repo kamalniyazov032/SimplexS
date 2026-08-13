@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpSession;
 
 import az.simplexs.simplexs.dto.rol.Rol;
 import az.simplexs.simplexs.repository.rol.RolRepository;
@@ -21,12 +22,12 @@ public class RolController {
     }
 
     @GetMapping("/rollar")
-    public String rollar(@RequestParam(required = false) Long rolId, Model model) {
+    public String rollar(@RequestParam(required = false) Long rolId, Model model, HttpSession session) {
         model.addAttribute("pageTitle", "Rollar və səlahiyyətlər");
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "rollar");
         model.addAttribute("selectedRol", new Rol(null, "", null, false, 0, false, null));
-            var rollar = rolRepository.findAll();
+            var rollar = rolRepository.findAll((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID));
             model.addAttribute("rollar", rollar);
             Long selectedRolId = rolId != null ? rolId : (rollar.isEmpty() ? null : rollar.getFirst().rolId());
             model.addAttribute("selectedRolId", selectedRolId);
@@ -44,8 +45,8 @@ public class RolController {
     @PostMapping("/rollar/yeni")
     public String create(@RequestParam String ad, @RequestParam(required = false) String aciqlama,
                          @RequestParam(defaultValue = "false") boolean sistemRoludur,
-                         @RequestParam(defaultValue = "0") Integer siraNo, RedirectAttributes attributes) {
-        rolRepository.create(ad, aciqlama, sistemRoludur, siraNo);
+                         HttpSession session, RedirectAttributes attributes) {
+        rolRepository.create((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID), ad, aciqlama, sistemRoludur);
         attributes.addFlashAttribute("successMessage", "Rol yaradıldı.");
         return redirect(null);
     }
@@ -54,9 +55,8 @@ public class RolController {
     public String update(@RequestParam Long rolId, @RequestParam String ad,
                          @RequestParam(required=false) String aciqlama,
                          @RequestParam(defaultValue="false") boolean sistemRoludur,
-                         @RequestParam(defaultValue="false") boolean aktiv,
-                         @RequestParam(defaultValue="0") Integer siraNo, RedirectAttributes attributes) {
-        rolRepository.update(rolId, ad, aciqlama, sistemRoludur, aktiv, siraNo);
+                         @RequestParam(defaultValue="false") boolean aktiv, RedirectAttributes attributes) {
+        rolRepository.update(rolId, ad, aciqlama, sistemRoludur, aktiv);
         attributes.addFlashAttribute("successMessage", "Rolun adı yeniləndi.");
         return redirect(rolId);
     }

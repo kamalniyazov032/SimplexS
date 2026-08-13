@@ -1,5 +1,6 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/SImplexSApplication.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/config/SecurityConfig.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/ApplicationExceptionHandler.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/HomeController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/KlinikaController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/MuhasibatKoduController.java

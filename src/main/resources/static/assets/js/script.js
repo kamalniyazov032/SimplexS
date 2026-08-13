@@ -163,18 +163,17 @@ Template Name: Dreams EMR - Bootstrap Admin Template
 	// Initialize Flatpickr on elements with data-provider="flatpickr"
 	document.querySelectorAll('[data-provider="flatpickr"]').forEach(el => {
 		const config = {
-			disableMobile: true
+			disableMobile: true,
+			locale: 'az',
+			dateFormat: 'Y-m-d',
+			altInput: true,
+			altFormat: 'd.m.Y',
+			allowInput: true
 		};
-		if (el.hasAttribute('data-date-format')) {
-			config.dateFormat = el.getAttribute('data-date-format');
-		}
 		if (el.hasAttribute('data-enable-time')) {
 			config.enableTime = true;
-			config.dateFormat = config.dateFormat ? `${config.dateFormat} H:i` : 'Y-m-d H:i';
-		}
-		if (el.hasAttribute('data-altFormat')) {
-			config.altInput = true;
-			config.altFormat = el.getAttribute('data-altFormat');
+			config.dateFormat = 'Y-m-d H:i';
+			config.altFormat = 'd.m.Y H:i';
 		}
 		if (el.hasAttribute('data-minDate')) {
 			config.minDate = el.getAttribute('data-minDate');
@@ -204,6 +203,24 @@ Template Name: Dreams EMR - Bootstrap Admin Template
 			config.weekNumbers = true;
 		}
 		flatpickr(el, config);
+	});
+
+	// Bütün native tarix sahələri üçün vahid SimplexS standartı.
+	// İstifadəçi DD.MM.YYYY görür, serverə isə ISO YYYY-MM-DD göndərilir.
+	document.querySelectorAll('input[type="date"]').forEach(el => {
+		if (el._flatpickr) return;
+		const isRequired = el.required;
+		flatpickr(el, {
+			disableMobile: true,
+			locale: 'az',
+			dateFormat: 'Y-m-d',
+			altInput: true,
+			altFormat: 'd.m.Y',
+			allowInput: true,
+			onReady: function (_selectedDates, _dateStr, instance) {
+				if (instance.altInput) instance.altInput.required = isRequired;
+			}
+		});
 	});
 
 	// Time Picker

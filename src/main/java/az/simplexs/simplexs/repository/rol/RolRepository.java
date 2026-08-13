@@ -3,7 +3,9 @@ package az.simplexs.simplexs.repository.rol;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.function.Supplier;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,20 +22,20 @@ public class RolRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Rol> findAll() {
-        return jdbcTemplate.query("""
+    public List<Rol> findAll(Long klinikaId) {
+        return retryOnBrokenConnection(() -> jdbcTemplate.query("""
             SELECT rol_id, rol_adi, aciqlama, sistem_roludur, sira_no, aktiv, yaranma_tarixi
-            FROM public.fn_rol_siyahisi(CAST(:aktiv AS boolean))
+            FROM public.fn_rol_siyahisi(p_klinika_id=>CAST(:klinikaId AS bigint), p_aktiv=>CAST(:aktiv AS boolean))
             ORDER BY sira_no NULLS LAST, rol_adi, rol_id
-            """, new MapSqlParameterSource("aktiv", null), (rs, rowNum) -> new Rol(
+            """, new MapSqlParameterSource("aktiv", null).addValue("klinikaId", klinikaId), (rs, rowNum) -> new Rol(
                 rs.getObject("rol_id", Long.class), rs.getString("rol_adi"), rs.getString("aciqlama"),
                 rs.getObject("sistem_roludur", Boolean.class), rs.getObject("sira_no", Integer.class),
                 rs.getObject("aktiv", Boolean.class), rs.getObject("yaranma_tarixi", java.time.LocalDateTime.class)
-            ));
+            )));
     }
 
     public List<RolModul> findModullar(Long rolId) {
-        return jdbcTemplate.query("""
+        return retryOnBrokenConnection(() -> jdbcTemplate.query("""
             SELECT t.sistem_id, t.sistem_kodu, t.modul_id, t.parent_id, t.modul_kodu,
                    t.modul_adi, t.modul_aciqlamasi, t.route, t.ikon, t.sira_no,
                    t.seviyye, t.secilib
@@ -45,11 +47,11 @@ public class RolRepository {
                 rs.getString("modul_kodu"), rs.getString("modul_adi"), rs.getString("modul_aciqlamasi"),
                 rs.getString("route"), rs.getString("ikon"), rs.getObject("sira_no", Integer.class),
                 rs.getObject("seviyye", Integer.class), rs.getObject("secilib", Boolean.class)
-            ));
+            )));
     }
 
     public List<RolSelahiyyet> findSelahiyyetler(Long rolId) {
-        return jdbcTemplate.query("""
+        return retryOnBrokenConnection(() -> jdbcTemplate.query("""
             SELECT t.selahiyyet_id, t.modul_id, t.modul_adi, t.selahiyyet_kodu,
                    t.selahiyyet_adi, t.aciqlama, t.secilib
             FROM public.fn_rol_selahiyyet_siyahisi(CAST(:rolId AS bigint)) AS t
@@ -58,28 +60,27 @@ public class RolRepository {
                 rs.getObject("selahiyyet_id", Long.class), rs.getObject("modul_id", Long.class),
                 rs.getString("modul_adi"), rs.getString("selahiyyet_kodu"), rs.getString("selahiyyet_adi"),
                 rs.getString("aciqlama"), rs.getObject("secilib", Boolean.class)
-            ));
+            )));
     }
 
-    public void create(String ad, String aciqlama, boolean sistemRoludur, Integer siraNo) {
+    public void create(Long klinikaId, String ad, String aciqlama, boolean sistemRoludur) {
         jdbcTemplate.queryForList("""
             SELECT status_kodu, rol_id, mesaj
-            FROM public.fn_rol_yarat(p_ad=>:ad, p_aciqlama=>:aciqlama,
-                p_sistem_roludur=>:sistemRoludur, p_aktiv=>true, p_sira_no=>:siraNo)
+            FROM public.fn_rol_yarat(p_klinika_id=>:klinikaId, p_ad=>:ad, p_aciqlama=>:aciqlama,
+                p_sistem_roludur=>:sistemRoludur, p_aktiv=>true)
             """, new MapSqlParameterSource()
-            .addValue("ad", ad.trim()).addValue("siraNo", siraNo)
+            .addValue("ad", ad.trim()).addValue("klinikaId", klinikaId)
             .addValue("aciqlama", blankToNull(aciqlama)).addValue("sistemRoludur", sistemRoludur));
     }
 
-    public void update(Long rolId, String ad, String aciqlama, boolean sistemRoludur, boolean aktiv, Integer siraNo) {
+    public void update(Long rolId, String ad, String aciqlama, boolean sistemRoludur, boolean aktiv) {
         jdbcTemplate.queryForList("""
             SELECT * FROM public.fn_rol_yenile(p_rol_id=>:rolId, p_ad=>:ad,
               p_aciqlama=>:aciqlama, p_aciqlama_deyisdirilsin=>true,
-              p_sistem_roludur=>:sistemRoludur, p_aktiv=>:aktiv,
-              p_sira_no=>:siraNo, p_sira_no_deyisdirilsin=>true)
+              p_sistem_roludur=>:sistemRoludur, p_aktiv=>:aktiv)
             """, new MapSqlParameterSource().addValue("rolId", rolId).addValue("ad", ad.trim())
             .addValue("aciqlama", blankToNull(aciqlama)).addValue("sistemRoludur", sistemRoludur)
-            .addValue("aktiv", aktiv).addValue("siraNo", siraNo));
+            .addValue("aktiv", aktiv));
     }
 
     public void deactivate(Long rolId) {
@@ -104,5 +105,13 @@ public class RolRepository {
 
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private <T> T retryOnBrokenConnection(Supplier<T> operation) {
+        try {
+            return operation.get();
+        } catch (DataAccessResourceFailureException firstFailure) {
+            return operation.get();
+        }
     }
 }

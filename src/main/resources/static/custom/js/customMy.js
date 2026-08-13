@@ -92,7 +92,8 @@ $(document).ready(function () {
 
     $('.btn-search-firma').on('click', function () {
         const year = $.trim($('[name="year"]').val());
-        const dateRange = $.trim($('[data-provider="flatpickr"]').val());
+        const dateRangeElement = document.querySelector('[data-provider="flatpickr"]');
+        const dateRange = $.trim(dateRangeElement?._flatpickr?.altInput?.value || $(dateRangeElement).val());
         const workType = $.trim($('[name="isleyis_novu"] option:selected').text());
         const invoiceNo = $.trim($('[name="qaimeno"]').val()).toLowerCase();
         const firma = $.trim($('[name="firma"] option:selected').text());

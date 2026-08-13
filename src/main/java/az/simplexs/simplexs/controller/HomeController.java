@@ -93,7 +93,6 @@ public class HomeController {
         @RequestParam(required = false) String mobilNomre,
         @RequestParam(required = false) Integer mertebeSayi,
         @RequestParam Long binaNovuId,
-        @RequestParam(required = false) Integer siraNo,
         HttpSession session,
         RedirectAttributes redirectAttributes
     ) {
@@ -106,7 +105,7 @@ public class HomeController {
             return "redirect:/binalar";
         }
 
-        var result = binaRepository.update(binaId, unvan, telefon, mobilNomre, mertebeSayi, binaNovuId, siraNo);
+        var result = binaRepository.update(binaId, unvan, telefon, mobilNomre, mertebeSayi, binaNovuId);
         if (result.statusKodu() != null && result.statusKodu() > 0) {
             redirectAttributes.addFlashAttribute("successMessage", result.mesaj());
         } else {
