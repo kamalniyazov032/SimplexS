@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,11 +30,14 @@ public class PersonalController {
     private final PersonalRepository repo;
     private final VezifeRepository vezife;
     private final RolRepository rol;
+    private final PasswordEncoder passwordEncoder;
 
-    public PersonalController(PersonalRepository repo, VezifeRepository vezife, RolRepository rol) {
+    public PersonalController(PersonalRepository repo, VezifeRepository vezife, RolRepository rol,
+            PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.vezife = vezife;
         this.rol = rol;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/emekdash")
@@ -98,7 +102,7 @@ public class PersonalController {
             HttpSession session, RedirectAttributes attributes) {
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         Map<String, Object> result = repo.create(klinikaId, vezifeId, ad, soyad, ataAdi, mobilNomre,
-                daxiliNomre, isNomresi, email, hekimdir, aktiv, sifre);
+                daxiliNomre, isNomresi, email, hekimdir, aktiv, encodePassword(sifre));
         addResultMessage(result, attributes);
         return "redirect:/emekdash";
     }
@@ -125,7 +129,7 @@ public class PersonalController {
             @RequestParam(required = false) String sifre,
             RedirectAttributes attributes) {
         Map<String, Object> result = repo.update(personalId, vezifeId, ad, soyad, ataAdi, mobilNomre,
-                daxiliNomre, isNomresi, email, hekimdir, aktiv, sifre);
+                daxiliNomre, isNomresi, email, hekimdir, aktiv, encodePassword(sifre));
         addResultMessage(result, attributes);
         return "redirect:/emekdash";
     }
@@ -178,5 +182,9 @@ public class PersonalController {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private String encodePassword(String password) {
+        return hasText(password) ? passwordEncoder.encode(password) : null;
     }
 }

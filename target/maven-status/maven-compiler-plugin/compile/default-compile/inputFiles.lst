@@ -3,6 +3,7 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/ApplicationExceptionHandler.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/HomeController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/KlinikaController.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/ModulController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/MuhasibatKoduController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/PersonalController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/QiymetController.java
@@ -22,6 +23,7 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/bina/BinaNovu.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/bina/BinaUpdateResult.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/klinika/KlinikaListItem.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/modul/ModulListItem.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/muhasibat/MuhasibatKodu.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/muhasibat/MuhasibatTipi.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/parametr/KlinikaParametr.java
@@ -49,6 +51,7 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/ambulator/AmbulatorRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/bina/BinaRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/klinika/KlinikaRepository.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/modul/ModulRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/muhasibat/MuhasibatKoduRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/parametr/ParametrRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/personal/PersonalRepository.java
@@ -59,4 +62,11 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/vezife/VezifeRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xidmet/SobeXidmetRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xidmet/XidmetRepository.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/AccessService.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/AuthenticatedPersonal.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/AuthenticationAuditListener.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/DatabaseUserDetailsService.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/LegacyUpgradingPasswordEncoder.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/MenuModule.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/security/ModuleAccessFilter.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/service/ambulator/AmbulatorService.java

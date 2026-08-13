@@ -18,7 +18,7 @@
                 <i class="ti ti-filter me-1"></i>Filter
                 <span th:if="${filterApplied}" class="badge bg-white text-primary ms-2">Aktiv</span>
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPersonal">
+            <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPersonal">
                 <i class="ti ti-user-plus me-1"></i>Yeni personal
             </button>
         </div>
@@ -162,8 +162,8 @@
                         <td><span class="badge d-inline-flex align-items-center gap-1" th:classappend="${p.personalAktiv and p.klinikaElagesiAktiv} ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'"><i class="ti ti-circle-filled" style="font-size: 7px"></i><span th:text="${p.personalAktiv and p.klinikaElagesiAktiv} ? 'Aktiv' : 'Passiv'"></span></span></td>
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et"><i class="ti ti-edit"></i></button>
-                                <button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i>Rol</button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et"><i class="ti ti-edit"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i>Rol</button>
                             </div>
                         </td>
                     </tr>

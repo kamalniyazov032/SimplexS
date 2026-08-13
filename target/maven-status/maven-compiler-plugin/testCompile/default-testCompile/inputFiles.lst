@@ -1,1 +1,3 @@
 /Users/user/Documents/GitHub/SimplexS/src/test/java/az/simplexs/simplexs/SImplexSApplicationTests.java
+/Users/user/Documents/GitHub/SimplexS/src/test/java/az/simplexs/simplexs/repository/modul/ModulRepositoryTests.java
+/Users/user/Documents/GitHub/SimplexS/src/test/java/az/simplexs/simplexs/security/LegacyUpgradingPasswordEncoderTests.java

@@ -2,211 +2,51 @@
 <html lang="az" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="sidebar" id="sidebar" th:fragment="sidebar">
-
     <div class="sidebar-logo">
         <div>
-            <a th:href="@{/dashboard}" class="logo logo-normal">
-                <img src="/custom/logo/LogosSVG/SS-White-logo.svg" alt="Logo" style="width: 140px">
-            </a>
-
-            <a th:href="@{/dashboard}" class="logo-small">
-                <img src="/custom/logo/LogosSVG/SS-White-logo.svg" alt="Logo">
-            </a>
-
-            <a th:href="@{/dashboard}" class="dark-logo">
-                <img src="/custom/logo/LogosSVG/SS-Black-logo.svg" alt="Logo">
-            </a>
+            <a th:href="@{/dashboard}" class="logo logo-normal"><img src="/custom/logo/LogosSVG/SS-White-logo.svg" alt="SimplexS" style="width:140px"></a>
+            <a th:href="@{/dashboard}" class="logo-small"><img src="/custom/logo/LogosSVG/SS-White-logo.svg" alt="SimplexS"></a>
+            <a th:href="@{/dashboard}" class="dark-logo"><img src="/custom/logo/LogosSVG/SS-Black-logo.svg" alt="SimplexS"></a>
         </div>
-
-        <button class="sidenav-toggle-btn btn border-0 p-0 active" id="toggle_btn">
-            <i class="ti ti-arrow-bar-to-left"></i>
-        </button>
-
-        <button class="sidebar-close">
-            <i class="ti ti-x align-middle"></i>
-        </button>
+        <button class="sidenav-toggle-btn btn border-0 p-0 active" id="toggle_btn"><i class="ti ti-arrow-bar-to-left"></i></button>
+        <button class="sidebar-close"><i class="ti ti-x align-middle"></i></button>
     </div>
 
     <div class="sidebar-inner" data-simplebar>
         <div id="sidebar-menu" class="sidebar-menu">
-            <ul role="menu" aria-label="Main navigation menu">
-
-
+            <ul role="menu" aria-label="Əsas naviqasiya menyusu">
                 <li>
                     <a th:href="@{/dashboard}" th:classappend="${activeMenu == 'dashboard'} ? 'active' : ''">
                         <i class="ti ti-layout-board"></i><span>Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-title"><span>Klinik məlumat sistemi</span></li>
 
-                <li class="submenu">
-                    <a href="javascript:void(0);"
-                       th:classappend="${activeMenuGroup == 'pasientQebulu'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-clipboard-user"></i><span>Pasiyent qəbulu</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'pasientQebulu'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/ambulatorQebul}"
-                               th:classappend="${activeMenu == 'ambulatorQebul'} ? 'active' : ''">Ambulator</a></li>
-                        <li><a href="javascript:void(0);">Stasionar</a></li>
-                        <li><a th:href="@{/xesteKarti}"
-                               th:classappend="${activeMenu == 'xesteKarti'} ? 'active' : ''">Xəstə Kartı</a></li>
-                    </ul>
+                <th:block th:each="modul : ${userModules}">
+                    <li class="submenu" th:if="${!#lists.isEmpty(modul.children)}">
+                        <a href="javascript:void(0);" th:classappend="${#strings.startsWith(currentRequestUri, modul.route ?: '__no_route__')} ? 'active subdrop' : ''">
+                            <i th:class="${modul.icon ?: 'ti ti-category'}"></i>
+                            <span th:text="${modul.name}">Modul</span><span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li th:each="child : ${modul.children}">
+                                <a th:if="${child.route != null}" th:href="@{${child.route}}"
+                                   th:classappend="${#strings.startsWith(currentRequestUri, child.route)} ? 'active' : ''">
+                                    <i th:class="${child.icon ?: 'ti ti-point'}"></i><span th:text="${child.name}">Alt modul</span>
+                                </a>
+                                <span th:unless="${child.route != null}" class="text-muted px-3 py-2 d-block" th:text="${child.name}"></span>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:if="${#lists.isEmpty(modul.children) and modul.route != null}">
+                        <a th:href="@{${modul.route}}" th:classappend="${#strings.startsWith(currentRequestUri, modul.route)} ? 'active' : ''">
+                            <i th:class="${modul.icon ?: 'ti ti-apps'}"></i><span th:text="${modul.name}">Modul</span>
+                        </a>
+                    </li>
+                </th:block>
+
+                <li th:if="${#lists.isEmpty(userModules)}" class="px-3 py-4 text-center text-muted">
+                    <i class="ti ti-shield-off fs-3 d-block mb-2"></i><small>Bu klinika üçün modul icazəsi verilməyib.</small>
                 </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-regular fa-calendar-days"></i><span>Randevu</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/randevu}">Qəbul vaxt təyini</a></li>
-                    </ul>
-                </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-user-doctor"></i><span>Kliniki sistem</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/poliklinikHekim}">Poliknika</a></li>
-                        <li><a th:href="@{/stasionar}">Stasionar</a></li>
-                        <li><a href="javascript:void(0);">Əməliyyatxana</a></li>
-                        <li><a th:href="@{/radiologiya}">Radiologiya</a></li>
-
-                    </ul>
-                </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-flask-vial"></i><span>Laboratoriya</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Xəstə barkod çapı</a></li>
-                        <li><a href="javascript:void(0);">Nümunə qəbulu</a></li>
-                        <li><a href="javascript:void(0);">Laborator nəticələr</a></li>
-                        <li><a href="javascript:void(0);">Nəticə təsdiqlənməsi</a></li>
-
-                    </ul>
-                </li>
-
-
-                <li class="menu-title"><span>Maliyyə sistemi</span></li>
-
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-wallet"></i><span>Maliyyə</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/kassa}">Kassa</a></li>
-                        <li><a th:href="@{/qebz}">Kassa hərəkəti</a></li>
-                        <li><a th:href="@{/qaimeHereketiFirma}">Qaime hərəkəti</a></li>
-                        <li><a href="javascript:void(0);">Sığorta fakturası</a></li>
-                    </ul>
-                </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-capsules"></i><span>Əczaxana</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Hesab-fakturalar</a></li>
-                        <li><a href="javascript:void(0);">Aylıq hesabat</a></li>
-                        <li><a href="javascript:void(0);">Xəstəyə çıxışlar</a></li>
-
-                    </ul>
-                </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'applications'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-money-bill-trend-up"></i><span>Bonus</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'applications'} ? 'display:block;' : ''">
-                        <li><a href="javascript:void(0);">Həkim bonus</a></li>
-                        <li><a href="javascript:void(0);">Reprezant bonus</a></li>
-                    </ul>
-                </li>
-
-
-
-                <li class="menu-title"><span>Parametrlər</span></li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);" th:classappend="${activeMenuGroup == 'adminPanel'} ? 'active subdrop' : ''">
-                        <i class="fa-solid fa-screwdriver-wrench"></i><span>Admin panel</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul th:style="${activeMenuGroup == 'adminPanel'} ? 'display:block;' : ''">
-                        <li><a th:href="@{/emekdash}" th:classappend="${activeMenu == 'emekdash'} ? 'active' : ''">Əməkdaş və Həkim</a></li>
-                        <li><a th:href="@{/parXidmet}" th:classappend="${activeMenu == 'xidmetler'} ? 'active' : ''">Xidmətlər</a></li>
-                        <li><a th:href="@{/xidmetQruplari}" th:classappend="${activeMenu == 'xidmetQruplari'} ? 'active' : ''">Xidmət qrupları</a></li>
-                        <li><a th:href="@{/xidmetQiymetleri}" th:classappend="${activeMenu == 'xidmetQiymetleri'} ? 'active' : ''">Qiymət</a></li>
-                        <li><a th:href="@{/parPaket}">Paket</a></li>
-                        <li><a th:href="@{/muhasibatKodu}" th:classappend="${activeMenu == 'muhasibatKodlari'} ? 'active' : ''">Mühasibat kodları</a></li>
-                        <li><a th:href="@{/parShobeXidmet}" th:classappend="${activeMenu == 'sobeXidmetleri'} ? 'active' : ''">Şöbə xidmətləri</a></li>
-                        <li><a th:href="@{/shobe}">Şöbələr</a></li>
-                        <li><a th:href="@{/vezifeler}" th:classappend="${activeMenu == 'vezifeler'} ? 'active' : ''">Vəzifələr</a></li>
-                        <li><a th:href="@{/teskilatlar}" th:classappend="${activeMenu == 'teskilatlar'} ? 'active' : ''">Təşkilatlar</a></li>
-                        <li><a th:href="@{/binalar}" th:classappend="${activeMenu == 'binalar'} ? 'active' : ''">Binalar</a></li>
-                        <li><a th:href="@{/bina-parametrleri}" th:classappend="${activeMenu == 'binaParametrleri'} ? 'active' : ''">Ümumi parametrlər</a></li>
-                        <li><a th:href="@{/rollar}" th:classappend="${activeMenu == 'rollar'} ? 'active' : ''">Rollar və səlahiyyətlər</a></li>
-
-
-                        <li><a href="javascript:void(0);">Anbar</a></li>
-                        <li><a href="javascript:void(0);">Tərcümələr</a></li>
-
-                    </ul>
-                </li>
-
-                <li class="submenu">
-                    <a href="javascript:void(0);">
-                        <i class="ti ti-stack"></i>
-                        <span>Əlavələr</span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul>
-
-
-                        <li class="submenu">
-                            <a href="javascript:void(0);">
-                                <span>Xəstə qəbulu</span>
-                                <span class="menu-arrow inside-submenu"></span>
-                            </a>
-                            <ul>
-                                <li><a th:href="@{/level2/item1}">Ambulator</a></li>
-                                <li><a th:href="@{/level2/item2}">Stasionar</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a th:href="@{/level1}">Poliklinika</a>
-                        </li>
-                        <li>
-                            <a th:href="@{/level1}">Şöbə</a>
-                        </li>
-                        <li>
-                            <a th:href="@{/level1}">Əməliyyatxana</a>
-                        </li>
-                        <li class="submenu">
-                            <a href="javascript:void(0);">
-                                <span>Əczanə</span>
-                                <span class="menu-arrow inside-submenu"></span>
-                            </a>
-                            <ul>
-                                <li><a th:href="@{/level2/item1}">Qaimələr</a></li>
-                                <li><a th:href="@{/level2/item2}">Aylıq dövriyyə</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-
-
-
             </ul>
         </div>
     </div>

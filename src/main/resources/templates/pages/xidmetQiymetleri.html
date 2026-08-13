@@ -3,7 +3,7 @@
 <body><div layout:fragment="content">
   <div class="d-flex justify-content-between mb-4">
     <div><h4><i class="ti ti-currency-manat text-primary me-2"></i>Xidmət qiymətləri</h4><p class="text-muted mb-0">Qiymət başlıqları, qrupları və xidmət tarifləri</p></div>
-    <div class="d-flex gap-2"><button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newHeading"><i class="ti ti-file-plus me-1"></i>Başlıq</button><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newGroup" th:disabled="${selectedBasliqId==null}"><i class="ti ti-tag-plus me-1"></i>Yeni qiymət qrupu</button></div>
+    <div class="d-flex gap-2" th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'QIYMET_YARAT')}"><button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newHeading"><i class="ti ti-file-plus me-1"></i>Başlıq</button><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newGroup" th:disabled="${selectedBasliqId==null}"><i class="ti ti-tag-plus me-1"></i>Yeni qiymət qrupu</button></div>
   </div>
   <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
   <div class="row g-3 mb-4">
@@ -16,7 +16,7 @@
         <div class="d-flex justify-content-between"><strong th:text="${g.ad}"></strong><div><span th:if="${g.standartdir}" class="badge bg-warning-subtle text-warning me-1">Standart</span><span class="badge" th:classappend="${g.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${g.aktiv}?'Aktiv':'Passiv'"></span></div></div>
         <small class="text-muted" th:text="|${#temporals.format(g.baslamaTarixi,'dd.MM.yyyy')} — ${#temporals.format(g.bitmeTarixi,'dd.MM.yyyy')}|"></small>
         <div class="small text-muted mt-2" th:text="|Xəstə/Sığorta payı: ${g.xestePayi ?: 0}/${g.sigortaPayi ?: 0}|"></div>
-        <div class="d-flex gap-2 mt-3"><a class="btn btn-sm btn-outline-primary flex-grow-1" th:href="@{/xidmetQiymetleri/qrup/{id}(id=${g.id})}">Tariflər</a><button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" th:data-bs-target="|#editGroup${g.id}|">Redaktə et</button></div>
+        <div class="d-flex gap-2 mt-3"><a class="btn btn-sm btn-outline-primary flex-grow-1" th:href="@{/xidmetQiymetleri/qrup/{id}(id=${g.id})}">Tariflər</a><button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'QIYMET_YENILE')}" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" th:data-bs-target="|#editGroup${g.id}|">Redaktə et</button></div>
       </div></div></div>
       <div th:if="${#lists.isEmpty(qruplar)}" class="text-muted text-center py-4">Bu başlıqda qiymət qrupu yoxdur.</div>
     </div></div></div></div>
