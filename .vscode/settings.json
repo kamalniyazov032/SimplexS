@@ -1,4 +1,8 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.jdt.ls.java.home": "/Users/user/Library/Java/JavaVirtualMachines/ms-21.0.11/Contents/Home",
+    "java.import.exclusions": [
+        "**/target/**"
+    ]
 }

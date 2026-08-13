@@ -30,6 +30,7 @@ az/simplexs/simplexs/dto/bina/BinaUpdateResult.class
 az/simplexs/simplexs/controller/SobeXidmetController.class
 az/simplexs/simplexs/dto/sobe/SobeOption.class
 az/simplexs/simplexs/service/ambulator/AmbulatorService.class
+az/simplexs/simplexs/dto/personal/PersonalKlinika.class
 az/simplexs/simplexs/dto/muhasibat/MuhasibatTipi.class
 az/simplexs/simplexs/controller/PersonalController.class
 az/simplexs/simplexs/dto/rol/RolModul.class

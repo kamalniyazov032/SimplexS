@@ -22,15 +22,20 @@ public class RolController {
     }
 
     @GetMapping("/rollar")
-    public String rollar(@RequestParam(required = false) Long rolId, Model model, HttpSession session) {
+    public String rollar(@RequestParam(required = false) Long rolId, @RequestParam(required = false) String status, Model model, HttpSession session) {
         model.addAttribute("pageTitle", "Rollar və səlahiyyətlər");
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "rollar");
         model.addAttribute("selectedRol", new Rol(null, "", null, false, 0, false, null));
-            var rollar = rolRepository.findAll((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID));
+            String selectedStatus = status == null ? "aktiv" : status;
+            var rollar = rolRepository.findAll((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID)).stream()
+                .filter(rol -> selectedStatus.isBlank() || ("aktiv".equals(selectedStatus) == Boolean.TRUE.equals(rol.aktiv())))
+                .toList();
             model.addAttribute("rollar", rollar);
-            Long selectedRolId = rolId != null ? rolId : (rollar.isEmpty() ? null : rollar.getFirst().rolId());
+            Long selectedRolId = rolId != null && rollar.stream().anyMatch(rol -> rol.rolId().equals(rolId))
+                ? rolId : (rollar.isEmpty() ? null : rollar.getFirst().rolId());
             model.addAttribute("selectedRolId", selectedRolId);
+            model.addAttribute("selectedRoleStatus", selectedStatus);
             if (selectedRolId != null) {
                 model.addAttribute("selectedRol", rollar.stream()
                     .filter(rol -> rol.rolId().equals(selectedRolId))

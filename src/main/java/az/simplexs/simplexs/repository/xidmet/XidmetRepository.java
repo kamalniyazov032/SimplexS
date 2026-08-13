@@ -31,6 +31,21 @@ public class XidmetRepository {
         return jdbc.query("SELECT * FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),CAST(:aktiv AS boolean),CAST(:alt AS boolean)) ORDER BY xidmet_adi",
                 new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("qrup",qrupId).addValue("aktiv",null).addValue("alt",true),(r,n)->new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class)));
     }
+    public List<Xidmet> availableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query,int limit,int offset){
+        String sql="""
+                SELECT f.* FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true) f
+                WHERE (CAST(:q AS text) IS NULL OR f.xidmet_adi ILIKE '%'||:q||'%' OR f.xidmet_kodu ILIKE '%'||:q||'%')
+                AND NOT EXISTS (SELECT 1 FROM public.fn_xidmet_sobe_siyahisi(CAST(:sobe AS bigint),true) s WHERE s.xidmet_id=f.xidmet_id)
+                ORDER BY f.xidmet_adi LIMIT :limit OFFSET :offset""";
+        return jdbc.query(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)).addValue("limit",limit).addValue("offset",offset),this::mapXidmet);
+    }
+    public long countAvailableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query){
+        String sql="""
+                SELECT count(*) FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true) f
+                WHERE (CAST(:q AS text) IS NULL OR f.xidmet_adi ILIKE '%'||:q||'%' OR f.xidmet_kodu ILIKE '%'||:q||'%')
+                AND NOT EXISTS (SELECT 1 FROM public.fn_xidmet_sobe_siyahisi(CAST(:sobe AS bigint),true) s WHERE s.xidmet_id=f.xidmet_id)""";
+        Long count=jdbc.queryForObject(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)),Long.class);return count==null?0:count;
+    }
     public List<XidmetOption> muhasibatKodlari(Long klinikaId){return options("SELECT muhasibat_kodu_id id,tip_kodu kod,ad FROM public.fn_muhasibat_kodu_siyahisi(CAST("+klinikaId+" AS bigint),true)");}
     public List<XidmetOption> xidmetTipleri(){return options("SELECT xidmet_tipi_id id,xidmet_tipi_kodu kod,xidmet_tipi_adi ad FROM public.fn_xidmet_tipi_siyahisi()");}
     public List<XidmetOption> hesabatNovleri(){return options("SELECT hesabat_novu_id id,hesabat_novu_kodu kod,hesabat_novu_adi ad FROM public.fn_hesabat_novu_siyahisi()");}
@@ -49,6 +64,7 @@ public class XidmetRepository {
     public Map<String,Object> xidmetYenile(Long id,String ad,Long qrupId,Long muhasibatId,Long tipId,String beynelxalqKod,String beynelxalqAd,Long hesabatNovuId,Long mecburiyyetId,boolean aktiv){return one("SELECT * FROM public.fn_xidmet_yenile(p_xidmet_id=>:id,p_ad=>:ad,p_xidmet_qrupu_id=>:qrup,p_muhasibat_kodu_id=>:muh,p_xidmet_tipi_id=>:tip,p_beynelxalq_kod=>:bk,p_beynelxalq_kod_deyisdirilsin=>true,p_beynelxalq_ad=>:ba,p_beynelxalq_ad_deyisdirilsin=>true,p_hesabat_novu_id=>:hn,p_hesabat_novu_deyisdirilsin=>true,p_hesabat_mecburiyyeti_id=>:hm,p_hesabat_mecburiyyeti_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)",new MapSqlParameterSource().addValue("id",id).addValue("ad",ad.trim()).addValue("qrup",qrupId).addValue("muh",muhasibatId).addValue("tip",tipId).addValue("bk",blank(beynelxalqKod)).addValue("ba",blank(beynelxalqAd)).addValue("hn",hesabatNovuId).addValue("hm",mecburiyyetId).addValue("aktiv",aktiv));}
 
     private List<XidmetOption> options(String sql){return jdbc.query(sql,(r,n)->new XidmetOption(l(r,"id"),r.getString("kod"),r.getString("ad")));}
+    private Xidmet mapXidmet(ResultSet r,int n)throws SQLException{return new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class));}
     private Map<String,Object> one(String sql,MapSqlParameterSource p){List<Map<String,Object>> rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}
     private static String blank(String s){return s==null||s.isBlank()?null:s.trim();}
     private static boolean successful(Map<String,Object> result){String status=String.valueOf(result.getOrDefault("status_kodu",""));return status.toUpperCase().contains("UGUR")||"1".equals(status);}

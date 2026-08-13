@@ -3,6 +3,26 @@
       layout:decorate="~{layouts/main}">
 <body>
 <div layout:fragment="content">
+    <style>
+        .role-workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+        .role-sidebar{position:sticky;top:82px;overflow:hidden}
+        .role-sidebar .card-body{padding:0}
+        .role-search{padding:16px;border-bottom:1px solid #e9edf4}
+        .role-search .input-group-text,.role-search .form-control{background:#fff;border-color:#dce3ee}
+        .role-list{max-height:calc(100vh - 310px);min-height:360px;overflow-y:auto;padding:8px 0}
+        .role-list .nav-item{width:100%}
+        .role-list .nav-link{position:relative;width:100%;min-height:48px;border:0!important;border-left:3px solid transparent!important;border-radius:0!important;color:#26324a;padding:10px 16px!important}
+        .role-list .nav-link:hover{background:#f5f8fd;color:#195fd0}
+        .role-list .nav-link.active{color:#174da6;background:linear-gradient(90deg,#e8f1ff,#f4f8ff);border-left-color:#216be0!important;font-weight:600}
+        .role-status-dot{width:7px;height:7px;border-radius:50%;background:#26b865;flex:0 0 auto}
+        .role-status-dot.passive{background:#ef5350}
+        .role-sidebar-footer{border-top:1px solid #e9edf4;padding:14px 18px;background:#fbfcfe;color:#53617a}
+        .role-detail{min-width:0}
+        .role-detail>.card{margin-bottom:0}
+        .role-identity{display:flex;align-items-center;gap:15px}
+        .role-avatar{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:#eaf2ff;color:#1767d5;font-size:27px;flex:0 0 auto}
+        @media(max-width:991.98px){.role-workspace{grid-template-columns:1fr}.role-sidebar{position:static}.role-list{max-height:300px;min-height:0}.role-detail{width:100%}}
+    </style>
     <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
         <div>
             <h4 class="mb-1">Rollar və səlahiyyətlər</h4>
@@ -27,7 +47,15 @@
         </div>
         <div class="offcanvas-body py-3">
             <div class="row g-2 align-items-end">
-                <div class="col-lg-4 col-md-5">
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label small text-muted" for="roleStatusFilter"><i class="ti ti-user-shield me-1"></i>Rol statusu</label>
+                    <select class="form-select" id="roleStatusFilter" th:data-initial="${selectedRoleStatus}">
+                        <option value="">Bütün statuslar</option>
+                        <option value="aktiv" th:selected="${selectedRoleStatus == 'aktiv'}">Aktiv</option>
+                        <option value="passiv" th:selected="${selectedRoleStatus == 'passiv'}">Passiv</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <label class="form-label small text-muted" for="moduleSelectionFilter"><i class="ti ti-layout-grid me-1"></i>Modullar</label>
                     <select class="form-select" id="moduleSelectionFilter">
                         <option value="all">Bütün modullar</option>
@@ -35,7 +63,7 @@
                         <option value="unselected">Seçilməmiş modullar</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-5">
+                <div class="col-lg-3 col-md-6">
                     <label class="form-label small text-muted" for="permissionSelectionFilter"><i class="ti ti-key me-1"></i>Səlahiyyətlər</label>
                     <select class="form-select" id="permissionSelectionFilter">
                         <option value="all">Bütün səlahiyyətlər</option>
@@ -43,7 +71,7 @@
                         <option value="unselected">Seçilməmiş səlahiyyətlər</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-2">
+                <div class="col-lg-3 col-md-6">
                     <div class="d-flex gap-2">
                         <button class="btn btn-primary flex-fill" type="button" id="applyRoleFilter"><i class="ti ti-search me-1"></i>Tətbiq et</button>
                         <button class="btn btn-light flex-fill" type="button" id="clearRoleFilter"><i class="ti ti-x me-1"></i>Təmizlə</button>
@@ -62,20 +90,25 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="role-workspace">
+    <aside class="card border-0 shadow-sm role-sidebar">
         <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
             <h6 class="mb-0"><i class="ti ti-users-group text-primary me-2"></i>Rollar</h6>
             <span class="badge bg-primary-subtle text-primary" th:text="${#lists.size(rollar)} + ' rol'">0 rol</span>
         </div>
-        <div class="card-body pb-2">
-            <ul class="nav nav-pills gap-2 flex-nowrap overflow-auto pb-2" role="tablist">
-                <li class="nav-item" th:each="rol : ${rollar}">
-                    <a class="nav-link border d-flex align-items-center gap-2 text-nowrap px-3"
+        <div class="role-search">
+            <div class="input-group mb-2"><span class="input-group-text"><i class="ti ti-search"></i></span><input class="form-control" id="roleSearch" type="search" placeholder="Rol axtar..." aria-label="Rol axtarışı"></div>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-pills flex-column role-list" id="roleList" role="list">
+                <li class="nav-item role-list-item" th:each="rol : ${rollar}" th:data-role-name="${rol.rolAdi}" th:data-active="${rol.aktiv}">
+                    <a class="nav-link d-flex align-items-center gap-2"
                        th:classappend="${rol.rolId == selectedRolId} ? 'active' : ''"
-                       th:href="@{/rollar(rolId=${rol.rolId})}">
+                       th:href="@{/rollar(rolId=${rol.rolId},status=${selectedRoleStatus})}">
                         <i class="ti" th:classappend="${rol.sistemRoludur} ? 'ti-shield-lock' : 'ti-user-shield'"></i>
-                        <span th:text="${rol.rolAdi}">Rol</span>
+                        <span class="text-truncate flex-grow-1" th:text="${rol.rolAdi}">Rol</span>
                         <span th:unless="${rol.aktiv}" class="badge bg-danger-subtle text-danger">Passiv</span>
+                        <span th:if="${rol.aktiv}" class="role-status-dot" title="Aktiv"></span>
                     </a>
                 </li>
             </ul>
@@ -83,7 +116,10 @@
                 <i class="ti ti-shield-off fs-2 d-block mb-2"></i>Hələ rol yaradılmayıb.
             </div>
         </div>
-    </div>
+        <div class="role-sidebar-footer"><i class="ti ti-users-group me-2"></i><span th:text="|'Ümumi rol sayı: ' + ${#lists.size(rollar)}|">Ümumi rol sayı: 0</span></div>
+    </aside>
+
+    <section class="role-detail">
 
     <div th:if="${selectedRolId == null}" class="card border-0 shadow-sm">
         <div class="card-body text-center text-muted py-5">
@@ -94,7 +130,9 @@
     <div th:if="${selectedRolId != null}" class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom p-3">
             <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-                <div>
+                <div class="role-identity">
+                    <span class="role-avatar"><i class="ti ti-user-shield"></i></span>
+                    <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <h5 class="mb-0" th:text="${selectedRol.rolAdi}">Rol</h5>
                         <span th:if="${selectedRol.sistemRoludur}" class="badge bg-warning-subtle text-warning">Sistem rolu</span>
@@ -102,6 +140,8 @@
                               th:text="${selectedRol.aktiv} ? 'Aktiv' : 'Passiv'">Aktiv</span>
                     </div>
                     <p class="text-muted mb-0" th:text="${selectedRol.aciqlama ?: 'Bu rol üçün açıqlama qeyd edilməyib.'}"></p>
+                    <small class="text-muted"><i class="ti ti-calendar me-1"></i><span th:text="${selectedRol.yaranmaTarixi != null ? #temporals.format(selectedRol.yaranmaTarixi, 'dd.MM.yyyy HH:mm') : 'Tarix qeyd edilməyib'}"></span></small>
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal">
@@ -193,6 +233,8 @@
             </div>
         </form>
     </div>
+    </section>
+    </div>
 
     <div class="modal fade" id="newRoleModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
         <form method="post" th:action="@{/rollar/yeni}">
@@ -222,9 +264,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const roleSearch = document.getElementById('roleSearch');
+            const roleStatusFilter = document.getElementById('roleStatusFilter');
+            const roleItems = Array.from(document.querySelectorAll('.role-list-item'));
+            function filterRoles() {
+                const query = roleSearch.value.trim().toLocaleLowerCase('az');
+                roleItems.forEach(function (item) {
+                    const matchesName = item.dataset.roleName.toLocaleLowerCase('az').includes(query);
+                    item.classList.toggle('d-none', !matchesName);
+                });
+            }
+            if (roleSearch && roleStatusFilter) {
+                roleSearch.addEventListener('input', filterRoles);
+                filterRoles();
+            }
             const moduleFilter = document.getElementById('moduleSelectionFilter');
             const permissionFilter = document.getElementById('permissionSelectionFilter');
             const badge = document.getElementById('roleFilterBadge');
+            badge.classList.toggle('d-none', roleStatusFilter.dataset.initial === 'aktiv');
 
             function matches(element, filter) {
                 const selected = element.querySelector('input[type="checkbox"]').checked;
@@ -246,9 +303,16 @@
             }
 
             function applyFilter() {
+                if (roleStatusFilter.value !== roleStatusFilter.dataset.initial) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('rolId');
+                    url.searchParams.set('status', roleStatusFilter.value);
+                    window.location.href = url.toString();
+                    return;
+                }
                 filterItems('.role-module-item', moduleFilter.value, 'moduleFilterEmpty');
                 filterItems('.role-permission-item', permissionFilter.value, 'permissionFilterEmpty');
-                badge.classList.toggle('d-none', moduleFilter.value === 'all' && permissionFilter.value === 'all');
+                badge.classList.toggle('d-none', roleStatusFilter.value === 'aktiv' && moduleFilter.value === 'all' && permissionFilter.value === 'all');
                 const panel = bootstrap.Offcanvas.getInstance(document.getElementById('rolePermissionFilter'));
                 if (panel) panel.hide();
             }
@@ -257,6 +321,10 @@
             document.getElementById('clearRoleFilter').addEventListener('click', function () {
                 moduleFilter.value = 'all';
                 permissionFilter.value = 'all';
+                if (roleStatusFilter.value !== 'aktiv') {
+                    window.location.href = '/rollar';
+                    return;
+                }
                 applyFilter();
             });
         });
