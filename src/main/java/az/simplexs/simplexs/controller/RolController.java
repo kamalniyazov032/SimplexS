@@ -1,6 +1,7 @@
 package az.simplexs.simplexs.controller;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import az.simplexs.simplexs.dto.rol.Rol;
+import az.simplexs.simplexs.dto.rol.RolSelahiyyet;
 import az.simplexs.simplexs.repository.rol.RolRepository;
 
 @Controller
@@ -26,7 +28,7 @@ public class RolController {
         model.addAttribute("pageTitle", "Rollar və səlahiyyətlər");
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "rollar");
-        model.addAttribute("selectedRol", new Rol(null, "", null, false, 0, false, null));
+        model.addAttribute("selectedRol", new Rol(null, null, "", null, false, 0, false, null));
             String selectedStatus = status == null ? "aktiv" : status;
             var rollar = rolRepository.findAll((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID)).stream()
                 .filter(rol -> selectedStatus.isBlank() || ("aktiv".equals(selectedStatus) == Boolean.TRUE.equals(rol.aktiv())))
@@ -40,9 +42,16 @@ public class RolController {
                 model.addAttribute("selectedRol", rollar.stream()
                     .filter(rol -> rol.rolId().equals(selectedRolId))
                     .findFirst()
-                    .orElse(new Rol(null, "", null, false, 0, false, null)));
+                    .orElse(new Rol(null, null, "", null, false, 0, false, null)));
                 model.addAttribute("modullar", rolRepository.findModullar(selectedRolId));
-                model.addAttribute("selahiyyetler", rolRepository.findSelahiyyetler(selectedRolId));
+                var selahiyyetler = rolRepository.findSelahiyyetler(selectedRolId);
+                var selahiyyetQruplari = new LinkedHashMap<Long, List<RolSelahiyyet>>();
+                for (var selahiyyet : selahiyyetler) {
+                    selahiyyetQruplari.computeIfAbsent(selahiyyet.modulId(), ignored -> new java.util.ArrayList<>())
+                        .add(selahiyyet);
+                }
+                model.addAttribute("selahiyyetler", selahiyyetler);
+                model.addAttribute("selahiyyetQruplari", selahiyyetQruplari);
             }
         return "pages/rollar";
     }
@@ -78,8 +87,12 @@ public class RolController {
                                   @RequestParam(required = false) List<Long> modulIds,
                                   @RequestParam(required = false) List<Long> selahiyyetIds,
                                   RedirectAttributes attributes) {
-        rolRepository.savePermissions(rolId, modulIds == null ? List.of() : modulIds, selahiyyetIds == null ? List.of() : selahiyyetIds);
-        attributes.addFlashAttribute("successMessage", "Rolun modul və səlahiyyətləri yadda saxlanıldı.");
+        var result = rolRepository.savePermissions(rolId, modulIds == null ? List.of() : modulIds,
+            selahiyyetIds == null ? List.of() : selahiyyetIds);
+        attributes.addFlashAttribute(result.ugurludur() ? "successMessage" : "errorMessage",
+            result.mesaj() == null || result.mesaj().isBlank()
+                ? (result.ugurludur() ? "Rolun modul və səlahiyyətləri yadda saxlanıldı." : "Əməliyyat uğursuz oldu.")
+                : result.mesaj());
         return redirect(rolId);
     }
 

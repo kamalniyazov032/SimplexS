@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import az.simplexs.simplexs.dto.rol.Rol;
 import az.simplexs.simplexs.dto.rol.RolModul;
+import az.simplexs.simplexs.dto.rol.RolPermissionSaveResult;
 import az.simplexs.simplexs.dto.rol.RolSelahiyyet;
 
 @Repository
@@ -24,11 +25,12 @@ public class RolRepository {
 
     public List<Rol> findAll(Long klinikaId) {
         return retryOnBrokenConnection(() -> jdbcTemplate.query("""
-            SELECT rol_id, rol_adi, aciqlama, sistem_roludur, sira_no, aktiv, yaranma_tarixi
+            SELECT rol_id, klinika_id, rol_adi, aciqlama, sistem_roludur, sira_no, aktiv, yaranma_tarixi
             FROM public.fn_rol_siyahisi(p_klinika_id=>CAST(:klinikaId AS bigint), p_aktiv=>CAST(:aktiv AS boolean))
             ORDER BY sira_no NULLS LAST, rol_adi, rol_id
             """, new MapSqlParameterSource("aktiv", null).addValue("klinikaId", klinikaId), (rs, rowNum) -> new Rol(
-                rs.getObject("rol_id", Long.class), rs.getString("rol_adi"), rs.getString("aciqlama"),
+                rs.getObject("rol_id", Long.class), rs.getObject("klinika_id", Long.class),
+                rs.getString("rol_adi"), rs.getString("aciqlama"),
                 rs.getObject("sistem_roludur", Boolean.class), rs.getObject("sira_no", Integer.class),
                 rs.getObject("aktiv", Boolean.class), rs.getObject("yaranma_tarixi", java.time.LocalDateTime.class)
             )));
@@ -36,16 +38,17 @@ public class RolRepository {
 
     public List<RolModul> findModullar(Long rolId) {
         return retryOnBrokenConnection(() -> jdbcTemplate.query("""
-            SELECT t.sistem_id, t.sistem_kodu, t.modul_id, t.parent_id, t.modul_kodu,
-                   t.modul_adi, t.modul_aciqlamasi, t.route, t.ikon, t.sira_no,
+            SELECT t.sistem_id, t.sistem_kodu, t.sistem_adi, t.modul_id, t.parent_id, t.modul_kodu,
+                   t.modul_adi, t.modul_aciqlamasi, t.route, t.ikon, t.menyuda_gorunsun, t.sira_no,
                    t.seviyye, t.secilib
             FROM public.fn_rol_modul_siyahisi(:rolId) AS t
             ORDER BY t.sira_no NULLS LAST, t.modul_adi
             """, new MapSqlParameterSource("rolId", rolId), (rs, rowNum) -> new RolModul(
-                rs.getObject("sistem_id", Long.class), rs.getString("sistem_kodu"),
+                rs.getObject("sistem_id", Long.class), rs.getString("sistem_kodu"), rs.getString("sistem_adi"),
                 rs.getObject("modul_id", Long.class), rs.getObject("parent_id", Long.class),
                 rs.getString("modul_kodu"), rs.getString("modul_adi"), rs.getString("modul_aciqlamasi"),
-                rs.getString("route"), rs.getString("ikon"), rs.getObject("sira_no", Integer.class),
+                rs.getString("route"), rs.getString("ikon"), rs.getObject("menyuda_gorunsun", Boolean.class),
+                rs.getObject("sira_no", Integer.class),
                 rs.getObject("seviyye", Integer.class), rs.getObject("secilib", Boolean.class)
             )));
     }
@@ -88,8 +91,8 @@ public class RolRepository {
             new MapSqlParameterSource("rolId", rolId));
     }
 
-    public void savePermissions(Long rolId, List<Long> modulIds, List<Long> selahiyyetIds) {
-        jdbcTemplate.getJdbcTemplate().execute((Connection connection) -> {
+    public RolPermissionSaveResult savePermissions(Long rolId, List<Long> modulIds, List<Long> selahiyyetIds) {
+        return jdbcTemplate.getJdbcTemplate().execute((Connection connection) -> {
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT status_kodu, modul_sayi, selahiyyet_sayi, mesaj
                 FROM public.fn_rola_modul_ve_selahiyyet_ver(?, ?, ?)
@@ -97,9 +100,19 @@ public class RolRepository {
                 statement.setLong(1, rolId);
                 statement.setArray(2, connection.createArrayOf("bigint", modulIds.toArray(Long[]::new)));
                 statement.setArray(3, connection.createArrayOf("bigint", selahiyyetIds.toArray(Long[]::new)));
-                statement.execute();
+                try (var resultSet = statement.executeQuery()) {
+                    if (!resultSet.next()) {
+                        return new RolPermissionSaveResult("NETICE_YOXDUR", 0, 0,
+                            "Verilənlər bazası əməliyyat nəticəsi qaytarmadı.");
+                    }
+                    return new RolPermissionSaveResult(
+                        resultSet.getString("status_kodu"),
+                        resultSet.getObject("modul_sayi", Integer.class),
+                        resultSet.getObject("selahiyyet_sayi", Integer.class),
+                        resultSet.getString("mesaj")
+                    );
+                }
             }
-            return null;
         });
     }
 

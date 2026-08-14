@@ -21,7 +21,16 @@
         .role-detail>.card{margin-bottom:0}
         .role-identity{display:flex;align-items-center;gap:15px}
         .role-avatar{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:#eaf2ff;color:#1767d5;font-size:27px;flex:0 0 auto}
+        .permission-browser{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+        .permission-module-nav{position:sticky;top:82px;border:1px solid #e3e9f2;border-radius:12px;overflow:hidden;background:#fff}
+        .permission-module-nav-title{padding:13px 15px;background:#f7f9fc;border-bottom:1px solid #e3e9f2;font-weight:600}
+        .permission-module-list{max-height:520px;overflow-y:auto;padding:7px}
+        .permission-module-button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:10px 11px;border:0;border-radius:8px;background:transparent;color:#344054;text-align:left}
+        .permission-module-button:hover{background:#f2f6fc;color:#175fc7}
+        .permission-module-button.active{background:#e8f1ff;color:#175fc7;font-weight:600}
+        .permission-results{min-width:0}
         @media(max-width:991.98px){.role-workspace{grid-template-columns:1fr}.role-sidebar{position:static}.role-list{max-height:300px;min-height:0}.role-detail{width:100%}}
+        @media(max-width:767.98px){.permission-browser{grid-template-columns:1fr}.permission-module-nav{position:static}.permission-module-list{display:flex;gap:6px;overflow-x:auto;padding:8px}.permission-module-button{width:auto;min-width:max-content}.permission-module-nav-title{display:none}}
     </style>
     <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
         <div>
@@ -147,12 +156,6 @@
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal">
                         <i class="ti ti-edit me-1"></i>Redaktə
                     </button>
-                    <form method="post" th:action="@{/rollar/sil}" onsubmit="return confirm('Rolu deaktiv etmək istəyirsiniz?');">
-                        <input type="hidden" name="rolId" th:value="${selectedRolId}">
-                        <button class="btn btn-sm btn-outline-danger" type="submit" th:disabled="${!selectedRol.aktiv}">
-                            <i class="ti ti-ban me-1"></i>Deaktiv et
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -210,16 +213,42 @@
                                 <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#permissions-pane input[type=checkbox]').forEach(x=>x.checked=false)">Təmizlə</button>
                             </div>
                         </div>
-                        <div class="row g-3">
-                            <div class="col-md-6 role-permission-item" th:each="selahiyyet : ${selahiyyetler}" th:data-selected="${selahiyyet.secilib}">
-                                <label class="border rounded-3 p-3 w-100 h-100 d-flex align-items-start gap-3 cursor-pointer">
-                                    <input class="form-check-input mt-1" type="checkbox" name="selahiyyetIds" th:value="${selahiyyet.selahiyyetId}" th:checked="${selahiyyet.secilib}">
-                                    <span>
-                                        <span class="fw-semibold d-block" th:text="${selahiyyet.selahiyyetAdi}">Səlahiyyət</span>
-                                        <small class="text-primary" th:text="${selahiyyet.modulAdi}">Modul</small>
-                                        <small class="text-muted d-block" th:text="${selahiyyet.aciqlama ?: selahiyyet.selahiyyetKodu}">Kod</small>
-                                    </span>
-                                </label>
+                        <div class="permission-browser">
+                            <aside class="permission-module-nav">
+                                <div class="permission-module-nav-title"><i class="ti ti-layout-grid me-2"></i>Modullar</div>
+                                <div class="permission-module-list" id="permissionModuleList">
+                                    <button class="permission-module-button active" type="button" data-module-filter="all">
+                                        <span><i class="ti ti-list me-2"></i>Hamısı</span>
+                                        <span class="badge bg-light text-dark" th:text="${#lists.size(selahiyyetler)}">0</span>
+                                    </button>
+                                    <button class="permission-module-button" type="button" th:each="qrup : ${selahiyyetQruplari}"
+                                            th:data-module-filter="${qrup.key == null ? 'other' : qrup.key}">
+                                        <span class="text-truncate" th:title="${qrup.key == null or #strings.isEmpty(qrup.value[0].modulAdi) ? 'Digər' : qrup.value[0].modulAdi}">
+                                            <i class="ti me-2" th:classappend="${qrup.key == null} ? 'ti-dots' : 'ti-folder'"></i><span th:text="${qrup.key == null or #strings.isEmpty(qrup.value[0].modulAdi) ? 'Digər' : qrup.value[0].modulAdi}">Modul</span>
+                                        </span>
+                                        <span class="badge bg-light text-dark" th:text="${#lists.size(qrup.value)}">0</span>
+                                    </button>
+                                </div>
+                            </aside>
+                            <div class="permission-results">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text bg-white"><i class="ti ti-search"></i></span>
+                                    <input class="form-control" id="permissionSearch" type="search" placeholder="Səlahiyyət axtar..." autocomplete="off" aria-label="Səlahiyyətlər üzrə axtarış">
+                                    <span class="input-group-text bg-white text-muted"><span id="permissionVisibleCount" th:text="${#lists.size(selahiyyetler)}">0</span>&nbsp;nəticə</span>
+                                </div>
+                                <div class="row g-3">
+                                        <div class="col-md-6 role-permission-item" th:each="selahiyyet : ${selahiyyetler}"
+                                             th:data-module-id="${selahiyyet.modulId == null ? 'other' : selahiyyet.modulId}"
+                                             th:data-selected="${selahiyyet.secilib}" th:data-search="|${selahiyyet.selahiyyetAdi} ${selahiyyet.modulAdi ?: 'Digər'} ${selahiyyet.selahiyyetKodu} ${selahiyyet.aciqlama ?: ''}|"><!-- Search index -->
+                                            <label class="border rounded-3 p-3 w-100 h-100 d-flex align-items-start gap-3 cursor-pointer">
+                                                <input class="form-check-input mt-1" type="checkbox" name="selahiyyetIds" th:value="${selahiyyet.selahiyyetId}" th:checked="${selahiyyet.secilib}">
+                                                <span>
+                                                    <span class="fw-semibold d-block" th:text="${selahiyyet.selahiyyetAdi}">Səlahiyyət</span>
+                                                    <small class="text-muted d-block" th:text="${selahiyyet.aciqlama ?: selahiyyet.selahiyyetKodu}">Kod</small>
+                                                </span>
+                                            </label>
+                                        </div>
+                                </div>
                             </div>
                         </div>
                         <div th:if="${#lists.isEmpty(selahiyyetler)}" class="text-center text-muted py-5">Səlahiyyət tapılmadı.</div>
@@ -280,6 +309,10 @@
             }
             const moduleFilter = document.getElementById('moduleSelectionFilter');
             const permissionFilter = document.getElementById('permissionSelectionFilter');
+            const permissionSearch = document.getElementById('permissionSearch');
+            const permissionVisibleCount = document.getElementById('permissionVisibleCount');
+            const permissionModuleButtons = Array.from(document.querySelectorAll('.permission-module-button'));
+            let selectedPermissionModule = 'all';
             const badge = document.getElementById('roleFilterBadge');
             badge.classList.toggle('d-none', roleStatusFilter.dataset.initial === 'aktiv');
 
@@ -290,15 +323,33 @@
                     || (filter === 'unselected' && !selected);
             }
 
-            function filterItems(selector, filter, emptyId) {
+            function filterItems(selector, filter, emptyId, query) {
                 const items = Array.from(document.querySelectorAll(selector));
                 let visibleCount = 0;
                 items.forEach(function (item) {
-                    const visible = matches(item, filter);
+                    const matchesQuery = !query || (item.dataset.search || '').toLocaleLowerCase('az').includes(query);
+                    const visible = matches(item, filter) && matchesQuery;
                     item.classList.toggle('d-none', !visible);
                     if (visible) visibleCount++;
                 });
                 const empty = document.getElementById(emptyId);
+                if (empty) empty.classList.toggle('d-none', items.length === 0 || visibleCount > 0);
+                return visibleCount;
+            }
+
+            function filterPermissions() {
+                const query = permissionSearch ? permissionSearch.value.trim().toLocaleLowerCase('az') : '';
+                const items = Array.from(document.querySelectorAll('.role-permission-item'));
+                let visibleCount = 0;
+                items.forEach(function (item) {
+                    const matchesModule = selectedPermissionModule === 'all' || item.dataset.moduleId === selectedPermissionModule;
+                    const matchesQuery = !query || (item.dataset.search || '').toLocaleLowerCase('az').includes(query);
+                    const visible = matchesModule && matchesQuery && matches(item, permissionFilter.value);
+                    item.classList.toggle('d-none', !visible);
+                    if (visible) visibleCount++;
+                });
+                if (permissionVisibleCount) permissionVisibleCount.textContent = visibleCount;
+                const empty = document.getElementById('permissionFilterEmpty');
                 if (empty) empty.classList.toggle('d-none', items.length === 0 || visibleCount > 0);
             }
 
@@ -311,13 +362,21 @@
                     return;
                 }
                 filterItems('.role-module-item', moduleFilter.value, 'moduleFilterEmpty');
-                filterItems('.role-permission-item', permissionFilter.value, 'permissionFilterEmpty');
+                filterPermissions();
                 badge.classList.toggle('d-none', roleStatusFilter.value === 'aktiv' && moduleFilter.value === 'all' && permissionFilter.value === 'all');
                 const panel = bootstrap.Offcanvas.getInstance(document.getElementById('rolePermissionFilter'));
                 if (panel) panel.hide();
             }
 
             document.getElementById('applyRoleFilter').addEventListener('click', applyFilter);
+            if (permissionSearch) permissionSearch.addEventListener('input', filterPermissions);
+            permissionModuleButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    selectedPermissionModule = button.dataset.moduleFilter;
+                    permissionModuleButtons.forEach(item => item.classList.toggle('active', item === button));
+                    filterPermissions();
+                });
+            });
             document.getElementById('clearRoleFilter').addEventListener('click', function () {
                 moduleFilter.value = 'all';
                 permissionFilter.value = 'all';

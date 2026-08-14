@@ -37,6 +37,7 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/qiymet/QiymetXidmeti.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rol/Rol.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rol/RolModul.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rol/RolPermissionSaveResult.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rol/RolSelahiyyet.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sobe/PersonalOption.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sobe/SobeListItem.java
