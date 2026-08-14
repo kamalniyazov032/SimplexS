@@ -66,6 +66,7 @@ public class YataqController {
         model.addAttribute("selectedMertebe", mertebeler.stream().filter(x -> x.id().equals(selectedMertebeId)).findFirst().orElse(null));
         model.addAttribute("selectedPalata", palatalar.stream().filter(x -> x.id().equals(selectedPalataId)).findFirst().orElse(null));
         model.addAttribute("status", status);
+        model.addAttribute("filterApplied", sobeId != null || !"aktiv".equals(status));
         return "pages/yataqlar";
     }
 

@@ -4,6 +4,7 @@
   <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
     <div><h4 class="mb-1"><i class="ti ti-bed text-primary me-2"></i>Yataqlar</h4><p class="text-muted mb-0">Bina, mərtəbə, palata və yataqların idarəsi</p></div>
     <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#bedFilter" aria-controls="bedFilter"><i class="ti ti-filter me-1"></i>Filter<span th:if="${filterApplied}" class="badge bg-white text-primary ms-2">Aktiv</span></button>
       <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'MERTEBE_YARAT')}" th:disabled="${selectedBinaId == null}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFloor" title="Əvvəl bina seçin"><i class="ti ti-layers-intersect me-1"></i>Yeni mərtəbə</button>
       <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PALATA_YARAT')}" th:disabled="${selectedMertebeId == null}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRoom" title="Əvvəl mərtəbə seçin"><i class="ti ti-door-enter me-1"></i>Yeni palata</button>
       <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'YATAQ_YARAT')}" th:disabled="${selectedPalataId == null}" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newBed" title="Əvvəl palata seçin"><i class="ti ti-bed me-1"></i>Yeni yataq</button>
@@ -11,12 +12,15 @@
   </div>
   <div th:if="${successMessage}" class="alert alert-success alert-dismissible"><span th:text="${successMessage}"></span><button class="btn-close" data-bs-dismiss="alert"></button></div><div th:if="${errorMessage}" class="alert alert-danger alert-dismissible"><span th:text="${errorMessage}"></span><button class="btn-close" data-bs-dismiss="alert"></button></div>
 
-  <div class="card border-0 shadow-sm mb-3"><div class="card-body"><form method="get" th:action="@{/yataqlar}" class="row g-2 align-items-end">
-    <div class="col-md-5"><label class="form-label">Bina</label><select class="form-select" name="binaId" required><option value="">Bina seçin</option><option th:each="b:${binalar}" th:value="${b.binaId}" th:text="${b.binaAdi}" th:selected="${b.binaId==selectedBinaId}"></option></select></div>
-    <div class="col-md-3"><label class="form-label">Status</label><select class="form-select" name="status"><option value="aktiv" th:selected="${status=='aktiv'}">Aktiv</option><option value="passiv" th:selected="${status=='passiv'}">Passiv</option><option value="hamisi" th:selected="${status=='hamisi'}">Hamısı</option></select></div>
-    <div class="col-md-2"><label class="form-label">Şöbə filtri</label><select class="form-select" name="sobeId"><option value="">Bütün şöbələr</option><option th:each="s:${sobeler}" th:value="${s.sobeId}" th:text="${s.sobeAdi}" th:selected="${s.sobeId==selectedSobeId}"></option></select></div>
-    <div class="col-md-2"><button class="btn btn-primary w-100"><i class="ti ti-filter me-1"></i>Tətbiq et</button></div>
-  </form></div></div>
+  <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="bedFilter" aria-labelledby="bedFilterLabel" style="--bs-offcanvas-height:190px!important;height:190px!important;min-height:190px!important;max-height:190px!important">
+    <div class="offcanvas-header border-bottom bg-light py-3"><h5 class="mb-0 text-primary" id="bedFilterLabel"><i class="ti ti-filter me-2"></i>Yataqlar üzrə filter</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla"></button></div>
+    <div class="offcanvas-body py-3"><form method="get" th:action="@{/yataqlar}" class="row g-2 align-items-end">
+      <div class="col-lg-4 col-md-6"><label class="form-label small text-muted"><i class="ti ti-building me-1"></i>Bina</label><select class="form-select" name="binaId" required><option value="">Bina seçin</option><option th:each="b:${binalar}" th:value="${b.binaId}" th:text="${b.binaAdi}" th:selected="${b.binaId==selectedBinaId}"></option></select></div>
+      <div class="col-lg-3 col-md-6"><label class="form-label small text-muted"><i class="ti ti-activity me-1"></i>Status</label><select class="form-select" name="status"><option value="aktiv" th:selected="${status=='aktiv'}">Aktiv</option><option value="passiv" th:selected="${status=='passiv'}">Passiv</option><option value="hamisi" th:selected="${status=='hamisi'}">Hamısı</option></select></div>
+      <div class="col-lg-3 col-md-6"><label class="form-label small text-muted"><i class="ti ti-hierarchy-2 me-1"></i>Şöbə</label><select class="form-select" name="sobeId"><option value="">Bütün şöbələr</option><option th:each="s:${sobeler}" th:value="${s.sobeId}" th:text="${s.sobeAdi}" th:selected="${s.sobeId==selectedSobeId}"></option></select></div>
+      <div class="col-lg-2 col-md-6"><div class="d-flex gap-2"><button class="btn btn-primary flex-fill"><i class="ti ti-search me-1"></i>Tətbiq et</button><a class="btn btn-light" th:href="@{/yataqlar}" title="Təmizlə"><i class="ti ti-refresh"></i></a></div></div>
+    </form></div>
+  </div>
 
   <div class="row g-3">
     <div class="col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-header d-flex justify-content-between"><h6 class="mb-0">1. Mərtəbələr</h6><span class="badge bg-primary-subtle text-primary" th:text="${#lists.size(mertebeler)}"></span></div><div class="list-group list-group-flush">
