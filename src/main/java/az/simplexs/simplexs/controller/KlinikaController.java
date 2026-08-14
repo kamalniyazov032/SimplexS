@@ -90,6 +90,9 @@ class KlinikaHeaderAdvice {
         model.addAttribute("klinikalar", aktivKlinikalar);
         model.addAttribute("selectedKlinikaId", selectedId);
         model.addAttribute("currentRequestUri", request.getRequestURI());
-        model.addAttribute("userModules", accessService.menu(authentication, selectedId));
+        var menuSystems = accessService.menuSystems(authentication, selectedId);
+        model.addAttribute("userMenuSystems", menuSystems);
+        model.addAttribute("userModules", menuSystems.stream()
+                .flatMap(system -> system.getModules().stream()).toList());
     }
 }

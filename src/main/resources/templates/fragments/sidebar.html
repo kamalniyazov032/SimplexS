@@ -15,36 +15,65 @@
     <div class="sidebar-inner" data-simplebar>
         <div id="sidebar-menu" class="sidebar-menu">
             <ul role="menu" aria-label="Əsas naviqasiya menyusu">
-                <li>
+                <li class="menu-dashboard">
                     <a th:href="@{/dashboard}" th:classappend="${activeMenu == 'dashboard'} ? 'active' : ''">
                         <i class="ti ti-layout-board"></i><span>Dashboard</span>
                     </a>
                 </li>
 
-                <th:block th:each="modul : ${userModules}">
-                    <li class="submenu" th:if="${!#lists.isEmpty(modul.children)}">
-                        <a href="javascript:void(0);" th:classappend="${#strings.startsWith(currentRequestUri, modul.route ?: '__no_route__')} ? 'active subdrop' : ''">
+                <th:block th:each="sistem : ${userMenuSystems}">
+                <li class="menu-title menu-system-title">
+                    <i th:class="${sistem.icon ?: 'ti ti-apps'}"></i>
+                    <span th:text="${sistem.name}">Sistem</span>
+                </li>
+                <th:block th:each="modul : ${sistem.modules}">
+                    <li class="submenu menu-module" th:if="${!#lists.isEmpty(modul.children)}">
+                        <a href="javascript:void(0);" th:classappend="${modul.containsRoute(currentRequestUri)} ? 'active subdrop' : ''">
                             <i th:class="${modul.icon ?: 'ti ti-category'}"></i>
                             <span th:text="${modul.name}">Modul</span><span class="menu-arrow"></span>
                         </a>
-                        <ul>
-                            <li th:each="child : ${modul.children}">
-                                <a th:if="${child.route != null}" th:href="@{${child.route}}"
+                        <ul th:style="${modul.containsRoute(currentRequestUri)} ? 'display:block' : ''">
+                            <li th:each="child : ${modul.children}" class="menu-leaf"
+                                th:class="${!#lists.isEmpty(child.children)} ? 'submenu submenu-two' : ''">
+                                <a th:if="${!#lists.isEmpty(child.children)}" href="javascript:void(0);"
+                                   th:classappend="${child.containsRoute(currentRequestUri)} ? 'active subdrop' : ''">
+                                    <i th:class="${child.icon ?: 'ti ti-folder'}"></i>
+                                    <span th:text="${child.name}">Alt modul qrupu</span><span class="menu-arrow inside-submenu"></span>
+                                </a>
+                                <ul th:if="${!#lists.isEmpty(child.children)}"
+                                    th:style="${child.containsRoute(currentRequestUri)} ? 'display:block' : ''">
+                                    <li th:each="grandchild : ${child.children}">
+                                        <a th:if="${grandchild.route != null}" th:href="@{${grandchild.route}}"
+                                           th:classappend="${grandchild.containsRoute(currentRequestUri)} ? 'active' : ''">
+                                            <i th:class="${grandchild.icon ?: 'ti ti-point'}"></i>
+                                            <span th:text="${grandchild.name}">Submodul</span>
+                                        </a>
+                                        <span th:unless="${grandchild.route != null}" class="text-muted px-3 py-2 d-block"
+                                              th:text="${grandchild.name}"></span>
+                                    </li>
+                                </ul>
+                                <a th:if="${#lists.isEmpty(child.children) and child.route != null}" th:href="@{${child.route}}"
                                    th:classappend="${#strings.startsWith(currentRequestUri, child.route)} ? 'active' : ''">
                                     <i th:class="${child.icon ?: 'ti ti-point'}"></i><span th:text="${child.name}">Alt modul</span>
                                 </a>
-                                <span th:unless="${child.route != null}" class="text-muted px-3 py-2 d-block" th:text="${child.name}"></span>
+                                <span th:if="${#lists.isEmpty(child.children) and child.route == null}" class="text-muted px-3 py-2 d-block" th:text="${child.name}"></span>
                             </li>
                         </ul>
                     </li>
-                    <li th:if="${#lists.isEmpty(modul.children) and modul.route != null}">
+                    <li class="menu-module menu-module-link" th:if="${#lists.isEmpty(modul.children) and modul.route != null}">
                         <a th:href="@{${modul.route}}" th:classappend="${#strings.startsWith(currentRequestUri, modul.route)} ? 'active' : ''">
                             <i th:class="${modul.icon ?: 'ti ti-apps'}"></i><span th:text="${modul.name}">Modul</span>
                         </a>
                     </li>
+                    <li class="menu-module menu-module-link" th:if="${#lists.isEmpty(modul.children) and modul.route == null}">
+                        <a href="javascript:void(0);" class="menu-route-pending" aria-disabled="true">
+                            <i th:class="${modul.icon ?: 'ti ti-apps'}"></i><span th:text="${modul.name}">Modul</span>
+                        </a>
+                    </li>
+                </th:block>
                 </th:block>
 
-                <li th:if="${#lists.isEmpty(userModules)}" class="px-3 py-4 text-center text-muted">
+                <li th:if="${#lists.isEmpty(userMenuSystems)}" class="px-3 py-4 text-center text-muted">
                     <i class="ti ti-shield-off fs-3 d-block mb-2"></i><small>Bu klinika üçün modul icazəsi verilməyib.</small>
                 </li>
             </ul>

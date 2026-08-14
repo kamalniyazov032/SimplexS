@@ -36,16 +36,41 @@ public class AccessService {
     }
 
     public List<MenuModule> menu(Authentication authentication, Long clinicId) {
-        Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return List.of();
-        List<MenuModule> flat=jdbc.query("SELECT * FROM public.fn_personal_modul_siyahisi(:pid,:kid)",
-            new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId),
-            (rs,row)->new MenuModule(rs.getLong("modul_id"),rs.getObject("parent_id",Long.class),
-                rs.getString("modul_kodu"),rs.getString("modul_adi"),rs.getString("route"),rs.getString("ikon")));
-        Map<Long,MenuModule> byId=new LinkedHashMap<>(); flat.forEach(m->byId.put(m.getId(),m));
-        List<MenuModule> roots=new ArrayList<>();
-        for(MenuModule m:flat){MenuModule parent=byId.get(m.getParentId());if(parent==null)roots.add(m);else parent.getChildren().add(m);}
-        return roots;
+        return menuSystems(authentication, clinicId).stream()
+                .flatMap(system -> system.getModules().stream()).toList();
     }
+
+    public List<MenuSystem> menuSystems(Authentication authentication, Long clinicId) {
+        Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return List.of();
+        List<MenuRow> rows=jdbc.query("""
+                SELECT menu.*, sistem.id AS sistem_id, sistem.kod AS sistem_kodu,
+                       sistem.ad AS sistem_adi, sistem.ikon AS sistem_ikonu
+                FROM public.fn_personal_modul_siyahisi(:pid,:kid) menu
+                JOIN public.rn_modullar modul ON modul.id=menu.modul_id
+                JOIN public.rn_sistemler sistem ON sistem.id=modul.sistem_id AND sistem.aktiv
+                ORDER BY sistem.sira_no NULLS LAST, menu.sira_no NULLS LAST, menu.modul_adi
+                """,
+            new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId),
+            (rs,row)->new MenuRow(rs.getObject("sistem_id",Long.class),rs.getString("sistem_kodu"),
+                rs.getString("sistem_adi"),rs.getString("sistem_ikonu"),
+                new MenuModule(rs.getLong("modul_id"),rs.getObject("parent_id",Long.class),
+                    rs.getString("modul_kodu"),rs.getString("modul_adi"),rs.getString("route"),rs.getString("ikon"))));
+        List<MenuModule> flat=rows.stream().map(MenuRow::module).toList();
+        Map<Long,MenuModule> byId=new LinkedHashMap<>(); flat.forEach(m->byId.put(m.getId(),m));
+        Map<Long,MenuSystem> systems=new LinkedHashMap<>();
+        for(MenuRow row:rows) {
+            systems.computeIfAbsent(row.systemId(), id ->
+                    new MenuSystem(id,row.systemCode(),row.systemName(),row.systemIcon()));
+            MenuModule module=row.module();
+            MenuModule parent=byId.get(module.getParentId());
+            if(parent==null) systems.get(row.systemId()).getModules().add(module);
+            else parent.getChildren().add(module);
+        }
+        return new ArrayList<>(systems.values());
+    }
+
+    private record MenuRow(Long systemId, String systemCode, String systemName,
+            String systemIcon, MenuModule module) {}
 
     public boolean hasPermission(Authentication authentication, Long clinicId, String code) {
         Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return false;

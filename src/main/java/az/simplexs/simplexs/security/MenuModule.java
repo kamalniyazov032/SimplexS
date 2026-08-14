@@ -18,4 +18,10 @@ public class MenuModule {
     public Long getId(){return id;} public Long getParentId(){return parentId;} public String getCode(){return code;}
     public String getName(){return name;} public String getRoute(){return route;} public String getIcon(){return icon;}
     public List<MenuModule> getChildren(){return children;}
+
+    public boolean containsRoute(String requestUri) {
+        if (requestUri == null) return false;
+        if (route != null && (requestUri.equals(route) || requestUri.startsWith(route + "/"))) return true;
+        return children.stream().anyMatch(child -> child.containsRoute(requestUri));
+    }
 }

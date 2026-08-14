@@ -6,13 +6,12 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DatabaseUserDetailsService implements UserDetailsService, UserDetailsPasswordService {
+public class DatabaseUserDetailsService implements UserDetailsService {
     private final NamedParameterJdbcTemplate jdbc;
 
     public DatabaseUserDetailsService(NamedParameterJdbcTemplate jdbc) {
@@ -42,13 +41,4 @@ public class DatabaseUserDetailsService implements UserDetailsService, UserDetai
         return users.getFirst();
     }
 
-    @Override
-    public UserDetails updatePassword(UserDetails user, String newPassword) {
-        jdbc.update("UPDATE public.rn_personallar SET sifre=:password, sifre_deyisme_tarixi=now() WHERE id=:id",
-            new MapSqlParameterSource("password", newPassword)
-                .addValue("id", ((AuthenticatedPersonal) user).personalId()));
-        var personal = (AuthenticatedPersonal) user;
-        return new AuthenticatedPersonal(personal.personalId(), personal.username(), newPassword,
-            personal.fullName(), personal.enabled(), personal.authorities());
-    }
 }
