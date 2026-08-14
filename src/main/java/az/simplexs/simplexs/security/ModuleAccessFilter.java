@@ -17,12 +17,23 @@ public class ModuleAccessFilter extends OncePerRequestFilter {
     private final AccessService access;
     public ModuleAccessFilter(AccessService access){this.access=access;}
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path=request.getRequestURI().substring(request.getContextPath().length());
+        // Statik fayllar modul icazəsi deyil; onların hər biri üçün DB sorğusu göndərilmir.
+        return path.equals("/")||path.equals("/login")||path.equals("/error")
+                ||path.equals("/favicon.ico")||path.startsWith("/assets/")
+                ||path.startsWith("/custom/")||path.startsWith("/webjars/");
+    }
+
     @Override protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain chain)
             throws ServletException,IOException {
         Authentication auth=SecurityContextHolder.getContext().getAuthentication();
         if(auth!=null&&auth.isAuthenticated()&&auth.getPrincipal() instanceof AuthenticatedPersonal){
             Long clinicId=(Long)request.getSession().getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
             if(clinicId==null){clinicId=access.firstClinicId(auth);if(clinicId!=null)request.getSession().setAttribute(KlinikaController.SELECTED_KLINIKA_ID,clinicId);}
+            // Sistem rolu bütün modullara açıqdır; onun üçün route və əməliyyat icazəsini təkrar DB-dən yoxlamırıq.
+            if(access.hasFullAccess(auth)){chain.doFilter(request,response);return;}
             String path=request.getRequestURI().substring(request.getContextPath().length());
             if(access.isRegisteredRoute(path)&&!access.canAccessRoute(auth,clinicId,path)){
                 access.audit(auth,clinicId,"MODUL_GIRISI_REDDEDILDI",path,request.getMethod(),request.getRemoteAddr(),false);

@@ -1,7 +1,9 @@
 package az.simplexs.simplexs.repository.klinika;
 
 import java.util.List;
+import java.util.function.Supplier;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +27,7 @@ public class KlinikaRepository {
             ORDER BY sira_no NULLS LAST, klinika_adi, klinika_id
             """;
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new KlinikaListItem(
+        return retryOnBrokenConnection(() -> jdbcTemplate.query(sql, (rs, rowNum) -> new KlinikaListItem(
             numberAsLong(rs.getObject("klinika_id")),
             numberAsInteger(rs.getObject("sira_no")),
             rs.getString("klinika_adi"),
@@ -43,7 +45,7 @@ public class KlinikaRepository {
             rs.getString("bas_hekim_tam_adi"),
             rs.getObject("aktiv", Boolean.class),
             rs.getObject("yaranma_tarixi", java.time.LocalDateTime.class)
-        ));
+        )));
     }
 
     private static Long numberAsLong(Object value) {
@@ -52,5 +54,14 @@ public class KlinikaRepository {
 
     private static Integer numberAsInteger(Object value) {
         return value instanceof Number number ? number.intValue() : null;
+    }
+
+    private <T> T retryOnBrokenConnection(Supplier<T> operation) {
+        try {
+            return operation.get();
+        } catch (DataAccessResourceFailureException firstFailure) {
+            // Yalnız read-only siyahı sorğusu qırıq socket olduqda yeni connection ilə bir dəfə təkrarlanır.
+            return operation.get();
+        }
     }
 }
