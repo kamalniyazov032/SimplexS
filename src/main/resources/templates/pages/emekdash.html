@@ -165,6 +165,8 @@
                                 <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et"><i class="ti ti-edit"></i></button>
                                 <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#clinicP${p.personalId}|"><i class="ti ti-building-hospital"></i>Klinikalar</button>
                                 <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i>Rol</button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" th:data-bs-target="|#cashP${p.personalId}|" title="Kassalar"><i class="ti ti-cash-register"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" th:data-bs-target="|#departmentP${p.personalId}|" title="Şöbələr"><i class="ti ti-building-community"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -366,6 +368,38 @@
             <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button></div>
         </div></div>
     </div>
+
+    <div th:each="p : ${personallar}" class="modal fade" th:id="|cashP${p.personalId}|" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
+            <form method="post" th:action="@{/emekdash/kassalar}" class="js-access-form" data-kind="cash">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="kassalarJson" class="js-json">
+                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-cash-register text-success me-2"></i>Kassa səlahiyyətləri</h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kassa</th><th class="text-center">Seçilib</th><th class="text-center">İzləsin</th><th class="text-center">İşləsin</th></tr></thead><tbody>
+                    <tr th:each="k:${personalKassalar[p.personalId]}" class="js-access-row" th:attr="data-id=${k.kassaId}"><td><strong th:text="${k.kassaAdi}"></strong><small class="d-block text-muted" th:text="${k.kassaKodu}"></small></td><td class="text-center"><input class="form-check-input js-selected" type="checkbox" th:checked="${k.secilib}"></td><td class="text-center"><input class="form-check-input js-watch" type="checkbox" th:checked="${k.izlesin}"></td><td class="text-center"><input class="form-check-input js-work" type="checkbox" th:checked="${k.islesin}"></td></tr>
+                    <tr th:if="${#lists.isEmpty(personalKassalar[p.personalId])}"><td colspan="4" class="text-center text-muted py-4">Kassa tapılmadı</td></tr>
+                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button><button class="btn btn-success">Yadda saxla</button></div>
+            </form>
+        </div></div>
+    </div>
+
+    <div th:each="p : ${personallar}" class="modal fade" th:id="|departmentP${p.personalId}|" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
+            <form method="post" th:action="@{/emekdash/sobeler}" class="js-access-form" data-kind="department">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="sobelerJson" class="js-json">
+                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-building-community text-info me-2"></i>Şöbə səlahiyyətləri</h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Şöbə</th><th>Tip</th><th class="text-center">Seçilib</th><th class="text-center">İzləsin</th><th class="text-center">İşləsin</th></tr></thead><tbody>
+                    <tr th:each="s:${personalSobeler[p.personalId]}" class="js-access-row" th:attr="data-id=${s.sobeId}"><td><strong th:text="${s.sobeAdi}"></strong></td><td th:text="${s.sobeTipiAdi}"></td><td class="text-center"><input class="form-check-input js-selected" type="checkbox" th:checked="${s.secilib}"></td><td class="text-center"><input class="form-check-input js-watch" type="checkbox" th:checked="${s.izlesin}"></td><td class="text-center"><input class="form-check-input js-work" type="checkbox" th:checked="${s.islesin}"></td></tr>
+                    <tr th:if="${#lists.isEmpty(personalSobeler[p.personalId])}"><td colspan="5" class="text-center text-muted py-4">Şöbə tapılmadı</td></tr>
+                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button><button class="btn btn-info">Yadda saxla</button></div>
+            </form>
+        </div></div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.js-access-form').forEach(form=>{
+        form.querySelectorAll('.js-access-row').forEach(row=>row.querySelectorAll('.js-watch,.js-work').forEach(box=>box.addEventListener('change',()=>{if(box.checked)row.querySelector('.js-selected').checked=true})));
+        form.addEventListener('submit',()=>{const key=form.dataset.kind==='cash'?'kassa_id':'sobe_id';const data=[...form.querySelectorAll('.js-access-row')].filter(row=>row.querySelector('.js-selected').checked).map(row=>({[key]:Number(row.dataset.id),izlesin:row.querySelector('.js-watch').checked,islesin:row.querySelector('.js-work').checked}));form.querySelector('.js-json').value=JSON.stringify(data)});
+    }));
+    </script>
 </div>
 </body>
 </html>

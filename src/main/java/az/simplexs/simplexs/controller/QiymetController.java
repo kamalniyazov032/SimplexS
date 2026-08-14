@@ -4,14 +4,23 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import az.simplexs.simplexs.repository.personal.PersonalRepository;
 import az.simplexs.simplexs.repository.qiymet.QiymetRepository;
+import az.simplexs.simplexs.repository.rol.RolRepository;
 import az.simplexs.simplexs.repository.teskilat.TeskilatRepository;
 import az.simplexs.simplexs.repository.xidmet.XidmetRepository;
+import az.simplexs.simplexs.security.AuthenticatedPersonal;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -19,25 +28,208 @@ public class QiymetController {
     private final QiymetRepository repo;
     private final XidmetRepository xidmetRepo;
     private final TeskilatRepository teskilatRepo;
-    public QiymetController(QiymetRepository r,XidmetRepository x,TeskilatRepository t){repo=r;xidmetRepo=x;teskilatRepo=t;}
+    private final RolRepository rolRepo;
+    private final PersonalRepository personalRepo;
+
+    public QiymetController(QiymetRepository repo, XidmetRepository xidmetRepo,
+            TeskilatRepository teskilatRepo, RolRepository rolRepo, PersonalRepository personalRepo) {
+        this.repo = repo;
+        this.xidmetRepo = xidmetRepo;
+        this.teskilatRepo = teskilatRepo;
+        this.rolRepo = rolRepo;
+        this.personalRepo = personalRepo;
+    }
 
     @GetMapping("/xidmetQiymetleri")
-    public String list(@RequestParam(required=false)Long basliqId,@RequestParam(defaultValue="aktiv")String basliqStatus,@RequestParam(defaultValue="aktiv")String qrupStatus,Model m,HttpSession session){Long kid=klinikaId(session);Boolean basliqAktiv=statusBoolean(basliqStatus);Boolean qrupAktiv=statusBoolean(qrupStatus);var basliqlar=repo.basliqlar(kid,basliqAktiv);if(basliqId==null&&!basliqlar.isEmpty())basliqId=basliqlar.getFirst().id();Long selected=basliqId;if(selected!=null&&basliqlar.stream().noneMatch(x->x.id().equals(selected)))basliqId=basliqlar.isEmpty()?null:basliqlar.getFirst().id();var qruplar=repo.qruplar(kid,basliqId,qrupAktiv);m.addAttribute("pageTitle","Xidmət qiymətləri");m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu","xidmetQiymetleri");m.addAttribute("basliqlar",basliqlar);m.addAttribute("qruplar",qruplar);m.addAttribute("qrupTeskilatIds",repo.qruplarinTeskilatIdleri(qruplar.stream().map(x->x.id()).toList()));m.addAttribute("selectedBasliqId",basliqId);m.addAttribute("selectedBasliq",basliqlar.stream().filter(x->x.id().equals(selected)).findFirst().orElse(null));m.addAttribute("basliqStatus",basliqStatus);m.addAttribute("qrupStatus",qrupStatus);m.addAttribute("filterApplied",!"aktiv".equals(basliqStatus)||!"aktiv".equals(qrupStatus));m.addAttribute("teskilatlar",teskilatRepo.siyahi(kid).stream().filter(t->Boolean.TRUE.equals(t.aktiv())).toList());return "pages/xidmetQiymetleri";}
+    public String list(@RequestParam(required = false) Long basliqId,
+            @RequestParam(required = false) Long qrupId,
+            @RequestParam(defaultValue = "aktiv") String qrupStatus,
+            @RequestParam(defaultValue = "aktiv") String cedvelStatus,
+            Model model, HttpSession session) {
+        Long klinikaId = klinikaId(session);
+        var basliqlar = repo.basliqlar(klinikaId, null);
+        if (basliqId == null && !basliqlar.isEmpty()) basliqId = basliqlar.getFirst().id();
+        Long selectedBasliqId = basliqId;
+        var qruplar = repo.qruplar(klinikaId, basliqId, statusBoolean(qrupStatus));
+        if (qrupId == null && !qruplar.isEmpty()) qrupId = qruplar.getFirst().id();
+        Long selectedQrupId = qrupId;
+        var cedveller = qrupId == null ? List.of()
+                : repo.cedveller(klinikaId, qrupId, statusBoolean(cedvelStatus), null);
 
-    @GetMapping("/xidmetQiymetleri/qrup/{qrupId}")
-    public String tarifler(@PathVariable Long qrupId,@RequestParam(required=false)Long xidmetQrupuId,@RequestParam(required=false)String q,@RequestParam(required=false)String qiymetStatus,@RequestParam(defaultValue="1")int page,@RequestParam(defaultValue="100")int size,Model m,HttpSession session){Long kid=klinikaId(session);var qrup=repo.qruplar(kid,null).stream().filter(x->x.id().equals(qrupId)).findFirst().orElseThrow();size=Math.max(20,Math.min(size,100));long total=repo.xidmetSayi(qrupId,xidmetQrupuId,q,qiymetStatus);int totalPages=Math.max(1,(int)Math.ceil((double)total/size));page=Math.max(1,Math.min(page,totalPages));m.addAttribute("pageTitle",qrup.ad());m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu","xidmetQiymetleri");m.addAttribute("qrup",qrup);m.addAttribute("xidmetQruplari",xidmetRepo.qruplar(kid));m.addAttribute("xidmetler",repo.xidmetler(qrupId,xidmetQrupuId,q,qiymetStatus,size,(page-1)*size));m.addAttribute("selectedXidmetQrupuId",xidmetQrupuId);m.addAttribute("q",q);m.addAttribute("qiymetStatus",qiymetStatus);m.addAttribute("totalCount",total);m.addAttribute("totalPages",totalPages);m.addAttribute("currentPage",page);m.addAttribute("pageSize",size);return "pages/xidmetQiymetTarifleri";}
+        model.addAttribute("pageTitle", "Xidmət qiymətləri");
+        model.addAttribute("activeMenuGroup", "adminPanel");
+        model.addAttribute("activeMenu", "xidmetQiymetleri");
+        model.addAttribute("basliqlar", basliqlar);
+        model.addAttribute("qruplar", qruplar);
+        model.addAttribute("cedveller", cedveller);
+        model.addAttribute("selectedBasliqId", basliqId);
+        model.addAttribute("selectedQrupId", qrupId);
+        model.addAttribute("selectedBasliq", basliqlar.stream().filter(x -> x.id().equals(selectedBasliqId)).findFirst().orElse(null));
+        model.addAttribute("selectedQrup", qruplar.stream().filter(x -> x.id().equals(selectedQrupId)).findFirst().orElse(null));
+        model.addAttribute("qrupStatus", qrupStatus);
+        model.addAttribute("cedvelStatus", cedvelStatus);
+        model.addAttribute("filterApplied", !"aktiv".equals(qrupStatus) || !"aktiv".equals(cedvelStatus));
+        model.addAttribute("qrupTeskilatIds", repo.qruplarinTeskilatIdleri(qruplar.stream().map(x -> x.id()).toList()));
+        model.addAttribute("teskilatlar", teskilatRepo.siyahi(klinikaId).stream()
+                .filter(t -> Boolean.TRUE.equals(t.aktiv())).toList());
+        return "pages/xidmetQiymetleri";
+    }
 
-    @PostMapping("/xidmetQiymetleri/basliq/yeni") public String basliqYarat(@RequestParam String ad,@RequestParam(required=false)String aciqlama,HttpSession s,RedirectAttributes a){flash(repo.basliqYarat(klinikaId(s),ad,aciqlama),a,"Qiymət başlığı yaradıldı.");return redirect(null);}
-    @PostMapping("/xidmetQiymetleri/basliq/yenile") public String basliqYenile(@RequestParam Long id,@RequestParam String ad,@RequestParam(required=false)String aciqlama,@RequestParam(defaultValue="false")boolean aktiv,RedirectAttributes a){flash(repo.basliqYenile(id,ad,aciqlama,aktiv),a,"Qiymət başlığı yeniləndi.");return redirect(id);}
-    @PostMapping("/xidmetQiymetleri/basliq/sil") public String basliqSil(@RequestParam Long id,RedirectAttributes a){flash(repo.basliqSil(id),a,"Qiymət başlığı silindi.");return redirect(null);}
-    @PostMapping("/xidmetQiymetleri/qrup/yeni") public String qrupYarat(@RequestParam Long basliqId,@RequestParam String ad,@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate baslamaTarixi,@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate bitmeTarixi,@RequestParam(required=false)String aciqlama,@RequestParam(required=false)Long klonQrupId,@RequestParam(required=false)List<Long> teskilatIds,@RequestParam(defaultValue="false")boolean standartdir,@RequestParam(required=false)BigDecimal xestePayi,@RequestParam(required=false)BigDecimal sigortaPayi,@RequestParam(required=false)BigDecimal xesteEndirimi,@RequestParam(required=false)BigDecimal sigortaEndirimi,HttpSession s,RedirectAttributes a){Long kid=klinikaId(s);if(kid==null)return clinicRequired(a,basliqId);flash(repo.qrupYarat(basliqId,ad,baslamaTarixi,bitmeTarixi,aciqlama,klonQrupId,teskilatIds,kid,standartdir,xestePayi,sigortaPayi,xesteEndirimi,sigortaEndirimi),a,"Qiymət qrupu yaradıldı.");return redirect(basliqId);}
-    @PostMapping("/xidmetQiymetleri/qrup/yenile") public String qrupYenile(@RequestParam Long id,@RequestParam Long basliqId,@RequestParam String ad,@RequestParam(required=false)String aciqlama,@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate baslamaTarixi,@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate bitmeTarixi,@RequestParam(required=false)List<Long> teskilatIds,@RequestParam(defaultValue="false")boolean standartdir,@RequestParam(required=false)BigDecimal xestePayi,@RequestParam(required=false)BigDecimal sigortaPayi,@RequestParam(required=false)BigDecimal xesteEndirimi,@RequestParam(required=false)BigDecimal sigortaEndirimi,@RequestParam(defaultValue="false")boolean aktiv,RedirectAttributes a){flash(repo.qrupYenile(id,ad,aciqlama,baslamaTarixi,bitmeTarixi,standartdir,aktiv,teskilatIds,xestePayi,sigortaPayi,xesteEndirimi,sigortaEndirimi),a,"Qiymət qrupu yeniləndi.");return redirect(basliqId);}
-    @PostMapping("/xidmetQiymetleri/qiymet") public String qiymet(@RequestParam Long qrupId,@RequestParam Long xidmetId,@RequestParam BigDecimal qiymet,@RequestParam(required=false)BigDecimal xestePayFaizi,@RequestParam(required=false)BigDecimal xesteEndirimFaizi,@RequestParam(required=false)BigDecimal qurumEndirimFaizi,@RequestParam(defaultValue="false")boolean edvAktivdir,RedirectAttributes a){flash(repo.qiymetSaxla(qrupId,xidmetId,qiymet,xestePayFaizi,xesteEndirimFaizi,qurumEndirimFaizi,edvAktivdir),a,"Xidmət qiyməti yadda saxlanıldı.");return "redirect:/xidmetQiymetleri/qrup/"+qrupId;}
-    @PostMapping("/xidmetQiymetleri/qiymetler") public String qiymetler(@RequestParam Long qrupId,@RequestParam String qiymetlerJson,RedirectAttributes a){if(qiymetlerJson.length()>1_000_000||!qiymetlerJson.trim().startsWith("["))a.addFlashAttribute("errorMessage","Göndərilən qiymət məlumatları düzgün deyil.");else flash(repo.qiymetleriSaxla(qrupId,qiymetlerJson),a,"Dəyişdirilmiş xidmət qiymətləri yadda saxlanıldı.");return "redirect:/xidmetQiymetleri/qrup/"+qrupId;}
+    @GetMapping("/xidmetQiymetleri/cedvel/{cedvelId}")
+    public String tarifler(@PathVariable Long cedvelId,
+            @RequestParam(required = false) Long xidmetQrupuId,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String qiymetStatus,
+            @RequestParam(required = false) Long hekimRolId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "100") int size,
+            Model model, HttpSession session) {
+        Long klinikaId = klinikaId(session);
+        var cedvel = repo.cedvel(klinikaId, cedvelId);
+        size = Math.max(20, Math.min(size, 100));
+        long total = repo.xidmetSayi(cedvelId, xidmetQrupuId, q, qiymetStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) total / size));
+        page = Math.max(1, Math.min(page, totalPages));
+        var rollar = rolRepo.findAll(klinikaId).stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
 
-    private Long klinikaId(HttpSession s){return (Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);}
-    private String clinicRequired(RedirectAttributes a,Long b){a.addFlashAttribute("errorMessage","Əvvəlcə klinika seçin.");return redirect(b);}
-    private void flash(Map<String,Object>r,RedirectAttributes a,String f){String status=String.valueOf(r.getOrDefault("status_kodu",""));a.addFlashAttribute(status.toUpperCase().contains("UGUR")||status.equals("1")?"successMessage":"errorMessage",String.valueOf(r.getOrDefault("mesaj",f)));}
-    private String redirect(Long b){return "redirect:/xidmetQiymetleri"+(b==null?"":"?basliqId="+b);}
-    private Boolean statusBoolean(String status){return "hamisi".equals(status)?null:!"passiv".equals(status);}
+        model.addAttribute("pageTitle", cedvel.qrupAdi());
+        model.addAttribute("activeMenuGroup", "adminPanel");
+        model.addAttribute("activeMenu", "xidmetQiymetleri");
+        model.addAttribute("cedvel", cedvel);
+        model.addAttribute("xidmetQruplari", xidmetRepo.qruplar(klinikaId));
+        model.addAttribute("xidmetler", repo.xidmetler(cedvelId, xidmetQrupuId, q, qiymetStatus, size, (page - 1) * size));
+        model.addAttribute("hekimQiymetleri", repo.hekimQiymetleri(cedvelId, null, null));
+        model.addAttribute("rollar", rollar);
+        model.addAttribute("hekimRolId", hekimRolId);
+        model.addAttribute("hekimler", hekimRolId == null ? List.of() : personalRepo.findByRole(hekimRolId, true));
+        model.addAttribute("selectedXidmetQrupuId", xidmetQrupuId);
+        model.addAttribute("q", q);
+        model.addAttribute("qiymetStatus", qiymetStatus);
+        model.addAttribute("totalCount", total);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        return "pages/xidmetQiymetTarifleri";
+    }
+
+    @PostMapping("/xidmetQiymetleri/basliq/yeni")
+    public String basliqYarat(@RequestParam String ad, @RequestParam(required = false) String aciqlama,
+            HttpSession session, @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.basliqYarat(klinikaId(session), ad, aciqlama, personal.personalId()), a, "Qiymət başlığı yaradıldı.");
+        return redirect(null, null);
+    }
+
+    @PostMapping("/xidmetQiymetleri/basliq/yenile")
+    public String basliqYenile(@RequestParam Long id, @RequestParam String ad,
+            @RequestParam(required = false) String aciqlama, @RequestParam(defaultValue = "false") boolean aktiv,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.basliqYenile(id, ad, aciqlama, aktiv, personal.personalId()), a, "Qiymət başlığı yeniləndi.");
+        return redirect(id, null);
+    }
+
+    @PostMapping("/xidmetQiymetleri/qrup/yeni")
+    public String qrupYarat(@RequestParam Long basliqId, @RequestParam String ad,
+            @RequestParam(required = false) String aciqlama, @RequestParam(required = false) List<Long> teskilatIds,
+            @RequestParam(defaultValue = "false") boolean standartdir, HttpSession session,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.qrupYarat(klinikaId(session), basliqId, ad, aciqlama, standartdir, teskilatIds,
+                personal.personalId()), a, "Qiymət qrupu yaradıldı.");
+        return redirect(basliqId, null);
+    }
+
+    @PostMapping("/xidmetQiymetleri/qrup/yenile")
+    public String qrupYenile(@RequestParam Long id, @RequestParam Long basliqId, @RequestParam String ad,
+            @RequestParam(required = false) String aciqlama, @RequestParam(required = false) List<Long> teskilatIds,
+            @RequestParam(defaultValue = "false") boolean standartdir,
+            @RequestParam(defaultValue = "false") boolean aktiv,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.qrupYenile(id, ad, aciqlama, standartdir, aktiv, teskilatIds, personal.personalId()),
+                a, "Qiymət qrupu yeniləndi.");
+        return redirect(basliqId, id);
+    }
+
+    @PostMapping("/xidmetQiymetleri/cedvel/yeni")
+    public String cedvelYarat(@RequestParam Long basliqId, @RequestParam Long qrupId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate baslamaTarixi,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate bitmeTarixi,
+            @RequestParam(required = false) BigDecimal xestePayi,
+            @RequestParam(required = false) BigDecimal xesteEndirimi,
+            @RequestParam(required = false) BigDecimal sigortaEndirimi,
+            HttpSession session, @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.cedvelYarat(klinikaId(session), qrupId, baslamaTarixi, bitmeTarixi, xestePayi,
+                xesteEndirimi, sigortaEndirimi, personal.personalId()), a, "Qiymət cədvəli yaradıldı.");
+        return redirect(basliqId, qrupId);
+    }
+
+    @PostMapping("/xidmetQiymetleri/cedvel/yenile")
+    public String cedvelYenile(@RequestParam Long id, @RequestParam Long basliqId, @RequestParam Long qrupId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate baslamaTarixi,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate bitmeTarixi,
+            @RequestParam(required = false) BigDecimal xestePayi,
+            @RequestParam(required = false) BigDecimal xesteEndirimi,
+            @RequestParam(required = false) BigDecimal sigortaEndirimi,
+            @RequestParam(defaultValue = "false") boolean aktiv,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.cedvelYenile(id, baslamaTarixi, bitmeTarixi, xestePayi, xesteEndirimi,
+                sigortaEndirimi, aktiv, personal.personalId()), a, "Qiymət cədvəli yeniləndi.");
+        return redirect(basliqId, qrupId);
+    }
+
+    @PostMapping("/xidmetQiymetleri/qiymetler")
+    public String qiymetler(@RequestParam Long cedvelId, @RequestParam String qiymetlerJson,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        if (!validJsonArray(qiymetlerJson)) a.addFlashAttribute("errorMessage", "Göndərilən qiymət məlumatları düzgün deyil.");
+        else flash(repo.qiymetleriSaxla(cedvelId, qiymetlerJson, personal.personalId()), a,
+                "Dəyişdirilmiş xidmət qiymətləri yadda saxlanıldı.");
+        return tarifRedirect(cedvelId);
+    }
+
+    @PostMapping("/xidmetQiymetleri/qiymetler/toplu")
+    public String topluYenile(@RequestParam Long cedvelId, @RequestParam List<Long> xidmetIds,
+            @RequestParam(required = false) BigDecimal xestePayi,
+            @RequestParam(required = false) BigDecimal sigortaPayi,
+            @RequestParam(required = false) BigDecimal xesteEndirimi,
+            @RequestParam(required = false) BigDecimal sigortaEndirimi,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.qiymetleriTopluYenile(cedvelId, xidmetIds, xestePayi, sigortaPayi,
+                xesteEndirimi, sigortaEndirimi, personal.personalId()), a, "Xidmətlər toplu yeniləndi.");
+        return tarifRedirect(cedvelId);
+    }
+
+    @PostMapping("/xidmetQiymetleri/hekim-qiymeti")
+    public String hekimQiymeti(@RequestParam Long cedvelId, @RequestParam Long xidmetId,
+            @RequestParam Long hekimPersonalId, @RequestParam BigDecimal qiymet,
+            @RequestParam(defaultValue = "true") boolean aktiv, HttpSession session,
+            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        flash(repo.hekimQiymetiSaxla(klinikaId(session), cedvelId, xidmetId, hekimPersonalId,
+                qiymet, aktiv, personal.personalId()), a, "Həkimə özəl qiymət yadda saxlanıldı.");
+        return tarifRedirect(cedvelId);
+    }
+
+    private Long klinikaId(HttpSession session) {
+        return (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+    }
+
+    private boolean validJsonArray(String json) {
+        return json != null && json.length() <= 1_000_000 && json.trim().startsWith("[") && json.trim().endsWith("]");
+    }
+
+    private void flash(Map<String, Object> result, RedirectAttributes attributes, String fallback) {
+        String status = String.valueOf(result.getOrDefault("status_kodu", ""));
+        attributes.addFlashAttribute(status.toUpperCase().contains("UGUR") || status.equals("1")
+                ? "successMessage" : "errorMessage", String.valueOf(result.getOrDefault("mesaj", fallback)));
+    }
+
+    private String redirect(Long basliqId, Long qrupId) {
+        String query = basliqId == null ? "" : "?basliqId=" + basliqId + (qrupId == null ? "" : "&qrupId=" + qrupId);
+        return "redirect:/xidmetQiymetleri" + query;
+    }
+
+    private String tarifRedirect(Long cedvelId) {
+        return "redirect:/xidmetQiymetleri/cedvel/" + cedvelId;
+    }
+
+    private Boolean statusBoolean(String status) {
+        return "hamisi".equals(status) ? null : !"passiv".equals(status);
+    }
 }

@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
                                             <label for="defaultLayout">
                                                 <span class="d-block mb-2 layout-img">
                                                     <span class="theme-check rounded-circle"><i class="ti ti-check"></i></span>
-                                                    <img src="assets/img/theme/default.svg" alt="img">
+                                                    <img src="/assets/img/theme/default.svg" alt="img">
                                                 </span>                                     
                                                 <span class="layout-type">Default</span>
                                             </label>
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
                                             <label for="miniLayout">
                                                 <span class="d-block mb-2 layout-img">
                                                 <span class="theme-check rounded-circle"><i class="ti ti-check"></i></span>
-                                                    <img src="assets/img/theme/mini.svg" alt="img">
+                                                    <img src="/assets/img/theme/mini.svg" alt="img">
                                                 </span>                                    
                                                 <span class="layout-type">Mini</span>
                                             </label>
@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
                                             <label for="hoverviewLayout">
                                                 <span class="d-block mb-2 layout-img">
                                                 <span class="theme-check rounded-circle"><i class="ti ti-check"></i></span>
-                                                    <img src="assets/img/theme/mini.svg" alt="img">
+                                                    <img src="/assets/img/theme/mini.svg" alt="img">
                                                 </span>                                    
                                                 <span class="layout-type">Hover View</span>
                                             </label>
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
                                             <label for="hiddenLayout">
                                                 <span class="d-block mb-2 layout-img">
                                                 <span class="theme-check rounded-circle"><i class="ti ti-check"></i></span>
-                                                    <img src="assets/img/theme/full-width.svg" alt="img">
+                                                    <img src="/assets/img/theme/full-width.svg" alt="img">
                                                 </span>                                    
                                                 <span class="layout-type">Hidden</span>
                                             </label>
@@ -281,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
                                             <label for="full-widthLayout">
                                                 <span class="d-block mb-2 layout-img">
                                                 <span class="theme-check rounded-circle"><i class="ti ti-check"></i></span>
-                                                    <img src="assets/img/theme/full-width.svg" alt="img">
+                                                    <img src="/assets/img/theme/full-width.svg" alt="img">
                                                 </span>                                    
                                                 <span class="layout-type">Full Width</span>
                                             </label>
@@ -540,4 +540,3 @@ document.addEventListener("DOMContentLoaded", function(e) {
 	}
 	(new ThemeCustomizer).init()
 });
-

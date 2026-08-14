@@ -1,48 +1,247 @@
 package az.simplexs.simplexs.repository.qiymet;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import az.simplexs.simplexs.dto.qiymet.HekimXidmetQiymeti;
 import az.simplexs.simplexs.dto.qiymet.QiymetBasligi;
+import az.simplexs.simplexs.dto.qiymet.QiymetCedveli;
 import az.simplexs.simplexs.dto.qiymet.QiymetQrupu;
 import az.simplexs.simplexs.dto.qiymet.QiymetXidmeti;
 
 @Repository
 public class QiymetRepository {
     private final NamedParameterJdbcTemplate jdbc;
-    public QiymetRepository(NamedParameterJdbcTemplate jdbc){this.jdbc=jdbc;}
 
-    public List<QiymetBasligi> basliqlar(Long klinikaId,Boolean aktiv){return jdbc.query("SELECT id,ad,aciqlama,sira_no,aktiv FROM public.rn_qiymet_basliqlari WHERE klinika_id=:klinika AND (CAST(:aktiv AS boolean) IS NULL OR aktiv=:aktiv) ORDER BY sira_no NULLS LAST,ad",new MapSqlParameterSource("klinika",klinikaId).addValue("aktiv",aktiv),(r,n)->new QiymetBasligi(l(r,"id"),r.getString("ad"),r.getString("aciqlama"),i(r,"sira_no"),r.getObject("aktiv",Boolean.class)));}
-    public List<QiymetBasligi> basliqlar(Long klinikaId){return basliqlar(klinikaId,null);}
-    public List<QiymetQrupu> qruplar(Long klinikaId,Long basliqId){return qruplar(klinikaId,basliqId,null);}
-    public List<QiymetQrupu> qruplar(Long klinikaId,Long basliqId,Boolean aktiv){return jdbc.query("SELECT * FROM public.fn_qiymet_qrupu_siyahisi(p_klinika_id=>CAST(:klinika AS bigint),p_qiymet_basligi_id=>CAST(:id AS bigint),p_aktiv=>CAST(:aktiv AS boolean),p_tarixde_aktivdir=>CAST(:tarix AS boolean)) ORDER BY sira_no NULLS LAST,qiymet_qrupu_adi",new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("id",basliqId).addValue("aktiv",aktiv).addValue("tarix",null),(r,n)->new QiymetQrupu(l(r,"qiymet_qrupu_id"),l(r,"klinika_id"),l(r,"qiymet_basligi_id"),r.getString("qiymet_basligi_adi"),r.getString("qiymet_qrupu_adi"),r.getString("aciqlama"),r.getObject("baslama_tarixi",java.time.LocalDate.class),r.getObject("bitme_tarixi",java.time.LocalDate.class),r.getObject("tarixde_aktivdir",Boolean.class),r.getObject("standartdir",Boolean.class),r.getBigDecimal("sigorta_payi"),r.getBigDecimal("xeste_payi"),r.getBigDecimal("sigorta_endirim"),r.getBigDecimal("xeste_endirim"),i(r,"sira_no"),r.getObject("aktiv",Boolean.class)));}
-    public List<QiymetXidmeti> xidmetler(Long qrupId,Long xidmetQrupuId,String query,String status,int limit,int offset){String sql="SELECT * FROM public.fn_qiymet_qrupu_xidmet_siyahisi(CAST(:q AS bigint),CAST(:x AS bigint),true) f WHERE (CAST(:axtar AS text) IS NULL OR f.xidmet_adi ILIKE '%'||CAST(:axtar AS text)||'%' OR f.xidmet_kodu ILIKE '%'||CAST(:axtar AS text)||'%') AND (CAST(:status AS text) IS NULL OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true) OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false)) ORDER BY f.xidmet_qrupu_adi,f.xidmet_sira_no NULLS LAST,f.xidmet_adi LIMIT :limit OFFSET :offset";return jdbc.query(sql,filterParams(qrupId,xidmetQrupuId,query,status).addValue("limit",limit).addValue("offset",offset),(r,n)->mapXidmet(r));}
-    public long xidmetSayi(Long qrupId,Long xidmetQrupuId,String query,String status){return jdbc.queryForObject("SELECT count(*) FROM public.fn_qiymet_qrupu_xidmet_siyahisi(CAST(:q AS bigint),CAST(:x AS bigint),true) f WHERE (CAST(:axtar AS text) IS NULL OR f.xidmet_adi ILIKE '%'||CAST(:axtar AS text)||'%' OR f.xidmet_kodu ILIKE '%'||CAST(:axtar AS text)||'%') AND (CAST(:status AS text) IS NULL OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true) OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false))",filterParams(qrupId,xidmetQrupuId,query,status),Long.class);}
+    public QiymetRepository(NamedParameterJdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
 
-    public Map<String,Object> basliqYarat(Long klinikaId,String ad,String aciqlama){return one("SELECT * FROM public.fn_qiymet_basligi_yarat(p_klinika_id=>:klinika,p_ad=>:ad,p_aciqlama=>:aciq,p_yaradan_personal_id=>NULL)",new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("ad",ad.trim()).addValue("aciq",blank(aciqlama)));}
-    public Map<String,Object> basliqYenile(Long id,String ad,String aciqlama,boolean aktiv){return one("SELECT * FROM public.fn_qiymet_basligi_yenile(p_qiymet_basligi_id=>:id,p_ad=>:ad,p_aciqlama=>:aciq,p_aciqlama_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)",new MapSqlParameterSource().addValue("id",id).addValue("ad",ad.trim()).addValue("aciq",blank(aciqlama)).addValue("aktiv",aktiv));}
-    public Map<String,Object> basliqSil(Long id){Integer count=jdbc.queryForObject("SELECT count(*) FROM public.rn_qiymet_qruplari WHERE qiymet_basligi_id=:id",new MapSqlParameterSource("id",id),Integer.class);if(count!=null&&count>0)return Map.of("status_kodu","ISTIFADE_OLUNUR","mesaj","Başlıqda qiymət qrupları var. Əvvəlcə başlığı deaktiv edin.");int changed=jdbc.update("DELETE FROM public.rn_qiymet_basliqlari WHERE id=:id",new MapSqlParameterSource("id",id));return changed==1?Map.of("status_kodu","UGURLU","mesaj","Qiymət başlığı silindi."):Map.of("status_kodu","TAPILMADI","mesaj","Qiymət başlığı tapılmadı.");}
+    public List<QiymetBasligi> basliqlar(Long klinikaId, Boolean aktiv) {
+        return jdbc.query("""
+                SELECT qiymet_basligi_id, qiymet_basligi_adi, aciqlama, sira_no
+                FROM public.fn_qiymet_basligi_siyahisi(p_klinika_id=>CAST(:klinika AS bigint))
+                ORDER BY sira_no NULLS LAST, qiymet_basligi_adi
+                """, new MapSqlParameterSource("klinika", klinikaId),
+                (r, n) -> new QiymetBasligi(l(r, "qiymet_basligi_id"), r.getString("qiymet_basligi_adi"),
+                        r.getString("aciqlama"), i(r, "sira_no"), true));
+    }
 
-    public Map<String,Object> qrupYarat(Long basliq,String ad,java.time.LocalDate bas,java.time.LocalDate bit,String aciq,Long klon,List<Long> ids,Long klinikaId,boolean standartdir,java.math.BigDecimal xestePayi,java.math.BigDecimal sigortaPayi,java.math.BigDecimal xesteEndirimi,java.math.BigDecimal sigortaEndirimi){String sql="SELECT * FROM public.fn_qiymet_qrupu_yarat(p_klinika_id=>:klinika,p_qiymet_basligi_id=>:b,p_ad=>:ad,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_aciqlama=>:aciq,p_standartdir=>:standart,p_klon_qiymet_qrupu_id=>:klon,p_xeste_payi=>:xp,p_sigorta_payi=>:sp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_teskilat_idleri=>CAST(:teskilatlar AS bigint[]),p_yaradan_personal_id=>NULL)";return one(sql,qrupParams(basliq,ad,bas,bit,aciq,ids,xestePayi,sigortaPayi,xesteEndirimi,sigortaEndirimi).addValue("klinika",klinikaId).addValue("standart",standartdir).addValue("klon",klon));}
-    public Map<String,Object> qrupYenile(Long id,String ad,String aciq,java.time.LocalDate bas,java.time.LocalDate bit,boolean standartdir,boolean aktiv,List<Long> ids,java.math.BigDecimal xestePayi,java.math.BigDecimal sigortaPayi,java.math.BigDecimal xesteEndirimi,java.math.BigDecimal sigortaEndirimi){String sql="SELECT * FROM public.fn_qiymet_qrupu_yenile(p_qiymet_qrupu_id=>:id,p_ad=>:ad,p_aciqlama=>:aciq,p_aciqlama_deyisdirilsin=>true,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_standartdir=>:standart,p_standartdir_deyisdirilsin=>true,p_xeste_payi=>:xp,p_xeste_payi_deyisdirilsin=>true,p_sigorta_payi=>:sp,p_sigorta_payi_deyisdirilsin=>true,p_xeste_endirim=>:xe,p_xeste_endirim_deyisdirilsin=>true,p_sigorta_endirim=>:se,p_sigorta_endirim_deyisdirilsin=>true,p_teskilat_idleri=>CAST(:teskilatlar AS bigint[]),p_teskilatlar_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)";return one(sql,qrupParams(null,ad,bas,bit,aciq,ids,xestePayi,sigortaPayi,xesteEndirimi,sigortaEndirimi).addValue("id",id).addValue("standart",standartdir).addValue("aktiv",aktiv));}
+    public List<QiymetQrupu> qruplar(Long klinikaId, Long basliqId, Boolean aktiv) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_qiymet_qrupu_siyahisi(
+                    p_klinika_id=>CAST(:klinika AS bigint),
+                    p_qiymet_basligi_id=>CAST(:basliq AS bigint),
+                    p_aktiv=>CAST(:aktiv AS boolean))
+                ORDER BY sira_no NULLS LAST, qiymet_qrupu_adi
+                """, new MapSqlParameterSource("klinika", klinikaId).addValue("basliq", basliqId)
+                        .addValue("aktiv", aktiv), (r, n) -> new QiymetQrupu(
+                        l(r, "qiymet_qrupu_id"), l(r, "klinika_id"), l(r, "qiymet_basligi_id"),
+                        r.getString("qiymet_basligi_adi"), r.getString("qiymet_qrupu_adi"),
+                        r.getString("aciqlama"), r.getObject("standartdir", Boolean.class), i(r, "sira_no"),
+                        r.getObject("aktiv", Boolean.class), r.getObject("yaranma_tarixi", java.time.LocalDateTime.class),
+                        l(r, "yaradan_personal_id"), r.getObject("yenilenme_tarixi", java.time.LocalDateTime.class),
+                        l(r, "yenileyen_personal_id")));
+    }
 
-    public Map<String,Object> qiymetSaxla(Long qrup,Long xidmet,java.math.BigDecimal qiymet,java.math.BigDecimal xestePay,java.math.BigDecimal xesteEndirim,java.math.BigDecimal qurumEndirim,boolean edv){String json="[{\"xidmet_id\":"+xidmet+",\"qiymet\":"+qiymet+",\"xeste_pay_faizi\":"+nz(xestePay)+",\"xeste_endirim_faizi\":"+nz(xesteEndirim)+",\"qurum_endirim_faizi\":"+nz(qurumEndirim)+",\"edv_aktivdir\":"+edv+"}]";return one("SELECT * FROM public.fn_xidmet_qiymetlerini_yadda_saxla(p_qiymet_qrupu_id=>:q,p_qiymetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>NULL)",new MapSqlParameterSource().addValue("q",qrup).addValue("json",json));}
-    public Map<String,Object> qiymetleriSaxla(Long qrup,String json){return one("SELECT * FROM public.fn_xidmet_qiymetlerini_yadda_saxla(p_qiymet_qrupu_id=>:q,p_qiymetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>NULL)",new MapSqlParameterSource().addValue("q",qrup).addValue("json",json));}
+    public QiymetQrupu qrup(Long klinikaId, Long qrupId) {
+        return qruplar(klinikaId, null, null).stream().filter(q -> q.id().equals(qrupId)).findFirst().orElseThrow();
+    }
 
-    public Map<Long,List<Long>> qruplarinTeskilatIdleri(List<Long> qrupIds){Map<Long,List<Long>> result=new LinkedHashMap<>();if(qrupIds==null)return result;for(Long id:qrupIds){List<Long> ids=jdbc.query("SELECT teskilat_id FROM public.fn_qiymet_qrupu_teskilat_siyahisi(p_qiymet_qrupu_id=>CAST(:id AS bigint),p_aktiv=>true)",new MapSqlParameterSource("id",id),(r,n)->r.getLong("teskilat_id"));result.put(id,ids);}return result;}
+    public List<QiymetCedveli> cedveller(Long klinikaId, Long qrupId, Boolean aktiv, Boolean tarixdeAktivdir) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_qiymet_cedveli_siyahisi(
+                    p_klinika_id=>CAST(:klinika AS bigint), p_qiymet_qrupu_id=>CAST(:qrup AS bigint),
+                    p_aktiv=>CAST(:aktiv AS boolean), p_tarixde_aktivdir=>CAST(:tarix AS boolean))
+                ORDER BY baslama_tarixi DESC, qiymet_cedveli_id DESC
+                """, new MapSqlParameterSource("klinika", klinikaId).addValue("qrup", qrupId)
+                        .addValue("aktiv", aktiv).addValue("tarix", tarixdeAktivdir),
+                (r, n) -> new QiymetCedveli(l(r, "qiymet_cedveli_id"), l(r, "klinika_id"),
+                        l(r, "qiymet_basligi_id"), r.getString("qiymet_basligi_adi"),
+                        l(r, "qiymet_qrupu_id"), r.getString("qiymet_qrupu_adi"),
+                        r.getObject("baslama_tarixi", LocalDate.class), r.getObject("bitme_tarixi", LocalDate.class),
+                        r.getObject("tarixde_aktivdir", Boolean.class), r.getBigDecimal("xeste_payi"),
+                        r.getBigDecimal("sigorta_payi"), r.getBigDecimal("xeste_endirim"),
+                        r.getBigDecimal("sigorta_endirim"), r.getObject("aktiv", Boolean.class),
+                        r.getObject("yaranma_tarixi", java.time.LocalDateTime.class), l(r, "yaradan_personal_id"),
+                        r.getObject("yenilenme_tarixi", java.time.LocalDateTime.class), l(r, "yenileyen_personal_id")));
+    }
 
-    private MapSqlParameterSource qrupParams(Long b,String ad,java.time.LocalDate bas,java.time.LocalDate bit,String aciq,List<Long> ids,java.math.BigDecimal xp,java.math.BigDecimal sp,java.math.BigDecimal xe,java.math.BigDecimal se){return new MapSqlParameterSource().addValue("b",b).addValue("ad",ad.trim()).addValue("bas",bas).addValue("bit",bit).addValue("aciq",blank(aciq)).addValue("teskilatlar",arrayLiteral(ids)).addValue("xp",nz(xp)).addValue("sp",nz(sp)).addValue("xe",nz(xe)).addValue("se",nz(se));}
-    private String arrayLiteral(List<Long> ids){if(ids==null||ids.isEmpty())return "{}";return ids.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(",","{","}"));}
-    private MapSqlParameterSource filterParams(Long q,Long x,String a,String s){return new MapSqlParameterSource().addValue("q",q).addValue("x",x).addValue("axtar",blank(a)).addValue("status",blank(s));}
-    private QiymetXidmeti mapXidmet(ResultSet r)throws SQLException{return new QiymetXidmeti(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_adi"),r.getString("xidmet_tipi_adi"),l(r,"xidmet_qiymeti_id"),r.getBigDecimal("qiymet"),r.getBigDecimal("xeste_pay_faizi"),r.getBigDecimal("qurum_pay_faizi"),r.getBigDecimal("xeste_endirim_faizi"),r.getBigDecimal("qurum_endirim_faizi"),r.getObject("edv_aktivdir",Boolean.class),r.getObject("qiymet_aktiv",Boolean.class),r.getObject("qiymet_teyin_edilib",Boolean.class));}
-    private Map<String,Object> one(String sql,MapSqlParameterSource p){List<Map<String,Object>> rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}
-    private static String blank(String s){return s==null||s.isBlank()?null:s.trim();}
-    private static java.math.BigDecimal nz(java.math.BigDecimal x){return x==null?java.math.BigDecimal.ZERO:x;}
-    private static Long l(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.longValue():null;}
-    private static Integer i(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.intValue():null;}
+    public QiymetCedveli cedvel(Long klinikaId, Long cedvelId) {
+        return cedveller(klinikaId, null, null, null).stream().filter(c -> c.id().equals(cedvelId))
+                .findFirst().orElseThrow();
+    }
+
+    public List<QiymetXidmeti> xidmetler(Long cedvelId, Long xidmetQrupuId, String query, String status,
+            int limit, int offset) {
+        String sql = """
+                SELECT * FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
+                    p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),
+                    p_xidmet_qrupu_id=>CAST(:xidmetQrupu AS bigint),
+                    p_alt_qruplar_daxil=>true, p_aktiv=>true) f
+                WHERE (CAST(:axtar AS text) IS NULL OR f.xidmet_adi ILIKE '%%'||CAST(:axtar AS text)||'%%'
+                    OR f.xidmet_kodu ILIKE '%%'||CAST(:axtar AS text)||'%%')
+                  AND (CAST(:status AS text) IS NULL
+                    OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true)
+                    OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false))
+                ORDER BY f.xidmet_qrupu_adi, f.xidmet_sira_no NULLS LAST, f.xidmet_adi
+                LIMIT :limit OFFSET :offset
+                """;
+        return jdbc.query(sql, filterParams(cedvelId, xidmetQrupuId, query, status)
+                .addValue("limit", limit).addValue("offset", offset), (r, n) -> mapXidmet(r));
+    }
+
+    public long xidmetSayi(Long cedvelId, Long xidmetQrupuId, String query, String status) {
+        return jdbc.queryForObject("""
+                SELECT count(*) FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
+                    p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),
+                    p_xidmet_qrupu_id=>CAST(:xidmetQrupu AS bigint),
+                    p_alt_qruplar_daxil=>true, p_aktiv=>true) f
+                WHERE (CAST(:axtar AS text) IS NULL OR f.xidmet_adi ILIKE '%%'||CAST(:axtar AS text)||'%%'
+                    OR f.xidmet_kodu ILIKE '%%'||CAST(:axtar AS text)||'%%')
+                  AND (CAST(:status AS text) IS NULL
+                    OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true)
+                    OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false))
+                """, filterParams(cedvelId, xidmetQrupuId, query, status), Long.class);
+    }
+
+    public Map<String, Object> basliqYarat(Long klinikaId, String ad, String aciqlama, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_basligi_yarat(p_klinika_id=>:klinika,p_ad=>:ad,p_aciqlama=>:aciq,p_yaradan_personal_id=>:personal)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("ad", ad.trim())
+                        .addValue("aciq", blank(aciqlama)).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> basliqYenile(Long id, String ad, String aciqlama, boolean aktiv, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_basligi_yenile(p_qiymet_basligi_id=>:id,p_ad=>:ad,p_aciqlama=>:aciq,p_aciqlama_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)",
+                new MapSqlParameterSource("id", id).addValue("ad", ad.trim()).addValue("aciq", blank(aciqlama))
+                        .addValue("aktiv", aktiv).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> qrupYarat(Long klinikaId, Long basliqId, String ad, String aciqlama,
+            boolean standartdir, List<Long> teskilatIds, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_qrupu_yarat(p_klinika_id=>:klinika,p_qiymet_basligi_id=>:basliq,p_ad=>:ad,p_aciqlama=>:aciq,p_standartdir=>:standart,p_teskilat_idleri=>CAST(:teskilatlar AS bigint[]),p_yaradan_personal_id=>:personal)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("basliq", basliqId)
+                        .addValue("ad", ad.trim()).addValue("aciq", blank(aciqlama))
+                        .addValue("standart", standartdir).addValue("teskilatlar", arrayLiteral(teskilatIds))
+                        .addValue("personal", personalId));
+    }
+
+    public Map<String, Object> qrupYenile(Long id, String ad, String aciqlama, boolean standartdir,
+            boolean aktiv, List<Long> teskilatIds, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_qrupu_yenile(p_qiymet_qrupu_id=>:id,p_ad=>:ad,p_aciqlama=>:aciq,p_aciqlama_deyisdirilsin=>true,p_standartdir=>:standart,p_standartdir_deyisdirilsin=>true,p_aktiv=>:aktiv,p_teskilat_idleri=>CAST(:teskilatlar AS bigint[]),p_teskilatlar_deyisdirilsin=>true,p_yenileyen_personal_id=>:personal)",
+                new MapSqlParameterSource("id", id).addValue("ad", ad.trim()).addValue("aciq", blank(aciqlama))
+                        .addValue("standart", standartdir).addValue("aktiv", aktiv)
+                        .addValue("teskilatlar", arrayLiteral(teskilatIds)).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> cedvelYarat(Long klinikaId, Long qrupId, LocalDate baslamaTarixi,
+            LocalDate bitmeTarixi, BigDecimal xestePayi, BigDecimal xesteEndirim,
+            BigDecimal sigortaEndirim, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_cedveli_yarat(p_klinika_id=>:klinika,p_qiymet_qrupu_id=>:qrup,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_xeste_payi=>:xp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_yaradan_personal_id=>:personal)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("qrup", qrupId)
+                        .addValue("bas", baslamaTarixi).addValue("bit", bitmeTarixi)
+                        .addValue("xp", xestePayi).addValue("xe", xesteEndirim)
+                        .addValue("se", sigortaEndirim).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> cedvelYenile(Long id, LocalDate baslamaTarixi, LocalDate bitmeTarixi,
+            BigDecimal xestePayi, BigDecimal xesteEndirim, BigDecimal sigortaEndirim,
+            boolean aktiv, Long personalId) {
+        return one("SELECT * FROM public.fn_qiymet_cedveli_yenile(p_qiymet_cedveli_id=>:id,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_xeste_payi=>:xp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)",
+                new MapSqlParameterSource("id", id).addValue("bas", baslamaTarixi).addValue("bit", bitmeTarixi)
+                        .addValue("xp", xestePayi).addValue("xe", xesteEndirim)
+                        .addValue("se", sigortaEndirim).addValue("aktiv", aktiv).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> qiymetleriSaxla(Long cedvelId, String json, Long personalId) {
+        return one("SELECT * FROM public.fn_xidmet_qiymetlerini_yadda_saxla(p_qiymet_cedveli_id=>:cedvel,p_qiymetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:personal)",
+                new MapSqlParameterSource("cedvel", cedvelId).addValue("json", json).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> qiymetleriTopluYenile(Long cedvelId, List<Long> xidmetIds,
+            BigDecimal xestePayi, BigDecimal sigortaPayi, BigDecimal xesteEndirim,
+            BigDecimal sigortaEndirim, Long personalId) {
+        return one("SELECT * FROM public.fn_xidmet_qiymetlerini_toplu_yenile(p_qiymet_cedveli_id=>:cedvel,p_xidmet_idleri=>CAST(:xidmetler AS bigint[]),p_xeste_payi=>:xp,p_sigorta_payi=>:sp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_yenileyen_personal_id=>:personal)",
+                new MapSqlParameterSource("cedvel", cedvelId).addValue("xidmetler", arrayLiteral(xidmetIds))
+                        .addValue("xp", xestePayi).addValue("sp", sigortaPayi).addValue("xe", xesteEndirim)
+                        .addValue("se", sigortaEndirim).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> hekimQiymetiSaxla(Long klinikaId, Long cedvelId, Long xidmetId,
+            Long hekimId, BigDecimal qiymet, boolean aktiv, Long personalId) {
+        return one("SELECT * FROM public.fn_hekim_xidmet_qiymeti_yadda_saxla(p_klinika_id=>:klinika,p_qiymet_cedveli_id=>:cedvel,p_xidmet_id=>:xidmet,p_hekim_personal_id=>:hekim,p_qiymet=>:qiymet,p_aktiv=>:aktiv,p_emel_eden_personal_id=>:personal)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("cedvel", cedvelId)
+                        .addValue("xidmet", xidmetId).addValue("hekim", hekimId).addValue("qiymet", qiymet)
+                        .addValue("aktiv", aktiv).addValue("personal", personalId));
+    }
+
+    public List<HekimXidmetQiymeti> hekimQiymetleri(Long cedvelId, Long xidmetId, Boolean aktiv) {
+        return jdbc.query("SELECT * FROM public.fn_hekim_xidmet_qiymet_siyahisi(p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),p_xidmet_id=>CAST(:xidmet AS bigint),p_aktiv=>CAST(:aktiv AS boolean))",
+                new MapSqlParameterSource("cedvel", cedvelId).addValue("xidmet", xidmetId).addValue("aktiv", aktiv),
+                (r, n) -> new HekimXidmetQiymeti(l(r, "hekim_xidmet_qiymeti_id"), l(r, "qiymet_cedveli_id"),
+                        l(r, "xidmet_id"), r.getString("xidmet_kodu"), r.getString("xidmet_adi"),
+                        l(r, "hekim_personal_id"), r.getString("hekim_kodu"), r.getString("hekim_ad_soyad"),
+                        r.getBigDecimal("umumi_qiymet"), r.getBigDecimal("hekim_qiymeti"),
+                        r.getObject("aktiv", Boolean.class), r.getObject("yaranma_tarixi", java.time.LocalDateTime.class),
+                        l(r, "yaradan_personal_id"), r.getObject("yenilenme_tarixi", java.time.LocalDateTime.class),
+                        l(r, "yenileyen_personal_id")));
+    }
+
+    public Map<Long, List<Long>> qruplarinTeskilatIdleri(List<Long> qrupIds) {
+        Map<Long, List<Long>> result = new LinkedHashMap<>();
+        if (qrupIds == null) return result;
+        for (Long id : qrupIds) {
+            result.put(id, jdbc.query("SELECT teskilat_id FROM public.fn_qiymet_qrupu_teskilat_siyahisi(p_qiymet_qrupu_id=>CAST(:id AS bigint),p_aktiv=>true)",
+                    new MapSqlParameterSource("id", id), (r, n) -> r.getLong("teskilat_id")));
+        }
+        return result;
+    }
+
+    private MapSqlParameterSource filterParams(Long cedvel, Long qrup, String axtar, String status) {
+        return new MapSqlParameterSource("cedvel", cedvel).addValue("xidmetQrupu", qrup)
+                .addValue("axtar", blank(axtar)).addValue("status", blank(status));
+    }
+
+    private QiymetXidmeti mapXidmet(ResultSet r) throws SQLException {
+        return new QiymetXidmeti(l(r, "xidmet_id"), r.getString("xidmet_kodu"), r.getString("xidmet_adi"),
+                l(r, "xidmet_qrupu_id"), r.getString("xidmet_qrupu_kodu"), r.getString("xidmet_qrupu_adi"),
+                l(r, "xidmet_tipi_id"), r.getString("xidmet_tipi_kodu"), r.getString("xidmet_tipi_adi"),
+                l(r, "xidmet_qiymeti_id"), r.getBigDecimal("qiymet"), r.getBigDecimal("xeste_pay"),
+                r.getBigDecimal("qurum_payi"), r.getBigDecimal("xeste_endirim"), r.getBigDecimal("qurum_endirim"),
+                r.getObject("edv_aktivdir", Boolean.class), r.getObject("qiymet_aktiv", Boolean.class),
+                r.getObject("qiymet_teyin_edilib", Boolean.class), i(r, "xidmet_sira_no"));
+    }
+
+    private Map<String, Object> one(String sql, MapSqlParameterSource params) {
+        List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        return rows.isEmpty() ? Map.of() : rows.getFirst();
+    }
+
+    private String arrayLiteral(List<Long> ids) {
+        return ids == null || ids.isEmpty() ? "{}"
+                : ids.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(",", "{", "}"));
+    }
+
+    private static String blank(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private static Long l(ResultSet r, String column) throws SQLException {
+        Object value = r.getObject(column);
+        return value instanceof Number n ? n.longValue() : null;
+    }
+
+    private static Integer i(ResultSet r, String column) throws SQLException {
+        Object value = r.getObject(column);
+        return value instanceof Number n ? n.intValue() : null;
+    }
 }

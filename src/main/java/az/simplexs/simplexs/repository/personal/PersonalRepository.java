@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import az.simplexs.simplexs.dto.personal.PersonalListItem;
 import az.simplexs.simplexs.dto.personal.PersonalKlinika;
+import az.simplexs.simplexs.dto.personal.PersonalKassa;
 import az.simplexs.simplexs.dto.personal.PersonalRol;
+import az.simplexs.simplexs.dto.personal.PersonalSobe;
+import az.simplexs.simplexs.dto.personal.RolaBagliPersonal;
 
 @Repository
 public class PersonalRepository {
@@ -47,13 +50,14 @@ public class PersonalRepository {
     @Transactional
     public Map<String, Object> create(Long kid, Long vid, String ad, String soyad, String ataAdi,
             String mobilNomre, String daxiliNomre, String isNomresi, String email, boolean hekimdir,
-            boolean aktiv, String sifre) {
+            boolean aktiv, String sifre, Long emelEdenId) {
         List<Map<String, Object>> created = jdbc.queryForList("""
                 SELECT * FROM public.fn_personal_yarat(
                     p_klinika_id=>:kid, p_vezife_id=>:vid, p_ad=>:ad,
-                    p_soyad=>:soyad, p_hekimdir=>:hekim, p_yaradan_personal_id=>NULL)
+                    p_soyad=>:soyad, p_hekimdir=>:hekim, p_yaradan_personal_id=>:emelEden)
                 """, new MapSqlParameterSource().addValue("kid", kid).addValue("vid", vid)
-                .addValue("ad", ad.trim()).addValue("soyad", soyad.trim()).addValue("hekim", hekimdir));
+                .addValue("ad", ad.trim()).addValue("soyad", soyad.trim()).addValue("hekim", hekimdir)
+                .addValue("emelEden", emelEdenId));
         if (created.isEmpty() || !"UGURLU".equals(String.valueOf(created.getFirst().get("status_kodu")))) {
             return created.isEmpty()
                     ? Map.of("status_kodu", "SISTEM_XETASI", "mesaj", "Personal yaradıla bilmədi")
@@ -61,12 +65,12 @@ public class PersonalRepository {
         }
         Number personalId = (Number) created.getFirst().get("personal_id");
         return update(personalId.longValue(), vid, ad, soyad, ataAdi, mobilNomre, daxiliNomre,
-                isNomresi, email, hekimdir, aktiv, sifre);
+                isNomresi, email, hekimdir, aktiv, sifre, emelEdenId);
     }
 
     public Map<String, Object> update(Long personalId, Long vezifeId, String ad, String soyad, String ataAdi,
             String mobilNomre, String daxiliNomre, String isNomresi, String email, boolean hekimdir,
-            boolean aktiv, String sifre) {
+            boolean aktiv, String sifre, Long emelEdenId) {
         String sql = """
                 SELECT netice.*
                 FROM public.rn_personallar movcud
@@ -101,7 +105,7 @@ public class PersonalRepository {
                     p_isden_ayrilib => movcud.isden_ayrilib,
                     p_isden_ayrilma_tarixi => movcud.isden_ayrilma_tarixi,
                     p_aktiv => :aktiv,
-                    p_yenileyen_personal_id => NULL
+                    p_yenileyen_personal_id => :emelEden
                 ) netice
                 WHERE movcud.id = :personalId
                 """;
@@ -110,32 +114,82 @@ public class PersonalRepository {
                 .addValue("ad", ad).addValue("soyad", soyad).addValue("ataAdi", ataAdi)
                 .addValue("mobilNomre", mobilNomre).addValue("daxiliNomre", daxiliNomre)
                 .addValue("isNomresi", isNomresi).addValue("email", email)
-                .addValue("hekimdir", hekimdir).addValue("aktiv", aktiv).addValue("sifre", sifre);
+                .addValue("hekimdir", hekimdir).addValue("aktiv", aktiv).addValue("sifre", sifre)
+                .addValue("emelEden", emelEdenId);
         List<Map<String, Object>> result = jdbc.queryForList(sql, params);
         return result.isEmpty()
                 ? Map.of("status_kodu", "PERSONAL_TAPILMADI", "mesaj", "Personal tapılmadı")
                 : result.getFirst();
     }
 
-    public void role(Long personalKlinikaId, Long rid, boolean add, boolean primary) {
-        jdbc.queryForList("""
+    public Map<String, Object> role(Long personalKlinikaId, Long rid, boolean add, boolean primary, Long emelEdenId) {
+        return one("""
                 SELECT * FROM public.fn_personal_klinika_rol_yenile(
                     p_personal_klinika_id=>:pkid, p_rol_id=>:rid, p_elave_edilsin=>:add,
-                    p_esas_rol=>:primary, p_emel_eden_personal_id=>NULL)
+                    p_esas_rol=>:primary, p_emel_eden_personal_id=>:emelEden)
                 """, new MapSqlParameterSource().addValue("pkid", personalKlinikaId).addValue("rid", rid)
-                .addValue("add", add).addValue("primary", primary));
+                .addValue("add", add).addValue("primary", primary).addValue("emelEden", emelEdenId));
     }
 
-    public Map<String, Object> clinic(Long personalId, Long klinikaId, boolean add) {
+    public Map<String, Object> clinic(Long personalId, Long klinikaId, boolean add, Long emelEdenId) {
         List<Map<String, Object>> result = jdbc.queryForList("""
                 SELECT * FROM public.fn_personal_klinika_yenile(
                     p_personal_id=>:personalId, p_klinika_id=>:klinikaId,
-                    p_elave_edilsin=>:add, p_emel_eden_personal_id=>NULL)
+                    p_elave_edilsin=>:add, p_emel_eden_personal_id=>:emelEden)
                 """, new MapSqlParameterSource().addValue("personalId", personalId)
-                .addValue("klinikaId", klinikaId).addValue("add", add));
+                .addValue("klinikaId", klinikaId).addValue("add", add).addValue("emelEden", emelEdenId));
         return result.isEmpty()
                 ? Map.of("status_kodu", "SISTEM_XETASI", "mesaj", "Klinika icazəsi dəyişdirilə bilmədi")
                 : result.getFirst();
+    }
+
+    public List<RolaBagliPersonal> findByRole(Long rolId, boolean onlyActive) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_rola_bagli_personal_siyahisi(
+                    p_rol_id=>CAST(:rolId AS bigint), p_yalniz_aktiv=>:aktiv)
+                ORDER BY tam_ad
+                """, new MapSqlParameterSource("rolId", rolId).addValue("aktiv", onlyActive),
+                (r, n) -> new RolaBagliPersonal(l(r, "personal_id"), r.getString("personal_kod"),
+                        r.getString("ad"), r.getString("soyad"), r.getString("ata_adi"), r.getString("tam_ad"),
+                        l(r, "personal_klinika_id"), l(r, "klinika_id"), r.getString("klinika_ad"),
+                        l(r, "rol_id"), r.getString("rol_ad"), r.getObject("elaqe_aktiv", Boolean.class),
+                        r.getObject("personal_aktiv", Boolean.class), r.getObject("isden_ayrilib", Boolean.class)));
+    }
+
+    public List<PersonalKassa> kassalar(Long klinikaId, Long personalId) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_personal_kassa_siyahisi(
+                    p_klinika_id=>CAST(:klinika AS bigint), p_personal_id=>CAST(:personal AS bigint))
+                ORDER BY kassa_adi
+                """, new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId),
+                (r, n) -> new PersonalKassa(l(r, "kassa_id"), r.getString("kassa_kodu"),
+                        r.getString("kassa_adi"), l(r, "elaqe_id"), r.getObject("secilib", Boolean.class),
+                        r.getObject("izlesin", Boolean.class), r.getObject("islesin", Boolean.class),
+                        r.getObject("elaqe_aktiv", Boolean.class)));
+    }
+
+    public Map<String, Object> kassalariSaxla(Long klinikaId, Long personalId, String json, Long emelEdenId) {
+        return one("SELECT * FROM public.fn_personal_kassalar_yadda_saxla(p_klinika_id=>:klinika,p_personal_id=>:personal,p_kassalar=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:emelEden)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId)
+                        .addValue("json", json).addValue("emelEden", emelEdenId));
+    }
+
+    public List<PersonalSobe> sobeler(Long klinikaId, Long personalId) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_personal_sobe_siyahisi(
+                    p_klinika_id=>CAST(:klinika AS bigint), p_personal_id=>CAST(:personal AS bigint))
+                ORDER BY sobe_adi
+                """, new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId),
+                (r, n) -> new PersonalSobe(l(r, "sobe_id"), r.getString("sobe_adi"), l(r, "sobe_tipi_id"),
+                        r.getString("sobe_tipi_adi"), l(r, "elaqe_id"), r.getObject("secilib", Boolean.class),
+                        r.getObject("izlesin", Boolean.class), r.getObject("islesin", Boolean.class),
+                        r.getObject("elaqe_aktiv", Boolean.class)));
+    }
+
+    public Map<String, Object> sobeleriSaxla(Long klinikaId, Long personalId, String json, Long emelEdenId) {
+        return one("SELECT * FROM public.fn_personal_sobeler_yadda_saxla(p_klinika_id=>:klinika,p_personal_id=>:personal,p_sobeler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:emelEden)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId)
+                        .addValue("json", json).addValue("emelEden", emelEdenId));
     }
 
     public Map<Long, List<PersonalKlinika>> clinicsByPersonal(Collection<Long> personalIds,
@@ -196,5 +250,10 @@ public class PersonalRepository {
     private static Integer i(java.sql.ResultSet r, String c) throws java.sql.SQLException {
         Object x = r.getObject(c);
         return x instanceof Number n ? n.intValue() : null;
+    }
+
+    private Map<String, Object> one(String sql, MapSqlParameterSource params) {
+        List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        return rows.isEmpty() ? Map.of() : rows.getFirst();
     }
 }

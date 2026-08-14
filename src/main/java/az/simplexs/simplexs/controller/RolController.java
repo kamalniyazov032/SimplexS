@@ -14,13 +14,16 @@ import jakarta.servlet.http.HttpSession;
 import az.simplexs.simplexs.dto.rol.Rol;
 import az.simplexs.simplexs.dto.rol.RolSelahiyyet;
 import az.simplexs.simplexs.repository.rol.RolRepository;
+import az.simplexs.simplexs.repository.personal.PersonalRepository;
 
 @Controller
 public class RolController {
     private final RolRepository rolRepository;
+    private final PersonalRepository personalRepository;
 
-    public RolController(RolRepository rolRepository) {
+    public RolController(RolRepository rolRepository, PersonalRepository personalRepository) {
         this.rolRepository = rolRepository;
+        this.personalRepository = personalRepository;
     }
 
     @GetMapping("/rollar")
@@ -52,6 +55,7 @@ public class RolController {
                 }
                 model.addAttribute("selahiyyetler", selahiyyetler);
                 model.addAttribute("selahiyyetQruplari", selahiyyetQruplari);
+                model.addAttribute("rolaBagliPersonallar", personalRepository.findByRole(selectedRolId, false));
             }
         return "pages/rollar";
     }

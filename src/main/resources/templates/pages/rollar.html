@@ -171,6 +171,12 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4" id="personals-tab" data-bs-toggle="tab" data-bs-target="#personals-pane" type="button" role="tab">
+                            <i class="ti ti-users me-2"></i>Personallar
+                            <span class="badge bg-light text-dark ms-1" th:text="${#lists.size(rolaBagliPersonallar)}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link px-4" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions-pane" type="button" role="tab">
                             <i class="ti ti-key me-2"></i>Səlahiyyətlər
                             <span class="badge bg-light text-dark ms-1" th:text="${#lists.size(selahiyyetler)}">0</span>
@@ -253,6 +259,10 @@
                         </div>
                         <div th:if="${#lists.isEmpty(selahiyyetler)}" class="text-center text-muted py-5">Səlahiyyət tapılmadı.</div>
                         <div id="permissionFilterEmpty" class="text-center text-muted py-5 d-none"><i class="ti ti-filter-off fs-2 d-block mb-2"></i>Filterə uyğun səlahiyyət tapılmadı.</div>
+                    </div>
+                    <div class="tab-pane fade" id="personals-pane" role="tabpanel" aria-labelledby="personals-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3"><div><h6 class="mb-1">Rola bağlı personallar</h6><small class="text-muted">Siyahı yeni DB funksiyasından birbaşa gətirilir.</small></div><span class="badge bg-primary-subtle text-primary" th:text="|${#lists.size(rolaBagliPersonallar)} personal|"></span></div>
+                        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Personal</th><th>Kod</th><th>Klinika</th><th>Əlaqə</th><th>Status</th></tr></thead><tbody><tr th:each="p:${rolaBagliPersonallar}"><td><strong th:text="${p.tamAd}"></strong></td><td th:text="${p.personalKodu}"></td><td th:text="${p.klinikaAdi}"></td><td><span class="badge" th:classappend="${p.elaqeAktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${p.elaqeAktiv}?'Aktiv':'Passiv'"></span></td><td><span th:if="${p.isdenAyrilib}" class="badge bg-danger">İşdən ayrılıb</span><span th:unless="${p.isdenAyrilib}" class="badge bg-success">İşləyir</span></td></tr><tr th:if="${#lists.isEmpty(rolaBagliPersonallar)}"><td colspan="5" class="text-center text-muted py-5">Bu rola bağlı personal yoxdur.</td></tr></tbody></table></div>
                     </div>
                 </div>
             </div>
