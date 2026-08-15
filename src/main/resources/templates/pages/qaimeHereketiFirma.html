@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az"
+<html lang="az" th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
@@ -64,8 +64,8 @@
                 </div>
                 <div class="col-md-1 d-grid align-self-end">
                     <button type="button" class="btn btn-primary btn-search-firma">
-                        <i class="ti ti-search me-1"></i> Axtar
-                    </button>
+                        <i class="ti ti-search me-1"></i><span> Axtar
+                    </span></button>
                 </div>
             </div>
         </div>

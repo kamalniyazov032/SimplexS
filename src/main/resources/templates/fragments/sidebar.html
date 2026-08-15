@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="sidebar" id="sidebar" th:fragment="sidebar">
     <div class="sidebar-logo">
@@ -14,10 +14,10 @@
 
     <div class="sidebar-inner" data-simplebar>
         <div id="sidebar-menu" class="sidebar-menu">
-            <ul role="menu" aria-label="Əsas naviqasiya menyusu">
+            <ul role="menu" aria-label="Əsas naviqasiya menyusu" th:aria-label="#{common.esas_naviqasiya_menyusu}">
                 <li class="menu-dashboard">
                     <a th:href="@{/dashboard}" th:classappend="${activeMenu == 'dashboard'} ? 'active' : ''">
-                        <i class="ti ti-layout-board"></i><span>Dashboard</span>
+                        <i class="ti ti-layout-board"></i><span th:text="#{common.dashboard}">Dashboard</span>
                     </a>
                 </li>
 
@@ -74,7 +74,7 @@
                 </th:block>
 
                 <li th:if="${#lists.isEmpty(userMenuSystems)}" class="px-3 py-4 text-center text-muted">
-                    <i class="ti ti-shield-off fs-3 d-block mb-2"></i><small>Bu klinika üçün modul icazəsi verilməyib.</small>
+                    <i class="ti ti-shield-off fs-3 d-block mb-2"></i><small th:text="#{common.bu_klinika_ucun_modul_icazesi_ver}">Bu klinika üçün modul icazəsi verilməyib.</small>
                 </li>
             </ul>
         </div>

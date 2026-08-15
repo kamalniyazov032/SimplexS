@@ -40,7 +40,6 @@ public class YataqController {
         var binalar = binaRepository.findByKlinikaId(klinikaId).stream()
                 .filter(b -> Boolean.TRUE.equals(b.aktiv())).toList();
         if (binaId == null && !binalar.isEmpty()) binaId = binalar.getFirst().binaId();
-        Long selectedBinaId = binaId;
         var mertebeler = repository.mertebeler(klinikaId, binaId, statusBoolean(status));
         if (mertebeId == null && !mertebeler.isEmpty()) mertebeId = mertebeler.getFirst().id();
         Long selectedMertebeId = mertebeId;

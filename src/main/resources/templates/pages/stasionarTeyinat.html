@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/blank}">
 
 <head></head>
@@ -9,13 +9,13 @@
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap">
         <div>
             <h4 class="mb-1 text-primary fw-bold">
-                <i class="fa-solid fa-clipboard-list me-2"></i>Həkim təyinatı
-            </h4>
+                <i class="fa-solid fa-clipboard-list me-2"></i><span>Həkim təyinatı
+            </span></h4>
             <p class="mb-0 text-muted">Stasionar pasient üzrə təyinatları idarə edin.</p>
         </div>
         <button type="button" class="btn btn-light border" onclick="window.close();">
-            <i class="fa-solid fa-xmark me-1"></i>Bağla
-        </button>
+            <i class="fa-solid fa-xmark me-1"></i><span>Bağla
+        </span></button>
     </div>
 
     <div class="card border-0 shadow-sm rounded-3 mb-3">
@@ -105,11 +105,11 @@
                 <div class="col-lg-5">
                     <div class="d-flex justify-content-lg-end flex-wrap gap-2">
                         <button type="button" class="btn btn-danger">
-                            <i class="fa-solid fa-stop me-1"></i>Təyinatı stopla
-                        </button>
+                            <i class="fa-solid fa-stop me-1"></i><span>Təyinatı stopla
+                        </span></button>
                         <button type="button" class="btn btn-primary">
-                            <i class="fa-solid fa-print me-1"></i>Təyinatı çap et
-                        </button>
+                            <i class="fa-solid fa-print me-1"></i><span>Təyinatı çap et
+                        </span></button>
                     </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                     <td><input class="form-check-input" type="checkbox" aria-label="Təyinatı seç"></td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 assignment-use-btn"
-                                type="button" data-used-text="1 ədəd<br><span class='text-muted'>500 mL</span>">
+                                type="button" data-used-text="1 ədəd&lt;br&gt;&lt;span class='text-muted'&gt;500 mL&lt;/span&gt;">
                             <i class="fa-solid fa-prescription-bottle-medical"></i>
                             <span class="fw-bold">15:00</span>
                         </button>
@@ -147,34 +147,34 @@
                     </td>
                     <td>
                         <a href="javascript:void(0);" class="fw-bold text-primary">Ringer 500ml</a>
-                        <div class="small text-muted mt-1">
-                            Təsvirinin adı: 1 x 1 intravenous (İV)<br>
-                            Müalicə başlayacaq: 27/04/2026<br>
-                            İstək depo adı: <span class="text-primary fw-semibold">Mərkəzi depodan</span><br>
-                            Sürəti: 100 mL/saat<br>
+                        <div class="small text-muted mt-1"><span>
+                            Təsvirinin adı: 1 x 1 intravenous (İV)</span><br><span>
+                            Müalicə başlayacaq: 27/04/2026</span><br><span>
+                            İstək depo adı: </span><span class="text-primary fw-semibold">Mərkəzi depodan</span><br><span>
+                            Sürəti: 100 mL/saat</span><br><span>
                             Order Id: 695946
-                        </div>
+                        </span></div>
                         <div class="border-top mt-2 pt-2 small text-success fw-semibold">
                             27/04/2026 15:24:42 - AYSEL İMRANOVA
                         </div>
                     </td>
-                    <td class="text-center fw-bold">1 ədəd<br><span class="text-muted">500 mL</span></td>
-                    <td class="text-center fw-bold assignment-used-cell">1 ədəd<br><span class="text-muted">500 mL</span></td>
+                    <td class="text-center fw-bold"><span>1 ədəd</span><br><span class="text-muted">500 mL</span></td>
+                    <td class="text-center fw-bold assignment-used-cell"><span>1 ədəd</span><br><span class="text-muted">500 mL</span></td>
                     <td class="text-center">
                         <span class="badge bg-success-light text-success d-inline-flex align-items-center gap-1">
-                            <i class="fa-solid fa-check"></i> Təsdiqlənib
-                        </span>
+                            <i class="fa-solid fa-check"></i><span> Təsdiqlənib
+                        </span></span>
                         <div class="small text-success fw-semibold mt-1">27/04/2026 15:10</div>
                     </td>
                     <td class="text-center">
                         <span class="badge bg-warning-light text-warning d-inline-flex align-items-center gap-1">
-                            <i class="fa-regular fa-clock"></i> Gözləyir
-                        </span>
+                            <i class="fa-regular fa-clock"></i><span> Gözləyir
+                        </span></span>
                     </td>
                     <td class="text-center">
                         <span class="badge bg-secondary-light text-secondary d-inline-flex align-items-center gap-1">
-                            <i class="fa-solid fa-check"></i> Gözləyir
-                        </span>
+                            <i class="fa-solid fa-check"></i><span> Gözləyir
+                        </span></span>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-primary" type="button" aria-label="Qeydi redaktə et">
@@ -186,7 +186,7 @@
                     <td><input class="form-check-input" type="checkbox" aria-label="Təyinatı seç"></td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 assignment-use-btn"
-                                type="button" data-used-text="1 ədəd<br><span class='text-muted'>500 mL</span>">
+                                type="button" data-used-text="1 ədəd&lt;br&gt;&lt;span class='text-muted'&gt;500 mL&lt;/span&gt;">
                             <i class="fa-solid fa-prescription-bottle-medical"></i>
                             <span class="fw-bold">16:00</span>
                         </button>
@@ -194,31 +194,31 @@
                     </td>
                     <td>
                         <a href="javascript:void(0);" class="fw-bold text-primary">Ringer 500ml</a>
-                        <div class="small text-muted mt-1">
-                            Təsvirinin adı: 1 x 1 intravenous (İV)<br>
-                            Müalicə başlayacaq: 27/04/2026<br>
-                            İstək depo adı: <span class="text-primary fw-semibold">KFO Deposu</span> (Mərkəzi depodan)<br>
-                            Sürəti: 100 mL/saat<br>
+                        <div class="small text-muted mt-1"><span>
+                            Təsvirinin adı: 1 x 1 intravenous (İV)</span><br><span>
+                            Müalicə başlayacaq: 27/04/2026</span><br><span>
+                            İstək depo adı: </span><span class="text-primary fw-semibold">KFO Deposu</span><span> (Mərkəzi depodan)</span><br><span>
+                            Sürəti: 100 mL/saat</span><br><span>
                             Order Id: 695946
-                        </div>
+                        </span></div>
                         <div class="border-top mt-2 pt-2 small text-muted">İstifadə məlumatı: -</div>
                     </td>
-                    <td class="text-center fw-bold">1 ədəd<br><span class="text-muted">500 mL</span></td>
+                    <td class="text-center fw-bold"><span>1 ədəd</span><br><span class="text-muted">500 mL</span></td>
                     <td class="text-center fw-bold assignment-used-cell">0 mL</td>
                     <td class="text-center">
                         <span class="badge bg-light text-muted border d-inline-flex align-items-center gap-1">
-                            <i class="fa-regular fa-building"></i> Gözləyir
-                        </span>
+                            <i class="fa-regular fa-building"></i><span> Gözləyir
+                        </span></span>
                     </td>
                     <td class="text-center">
                         <span class="badge bg-warning-light text-warning d-inline-flex align-items-center gap-1">
-                            <i class="fa-regular fa-clock"></i> Gözləyir
-                        </span>
+                            <i class="fa-regular fa-clock"></i><span> Gözləyir
+                        </span></span>
                     </td>
                     <td class="text-center">
                         <span class="badge bg-secondary-light text-secondary d-inline-flex align-items-center gap-1">
-                            <i class="fa-solid fa-check"></i> Gözləyir
-                        </span>
+                            <i class="fa-solid fa-check"></i><span> Gözləyir
+                        </span></span>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-primary" type="button" aria-label="Qeydi redaktə et">
@@ -242,7 +242,7 @@
 
                     button.classList.remove('btn-outline-primary');
                     button.classList.add('btn-success');
-                    button.innerHTML = '<i class="fa-solid fa-check"></i><span class="fw-bold">İstifadə edildi</span>';
+                    button.innerHTML = '<i class="fa-solid fa-check"></i><span class="fw-bold">İstifadə edildi</span><span>';
                     button.disabled = true;
 
                     if (usedCell) {
@@ -252,7 +252,7 @@
                 });
             });
         });
-    </script>
+    </span></script>
 </div>
 </body>
 

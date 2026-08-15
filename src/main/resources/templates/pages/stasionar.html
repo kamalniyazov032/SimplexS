@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 
 <body>
@@ -13,19 +13,19 @@
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#stasionarSearchOffcanvas" aria-controls="stasionarSearchOffcanvas">
-                <i class="fa-solid fa-filter me-1"></i>Filter
-            </button>
+                <i class="fa-solid fa-filter me-1"></i><span>Filter
+            </span></button>
             <div class="btn-group mt-2 mt-md-0" role="group" aria-label="Çıxış filteri">
                 <button class="btn btn-outline-light bg-white text-dark" type="button">Çıxışı olan</button>
                 <button class="btn btn-outline-light bg-white text-dark" type="button">Çıxışı olmayan</button>
                 <button class="btn btn-outline-primary active" type="button">Hamısı</button>
             </div>
             <button class="btn btn-outline-primary mt-2 mt-md-0" type="button">
-                <i class="ti ti-arrows-exchange me-1"></i> Şöbə Həkimi Dəyiş
-            </button>
+                <i class="ti ti-arrows-exchange me-1"></i><span> Şöbə Həkimi Dəyiş
+            </span></button>
             <button class="btn btn-primary mt-2 mt-md-0" type="button">
-                <i class="ti ti-arrows-exchange me-1"></i> Şöbə köçür
-            </button>
+                <i class="ti ti-arrows-exchange me-1"></i><span> Şöbə köçür
+            </span></button>
         </div>
     </div>
 
@@ -33,8 +33,8 @@
          style="visibility: visible; top: 0;">
         <div class="offcanvas-header border-bottom bg-light">
             <h4 id="stasionarSearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
-                <i class="ti ti-filter me-2"></i>Stasionar Əməliyyatları üzrə Ətraflı Axtarış
-            </h4>
+                <i class="ti ti-filter me-2"></i><span>Stasionar Əməliyyatları üzrə Ətraflı Axtarış
+            </span></h4>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
         </div>
@@ -285,8 +285,8 @@
                                 <div class="modal-content">
                                     <div class="modal-header border-0 pb-0">
                                         <h5 class="modal-title fw-bold">
-                                            <i class="fa-solid fa-stethoscope me-2 text-info"></i> İlkin Diaqnoz
-                                        </h5>
+                                            <i class="fa-solid fa-stethoscope me-2 text-info"></i><span> İlkin Diaqnoz
+                                        </span></h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                     </div>
@@ -305,8 +305,8 @@
                                                     </select>
                                                 </div>
                                                 <button class="btn btn-primary px-4 fw-bold" type="button">
-                                                    <i class="fa-solid fa-plus me-1"></i> Əlavə et
-                                                </button>
+                                                    <i class="fa-solid fa-plus me-1"></i><span> Əlavə et
+                                                </span></button>
                                             </div>
                                         </div>
 
@@ -395,8 +395,8 @@
                     <div class="card border-0 shadow-sm rounded-3 mb-3">
                         <div class="card-header bg-white py-3 border-0">
                             <h6 class="fw-bold mb-0 text-dark">
-                                <i class="ti ti-heart-rate-monitor me-2 text-success"></i>Xəstəyə Görülən Xidmətlər
-                            </h6>
+                                <i class="ti ti-heart-rate-monitor me-2 text-success"></i><span>Xəstəyə Görülən Xidmətlər
+                            </span></h6>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive" style="max-height: 460px; overflow-y: auto;">
@@ -500,7 +500,7 @@
                             <span class="fw-bold text-dark small">İcbari Tibbi Sığorta</span>
                         </div>
                         <div class="mb-2 pb-2 border-bottom border-light">
-                            <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i>Ünvan:</span>
+                            <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i><span>Ünvan:</span></span>
                             <span class="fw-bold text-dark small">Bakı ş., Nəsimi r., 28 May küç., 15</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">

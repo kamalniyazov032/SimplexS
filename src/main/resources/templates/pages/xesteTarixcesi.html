@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/main}">
 
 <head>
@@ -53,8 +53,8 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-header">
                         <h4 class="card-title mb-0">
-                            <i class="ti ti-file-description text-primary me-2"></i> Protokol Kartı
-                            <span class="fw-bold text-danger">100325</span>
+                            <i class="ti ti-file-description text-primary me-2"></i><span> Protokol Kartı
+                            </span><span class="fw-bold text-danger">100325</span>
                         </h4>
                     </div>
                     <div class="card-body">
@@ -220,8 +220,8 @@
                 <div class="card shadow-sm">
                     <div class="card-header">
                         <h4 class="card-title mb-0">
-                            <i class="ti ti-file-description text-primary me-2"></i> Protokol Kartı
-                        </h4>
+                            <i class="ti ti-file-description text-primary me-2"></i><span> Protokol Kartı
+                        </span></h4>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -277,8 +277,8 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-header">
                         <h4 class="card-title mb-0">
-                            <i class="ti ti-building-hospital text-info me-2"></i> Şöbələr
-                        </h4>
+                            <i class="ti ti-building-hospital text-info me-2"></i><span> Şöbələr
+                        </span></h4>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -317,8 +317,8 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-header">
                         <h4 class="card-title mb-0">
-                            <i class="ti ti-stethoscope text-primary me-2"></i> Xidmətlər
-                        </h4>
+                            <i class="ti ti-stethoscope text-primary me-2"></i><span> Xidmətlər
+                        </span></h4>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -357,8 +357,8 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-header">
                         <h4 class="card-title mb-0">
-                            <i class="ti ti-notes-medical text-danger me-2"></i> Diaqnozlar
-                        </h4>
+                            <i class="ti ti-notes-medical text-danger me-2"></i><span> Diaqnozlar
+                        </span></h4>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">

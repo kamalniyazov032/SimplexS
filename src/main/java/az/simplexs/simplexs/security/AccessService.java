@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -19,10 +21,14 @@ import org.springframework.web.context.request.RequestContextHolder;
 public class AccessService {
     private static final long ROUTE_CACHE_NANOS=30_000_000_000L;
     private final NamedParameterJdbcTemplate jdbc;
+    private final MessageSource messages;
     private final Map<String,TimedValue<Boolean>> registeredRouteCache=new ConcurrentHashMap<>();
     private final Map<String,TimedValue<String>> permissionCache=new ConcurrentHashMap<>();
 
-    public AccessService(NamedParameterJdbcTemplate jdbc) { this.jdbc=jdbc; }
+    public AccessService(NamedParameterJdbcTemplate jdbc, MessageSource messages) {
+        this.jdbc=jdbc;
+        this.messages=messages;
+    }
 
     public Long firstClinicId(Authentication authentication) {
         List<Long> ids=clinicIds(authentication);
@@ -61,20 +67,25 @@ public class AccessService {
 
     public List<MenuSystem> menuSystems(Authentication authentication, Long clinicId) {
         Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return List.of();
+        String dil=LocaleContextHolder.getLocale().getLanguage();
         List<MenuRow> rows=readWithConnectionRetry(() -> jdbc.query("""
                 SELECT menu.*, sistem.id AS sistem_id, sistem.kod AS sistem_kodu,
-                       sistem.ad AS sistem_adi, sistem.ikon AS sistem_ikonu
+                       sistem.ad AS sistem_adi, sistem.ikon AS sistem_ikonu,
+                       mt.deyer AS tercume_modul_adi
                 FROM public.fn_personal_modul_siyahisi(:pid,:kid) menu
                 JOIN public.rn_modullar modul ON modul.id=menu.modul_id
                 JOIN public.rn_sistemler sistem ON sistem.id=modul.sistem_id AND sistem.aktiv
+                LEFT JOIN public.kn_diller dil ON dil.kod=:dil AND dil.aktiv
+                LEFT JOIN public.kn_melumat_tercumeleri mt ON mt.melumat_novu='MODUL'
+                     AND mt.menbe_id=menu.modul_id AND mt.saha='ad' AND mt.dil_id=dil.id
                 ORDER BY sistem.sira_no NULLS LAST, menu.sira_no NULLS LAST, menu.modul_adi
                 """,
-            new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId),
+            new MapSqlParameterSource("pid",personalId).addValue("kid",clinicId).addValue("dil",dil),
             (rs,row)->new MenuRow(rs.getObject("sistem_id",Long.class),rs.getString("sistem_kodu"),
-                rs.getString("sistem_adi"),rs.getString("sistem_ikonu"),
+                localized("menu.system.",rs.getString("sistem_kodu"),rs.getString("sistem_adi")),rs.getString("sistem_ikonu"),
                 new MenuModule(rs.getLong("modul_id"),rs.getObject("parent_id",Long.class),
-                    rs.getString("modul_kodu"),rs.getString("modul_adi"),rs.getString("route"),rs.getString("ikon")))));
-        List<MenuModule> flat=rows.stream().map(MenuRow::module).toList();
+                    rs.getString("modul_kodu"),firstNonBlank(rs.getString("tercume_modul_adi"),localized("menu.module.",rs.getString("modul_kodu"),rs.getString("modul_adi"))),rs.getString("route"),rs.getString("ikon")))));
+        List<MenuModule> flat=rows.stream().map(row -> row.module()).toList();
         Map<Long,MenuModule> byId=new LinkedHashMap<>(); flat.forEach(m->byId.put(m.getId(),m));
         Map<Long,MenuSystem> systems=new LinkedHashMap<>();
         for(MenuRow row:rows) {
@@ -87,6 +98,12 @@ public class AccessService {
         }
         return new ArrayList<>(systems.values());
     }
+
+    private String localized(String prefix,String code,String fallback) {
+        if(code==null||code.isBlank())return fallback;
+        return messages.getMessage(prefix+code.toLowerCase(java.util.Locale.ROOT),null,fallback,LocaleContextHolder.getLocale());
+    }
+    private static String firstNonBlank(String value,String fallback){return value==null||value.isBlank()?fallback:value;}
 
     private record MenuRow(Long systemId, String systemCode, String systemName,
             String systemIcon, MenuModule module) {}

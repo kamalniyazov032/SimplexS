@@ -44,12 +44,12 @@
                     <form th:action="@{/klinika-sec}" method="post" class="m-0">
                         <input type="hidden" name="redirectUrl" th:value="${currentRequestUri}">
                         <select name="klinikaId"
-                                aria-label="Klinika seçimi"
+                                aria-label="Klinika seçimi" th:aria-label="#{header.clinic.select}"
                                 class="form-select form-select-sm border-0 bg-transparent shadow-none fw-bold p-0"
                                 style="font-size: 13px; color: #3d5ee1; width: auto; min-width: 150px; cursor: pointer;"
                                 th:disabled="${#lists.isEmpty(klinikalar)}"
                                 onchange="this.form.submit()">
-                            <option th:if="${#lists.isEmpty(klinikalar)}" value="">Aktiv klinika yoxdur</option>
+                            <option th:if="${#lists.isEmpty(klinikalar)}" value="" th:text="#{header.clinic.empty}">Aktiv klinika yoxdur</option>
                             <option th:each="klinika : ${klinikalar}"
                                     th:value="${klinika.klinikaId}"
                                     th:text="${klinika.klinikaAdi}"
@@ -70,7 +70,7 @@
 
             <div class="me-auto d-flex align-items-center header-search d-lg-none d-sm-flex d-none">
                 <div class="input-icon position-relative me-2">
-                    <input type="text" class="form-control" placeholder="Search Keyword">
+                    <input type="text" class="form-control" placeholder="Search Keyword" th:placeholder="#{common.search_keyword}">
                     <span class="input-icon-addon d-inline-flex p-0 header-search-icon">
                         <i class="ti ti-command"></i>
                     </span>
@@ -89,26 +89,13 @@
             <!-- Language -->
             <div class="header-item">
                 <div class="dropdown me-2">
-                    <button class="topbar-link btn" data-bs-toggle="dropdown" data-bs-offset="0,24" type="button">
-                        <img src="/assets/img/flags/us.svg" alt="flags" height="16">
+                    <button class="topbar-link btn" data-bs-toggle="dropdown" data-bs-offset="0,24" type="button" th:title="#{header.language}">
+                        <i class="ti ti-language fs-18"></i><span class="ms-1 text-uppercase small" th:text="${#locale.language}">AZ</span>
                     </button>
 
                     <div class="dropdown-menu dropdown-menu-end p-2">
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="/assets/img/flags/us.svg" class="me-1" height="16">
-                            <span class="align-middle">English</span>
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="/assets/img/flags/de.svg" class="me-1" height="16">
-                            <span class="align-middle">German</span>
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="/assets/img/flags/fr.svg" class="me-1" height="16">
-                            <span class="align-middle">French</span>
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="/assets/img/flags/ae.svg" class="me-1" height="16">
-                            <span class="align-middle">Arabic</span>
+                        <a th:each="d:${aktivDiller}" th:href="@{${currentRequestUri}(lang=${d.kod})}" class="dropdown-item d-flex justify-content-between gap-3" th:classappend="${#locale.language==d.kod}?' active':''">
+                            <span class="align-middle" th:text="${d.yerliAd}"></span><small class="text-uppercase" th:text="${d.kod}"></small>
                         </a>
                     </div>
                 </div>
@@ -127,18 +114,18 @@
 
                     <div class="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style="min-height: 300px;">
                         <div class="p-2 border-bottom">
-                            <h6 class="m-0 fs-16 fw-semibold">Notifications</h6>
+                            <h6 class="m-0 fs-16 fw-semibold" th:text="#{header.notifications}">Bildirişlər</h6>
                         </div>
 
                         <div class="notification-body position-relative z-2 rounded-0" data-simplebar>
                             <div class="dropdown-item notification-item py-3 text-wrap border-bottom">
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
-                                        <p class="mb-0 fw-medium text-dark">SimplexS</p>
-                                        <p class="mb-1 text-wrap">Yeni bildiriş nümunəsi</p>
+                                        <p class="mb-0 fw-medium text-dark" th:text="#{common.simplexs}">SimplexS</p>
+                                        <p class="mb-1 text-wrap" th:text="#{common.yeni_bildiris_numunesi}">Yeni bildiriş nümunəsi</p>
                                         <span class="fs-12">
-                                            <i class="ti ti-clock me-1"></i>Now
-                                        </span>
+                                            <i class="ti ti-clock me-1"></i><span th:text="#{common.now}">Now
+                                        </span></span>
                                     </div>
                                 </div>
                             </div>

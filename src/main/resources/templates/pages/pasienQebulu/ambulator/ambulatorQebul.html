@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az"
+<html lang="az" th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
@@ -24,15 +24,15 @@
                     data-bs-toggle="offcanvas"
                     data-bs-target="#ambulatorSearchOffcanvas"
                     aria-controls="ambulatorSearchOffcanvas">
-                <i class="ti ti-filter me-1"></i>Filter
-            </button>
+                <i class="ti ti-filter me-1"></i><span>Filter
+            </span></button>
 
             <button type="button"
                     class="btn btn-primary d-flex align-items-center"
                     data-bs-toggle="modal"
                     data-bs-target="#addCustomerModal">
-                <i class="ti ti-plus me-1"></i> Qeydçi / Əlavə et
-            </button>
+                <i class="ti ti-plus me-1"></i><span> Qeydçi / Əlavə et
+            </span></button>
         </div>
     </div>
     <!-- /Page Header -->
@@ -40,8 +40,8 @@
     <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="ambulatorSearchOffcanvas">
         <div class="offcanvas-header border-bottom bg-light">
             <h4 id="ambulatorSearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
-                <i class="ti ti-filter me-2"></i>Ambulator pasient üzrə ətraflı axtarış
-            </h4>
+                <i class="ti ti-filter me-2"></i><span>Ambulator pasient üzrə ətraflı axtarış
+            </span></h4>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
 
@@ -153,8 +153,8 @@
                                         th:data-fin="${patient.finCode()}"
                                         th:data-phone="${patient.mobilePhone()}"
                                         th:data-work="${patient.workplace()}">
-                                    <i class="ti ti-user-circle me-1"></i>Ambulator kart
-                                </button>
+                                    <i class="ti ti-user-circle me-1"></i><span>Ambulator kart
+                                </span></button>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" aria-label="Düzəliş et">
                                     <i class="ti ti-edit"></i>
                                 </a>
@@ -615,8 +615,8 @@
                     <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="ti ti-device-floppy me-1"></i>Yadda Saxla
-                        </button>
+                            <i class="ti ti-device-floppy me-1"></i><span>Yadda Saxla
+                        </span></button>
                     </div>
                 </form>
             </div>

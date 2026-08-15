@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az"
+<html lang="az" th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
@@ -74,8 +74,8 @@
 
                     <div class="col-md-2">
                         <button class="btn btn-primary w-100 fw-bold py-2">
-                            <i class="ti ti-search me-1"></i> AXTAR
-                        </button>
+                            <i class="ti ti-search me-1"></i><span> AXTAR
+                        </span></button>
                     </div>
                 </div>
             </div>
@@ -165,8 +165,8 @@
                 <div class="col-md-7">
                     <div class="d-flex flex-column h-100">
                         <label class="form-label fw-bold small text-muted d-flex align-items-center">
-                            <i class="ti ti-notes me-1 fs-16"></i> ƏLAVƏ QEYD
-                        </label>
+                            <i class="ti ti-notes me-1 fs-16"></i><span> ƏLAVƏ QEYD
+                        </span></label>
                         <textarea class="form-control flex-fill border-2" rows="3"
                                   placeholder="Bura ödənişlə bağlı xüsusi qeydlərinizi daxil edin..."
                                   style="resize: none; border-style: dashed;"></textarea>

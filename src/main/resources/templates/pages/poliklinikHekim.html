@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/main}">
 
 <head>
@@ -16,8 +16,8 @@
             <div class="d-flex align-items-center flex-wrap gap-2">
                 <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#poliklinikSearchOffcanvas" aria-controls="poliklinikSearchOffcanvas">
-                    <i class="fa-solid fa-filter me-1"></i>Filter
-                </button>
+                    <i class="fa-solid fa-filter me-1"></i><span>Filter
+                </span></button>
             </div>
         </div>
 
@@ -25,8 +25,8 @@
             style="visibility: visible; top: 0;">
             <div class="offcanvas-header border-bottom bg-light">
                 <h4 id="poliklinikSearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
-                    <i class="ti ti-filter me-2"></i>Poliklinik Əməliyyatları üzrə Ətraflı Axtarış
-                </h4>
+                    <i class="ti ti-filter me-2"></i><span>Poliklinik Əməliyyatları üzrə Ətraflı Axtarış
+                </span></h4>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
             </div>
@@ -510,8 +510,8 @@
                                     <div class="modal-content">
                                         <div class="modal-header border-0 pb-0">
                                             <h5 class="modal-title fw-bold">
-                                                <i class="fa-solid fa-stethoscope me-2 text-info"></i> İlkin Diaqnoz
-                                            </h5>
+                                                <i class="fa-solid fa-stethoscope me-2 text-info"></i><span> İlkin Diaqnoz
+                                            </span></h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
@@ -535,8 +535,8 @@
                                                         </div>
 
                                                         <button class="btn btn-primary px-4 fw-bold" type="button">
-                                                            <i class="fa-solid fa-plus me-1"></i> Əlavə et
-                                                        </button>
+                                                            <i class="fa-solid fa-plus me-1"></i><span> Əlavə et
+                                                        </span></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -650,8 +650,8 @@
                 <div class="card border-0 shadow-sm rounded-3 mb-3">
                     <div class="card-header bg-white py-3 border-0">
                         <h6 class="fw-bold mb-0 text-dark"><i
-                                class="ti ti-heart-rate-monitor me-2 text-success"></i>Xəstəyə
-                            Görülən Xidmətlər</h6>
+                                class="ti ti-heart-rate-monitor me-2 text-success"></i><span>Xəstəyə
+                            Görülən Xidmətlər</span></h6>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive" style="max-height: 460px; overflow-y: auto;">
@@ -820,7 +820,7 @@
                             </div>
 
                             <div class="mb-2 pb-2 border-bottom border-light">
-                                <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i>Ünvan:</span>
+                                <span class="text-muted small d-block"><i class="ti ti-map-pin me-1"></i><span>Ünvan:</span></span>
                                 <span class="fw-bold text-dark small">Bakı ş., Nəsimi r., 28 may küç., 15</span>
                             </div>
 
@@ -840,7 +840,7 @@
                 <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-header bg-light-gray py-2">
                         <h6 class="fw-bold mb-0 small text-dark"><i
-                                class="ti ti-user-edit me-2 text-danger"></i>Qeydiyyat Məlumatı</h6>
+                                class="ti ti-user-edit me-2 text-danger"></i><span>Qeydiyyat Məlumatı</span></h6>
                     </div>
                     <div class="card-body p-3">
                         <div class="bg-light rounded p-2 border-start border-danger border-3 shadow-xs">

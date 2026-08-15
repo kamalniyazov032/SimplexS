@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
 
             if (!selectedStart || !selectedEnd) {
-                alert('Əvvəlcə calendar-da saat seçin.');
+                alert(window.SimplexI18n.calendarSelectTime);
                 return;
             }
 
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const yasadigiUnvan = addCustomerForm.querySelector('[name="yasadigiUnvan"]')?.value.trim() || '';
 
             if (!ad) {
-                alert('Ad sahəsini doldurun.');
+                alert(window.SimplexI18n.nameRequired);
                 return;
             }
 

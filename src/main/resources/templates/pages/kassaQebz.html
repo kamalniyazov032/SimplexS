@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az"
+<html lang="az" th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
@@ -14,15 +14,15 @@
 
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
-            <h4 class="mb-1 fw-bold text-dark"><i class="ti ti-cash-banknote me-2"></i>Kassa hərəkətləri</h4>
+            <h4 class="mb-1 fw-bold text-dark"><i class="ti ti-cash-banknote me-2"></i><span>Kassa hərəkətləri</span></h4>
             <p class="mb-0 text-muted small">Maliyyə əməliyyatlarının monitorinqi və hesabatlığı</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-white border shadow-sm"><i class="ti ti-printer me-1"></i> Çap et</button>
+            <button class="btn btn-white border shadow-sm"><i class="ti ti-printer me-1"></i><span> Çap et</span></button>
             <button class="btn btn-primary shadow-sm">Ümumi Hesabat</button>
             <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><i class="fa-solid fa-filter me-1"></i>Filter
-            </button>
+                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><i class="fa-solid fa-filter me-1"></i><span>Filter
+            </span></button>
         </div>
     </div>
 
@@ -30,8 +30,8 @@
          style="visibility: visible; top: 0;">
         <div class="offcanvas-header border-bottom bg-light">
             <h4 id="offcanvasTopLabel" class="mb-0 fw-bold text-primary">
-                <i class="ti ti-filter me-2"></i>Kassa Əməliyyatları üzrə Ətraflı Axtarış
-            </h4>
+                <i class="ti ti-filter me-2"></i><span>Kassa Əməliyyatları üzrə Ətraflı Axtarış
+            </span></h4>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
 
@@ -156,8 +156,8 @@
                     <div class="col-md-12">
                         <br>
                         <button class="btn btn-primary btn-lg">
-                            <i class="ti ti-search me-1"></i> Filtirlə
-                        </button>
+                            <i class="ti ti-search me-1"></i><span> Filtirlə
+                        </span></button>
                     </div>
                 </div>
             </div>

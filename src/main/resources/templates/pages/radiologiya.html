@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/main}">
 
 <body>
@@ -13,11 +13,11 @@
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#radiologySearchOffcanvas" aria-controls="radiologySearchOffcanvas">
-                    <i class="fa-solid fa-filter me-1"></i>Filter
-                </button>
+                    <i class="fa-solid fa-filter me-1"></i><span>Filter
+                </span></button>
                 <button class="btn btn-outline-light bg-white text-dark mt-2 mt-md-0" type="button">
-                    <i class="ti ti-printer me-1"></i> ÇAP ET
-                </button>
+                    <i class="ti ti-printer me-1"></i><span> ÇAP ET
+                </span></button>
                 <button class="btn btn-primary mt-2 mt-md-0" type="button">HESABATI YADDA SAXLA</button>
             </div>
         </div>
@@ -27,8 +27,8 @@
             style="visibility: visible; top: 0;">
             <div class="offcanvas-header border-bottom bg-light">
                 <h4 id="radiologySearchOffcanvasLabel" class="mb-0 fw-bold text-primary">
-                    <i class="ti ti-filter me-2"></i>Radiologiya Əməliyyatları üzrə Ətraflı Axtarış
-                </h4>
+                    <i class="ti ti-filter me-2"></i><span>Radiologiya Əməliyyatları üzrə Ətraflı Axtarış
+                </span></h4>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
             </div>

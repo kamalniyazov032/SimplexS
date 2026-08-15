@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/main}">
 
 <head>
@@ -21,8 +21,8 @@
             </div>
              <div class="d-flex gap-2">
             <button type="button" class="btn btn-primary shadow-primary" data-bs-toggle="modal" data-bs-target="#addDiagnosisModal">
-    <i class="ti ti-plus me-1"></i> Yeni diaqnoz əlavə et
-</button>
+    <i class="ti ti-plus me-1"></i><span> Yeni diaqnoz əlavə et
+</span></button>
             </div>
         </div>
          
@@ -31,7 +31,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-primary-light">
-                <h5 class="modal-title text-primary"><i class="fa-solid fa-notes-medical me-2"></i>Yeni Diaqnoz Əlavə Et</h5>
+                <h5 class="modal-title text-primary"><i class="fa-solid fa-notes-medical me-2"></i><span>Yeni Diaqnoz Əlavə Et</span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -101,8 +101,8 @@
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light btn-sm px-4" data-bs-dismiss="modal">Ləğv et</button>
                 <button type="submit" form="diagnosisForm" class="btn btn-primary btn-sm px-4 shadow-primary">
-                    <i class="fa-solid fa-check me-1"></i> Təsdiqlə
-                </button>
+                    <i class="fa-solid fa-check me-1"></i><span> Təsdiqlə
+                </span></button>
             </div>
         </div>
     </div>
@@ -115,11 +115,11 @@
                             <thead style="font-size: small">
                             <tr>
                                 <th>#</th>
-                                <th><i class="fa-solid fa-calendar-day me-1"></i> Tarix</th>
-                                <th><i class="fa-solid fa-barcode me-1"></i> Kod</th>
-                                <th><i class="fa-solid fa-notes-medical me-1"></i> Diaqnoz adı</th>
-                                <th><i class="fa-solid fa-layer-group me-1"></i> Sinif</th>
-                                <th><i class="fa-solid fa-user-doctor me-1"></i> Həkim</th>
+                                <th><i class="fa-solid fa-calendar-day me-1"></i><span> Tarix</span></th>
+                                <th><i class="fa-solid fa-barcode me-1"></i><span> Kod</span></th>
+                                <th><i class="fa-solid fa-notes-medical me-1"></i><span> Diaqnoz adı</span></th>
+                                <th><i class="fa-solid fa-layer-group me-1"></i><span> Sinif</span></th>
+                                <th><i class="fa-solid fa-user-doctor me-1"></i><span> Həkim</span></th>
                                 <th>Açıqlama</th>
                             </tr>
                         </thead>

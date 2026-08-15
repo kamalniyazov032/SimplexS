@@ -45,15 +45,16 @@ public class XidmetController {
             @RequestParam(required=false)String q,Model m,HttpSession session){
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
-        Long kid=klinikaId(session);var all=repo.xidmetler(kid,qrupId);
+        Long kid=klinikaId(session);var qruplar=repo.qruplar(kid);var all=repo.xidmetler(kid,qrupId);
         var filtered=all.stream()
                 .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
                 .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
                 .filter(x->selectedStatus.isBlank()||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
                 .filter(x->matches(x,q)).toList();
         m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",filtered.size());
-        m.addAttribute("filterApplied",qrupId!=null||xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(q));
-        m.addAttribute("qruplar",repo.qruplar(kid));m.addAttribute("selectedQrupId",qrupId);
+        m.addAttribute("filterApplied",xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(q));
+        m.addAttribute("qruplar",qruplar);m.addAttribute("selectedQrupId",qrupId);
+        m.addAttribute("selectedQrup",qruplar.stream().filter(x->x.id().equals(qrupId)).findFirst().orElse(null));
         m.addAttribute("selectedXidmetTipiId",xidmetTipiId);m.addAttribute("selectedMuhasibatKoduId",muhasibatKoduId);
         m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("q",q);
         m.addAttribute("muhasibatKodlari",repo.muhasibatKodlari(kid));m.addAttribute("xidmetTipleri",repo.xidmetTipleri());

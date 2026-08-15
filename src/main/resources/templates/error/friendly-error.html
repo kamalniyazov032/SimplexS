@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,17 +28,17 @@
             <p class="text-muted mb-4" th:text="${errorAction}"></p>
 
             <div class="reference-box p-3 mb-4">
-                <div class="small text-muted mb-1"><i class="ti ti-ticket me-1"></i>Texniki dəstəyə veriləcək xəta kodu</div>
+                <div class="small text-muted mb-1"><i class="ti ti-ticket me-1"></i><span th:text="#{common.texniki_desteye_verilecek_xeta_ko}">Texniki dəstəyə veriləcək xəta kodu</span></div>
                 <div class="fw-bold fs-5 text-dark user-select-all" th:text="${errorReference}">XXXXXXXX</div>
             </div>
 
             <div class="d-flex justify-content-center gap-2 flex-wrap">
                 <button class="btn btn-primary px-4" type="button" onclick="window.location.reload()">
-                    <i class="ti ti-refresh me-1"></i>Yenidən yoxla
-                </button>
+                    <i class="ti ti-refresh me-1"></i><span th:text="#{common.yeniden_yoxla}">Yenidən yoxla
+                </span></button>
                 <button class="btn btn-light px-4" type="button" onclick="history.length > 1 ? history.back() : window.location.assign('/dashboard')">
-                    <i class="ti ti-arrow-left me-1"></i>Geri qayıt
-                </button>
+                    <i class="ti ti-arrow-left me-1"></i><span th:text="#{common.geri_qayit}">Geri qayıt
+                </span></button>
             </div>
         </div>
     </section>

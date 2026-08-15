@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <body>
 <div layout:fragment="content">
@@ -34,56 +34,56 @@
     </style>
     <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
         <div>
-            <h4 class="mb-1">Rollar və səlahiyyətlər</h4>
-            <p class="mb-0 text-muted">Rolu seçin, modulları və icazələri tablar üzrə idarə edin.</p>
+            <h4 class="mb-1" th:text="#{roles.rollar_ve_selahiyyetler}">Rollar və səlahiyyətlər</h4>
+            <p class="mb-0 text-muted" th:text="#{roles.rolu_secin_modullari_ve_icazeleri}">Rolu seçin, modulları və icazələri tablar üzrə idarə edin.</p>
         </div>
         <div class="d-flex gap-2">
             <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#rolePermissionFilter" aria-controls="rolePermissionFilter">
-                <i class="ti ti-filter me-1"></i>Filter
-                <span id="roleFilterBadge" class="badge bg-white text-primary ms-2 d-none">Aktiv</span>
+                <i class="ti ti-filter me-1"></i><span th:text="#{common.filter}">Filter
+                </span><span id="roleFilterBadge" class="badge bg-white text-primary ms-2 d-none" th:text="#{common.aktiv}">Aktiv</span>
             </button>
             <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'ROL_IDARE_ET')}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRoleModal">
-                <i class="ti ti-plus me-1"></i>Yeni rol
-            </button>
+                <i class="ti ti-plus me-1"></i><span th:text="#{roles.yeni_rol}">Yeni rol
+            </span></button>
         </div>
     </div>
 
     <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="rolePermissionFilter"
          style="--bs-offcanvas-height: 190px !important; height: 190px !important; min-height: 190px !important; max-height: 190px !important;">
         <div class="offcanvas-header border-bottom bg-light py-3">
-            <h5 class="mb-0 fw-bold text-primary"><i class="ti ti-filter me-2"></i>Rolun modul və səlahiyyətləri üzrə filter</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla"></button>
+            <h5 class="mb-0 fw-bold text-primary"><i class="ti ti-filter me-2"></i><span th:text="#{roles.rolun_modul_ve_selahiyyetleri_uzre}">Rolun modul və səlahiyyətləri üzrə filter</span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
         </div>
         <div class="offcanvas-body py-3">
             <div class="row g-2 align-items-end">
                 <div class="col-lg-3 col-md-6">
-                    <label class="form-label small text-muted" for="roleStatusFilter"><i class="ti ti-user-shield me-1"></i>Rol statusu</label>
+                    <label class="form-label small text-muted" for="roleStatusFilter"><i class="ti ti-user-shield me-1"></i><span th:text="#{roles.rol_statusu}">Rol statusu</span></label>
                     <select class="form-select" id="roleStatusFilter" th:data-initial="${selectedRoleStatus}">
-                        <option value="">Bütün statuslar</option>
-                        <option value="aktiv" th:selected="${selectedRoleStatus == 'aktiv'}">Aktiv</option>
-                        <option value="passiv" th:selected="${selectedRoleStatus == 'passiv'}">Passiv</option>
+                        <option value="" th:text="#{common.butun_statuslar}">Bütün statuslar</option>
+                        <option value="aktiv" th:selected="${selectedRoleStatus == 'aktiv'}" th:text="#{common.aktiv}">Aktiv</option>
+                        <option value="passiv" th:selected="${selectedRoleStatus == 'passiv'}" th:text="#{common.passiv}">Passiv</option>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <label class="form-label small text-muted" for="moduleSelectionFilter"><i class="ti ti-layout-grid me-1"></i>Modullar</label>
+                    <label class="form-label small text-muted" for="moduleSelectionFilter"><i class="ti ti-layout-grid me-1"></i><span th:text="#{roles.modullar}">Modullar</span></label>
                     <select class="form-select" id="moduleSelectionFilter">
-                        <option value="all">Bütün modullar</option>
-                        <option value="selected">Seçilmiş modullar</option>
-                        <option value="unselected">Seçilməmiş modullar</option>
+                        <option value="all" th:text="#{roles.butun_modullar}">Bütün modullar</option>
+                        <option value="selected" th:text="#{roles.secilmis_modullar}">Seçilmiş modullar</option>
+                        <option value="unselected" th:text="#{roles.secilmemis_modullar}">Seçilməmiş modullar</option>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <label class="form-label small text-muted" for="permissionSelectionFilter"><i class="ti ti-key me-1"></i>Səlahiyyətlər</label>
+                    <label class="form-label small text-muted" for="permissionSelectionFilter"><i class="ti ti-key me-1"></i><span th:text="#{roles.selahiyyetler}">Səlahiyyətlər</span></label>
                     <select class="form-select" id="permissionSelectionFilter">
-                        <option value="all">Bütün səlahiyyətlər</option>
-                        <option value="selected">Seçilmiş səlahiyyətlər</option>
-                        <option value="unselected">Seçilməmiş səlahiyyətlər</option>
+                        <option value="all" th:text="#{roles.butun_selahiyyetler}">Bütün səlahiyyətlər</option>
+                        <option value="selected" th:text="#{roles.secilmis_selahiyyetler}">Seçilmiş səlahiyyətlər</option>
+                        <option value="unselected" th:text="#{roles.secilmemis_selahiyyetler}">Seçilməmiş səlahiyyətlər</option>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex gap-2">
-                        <button class="btn btn-primary flex-fill" type="button" id="applyRoleFilter"><i class="ti ti-search me-1"></i>Tətbiq et</button>
-                        <button class="btn btn-light flex-fill" type="button" id="clearRoleFilter"><i class="ti ti-x me-1"></i>Təmizlə</button>
+                        <button class="btn btn-primary flex-fill" type="button" id="applyRoleFilter"><i class="ti ti-search me-1"></i><span th:text="#{common.tetbiq_et}">Tətbiq et</span></button>
+                        <button class="btn btn-light flex-fill" type="button" id="clearRoleFilter"><i class="ti ti-x me-1"></i><span th:text="#{common.temizle}">Təmizlə</span></button>
                     </div>
                 </div>
             </div>
@@ -102,11 +102,11 @@
     <div class="role-workspace">
     <aside class="card border-0 shadow-sm role-sidebar">
         <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-            <h6 class="mb-0"><i class="ti ti-users-group text-primary me-2"></i>Rollar</h6>
+            <h6 class="mb-0"><i class="ti ti-users-group text-primary me-2"></i><span th:text="#{roles.rollar}">Rollar</span></h6>
             <span class="badge bg-primary-subtle text-primary" th:text="${#lists.size(rollar)} + ' rol'">0 rol</span>
         </div>
         <div class="role-search">
-            <div class="input-group mb-2"><span class="input-group-text"><i class="ti ti-search"></i></span><input class="form-control" id="roleSearch" type="search" placeholder="Rol axtar..." aria-label="Rol axtarışı"></div>
+            <div class="input-group mb-2"><span class="input-group-text"><i class="ti ti-search"></i></span><input class="form-control" id="roleSearch" type="search" placeholder="Rol axtar..." aria-label="Rol axtarışı" th:placeholder="#{roles.rol_axtar}" th:aria-label="#{roles.rol_axtarisi}"></div>
         </div>
         <div class="card-body">
             <ul class="nav nav-pills flex-column role-list" id="roleList" role="list">
@@ -116,14 +116,14 @@
                        th:href="@{/rollar(rolId=${rol.rolId},status=${selectedRoleStatus})}">
                         <i class="ti" th:classappend="${rol.sistemRoludur} ? 'ti-shield-lock' : 'ti-user-shield'"></i>
                         <span class="text-truncate flex-grow-1" th:text="${rol.rolAdi}">Rol</span>
-                        <span th:unless="${rol.aktiv}" class="badge bg-danger-subtle text-danger">Passiv</span>
-                        <span th:if="${rol.aktiv}" class="role-status-dot" title="Aktiv"></span>
+                        <span th:unless="${rol.aktiv}" class="badge bg-danger-subtle text-danger" th:text="#{common.passiv}">Passiv</span>
+                        <span th:if="${rol.aktiv}" class="role-status-dot" title="Aktiv" th:title="#{common.aktiv}"></span>
                     </a>
                 </li>
             </ul>
             <div th:if="${#lists.isEmpty(rollar)}" class="text-center text-muted py-4">
-                <i class="ti ti-shield-off fs-2 d-block mb-2"></i>Hələ rol yaradılmayıb.
-            </div>
+                <i class="ti ti-shield-off fs-2 d-block mb-2"></i><span th:text="#{roles.hele_rol_yaradilmayib}">Hələ rol yaradılmayıb.
+            </span></div>
         </div>
         <div class="role-sidebar-footer"><i class="ti ti-users-group me-2"></i><span th:text="|'Ümumi rol sayı: ' + ${#lists.size(rollar)}|">Ümumi rol sayı: 0</span></div>
     </aside>
@@ -132,8 +132,8 @@
 
     <div th:if="${selectedRolId == null}" class="card border-0 shadow-sm">
         <div class="card-body text-center text-muted py-5">
-            <i class="ti ti-click fs-1 d-block mb-3"></i>Modul və səlahiyyətləri görmək üçün rol seçin.
-        </div>
+            <i class="ti ti-click fs-1 d-block mb-3"></i><span th:text="#{roles.modul_ve_selahiyyetleri_gormek_ucu}">Modul və səlahiyyətləri görmək üçün rol seçin.
+        </span></div>
     </div>
 
     <div th:if="${selectedRolId != null}" class="card border-0 shadow-sm">
@@ -144,7 +144,7 @@
                     <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <h5 class="mb-0" th:text="${selectedRol.rolAdi}">Rol</h5>
-                        <span th:if="${selectedRol.sistemRoludur}" class="badge bg-warning-subtle text-warning">Sistem rolu</span>
+                        <span th:if="${selectedRol.sistemRoludur}" class="badge bg-warning-subtle text-warning" th:text="#{roles.sistem_rolu}">Sistem rolu</span>
                         <span class="badge" th:classappend="${selectedRol.aktiv} ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'"
                               th:text="${selectedRol.aktiv} ? 'Aktiv' : 'Passiv'">Aktiv</span>
                     </div>
@@ -154,8 +154,8 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal">
-                        <i class="ti ti-edit me-1"></i>Redaktə
-                    </button>
+                        <i class="ti ti-edit me-1"></i><span th:text="#{common.redakte}">Redaktə
+                    </span></button>
                 </div>
             </div>
         </div>
@@ -166,20 +166,20 @@
                 <ul class="nav nav-tabs nav-tabs-bottom px-4 pt-3" id="permissionTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active px-4" id="modules-tab" data-bs-toggle="tab" data-bs-target="#modules-pane" type="button" role="tab">
-                            <i class="ti ti-layout-grid me-2"></i>Modullar
-                            <span class="badge bg-light text-dark ms-1" th:text="${#lists.size(modullar)}">0</span>
+                            <i class="ti ti-layout-grid me-2"></i><span th:text="#{roles.modullar}">Modullar
+                            </span><span class="badge bg-light text-dark ms-1" th:text="${#lists.size(modullar)}">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link px-4" id="personals-tab" data-bs-toggle="tab" data-bs-target="#personals-pane" type="button" role="tab">
-                            <i class="ti ti-users me-2"></i>Personallar
-                            <span class="badge bg-light text-dark ms-1" th:text="${#lists.size(rolaBagliPersonallar)}">0</span>
+                            <i class="ti ti-users me-2"></i><span th:text="#{roles.personallar}">Personallar
+                            </span><span class="badge bg-light text-dark ms-1" th:text="${#lists.size(rolaBagliPersonallar)}">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link px-4" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions-pane" type="button" role="tab">
-                            <i class="ti ti-key me-2"></i>Səlahiyyətlər
-                            <span class="badge bg-light text-dark ms-1" th:text="${#lists.size(selahiyyetler)}">0</span>
+                            <i class="ti ti-key me-2"></i><span th:text="#{roles.selahiyyetler}">Səlahiyyətlər
+                            </span><span class="badge bg-light text-dark ms-1" th:text="${#lists.size(selahiyyetler)}">0</span>
                         </button>
                     </li>
                 </ul>
@@ -187,10 +187,10 @@
                 <div class="tab-content p-4">
                     <div class="tab-pane fade show active" id="modules-pane" role="tabpanel" aria-labelledby="modules-tab">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <div><h6 class="mb-1">Sistem modulları</h6><small class="text-muted">Rolun görə biləcəyi menyu və modulları seçin.</small></div>
+                            <div><h6 class="mb-1" th:text="#{roles.sistem_modullari}">Sistem modulları</h6><small class="text-muted" th:text="#{roles.rolun_gore_bileceyi_menyu_ve_modul}">Rolun görə biləcəyi menyu və modulları seçin.</small></div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#modules-pane input[type=checkbox]').forEach(x=>x.checked=true)">Hamısını seç</button>
-                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#modules-pane input[type=checkbox]').forEach(x=>x.checked=false)">Təmizlə</button>
+                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#modules-pane input[type=checkbox]').forEach(x=>x.checked=true)" th:text="#{roles.hamisini_sec}">Hamısını seç</button>
+                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#modules-pane input[type=checkbox]').forEach(x=>x.checked=false)" th:text="#{common.temizle}">Təmizlə</button>
                             </div>
                         </div>
                         <div class="row g-3">
@@ -207,24 +207,24 @@
                                 </label>
                             </div>
                         </div>
-                        <div th:if="${#lists.isEmpty(modullar)}" class="text-center text-muted py-5">Modul tapılmadı.</div>
-                        <div id="moduleFilterEmpty" class="text-center text-muted py-5 d-none"><i class="ti ti-filter-off fs-2 d-block mb-2"></i>Filterə uyğun modul tapılmadı.</div>
+                        <div th:if="${#lists.isEmpty(modullar)}" class="text-center text-muted py-5" th:text="#{roles.modul_tapilmadi}">Modul tapılmadı.</div>
+                        <div id="moduleFilterEmpty" class="text-center text-muted py-5 d-none"><i class="ti ti-filter-off fs-2 d-block mb-2"></i><span th:text="#{roles.filtere_uygun_modul_tapilmadi}">Filterə uyğun modul tapılmadı.</span></div>
                     </div>
 
                     <div class="tab-pane fade" id="permissions-pane" role="tabpanel" aria-labelledby="permissions-tab">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <div><h6 class="mb-1">Əməliyyat səlahiyyətləri</h6><small class="text-muted">Rolun modullar daxilində edə biləcəyi əməliyyatları seçin.</small></div>
+                            <div><h6 class="mb-1" th:text="#{roles.emeliyyat_selahiyyetleri}">Əməliyyat səlahiyyətləri</h6><small class="text-muted" th:text="#{roles.rolun_modullar_daxilinde_ede_bilec}">Rolun modullar daxilində edə biləcəyi əməliyyatları seçin.</small></div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#permissions-pane input[type=checkbox]').forEach(x=>x.checked=true)">Hamısını seç</button>
-                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#permissions-pane input[type=checkbox]').forEach(x=>x.checked=false)">Təmizlə</button>
+                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#permissions-pane input[type=checkbox]').forEach(x=>x.checked=true)" th:text="#{roles.hamisini_sec}">Hamısını seç</button>
+                                <button class="btn btn-sm btn-light" type="button" onclick="document.querySelectorAll('#permissions-pane input[type=checkbox]').forEach(x=>x.checked=false)" th:text="#{common.temizle}">Təmizlə</button>
                             </div>
                         </div>
                         <div class="permission-browser">
                             <aside class="permission-module-nav">
-                                <div class="permission-module-nav-title"><i class="ti ti-layout-grid me-2"></i>Modullar</div>
+                                <div class="permission-module-nav-title"><i class="ti ti-layout-grid me-2"></i><span th:text="#{roles.modullar}">Modullar</span></div>
                                 <div class="permission-module-list" id="permissionModuleList">
                                     <button class="permission-module-button active" type="button" data-module-filter="all">
-                                        <span><i class="ti ti-list me-2"></i>Hamısı</span>
+                                        <span><i class="ti ti-list me-2"></i><span th:text="#{common.hamisi}">Hamısı</span></span>
                                         <span class="badge bg-light text-dark" th:text="${#lists.size(selahiyyetler)}">0</span>
                                     </button>
                                     <button class="permission-module-button" type="button" th:each="qrup : ${selahiyyetQruplari}"
@@ -239,8 +239,8 @@
                             <div class="permission-results">
                                 <div class="input-group mb-3">
                                     <span class="input-group-text bg-white"><i class="ti ti-search"></i></span>
-                                    <input class="form-control" id="permissionSearch" type="search" placeholder="Səlahiyyət axtar..." autocomplete="off" aria-label="Səlahiyyətlər üzrə axtarış">
-                                    <span class="input-group-text bg-white text-muted"><span id="permissionVisibleCount" th:text="${#lists.size(selahiyyetler)}">0</span>&nbsp;nəticə</span>
+                                    <input class="form-control" id="permissionSearch" type="search" placeholder="Səlahiyyət axtar..." autocomplete="off" aria-label="Səlahiyyətlər üzrə axtarış" th:placeholder="#{roles.selahiyyet_axtar}" th:aria-label="#{roles.selahiyyetler_uzre_axtaris}">
+                                    <span class="input-group-text bg-white text-muted"><span id="permissionVisibleCount" th:text="${#lists.size(selahiyyetler)}">0</span><span th:text="#{roles.nbsp_netice}">&nbsp;nəticə</span></span>
                                 </div>
                                 <div class="row g-3">
                                         <div class="col-md-6 role-permission-item" th:each="selahiyyet : ${selahiyyetler}"
@@ -257,18 +257,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div th:if="${#lists.isEmpty(selahiyyetler)}" class="text-center text-muted py-5">Səlahiyyət tapılmadı.</div>
-                        <div id="permissionFilterEmpty" class="text-center text-muted py-5 d-none"><i class="ti ti-filter-off fs-2 d-block mb-2"></i>Filterə uyğun səlahiyyət tapılmadı.</div>
+                        <div th:if="${#lists.isEmpty(selahiyyetler)}" class="text-center text-muted py-5" th:text="#{roles.selahiyyet_tapilmadi}">Səlahiyyət tapılmadı.</div>
+                        <div id="permissionFilterEmpty" class="text-center text-muted py-5 d-none"><i class="ti ti-filter-off fs-2 d-block mb-2"></i><span th:text="#{roles.filtere_uygun_selahiyyet_tapilmadi}">Filterə uyğun səlahiyyət tapılmadı.</span></div>
                     </div>
                     <div class="tab-pane fade" id="personals-pane" role="tabpanel" aria-labelledby="personals-tab">
-                        <div class="d-flex justify-content-between align-items-center mb-3"><div><h6 class="mb-1">Rola bağlı personallar</h6><small class="text-muted">Siyahı yeni DB funksiyasından birbaşa gətirilir.</small></div><span class="badge bg-primary-subtle text-primary" th:text="|${#lists.size(rolaBagliPersonallar)} personal|"></span></div>
-                        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Personal</th><th>Kod</th><th>Klinika</th><th>Əlaqə</th><th>Status</th></tr></thead><tbody><tr th:each="p:${rolaBagliPersonallar}"><td><strong th:text="${p.tamAd}"></strong></td><td th:text="${p.personalKodu}"></td><td th:text="${p.klinikaAdi}"></td><td><span class="badge" th:classappend="${p.elaqeAktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${p.elaqeAktiv}?'Aktiv':'Passiv'"></span></td><td><span th:if="${p.isdenAyrilib}" class="badge bg-danger">İşdən ayrılıb</span><span th:unless="${p.isdenAyrilib}" class="badge bg-success">İşləyir</span></td></tr><tr th:if="${#lists.isEmpty(rolaBagliPersonallar)}"><td colspan="5" class="text-center text-muted py-5">Bu rola bağlı personal yoxdur.</td></tr></tbody></table></div>
+                        <div class="d-flex justify-content-between align-items-center mb-3"><div><h6 class="mb-1" th:text="#{roles.rola_bagli_personallar}">Rola bağlı personallar</h6><small class="text-muted" th:text="#{roles.siyahi_yeni_db_funksiyasindan_birb}">Siyahı yeni DB funksiyasından birbaşa gətirilir.</small></div><span class="badge bg-primary-subtle text-primary" th:text="|${#lists.size(rolaBagliPersonallar)} personal|"></span></div>
+                        <div class="table-responsive"><table class="table align-middle"><thead><tr><th th:text="#{common.personal}">Personal</th><th th:text="#{common.kod}">Kod</th><th th:text="#{roles.klinika}">Klinika</th><th th:text="#{common.elaqe}">Əlaqə</th><th th:text="#{common.status}">Status</th></tr></thead><tbody><tr th:each="p:${rolaBagliPersonallar}"><td><strong th:text="${p.tamAd}"></strong></td><td th:text="${p.personalKodu}"></td><td th:text="${p.klinikaAdi}"></td><td><span class="badge" th:classappend="${p.elaqeAktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${p.elaqeAktiv}?'Aktiv':'Passiv'"></span></td><td><span th:if="${p.isdenAyrilib}" class="badge bg-danger" th:text="#{roles.isden_ayrilib}">İşdən ayrılıb</span><span th:unless="${p.isdenAyrilib}" class="badge bg-success" th:text="#{roles.isleyir}">İşləyir</span></td></tr><tr th:if="${#lists.isEmpty(rolaBagliPersonallar)}"><td colspan="5" class="text-center text-muted py-5" th:text="#{roles.bu_rola_bagli_personal_yoxdur}">Bu rola bağlı personal yoxdur.</td></tr></tbody></table></div>
                     </div>
                 </div>
             </div>
             <div class="card-footer bg-white border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <small class="text-muted"><i class="ti ti-info-circle me-1"></i>Dəyişikliklər yalnız “Yadda saxla” düyməsindən sonra tətbiq edilir.</small>
-                <button class="btn btn-primary px-4" type="submit"><i class="ti ti-device-floppy me-1"></i>İcazələri yadda saxla</button>
+                <small class="text-muted"><i class="ti ti-info-circle me-1"></i><span th:text="#{roles.deyisiklikler_yalniz_yadda_saxla_d}">Dəyişikliklər yalnız “Yadda saxla” düyməsindən sonra tətbiq edilir.</span></small>
+                <button class="btn btn-primary px-4" type="submit"><i class="ti ti-device-floppy me-1"></i><span th:text="#{roles.icazeleri_yadda_saxla}">İcazələri yadda saxla</span></button>
             </div>
         </form>
     </div>
@@ -277,27 +277,27 @@
 
     <div class="modal fade" id="newRoleModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
         <form method="post" th:action="@{/rollar/yeni}">
-            <div class="modal-header"><h5 class="modal-title">Yeni rol</h5><button class="btn-close" type="button" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5 class="modal-title" th:text="#{roles.yeni_rol}">Yeni rol</h5><button class="btn-close" type="button" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
-                <div class="mb-3"><label class="form-label">Rolun adı</label><input class="form-control" name="ad" required maxlength="150"></div>
-                <div class="mb-3"><label class="form-label">Açıqlama</label><textarea class="form-control" name="aciqlama" rows="3"></textarea></div>
-                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="sistemRoludur" value="true" id="newSystemRole"><label class="form-check-label" for="newSystemRole">Sistem rolu</label></div>
+                <div class="mb-3"><label class="form-label" th:text="#{roles.rolun_adi}">Rolun adı</label><input class="form-control" name="ad" required maxlength="150"></div>
+                <div class="mb-3"><label class="form-label" th:text="#{common.aciqlama}">Açıqlama</label><textarea class="form-control" name="aciqlama" rows="3"></textarea></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="sistemRoludur" value="true" id="newSystemRole"><label class="form-check-label" for="newSystemRole" th:text="#{roles.sistem_rolu}">Sistem rolu</label></div>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">İmtina</button><button class="btn btn-primary" type="submit">Yarat</button></div>
+            <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">İmtina</button><button class="btn btn-primary" type="submit" th:text="#{common.yarat}">Yarat</button></div>
         </form>
     </div></div></div>
 
     <div class="modal fade" id="editRoleModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
         <form method="post" th:action="@{/rollar/yenile}">
             <input type="hidden" name="rolId" th:value="${selectedRolId}">
-            <div class="modal-header"><h5 class="modal-title">Rolu redaktə et</h5><button class="btn-close" type="button" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5 class="modal-title" th:text="#{roles.rolu_redakte_et}">Rolu redaktə et</h5><button class="btn-close" type="button" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
-                <div class="mb-3"><label class="form-label">Ad</label><input class="form-control" name="ad" th:value="${selectedRol.rolAdi}" required></div>
-                <div class="mb-3"><label class="form-label">Açıqlama</label><textarea class="form-control" name="aciqlama" rows="3" th:text="${selectedRol.aciqlama}"></textarea></div>
-                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="sistemRoludur" value="true" th:checked="${selectedRol.sistemRoludur}" id="editSystemRole"><label class="form-check-label" for="editSystemRole">Sistem rolu</label></div>
-                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${selectedRol.aktiv}" id="editActiveRole"><label class="form-check-label" for="editActiveRole">Aktiv</label></div>
+                <div class="mb-3"><label class="form-label" th:text="#{common.ad}">Ad</label><input class="form-control" name="ad" th:value="${selectedRol.rolAdi}" required></div>
+                <div class="mb-3"><label class="form-label" th:text="#{common.aciqlama}">Açıqlama</label><textarea class="form-control" name="aciqlama" rows="3" th:text="${selectedRol.aciqlama}"></textarea></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="sistemRoludur" value="true" th:checked="${selectedRol.sistemRoludur}" id="editSystemRole"><label class="form-check-label" for="editSystemRole" th:text="#{roles.sistem_rolu}">Sistem rolu</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${selectedRol.aktiv}" id="editActiveRole"><label class="form-check-label" for="editActiveRole" th:text="#{common.aktiv}">Aktiv</label></div>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">İmtina</button><button class="btn btn-primary" type="submit">Yadda saxla</button></div>
+            <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">İmtina</button><button class="btn btn-primary" type="submit" th:text="#{common.yadda_saxla}">Yadda saxla</button></div>
         </form>
     </div></div></div>
 

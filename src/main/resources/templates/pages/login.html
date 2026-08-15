@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daxil ol — SimplexS</title>
+    <title th:text="#{common.daxil_ol_simplexs}">Daxil ol — SimplexS</title>
     <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/assets/plugins/tabler-icons/tabler-icons.min.css}" rel="stylesheet">
     <style>
@@ -50,32 +50,32 @@
 <main class="auth-page">
     <i class="ti ti-heart-rate-monitor medical-decor" aria-hidden="true"></i>
     <div class="auth-shell">
-        <section class="brand-panel" aria-label="SimplexS haqqında">
-            <div class="brand"><span class="brand-mark"><i class="ti ti-point-filled"></i></span><div><div class="brand-name">SimplexS</div><div class="brand-subtitle">Klinik İdarəetmə Sistemi</div></div></div>
-            <h2 class="hero-title">Rəqəmsal Sağlamlıq<br>Üçün İnteqrasiya!</h2>
-            <p class="hero-copy">Pasiyent məlumatları, həkim qəbulları, təyinatlar və daha çoxu — hamısı bir yerdə.</p>
+        <section class="brand-panel" aria-label="SimplexS haqqında" th:aria-label="#{common.simplexs_haqqinda}">
+            <div class="brand"><span class="brand-mark"><i class="ti ti-point-filled"></i></span><div><div class="brand-name" th:text="#{common.simplexs}">SimplexS</div><div class="brand-subtitle" th:text="#{common.klinik_idareetme_sistemi}">Klinik İdarəetmə Sistemi</div></div></div>
+            <h2 class="hero-title"><span th:text="#{common.reqemsal_saglamliq}">Rəqəmsal Sağlamlıq</span><br><span th:text="#{common.ucun_inteqrasiya}">Üçün İnteqrasiya!</span></h2>
+            <p class="hero-copy" th:text="#{common.pasiyent_melumatlari_hekim_qebull}">Pasiyent məlumatları, həkim qəbulları, təyinatlar və daha çoxu — hamısı bir yerdə.</p>
             <div class="benefits">
-                <div class="benefit"><i class="ti ti-shield-check"></i><strong>Təhlükəsiz</strong><small>Məlumatlarınız qorunur</small></div>
-                <div class="benefit"><i class="ti ti-chart-bar"></i><strong>Səmərəli</strong><small>Vaxta qənaət, daha çox nəticə</small></div>
-                <div class="benefit"><i class="ti ti-users-group"></i><strong>İnteqrasiya</strong><small>Bütün proseslər bir platformada</small></div>
-                <div class="benefit"><i class="ti ti-cloud-check"></i><strong>Bulud Dəstəyi</strong><small>Hər yerdən asan giriş</small></div>
+                <div class="benefit"><i class="ti ti-shield-check"></i><strong th:text="#{common.tehlukesiz}">Təhlükəsiz</strong><small th:text="#{common.melumatlariniz_qorunur}">Məlumatlarınız qorunur</small></div>
+                <div class="benefit"><i class="ti ti-chart-bar"></i><strong th:text="#{common.semereli}">Səmərəli</strong><small th:text="#{common.vaxta_qenaet_daha_cox_netice}">Vaxta qənaət, daha çox nəticə</small></div>
+                <div class="benefit"><i class="ti ti-users-group"></i><strong th:text="#{common.inteqrasiya}">İnteqrasiya</strong><small th:text="#{common.butun_prosesler_bir_platformada}">Bütün proseslər bir platformada</small></div>
+                <div class="benefit"><i class="ti ti-cloud-check"></i><strong th:text="#{common.bulud_desteyi}">Bulud Dəstəyi</strong><small th:text="#{common.her_yerden_asan_giris}">Hər yerdən asan giriş</small></div>
             </div>
         </section>
         <section class="login-card" aria-labelledby="login-title">
             <span class="card-mark"><i class="ti ti-point-filled"></i></span>
-            <div class="login-header"><h1 id="login-title">Xoş Gəldiniz!</h1><p>Hesabınıza daxil olaraq idarəetməyə başlayın</p></div>
-            <div th:if="${param.error}" class="alert alert-danger"><i class="ti ti-alert-circle me-1"></i>İstifadəçi adı və ya şifrə yanlışdır</div>
-            <div th:if="${param.logout}" class="alert alert-success"><i class="ti ti-circle-check me-1"></i>Uğurla çıxış etdiniz</div>
+            <div class="login-header"><h1 id="login-title" th:text="#{common.xos_geldiniz}">Xoş Gəldiniz!</h1><p th:text="#{common.hesabiniza_daxil_olaraq_idareetme}">Hesabınıza daxil olaraq idarəetməyə başlayın</p></div>
+            <div th:if="${param.error}" class="alert alert-danger"><i class="ti ti-alert-circle me-1"></i><span th:text="#{common.istifadeci_adi_ve_ya_sifre_yanlis}">İstifadəçi adı və ya şifrə yanlışdır</span></div>
+            <div th:if="${param.logout}" class="alert alert-success"><i class="ti ti-circle-check me-1"></i><span th:text="#{common.ugurla_cixis_etdiniz}">Uğurla çıxış etdiniz</span></div>
             <form th:action="@{/login}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <div class="form-group"><label for="username"><i class="ti ti-user"></i>İstifadəçi adı</label><div class="field-wrap"><input type="text" id="username" name="username" class="form-control" placeholder="İstifadəçi adınızı daxil edin" autocomplete="username" required autofocus></div></div>
-                <div class="form-group"><label for="password"><i class="ti ti-lock"></i>Şifrə</label><div class="field-wrap"><input type="password" id="password" name="password" class="form-control" placeholder="Şifrənizi daxil edin" autocomplete="current-password" required><button class="password-toggle" id="passwordToggle" type="button" aria-label="Şifrəni göstər"><i class="ti ti-eye-off"></i></button></div></div>
-                <button type="submit" class="btn-login">Daxil Ol</button>
+                <div class="form-group"><label for="username"><i class="ti ti-user"></i><span th:text="#{common.istifadeci_adi}">İstifadəçi adı</span></label><div class="field-wrap"><input type="text" id="username" name="username" class="form-control" placeholder="İstifadəçi adınızı daxil edin" autocomplete="username" required autofocus th:placeholder="#{common.istifadeci_adinizi_daxil_edin}"></div></div>
+                <div class="form-group"><label for="password"><i class="ti ti-lock"></i><span th:text="#{common.sifre}">Şifrə</span></label><div class="field-wrap"><input type="password" id="password" name="password" class="form-control" placeholder="Şifrənizi daxil edin" autocomplete="current-password" required th:placeholder="#{common.sifrenizi_daxil_edin}"><button class="password-toggle" id="passwordToggle" type="button" aria-label="Şifrəni göstər" th:aria-label="#{common.sifreni_goster}"><i class="ti ti-eye-off"></i></button></div></div>
+                <button type="submit" class="btn-login" th:text="#{common.daxil_ol}">Daxil Ol</button>
             </form>
-            <div class="support"><i class="ti ti-headphones"></i>Texniki dəstək üçün sistem administratoruna müraciət edin</div>
+            <div class="support"><i class="ti ti-headphones"></i><span th:text="#{common.texniki_destek_ucun_sistem_admini}">Texniki dəstək üçün sistem administratoruna müraciət edin</span></div>
         </section>
     </div>
-    <footer class="copyright">© 2026 SimplexS. Bütün hüquqlar qorunur.</footer>
+    <footer class="copyright"><span th:text="${#dates.year(#dates.createNow())}">2026</span> © <span th:text="#{common.simplexs}">SimplexS</span> <span th:text="#{common.all_rights_reserved}">— Bütün hüquqlar qorunur.</span></footer>
 </main>
 <script>
     const toggle=document.getElementById('passwordToggle');

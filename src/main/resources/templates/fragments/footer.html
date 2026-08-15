@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <body>
 <footer class="footer text-center" th:fragment="footer">
-    <p class="mb-0 text-dark">
-        2026 &copy;
-        <a href="javascript:void(0);" class="link-primary">SimplexS</a>
-        - All Rights Reserved.
-    </p>
+    <p class="mb-0 text-dark"><span th:text="${#dates.year(#dates.createNow())}">2026</span> &copy;
+        <a href="javascript:void(0);" class="link-primary" th:text="#{common.simplexs}">SimplexS</a>
+        <span th:text="#{common.all_rights_reserved}">— Bütün hüquqlar qorunur.</span></p>
 </footer>
 </body>
 </html>

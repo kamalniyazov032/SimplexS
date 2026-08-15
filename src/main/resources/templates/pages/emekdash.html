@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
 <body>
 <div layout:fragment="content">
     <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
         <div>
             <h4 class="mb-1 d-flex align-items-center gap-2">
-                <span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle"><i class="ti ti-users-group"></i></span>
+                <span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle"><i class="ti ti-users-group"></i></span><span th:text="#{personal.emekdas_ve_hekim}">
                 Əməkdaş və Həkim
-            </h4>
-            <p class="mb-0 text-muted">Header-də seçilmiş klinikanın personal siyahısı</p>
+            </span></h4>
+            <p class="mb-0 text-muted" th:text="#{personal.header_de_secilmis_klinikanin_p}">Header-də seçilmiş klinikanın personal siyahısı</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <button class="btn btn-primary d-flex align-items-center" type="button"
                     data-bs-toggle="offcanvas" data-bs-target="#personalSearchOffcanvas"
                     aria-controls="personalSearchOffcanvas">
-                <i class="ti ti-filter me-1"></i>Filter
-                <span th:if="${filterApplied}" class="badge bg-white text-primary ms-2">Aktiv</span>
+                <i class="ti ti-filter me-1"></i><span th:text="#{common.filter}">Filter
+                </span><span th:if="${filterApplied}" class="badge bg-white text-primary ms-2" th:text="#{common.aktiv}">Aktiv</span>
             </button>
             <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPersonal">
-                <i class="ti ti-user-plus me-1"></i>Yeni personal
-            </button>
+                <i class="ti ti-user-plus me-1"></i><span th:text="#{personal.yeni_personal}">Yeni personal
+            </span></button>
         </div>
     </div>
 
@@ -28,51 +28,51 @@
          style="--bs-offcanvas-height: 170px !important; height: 170px !important; min-height: 170px !important; max-height: 170px !important;">
         <div class="offcanvas-header border-bottom bg-light py-3">
             <h5 class="mb-0 fw-bold text-primary">
-                <i class="ti ti-filter me-2"></i>Əməkdaş və həkim üzrə axtarış
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla"></button>
+                <i class="ti ti-filter me-2"></i><span th:text="#{personal.emekdas_ve_hekim_uzre_axtaris}">Əməkdaş və həkim üzrə axtarış
+            </span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
         </div>
         <div class="offcanvas-body py-3">
             <form th:action="@{/emekdash}" method="get">
                 <div class="row g-2 align-items-end">
                     <div class="col-xl-4 col-lg-4 col-md-6">
-                        <label class="visually-hidden" for="personalQuery">Ümumi axtarış</label>
+                        <label class="visually-hidden" for="personalQuery" th:text="#{personal.umumi_axtaris}">Ümumi axtarış</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white"><i class="ti ti-search"></i></span>
                             <input id="personalQuery" class="form-control" name="q" th:value="${q}"
-                                   placeholder="Kod, ad soyad, telefon və ya e-poçt...">
+                                   placeholder="Kod, ad soyad, telefon və ya e-poçt..." th:placeholder="#{personal.kod_ad_soyad_telefon_ve_ya_e_po}">
                         </div>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-6">
-                        <label class="visually-hidden" for="personalVezife">Vəzifə</label>
+                        <label class="visually-hidden" for="personalVezife" th:text="#{personal.vezife}">Vəzifə</label>
                         <select id="personalVezife" class="form-select" name="vezifeId">
-                            <option value="">Bütün vəzifələr</option>
+                            <option value="" th:text="#{personal.butun_vezifeler}">Bütün vəzifələr</option>
                             <option th:each="v : ${vezifeler}" th:value="${v.vezifeId}"
                                     th:text="${v.vezifeAdi}" th:selected="${v.vezifeId == selectedVezifeId}"></option>
                         </select>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-6">
-                        <label class="visually-hidden" for="personalType">Personal tipi</label>
+                        <label class="visually-hidden" for="personalType" th:text="#{personal.personal_tipi}">Personal tipi</label>
                         <select id="personalType" class="form-select" name="personalTipi">
-                            <option value="">Bütün personal tipləri</option>
-                            <option value="emekdash" th:selected="${selectedPersonalTipi == 'emekdash'}">Əməkdaş</option>
-                            <option value="hekim" th:selected="${selectedPersonalTipi == 'hekim'}">Həkim</option>
+                            <option value="" th:text="#{personal.butun_personal_tipleri}">Bütün personal tipləri</option>
+                            <option value="emekdash" th:selected="${selectedPersonalTipi == 'emekdash'}" th:text="#{personal.emekdas}">Əməkdaş</option>
+                            <option value="hekim" th:selected="${selectedPersonalTipi == 'hekim'}" th:text="#{personal.hekim}">Həkim</option>
                         </select>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-6">
-                        <label class="visually-hidden" for="personalStatus">Status</label>
+                        <label class="visually-hidden" for="personalStatus" th:text="#{common.status}">Status</label>
                         <select id="personalStatus" class="form-select" name="status">
-                            <option value="">Bütün statuslar</option>
-                            <option value="aktiv" th:selected="${selectedStatus == 'aktiv'}">Aktiv</option>
-                            <option value="passiv" th:selected="${selectedStatus == 'passiv'}">Passiv</option>
+                            <option value="" th:text="#{common.butun_statuslar}">Bütün statuslar</option>
+                            <option value="aktiv" th:selected="${selectedStatus == 'aktiv'}" th:text="#{common.aktiv}">Aktiv</option>
+                            <option value="passiv" th:selected="${selectedStatus == 'passiv'}" th:text="#{common.passiv}">Passiv</option>
                         </select>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-12">
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary flex-fill" type="submit">
-                                <i class="ti ti-search me-1"></i>Axtar
-                            </button>
-                            <a class="btn btn-light flex-fill" th:href="@{/emekdash}">Təmizlə</a>
+                                <i class="ti ti-search me-1"></i><span th:text="#{common.axtar}">Axtar
+                            </span></button>
+                            <a class="btn btn-light flex-fill" th:href="@{/emekdash}" th:text="#{common.temizle}">Təmizlə</a>
                         </div>
                     </div>
                 </div>
@@ -86,32 +86,32 @@
     </div>
     <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
         <span th:text="${errorMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
     </div>
 
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-sm-6">
             <div class="card border-0 shadow-sm h-100 mb-0"><div class="card-body d-flex align-items-center gap-3 py-3">
                 <span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle"><i class="ti ti-users fs-24"></i></span>
-                <div><div class="text-muted small">Ümumi personal</div><h4 class="mb-0" th:text="${allPersonalCount}">0</h4></div>
+                <div><div class="text-muted small" th:text="#{personal.umumi_personal}">Ümumi personal</div><h4 class="mb-0" th:text="${allPersonalCount}">0</h4></div>
             </div></div>
         </div>
         <div class="col-xl-3 col-sm-6">
             <div class="card border-0 shadow-sm h-100 mb-0"><div class="card-body d-flex align-items-center gap-3 py-3">
                 <span class="avatar avatar-lg bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope fs-24"></i></span>
-                <div><div class="text-muted small">Həkimlər</div><h4 class="mb-0" th:text="${hekimCount}">0</h4></div>
+                <div><div class="text-muted small" th:text="#{personal.hekimler}">Həkimlər</div><h4 class="mb-0" th:text="${hekimCount}">0</h4></div>
             </div></div>
         </div>
         <div class="col-xl-3 col-sm-6">
             <div class="card border-0 shadow-sm h-100 mb-0"><div class="card-body d-flex align-items-center gap-3 py-3">
                 <span class="avatar avatar-lg bg-warning-subtle text-warning rounded-circle"><i class="ti ti-user-cog fs-24"></i></span>
-                <div><div class="text-muted small">Əməkdaşlar</div><h4 class="mb-0" th:text="${emekdashCount}">0</h4></div>
+                <div><div class="text-muted small" th:text="#{personal.emekdaslar}">Əməkdaşlar</div><h4 class="mb-0" th:text="${emekdashCount}">0</h4></div>
             </div></div>
         </div>
         <div class="col-xl-3 col-sm-6">
             <div class="card border-0 shadow-sm h-100 mb-0"><div class="card-body d-flex align-items-center gap-3 py-3">
                 <span class="avatar avatar-lg bg-success-subtle text-success rounded-circle"><i class="ti ti-user-check fs-24"></i></span>
-                <div><div class="text-muted small">Aktiv personal</div><h4 class="mb-0" th:text="${activePersonalCount}">0</h4></div>
+                <div><div class="text-muted small" th:text="#{personal.aktiv_personal}">Aktiv personal</div><h4 class="mb-0" th:text="${activePersonalCount}">0</h4></div>
             </div></div>
         </div>
     </div>
@@ -119,20 +119,20 @@
     <div class="card border-0 shadow-sm">
         <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
             <div>
-                <h5 class="card-title mb-1">Personal siyahısı</h5>
+                <h5 class="card-title mb-1" th:text="#{personal.personal_siyahisi}">Personal siyahısı</h5>
                 <p class="mb-0 text-muted small"
                    th:text="${filterApplied} ? |Filter nəticəsi: ${personalCount} personal| : |Cəmi ${personalCount} personal|">
                     Cəmi 0 personal
                 </p>
             </div>
             <a th:if="${filterApplied}" th:href="@{/emekdash}" class="btn btn-sm btn-light">
-                <i class="ti ti-x me-1"></i>Filteri təmizlə
-            </a>
+                <i class="ti ti-x me-1"></i><span th:text="#{common.filteri_temizle}">Filteri təmizlə
+            </span></a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light"><tr><th class="ps-3">Kod</th><th>Personal</th><th>Vəzifə</th><th>Tip</th><th>Əlaqə</th><th>Sıra</th><th>Status</th><th></th></tr></thead>
+                    <thead class="bg-light"><tr><th class="ps-3" th:text="#{common.kod}">Kod</th><th th:text="#{common.personal}">Personal</th><th th:text="#{personal.vezife}">Vəzifə</th><th th:text="#{common.tip}">Tip</th><th th:text="#{common.elaqe}">Əlaqə</th><th th:text="#{common.sira}">Sıra</th><th th:text="#{common.status}">Status</th><th></th></tr></thead>
                     <tbody>
                     <tr th:each="p : ${personallar}">
                         <td class="ps-3"><span class="badge bg-light text-dark border" th:text="${p.personalKodu}"></span></td>
@@ -162,11 +162,11 @@
                         <td><span class="badge d-inline-flex align-items-center gap-1" th:classappend="${p.personalAktiv and p.klinikaElagesiAktiv} ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'"><i class="ti ti-circle-filled" style="font-size: 7px"></i><span th:text="${p.personalAktiv and p.klinikaElagesiAktiv} ? 'Aktiv' : 'Passiv'"></span></span></td>
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
-                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et"><i class="ti ti-edit"></i></button>
-                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#clinicP${p.personalId}|"><i class="ti ti-building-hospital"></i>Klinikalar</button>
-                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i>Rol</button>
-                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" th:data-bs-target="|#cashP${p.personalId}|" title="Kassalar"><i class="ti ti-cash-register"></i></button>
-                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" th:data-bs-target="|#departmentP${p.personalId}|" title="Şöbələr"><i class="ti ti-building-community"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editP${p.personalId}|" title="Redaktə et" th:title="#{common.redakte_et}"><i class="ti ti-edit"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#clinicP${p.personalId}|"><i class="ti ti-building-hospital"></i><span th:text="#{personal.klinikalar}">Klinikalar</span></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" th:data-bs-target="|#roleP${p.personalId}|"><i class="ti ti-shield-lock"></i><span th:text="#{personal.rol}">Rol</span></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" th:data-bs-target="|#cashP${p.personalId}|" title="Kassalar" th:title="#{common.kassalar}"><i class="ti ti-cash-register"></i></button>
+                                <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'PERSONAL_IDARE_ET')}" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" th:data-bs-target="|#departmentP${p.personalId}|" title="Şöbələr" th:title="#{personal.sobeler}"><i class="ti ti-building-community"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -191,26 +191,26 @@
                         <span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
                             <i class="ti ti-user-plus fs-24"></i>
                         </span>
-                        <div><h5 class="mb-1">Yeni personal</h5><p class="mb-0 text-muted small">Personal məlumatlarını daxil edin</p></div>
+                        <div><h5 class="mb-1" th:text="#{personal.yeni_personal}">Yeni personal</h5><p class="mb-0 text-muted small" th:text="#{personal.personal_melumatlarini_daxil_ed}">Personal məlumatlarını daxil edin</p></div>
                     </div>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
                 </div>
                 <div class="modal-body pt-4"><div class="row g-3">
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i>Ad</label><input class="form-control" name="ad" placeholder="Ad" autocomplete="given-name" required></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i>Soyad</label><input class="form-control" name="soyad" placeholder="Soyad" autocomplete="family-name" required></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-users text-primary me-1"></i>Ata adı</label><input class="form-control" name="ataAdi" placeholder="Ata adı"></div>
-                    <div class="col-md-6"><label class="form-label"><i class="ti ti-briefcase text-primary me-1"></i>Vəzifə</label><select class="form-select" name="vezifeId" required><option value="" disabled selected>Vəzifə seçin</option><option th:each="v : ${vezifeler}" th:value="${v.vezifeId}" th:text="${v.vezifeAdi}"></option></select></div>
-                    <div class="col-md-6"><label class="form-label"><i class="ti ti-id-badge-2 text-primary me-1"></i>İş nömrəsi</label><input class="form-control" name="isNomresi" placeholder="İş nömrəsi"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone text-primary me-1"></i>Mobil nömrə</label><input class="form-control" name="mobilNomre" placeholder="Mobil nömrə"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone-call text-primary me-1"></i>Daxili nömrə</label><input class="form-control" name="daxiliNomre" placeholder="Daxili nömrə"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-mail text-primary me-1"></i>E-poçt</label><input class="form-control" type="email" name="email" placeholder="E-poçt"></div>
-                    <div class="col-12"><div class="rounded border bg-light p-3"><label class="form-label fw-semibold"><i class="ti ti-key text-primary me-2"></i>İstifadəçi şifrəsi</label><input class="form-control" type="password" name="sifre" autocomplete="new-password" placeholder="Şifrəni daxil edin"><small class="text-muted">Personal üçün giriş şifrəsi</small></div></div>
-                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope"></i></span><div><div class="fw-semibold">Həkimdir</div><small class="text-muted">Həkim personalı kimi qeyd et</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="hekimdir" value="true"></div></div></div>
-                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-user-check"></i></span><div><div class="fw-semibold">Aktiv personal</div><small class="text-muted">Personal aktiv yaradılsın</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" checked></div></div></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i><span th:text="#{common.ad}">Ad</span></label><input class="form-control" name="ad" placeholder="Ad" autocomplete="given-name" required th:placeholder="#{common.ad}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i><span th:text="#{personal.soyad}">Soyad</span></label><input class="form-control" name="soyad" placeholder="Soyad" autocomplete="family-name" required th:placeholder="#{personal.soyad}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-users text-primary me-1"></i><span th:text="#{personal.ata_adi}">Ata adı</span></label><input class="form-control" name="ataAdi" placeholder="Ata adı" th:placeholder="#{personal.ata_adi}"></div>
+                    <div class="col-md-6"><label class="form-label"><i class="ti ti-briefcase text-primary me-1"></i><span th:text="#{personal.vezife}">Vəzifə</span></label><select class="form-select" name="vezifeId" required><option value="" disabled selected th:text="#{personal.vezife_secin}">Vəzifə seçin</option><option th:each="v : ${vezifeler}" th:value="${v.vezifeId}" th:text="${v.vezifeAdi}"></option></select></div>
+                    <div class="col-md-6"><label class="form-label"><i class="ti ti-id-badge-2 text-primary me-1"></i><span th:text="#{personal.is_nomresi}">İş nömrəsi</span></label><input class="form-control" name="isNomresi" placeholder="İş nömrəsi" th:placeholder="#{personal.is_nomresi}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone text-primary me-1"></i><span th:text="#{common.mobil_nomre}">Mobil nömrə</span></label><input class="form-control" name="mobilNomre" placeholder="Mobil nömrə" th:placeholder="#{common.mobil_nomre}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone-call text-primary me-1"></i><span th:text="#{personal.daxili_nomre}">Daxili nömrə</span></label><input class="form-control" name="daxiliNomre" placeholder="Daxili nömrə" th:placeholder="#{personal.daxili_nomre}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-mail text-primary me-1"></i><span th:text="#{personal.e_poct}">E-poçt</span></label><input class="form-control" type="email" name="email" placeholder="E-poçt" th:placeholder="#{personal.e_poct}"></div>
+                    <div class="col-12"><div class="rounded border bg-light p-3"><label class="form-label fw-semibold"><i class="ti ti-key text-primary me-2"></i><span th:text="#{personal.istifadeci_sifresi}">İstifadəçi şifrəsi</span></label><input class="form-control" type="password" name="sifre" autocomplete="new-password" placeholder="Şifrəni daxil edin" th:placeholder="#{personal.sifreni_daxil_edin}"><small class="text-muted" th:text="#{personal.personal_ucun_giris_sifresi}">Personal üçün giriş şifrəsi</small></div></div>
+                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope"></i></span><div><div class="fw-semibold" th:text="#{personal.hekimdir}">Həkimdir</div><small class="text-muted" th:text="#{personal.hekim_personali_kimi_qeyd_et}">Həkim personalı kimi qeyd et</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="hekimdir" value="true"></div></div></div>
+                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-user-check"></i></span><div><div class="fw-semibold" th:text="#{personal.aktiv_personal}">Aktiv personal</div><small class="text-muted" th:text="#{personal.personal_aktiv_yaradilsin}">Personal aktiv yaradılsın</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" checked></div></div></div>
                 </div></div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button>
-                    <button class="btn btn-primary"><i class="ti ti-user-check me-1"></i>Personalı yarat</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.legv_et}">Ləğv et</button>
+                    <button class="btn btn-primary"><i class="ti ti-user-check me-1"></i><span th:text="#{personal.personali_yarat}">Personalı yarat</span></button>
                 </div>
             </form>
         </div></div>
@@ -224,24 +224,24 @@
                 <div class="modal-header border-0 pb-0">
                     <div class="d-flex align-items-center gap-3">
                         <span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle"><i class="ti ti-user-edit fs-24"></i></span>
-                        <div><h5 class="mb-1">Personalı redaktə et</h5><p class="mb-0 text-muted small" th:text="|${p.personalKodu} · ${p.tamAd}|"></p></div>
+                        <div><h5 class="mb-1" th:text="#{personal.personali_redakte_et}">Personalı redaktə et</h5><p class="mb-0 text-muted small" th:text="|${p.personalKodu} · ${p.tamAd}|"></p></div>
                     </div>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
                 </div>
                 <div class="modal-body pt-4"><div class="row g-3">
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i>Ad</label><input class="form-control" name="ad" th:value="${p.ad}" required></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i>Soyad</label><input class="form-control" name="soyad" th:value="${p.soyad}" required></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-users text-primary me-1"></i>Ata adı</label><input class="form-control" name="ataAdi" th:value="${p.ataAdi}"></div>
-                    <div class="col-md-6"><label class="form-label"><i class="ti ti-briefcase text-primary me-1"></i>Vəzifə</label><select class="form-select" name="vezifeId" required><option th:each="v : ${vezifeler}" th:value="${v.vezifeId}" th:text="${v.vezifeAdi}" th:selected="${v.vezifeId == p.vezifeId}"></option></select></div>
-                    <div class="col-md-6"><label class="form-label"><i class="ti ti-id-badge-2 text-primary me-1"></i>İş nömrəsi</label><input class="form-control" name="isNomresi" th:value="${p.isNomresi}"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone text-primary me-1"></i>Mobil nömrə</label><input class="form-control" name="mobilNomre" th:value="${p.mobilNomre}"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone-call text-primary me-1"></i>Daxili nömrə</label><input class="form-control" name="daxiliNomre" th:value="${p.daxiliNomre}"></div>
-                    <div class="col-md-4"><label class="form-label"><i class="ti ti-mail text-primary me-1"></i>E-poçt</label><input class="form-control" type="email" name="email" th:value="${p.email}"></div>
-                    <div class="col-12"><div class="rounded border bg-light p-3"><label class="form-label fw-semibold"><i class="ti ti-key text-primary me-2"></i>Yeni şifrə</label><input class="form-control" type="password" name="sifre" autocomplete="new-password" placeholder="Dəyişməməsi üçün boş saxlayın"><small class="text-muted">Bu sahə boş qaldıqda mövcud şifrə dəyişməyəcək.</small></div></div>
-                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope"></i></span><div><div class="fw-semibold">Həkimdir</div><small class="text-muted">Həkim personalı kimi qeyd et</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="hekimdir" value="true" th:checked="${p.hekimdir}"></div></div></div>
-                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-user-check"></i></span><div><div class="fw-semibold">Aktiv personal</div><small class="text-muted">Personalın aktiv statusu</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${p.personalAktiv}"></div></div></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i><span th:text="#{common.ad}">Ad</span></label><input class="form-control" name="ad" th:value="${p.ad}" required></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-user text-primary me-1"></i><span th:text="#{personal.soyad}">Soyad</span></label><input class="form-control" name="soyad" th:value="${p.soyad}" required></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-users text-primary me-1"></i><span th:text="#{personal.ata_adi}">Ata adı</span></label><input class="form-control" name="ataAdi" th:value="${p.ataAdi}"></div>
+                    <div class="col-md-6"><label class="form-label"><i class="ti ti-briefcase text-primary me-1"></i><span th:text="#{personal.vezife}">Vəzifə</span></label><select class="form-select" name="vezifeId" required><option th:each="v : ${vezifeler}" th:value="${v.vezifeId}" th:text="${v.vezifeAdi}" th:selected="${v.vezifeId == p.vezifeId}"></option></select></div>
+                    <div class="col-md-6"><label class="form-label"><i class="ti ti-id-badge-2 text-primary me-1"></i><span th:text="#{personal.is_nomresi}">İş nömrəsi</span></label><input class="form-control" name="isNomresi" th:value="${p.isNomresi}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone text-primary me-1"></i><span th:text="#{common.mobil_nomre}">Mobil nömrə</span></label><input class="form-control" name="mobilNomre" th:value="${p.mobilNomre}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-phone-call text-primary me-1"></i><span th:text="#{personal.daxili_nomre}">Daxili nömrə</span></label><input class="form-control" name="daxiliNomre" th:value="${p.daxiliNomre}"></div>
+                    <div class="col-md-4"><label class="form-label"><i class="ti ti-mail text-primary me-1"></i><span th:text="#{personal.e_poct}">E-poçt</span></label><input class="form-control" type="email" name="email" th:value="${p.email}"></div>
+                    <div class="col-12"><div class="rounded border bg-light p-3"><label class="form-label fw-semibold"><i class="ti ti-key text-primary me-2"></i><span th:text="#{personal.yeni_sifre}">Yeni şifrə</span></label><input class="form-control" type="password" name="sifre" autocomplete="new-password" placeholder="Dəyişməməsi üçün boş saxlayın" th:placeholder="#{personal.deyismemesi_ucun_bos_saxlayin}"><small class="text-muted" th:text="#{personal.bu_sahe_bos_qaldiqda_movcud_sif}">Bu sahə boş qaldıqda mövcud şifrə dəyişməyəcək.</small></div></div>
+                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope"></i></span><div><div class="fw-semibold" th:text="#{personal.hekimdir}">Həkimdir</div><small class="text-muted" th:text="#{personal.hekim_personali_kimi_qeyd_et}">Həkim personalı kimi qeyd et</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="hekimdir" value="true" th:checked="${p.hekimdir}"></div></div></div>
+                    <div class="col-md-6"><div class="d-flex align-items-center justify-content-between rounded border p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-user-check"></i></span><div><div class="fw-semibold" th:text="#{personal.aktiv_personal}">Aktiv personal</div><small class="text-muted" th:text="#{personal.personalin_aktiv_statusu}">Personalın aktiv statusu</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${p.personalAktiv}"></div></div></div>
                 </div></div>
-                <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Ləğv et</button><button class="btn btn-primary" type="submit"><i class="ti ti-device-floppy me-1"></i>Yadda saxla</button></div>
+                <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.legv_et}">Ləğv et</button><button class="btn btn-primary" type="submit"><i class="ti ti-device-floppy me-1"></i><span th:text="#{common.yadda_saxla}">Yadda saxla</span></button></div>
             </form>
         </div></div>
     </div>
@@ -251,50 +251,50 @@
             <div class="modal-header border-0 pb-0">
                 <div class="d-flex align-items-center gap-3">
                     <span class="avatar avatar-lg bg-info-subtle text-info rounded-circle"><i class="ti ti-building-hospital fs-24"></i></span>
-                    <div><h5 class="mb-1">Klinika giriş icazələri</h5><p class="mb-0 text-muted small" th:text="|${p.personalKodu} · ${p.tamAd}|"></p></div>
+                    <div><h5 class="mb-1" th:text="#{personal.klinika_giris_icazeleri}">Klinika giriş icazələri</h5><p class="mb-0 text-muted small" th:text="|${p.personalKodu} · ${p.tamAd}|"></p></div>
                 </div>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
             </div>
             <div class="modal-body pt-4">
-                <div class="alert alert-info d-flex gap-2 align-items-start"><i class="ti ti-info-circle fs-5"></i><span>Aktiv edilən klinikalar əməkdaş daxil olduqda yuxarıdakı klinika seçimində görünəcək.</span></div>
-                <h6 class="mb-2"><i class="ti ti-building-check text-success me-2"></i>Qoşulmuş klinikalar</h6>
+                <div class="alert alert-info d-flex gap-2 align-items-start"><i class="ti ti-info-circle fs-5"></i><span th:text="#{personal.aktiv_edilen_klinikalar_emekdas}">Aktiv edilən klinikalar əməkdaş daxil olduqda yuxarıdakı klinika seçimində görünəcək.</span></div>
+                <h6 class="mb-2"><i class="ti ti-building-check text-success me-2"></i><span th:text="#{personal.qosulmus_klinikalar}">Qoşulmuş klinikalar</span></h6>
                 <div class="border rounded overflow-hidden mb-4">
                     <div th:each="clinic : ${qosulmusKlinikalar.get(p.personalId)}" class="d-flex align-items-center justify-content-between gap-3 p-3 border-bottom">
                         <div class="d-flex align-items-center gap-3">
                             <span class="avatar rounded-circle bg-success-subtle text-success"><i class="ti ti-building-hospital fs-20"></i></span>
-                            <div><div class="fw-semibold" th:text="${clinic.klinikaAdi}"></div><small class="text-success">Giriş icazəsi verilib</small></div>
+                            <div><div class="fw-semibold" th:text="${clinic.klinikaAdi}"></div><small class="text-success" th:text="#{personal.giris_icazesi_verilib}">Giriş icazəsi verilib</small></div>
                         </div>
-                        <form method="post" th:action="@{/emekdash/klinika}" onsubmit="return confirm('Əməkdaşın bu klinika ilə bağlantısını kəsmək istəyirsiniz?')">
+                        <form method="post" th:action="@{/emekdash/klinika}" th:attr="data-confirm=#{js.confirm.employeeClinicRemove}">
                             <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                             <input type="hidden" name="personalId" th:value="${p.personalId}">
                             <input type="hidden" name="klinikaId" th:value="${clinic.klinikaId}">
                             <input type="hidden" name="elaveEdilsin" value="false">
-                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-unlink me-1"></i>Bağlantını kəs</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-unlink me-1"></i><span th:text="#{personal.baglantini_kes}">Bağlantını kəs</span></button>
                         </form>
                     </div>
-                    <div th:if="${#lists.isEmpty(qosulmusKlinikalar.get(p.personalId))}" class="text-center text-muted py-4"><i class="ti ti-building-off fs-3 d-block mb-2"></i>Qoşulmuş klinika yoxdur.</div>
+                    <div th:if="${#lists.isEmpty(qosulmusKlinikalar.get(p.personalId))}" class="text-center text-muted py-4"><i class="ti ti-building-off fs-3 d-block mb-2"></i><span th:text="#{personal.qosulmus_klinika_yoxdur}">Qoşulmuş klinika yoxdur.</span></div>
                 </div>
                 <div class="rounded bg-light border p-3">
-                    <h6 class="mb-3"><i class="ti ti-building-plus text-primary me-2"></i>Yeni klinika qoş</h6>
+                    <h6 class="mb-3"><i class="ti ti-building-plus text-primary me-2"></i><span th:text="#{personal.yeni_klinika_qos}">Yeni klinika qoş</span></h6>
                     <form method="post" th:action="@{/emekdash/klinika}">
                         <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                         <input type="hidden" name="personalId" th:value="${p.personalId}">
                         <input type="hidden" name="elaveEdilsin" value="true">
                         <div class="row g-2 align-items-end">
                             <div class="col-md-8">
-                                <label class="form-label small text-muted">Klinikanı seçin</label>
+                                <label class="form-label small text-muted" th:text="#{personal.klinikani_secin}">Klinikanı seçin</label>
                                 <select class="form-select" name="klinikaId" required th:disabled="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}">
-                                    <option value="" disabled selected>Qoşulacaq klinikanı seçin</option>
+                                    <option value="" disabled selected th:text="#{personal.qosulacaq_klinikani_secin}">Qoşulacaq klinikanı seçin</option>
                                     <option th:each="clinic : ${qosulmamisKlinikalar.get(p.personalId)}" th:value="${clinic.klinikaId}" th:text="${clinic.klinikaAdi}"></option>
                                 </select>
                             </div>
-                            <div class="col-md-4"><button type="submit" class="btn btn-primary w-100" th:disabled="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}"><i class="ti ti-link me-1"></i>Qoş</button></div>
+                            <div class="col-md-4"><button type="submit" class="btn btn-primary w-100" th:disabled="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}"><i class="ti ti-link me-1"></i><span th:text="#{personal.qos}">Qoş</span></button></div>
                         </div>
-                        <small th:if="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}" class="text-success d-block mt-2"><i class="ti ti-circle-check me-1"></i>Bütün mövcud klinikalar artıq qoşulub.</small>
+                        <small th:if="${#lists.isEmpty(qosulmamisKlinikalar.get(p.personalId))}" class="text-success d-block mt-2"><i class="ti ti-circle-check me-1"></i><span th:text="#{personal.butun_movcud_klinikalar_artiq_q}">Bütün mövcud klinikalar artıq qoşulub.</span></small>
                     </form>
                 </div>
             </div>
-            <div class="modal-footer border-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button></div>
+            <div class="modal-footer border-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.bagla}">Bağla</button></div>
         </div></div>
     </div>
 
@@ -305,13 +305,13 @@
                     <span class="avatar avatar-lg rounded-circle" th:classappend="${p.hekimdir} ? 'bg-info-subtle text-info' : 'bg-warning-subtle text-warning'">
                         <i class="fs-24" th:classappend="${p.hekimdir} ? 'ti ti-stethoscope' : 'ti ti-user-cog'"></i>
                     </span>
-                    <div><h5 class="mb-1" th:text="${p.tamAd}"></h5><p class="mb-0 text-muted small"><i class="ti ti-shield-lock me-1"></i>Rol və giriş səlahiyyətlərinin idarəsi</p></div>
+                    <div><h5 class="mb-1" th:text="${p.tamAd}"></h5><p class="mb-0 text-muted small"><i class="ti ti-shield-lock me-1"></i><span th:text="#{personal.rol_ve_giris_selahiyyetlerinin}">Rol və giriş səlahiyyətlərinin idarəsi</span></p></div>
                 </div>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla"></button>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Bağla" th:aria-label="#{common.bagla}"></button>
             </div>
             <div class="modal-body pt-4">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <h6 class="mb-0"><i class="ti ti-user-shield text-primary me-2"></i>Verilmiş rollar</h6>
+                    <h6 class="mb-0"><i class="ti ti-user-shield text-primary me-2"></i><span th:text="#{personal.verilmis_rollar}">Verilmiş rollar</span></h6>
                     <span class="badge bg-primary-subtle text-primary" th:text="|${#lists.size(personalRoles.get(p.personalId))} rol|"></span>
                 </div>
                 <div class="border rounded overflow-hidden mb-4">
@@ -319,53 +319,53 @@
                         <div class="d-flex align-items-center gap-3">
                             <span class="avatar bg-primary-subtle text-primary rounded-circle"><i class="ti ti-shield-check fs-20"></i></span>
                             <div>
-                                <div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${assigned.rolAdi}"></span><span th:if="${assigned.esasRol}" class="badge bg-success-subtle text-success">Əsas rol</span></div>
+                                <div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${assigned.rolAdi}"></span><span th:if="${assigned.esasRol}" class="badge bg-success-subtle text-success" th:text="#{personal.esas_rol}">Əsas rol</span></div>
                                 <small class="text-muted" th:text="${assigned.aciqlama ?: 'Rol üçün açıqlama yoxdur'}"></small>
                             </div>
                         </div>
-                        <form method="post" th:action="@{/emekdash/rol}" onsubmit="return confirm('Bu rolu personaldan silmək istəyirsiniz?')">
+                        <form method="post" th:action="@{/emekdash/rol}" th:attr="data-confirm=#{js.confirm.employeeRoleRemove}">
                             <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                             <input type="hidden" name="personalKlinikaId" th:value="${p.personalKlinikaId}">
                             <input type="hidden" name="rolId" th:value="${assigned.rolId}">
                             <input type="hidden" name="elaveEdilsin" value="false">
                             <input type="hidden" name="esasRol" th:value="${assigned.esasRol}">
-                            <button class="btn btn-sm btn-outline-danger" type="submit" title="Rolu sil"><i class="ti ti-trash me-1"></i>Sil</button>
+                            <button class="btn btn-sm btn-outline-danger" type="submit" title="Rolu sil" th:title="#{personal.rolu_sil}"><i class="ti ti-trash me-1"></i><span th:text="#{personal.sil}">Sil</span></button>
                         </form>
                     </div>
                     <div th:if="${#lists.isEmpty(personalRoles.get(p.personalId))}" class="text-center text-muted py-4">
-                        <i class="ti ti-shield-off fs-2 d-block mb-2"></i>Bu personala hələ rol verilməyib.
-                    </div>
+                        <i class="ti ti-shield-off fs-2 d-block mb-2"></i><span th:text="#{personal.bu_personala_hele_rol_verilmeyi}">Bu personala hələ rol verilməyib.
+                    </span></div>
                 </div>
 
                 <div class="rounded bg-light border p-3">
-                    <h6 class="mb-3"><i class="ti ti-shield-plus text-primary me-2"></i>Yeni rol əlavə et</h6>
+                    <h6 class="mb-3"><i class="ti ti-shield-plus text-primary me-2"></i><span th:text="#{personal.yeni_rol_elave_et}">Yeni rol əlavə et</span></h6>
                     <form method="post" th:action="@{/emekdash/rol}">
                         <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                         <input type="hidden" name="personalKlinikaId" th:value="${p.personalKlinikaId}">
                         <input type="hidden" name="elaveEdilsin" value="true">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-7">
-                                <label class="form-label small text-muted">Rol seçimi</label>
+                                <label class="form-label small text-muted" th:text="#{personal.rol_secimi}">Rol seçimi</label>
                                 <select class="form-select" name="rolId" required th:disabled="${#lists.isEmpty(availableRoles.get(p.personalId))}">
-                                    <option value="" disabled selected>Əlavə ediləcək rolu seçin</option>
+                                    <option value="" disabled selected th:text="#{personal.elave_edilecek_rolu_secin}">Əlavə ediləcək rolu seçin</option>
                                     <option th:each="r : ${availableRoles.get(p.personalId)}" th:value="${r.rolId}" th:text="${r.rolAdi}"></option>
                                 </select>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-check form-switch pb-2">
                                     <input class="form-check-input" type="checkbox" name="esasRol" value="true" th:id="|primaryRole${p.personalId}|">
-                                    <label class="form-check-label" th:for="|primaryRole${p.personalId}|">Əsas rol</label>
+                                    <label class="form-check-label" th:for="|primaryRole${p.personalId}|" th:text="#{personal.esas_rol}">Əsas rol</label>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-primary w-100" type="submit" th:disabled="${#lists.isEmpty(availableRoles.get(p.personalId))}"><i class="ti ti-plus me-1"></i>Rol əlavə et</button>
+                                <button class="btn btn-primary w-100" type="submit" th:disabled="${#lists.isEmpty(availableRoles.get(p.personalId))}"><i class="ti ti-plus me-1"></i><span th:text="#{personal.rol_elave_et}">Rol əlavə et</span></button>
                             </div>
                         </div>
-                        <small th:if="${#lists.isEmpty(availableRoles.get(p.personalId))}" class="text-success d-block mt-2"><i class="ti ti-circle-check me-1"></i>Bütün aktiv rollar artıq verilib.</small>
+                        <small th:if="${#lists.isEmpty(availableRoles.get(p.personalId))}" class="text-success d-block mt-2"><i class="ti ti-circle-check me-1"></i><span th:text="#{personal.butun_aktiv_rollar_artiq_verili}">Bütün aktiv rollar artıq verilib.</span></small>
                     </form>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button></div>
+            <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.bagla}">Bağla</button></div>
         </div></div>
     </div>
 
@@ -373,11 +373,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/kassalar}" class="js-access-form" data-kind="cash">
                 <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="kassalarJson" class="js-json">
-                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-cash-register text-success me-2"></i>Kassa səlahiyyətləri</h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kassa</th><th class="text-center">Seçilib</th><th class="text-center">İzləsin</th><th class="text-center">İşləsin</th></tr></thead><tbody>
+                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-cash-register text-success me-2"></i><span th:text="#{personal.kassa_selahiyyetleri}">Kassa səlahiyyətləri</span></h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th th:text="#{common.kassa}">Kassa</th><th class="text-center" th:text="#{personal.secilib}">Seçilib</th><th class="text-center" th:text="#{personal.izlesin}">İzləsin</th><th class="text-center" th:text="#{personal.islesin}">İşləsin</th></tr></thead><tbody>
                     <tr th:each="k:${personalKassalar[p.personalId]}" class="js-access-row" th:attr="data-id=${k.kassaId}"><td><strong th:text="${k.kassaAdi}"></strong><small class="d-block text-muted" th:text="${k.kassaKodu}"></small></td><td class="text-center"><input class="form-check-input js-selected" type="checkbox" th:checked="${k.secilib}"></td><td class="text-center"><input class="form-check-input js-watch" type="checkbox" th:checked="${k.izlesin}"></td><td class="text-center"><input class="form-check-input js-work" type="checkbox" th:checked="${k.islesin}"></td></tr>
-                    <tr th:if="${#lists.isEmpty(personalKassalar[p.personalId])}"><td colspan="4" class="text-center text-muted py-4">Kassa tapılmadı</td></tr>
-                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button><button class="btn btn-success">Yadda saxla</button></div>
+                    <tr th:if="${#lists.isEmpty(personalKassalar[p.personalId])}"><td colspan="4" class="text-center text-muted py-4" th:text="#{personal.kassa_tapilmadi}">Kassa tapılmadı</td></tr>
+                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.bagla}">Bağla</button><button class="btn btn-success" th:text="#{common.yadda_saxla}">Yadda saxla</button></div>
             </form>
         </div></div>
     </div>
@@ -386,11 +386,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/sobeler}" class="js-access-form" data-kind="department">
                 <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="sobelerJson" class="js-json">
-                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-building-community text-info me-2"></i>Şöbə səlahiyyətləri</h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Şöbə</th><th>Tip</th><th class="text-center">Seçilib</th><th class="text-center">İzləsin</th><th class="text-center">İşləsin</th></tr></thead><tbody>
+                <div class="modal-header"><div><h5 class="mb-1"><i class="ti ti-building-community text-info me-2"></i><span th:text="#{personal.sobe_selahiyyetleri}">Şöbə səlahiyyətləri</span></h5><small class="text-muted" th:text="${p.tamAd}"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><div class="table-responsive"><table class="table align-middle"><thead><tr><th th:text="#{common.sobe}">Şöbə</th><th th:text="#{common.tip}">Tip</th><th class="text-center" th:text="#{personal.secilib}">Seçilib</th><th class="text-center" th:text="#{personal.izlesin}">İzləsin</th><th class="text-center" th:text="#{personal.islesin}">İşləsin</th></tr></thead><tbody>
                     <tr th:each="s:${personalSobeler[p.personalId]}" class="js-access-row" th:attr="data-id=${s.sobeId}"><td><strong th:text="${s.sobeAdi}"></strong></td><td th:text="${s.sobeTipiAdi}"></td><td class="text-center"><input class="form-check-input js-selected" type="checkbox" th:checked="${s.secilib}"></td><td class="text-center"><input class="form-check-input js-watch" type="checkbox" th:checked="${s.izlesin}"></td><td class="text-center"><input class="form-check-input js-work" type="checkbox" th:checked="${s.islesin}"></td></tr>
-                    <tr th:if="${#lists.isEmpty(personalSobeler[p.personalId])}"><td colspan="5" class="text-center text-muted py-4">Şöbə tapılmadı</td></tr>
-                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Bağla</button><button class="btn btn-info">Yadda saxla</button></div>
+                    <tr th:if="${#lists.isEmpty(personalSobeler[p.personalId])}"><td colspan="5" class="text-center text-muted py-4" th:text="#{personal.sobe_tapilmadi}">Şöbə tapılmadı</td></tr>
+                </tbody></table></div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.bagla}">Bağla</button><button class="btn btn-info" th:text="#{common.yadda_saxla}">Yadda saxla</button></div>
             </form>
         </div></div>
     </div>

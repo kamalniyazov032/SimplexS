@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     data-layout="mini" data-bs-theme="light" data-sidebar="sidebar4" data-topbar="white" data-color="primary">
 
 <head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
@@ -20,6 +20,19 @@
 -->
         </div>
     </div>
+
+    <!-- jQuery -->
+    <script th:inline="javascript">
+        window.SimplexI18n = Object.freeze({
+            calendarSelectTime: /*[[#{js.calendar.selectTime}]]*/ 'Əvvəlcə təqvimdə saat seçin.',
+            nameRequired: /*[[#{js.name.required}]]*/ 'Ad sahəsini doldurun.',
+            serviceSelectOne: /*[[#{js.service.selectOne}]]*/ 'Ən azı bir xidmət seçin.'
+        });
+        document.addEventListener('submit', event => {
+            const message = event.target.dataset.confirm;
+            if (message && !window.confirm(message)) event.preventDefault();
+        });
+    </script>
 
     <!-- jQuery -->
     <script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>

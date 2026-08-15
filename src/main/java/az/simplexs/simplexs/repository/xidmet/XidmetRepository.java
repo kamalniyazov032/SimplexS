@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -28,8 +29,14 @@ public class XidmetRepository {
     public Map<String,Object> qrupYenile(Long id,String ad,Long parentId,boolean aktiv) { return one("SELECT * FROM public.fn_xidmet_qrupu_yenile(p_xidmet_qrupu_id=>:id,p_ad=>:ad,p_parent_id=>:parent,p_parent_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>NULL)",new MapSqlParameterSource().addValue("id",id).addValue("ad",ad.trim()).addValue("parent",parentId).addValue("aktiv",aktiv)); }
 
     public List<Xidmet> xidmetler(Long klinikaId,Long qrupId) {
-        return jdbc.query("SELECT * FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),CAST(:aktiv AS boolean),CAST(:alt AS boolean)) ORDER BY xidmet_adi",
-                new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("qrup",qrupId).addValue("aktiv",null).addValue("alt",true),(r,n)->new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class)));
+        return jdbc.query("""
+                SELECT f.*,COALESCE(NULLIF(t.deyer,''),f.xidmet_adi) lokallasdirilmis_xidmet_adi
+                FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),CAST(:aktiv AS boolean),CAST(:alt AS boolean)) f
+                LEFT JOIN public.kn_diller d ON d.kod=:dil AND d.aktiv
+                LEFT JOIN public.kn_melumat_tercumeleri t ON t.melumat_novu='XIDMET' AND t.menbe_id=f.xidmet_id AND t.saha='ad' AND t.dil_id=d.id
+                ORDER BY lokallasdirilmis_xidmet_adi
+                """,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("qrup",qrupId).addValue("aktiv",null).addValue("alt",false).addValue("dil",LocaleContextHolder.getLocale().getLanguage()),
+                (r,n)->new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("lokallasdirilmis_xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class)));
     }
     public List<Xidmet> availableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query,int limit,int offset){
         String sql="""

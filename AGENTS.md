@@ -8,8 +8,18 @@
 
 ## Canlı verilənlər bazasına dəyişiklik
 
-- İstifadəçinin həmin dəyişiklik üçün ayrıca və açıq razılığı olmadan canlı DB-də heç bir dəyişiklik tətbiq edilməməlidir.
-- Migration faylının hazırlanması onun canlı DB-də işə salınmasına icazə demək deyil.
-- DB dəyişiklikləri əvvəlcə yalnız kodda hazırlanmalı, istifadəçiyə göstərilməli və tətbiq etmək üçün ayrıca təsdiq alınmalıdır.
-- Test və diaqnostika zamanı canlı DB-yə yazan `INSERT`, `UPDATE`, `DELETE`, DDL və Flyway migrate əməliyyatları təsdiqsiz icra edilməməlidir.
-- Flyway standart olaraq söndürülmüş saxlanılmalıdır; istifadəçinin ayrıca razılığı olmadan aktivləşdirilməməli və migrate işlədilməməlidir.
+- `kn_` prefiksli cədvəllərin yaradılması və həmin cədvəllərdə `INSERT`, `UPDATE`, `DELETE`, DDL və Flyway migrate əməliyyatları üçün agent ayrıca təsdiq almadan dəyişiklik edə və canlı DB-yə tətbiq edə bilər.
+- `rn_` prefiksli mövcud və ya yeni cədvəllərə, onların məlumatlarına və əlaqəli DB obyektlərinə hər hansı dəyişiklik yalnız istifadəçinin həmin dəyişiklik üçün ayrıca və açıq razılığı ilə tətbiq edilə bilər.
+- Bir migration həm `kn_`, həm də `rn_` obyektlərinə toxunursa, canlı DB-yə tətbiqdən əvvəl ayrıca razılıq alınmalıdır.
+- Migration faylının hazırlanması `rn_` dəyişikliklərini canlı DB-yə tətbiq etməyə icazə sayılmır.
+- Flyway standart olaraq söndürülmüş saxlanılmalıdır; yalnız bütün pending migration-lar yuxarıdakı icazə qaydalarına uyğundursa migrate işlədilə bilər.
+
+## Çoxdillilik
+
+- İstifadəçiyə görünən yeni statik mətnlər birbaşa HTML, Java və ya JavaScript daxilində yazılmamalıdır; tərcümə açarı vasitəsilə göstərilməlidir.
+- Azərbaycan dili bütün interfeys mətnləri üçün standart və ehtiyat dildir.
+- Thymeleaf şablonlarında mətn, başlıq, `placeholder`, `title`, `aria-label` və oxşar atributlar `#{...}` mesaj açarlarından alınmalıdır.
+- Java bildirişləri, validasiya və xəta mesajları `MessageSource` vasitəsilə lokallaşdırılmalıdır.
+- JavaScript-in istifadəçiyə göstərdiyi mətnlər server tərəfindən verilən lokallaşdırılmış dəyərlərdən və ya ayrıca i18n obyektindən alınmalıdır.
+- Yeni interfeys açarı əlavə edilərkən onun Azərbaycan dilində standart dəyəri `messages_az.properties` faylına daxil edilməlidir.
+- DB-dən gələn biznes məlumatlarının tərcüməsi interfeys tərcümələrindən ayrı saxlanılmalı və ikinci mərhələnin tərcümə mexanizmi ilə idarə edilməlidir.

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/blank}">
 
 <head></head>
@@ -9,13 +9,13 @@
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap">
         <div>
             <h4 class="mb-1 text-primary fw-bold">
-                <i class="fa-solid fa-file-prescription me-2"></i>Həkim təyinat yaz
-            </h4>
+                <i class="fa-solid fa-file-prescription me-2"></i><span>Həkim təyinat yaz
+            </span></h4>
             <p class="mb-0 text-muted">Stasionar pasient üçün dərman təyinatı yaradın.</p>
         </div>
         <button type="button" class="btn btn-light border" onclick="window.close();">
-            <i class="fa-solid fa-xmark me-1"></i>Bağla
-        </button>
+            <i class="fa-solid fa-xmark me-1"></i><span>Bağla
+        </span></button>
     </div>
 
     <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
@@ -288,11 +288,11 @@
                                     <div class="col-lg-4">
                                         <div class="d-flex justify-content-lg-end gap-2">
                                             <button type="button" class="btn btn-primary px-4">
-                                                <i class="fa-solid fa-download me-1"></i>Yüklə
-                                            </button>
+                                                <i class="fa-solid fa-download me-1"></i><span>Yüklə
+                                            </span></button>
                                             <button type="button" class="btn btn-light border px-4">
-                                                <i class="fa-regular fa-trash-can me-1"></i>Təmizlə
-                                            </button>
+                                                <i class="fa-regular fa-trash-can me-1"></i><span>Təmizlə
+                                            </span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -346,7 +346,7 @@
                                 <tr>
                                     <td>24.05.2025</td>
                                     <td class="fw-bold">08:00</td>
-                                    <td class="text-start fw-semibold">Paracetamol<br><span class="small text-muted">500 mg tablet</span></td>
+                                    <td class="text-start fw-semibold"><span>Paracetamol</span><br><span class="small text-muted">500 mg tablet</span></td>
                                     <td>100001</td>
                                     <td>500</td>
                                     <td>1</td>
@@ -377,11 +377,11 @@
 
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
                         <button type="button" class="btn btn-primary px-4">
-                            <i class="fa-regular fa-floppy-disk me-1"></i>Saxla
-                        </button>
+                            <i class="fa-regular fa-floppy-disk me-1"></i><span>Saxla
+                        </span></button>
                         <button type="button" class="btn btn-light border px-4" onclick="window.close();">
-                            <i class="fa-solid fa-xmark me-1"></i>Bağla
-                        </button>
+                            <i class="fa-solid fa-xmark me-1"></i><span>Bağla
+                        </span></button>
                     </div>
                 </div>
 

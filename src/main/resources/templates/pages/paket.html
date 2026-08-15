@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="az"
+<html lang="az" th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
@@ -36,8 +36,8 @@
             <p class="mb-0">Mövcud paketlər və onlara daxil olan xidmətlərin tənzimlənməsi</p>
         </div>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPackageModal">
-            <i class="ti ti-plus me-1"></i> Yeni Paket Əlavə Et
-        </button>
+            <i class="ti ti-plus me-1"></i><span> Yeni Paket Əlavə Et
+        </span></button>
     </div>
 
     <div class="row">
@@ -127,8 +127,8 @@
                         </div>
                         <div class="col-md-2">
                             <button class="btn btn-primary  w-75">
-                                <i class="ti ti-plus me-1"></i> Əlavə et
-                            </button>
+                                <i class="ti ti-plus me-1"></i><span> Əlavə et
+                            </span></button>
                         </div>
                     </div>
 
@@ -183,8 +183,8 @@
                             </div>
                         </div>
                     <button class="btn btn-primary px-2">
-                        <i class="ti ti-device-floppy me-1"></i> Paketi Yadda Saxla
-                    </button>
+                        <i class="ti ti-device-floppy me-1"></i><span> Paketi Yadda Saxla
+                    </span></button>
 
                 </div>
             </div>
