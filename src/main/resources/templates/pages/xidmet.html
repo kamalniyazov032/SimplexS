@@ -61,7 +61,7 @@
     <div class="card border-0 shadow-sm">
         <div class="card-header d-flex align-items-center justify-content-between gap-3"><div><h5 class="mb-1" th:text="${selectedQrup != null ? selectedQrup.ad : #messages.msg('services.all')}">Xidmət siyahısı</h5><small class="text-muted" th:text="#{services.count(${xidmetCount})}"></small></div><a th:if="${filterApplied}" class="btn btn-sm btn-light" th:href="@{/parXidmet(qrupId=${selectedQrupId})}"><i class="ti ti-x me-1"></i><span th:text="#{common.clear}">Təmizlə</span></a></div>
         <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3" th:text="#{services.kod}">Kod</th><th th:text="#{services.xidmet}">Xidmət</th><th th:text="#{services.qrup}">Qrup</th><th th:text="#{services.tip}">Tip</th><th th:text="#{services.muhasibat}">Mühasibat</th><th th:text="#{services.hesabat}">Hesabat</th><th th:text="#{services.status}">Status</th><th></th></tr></thead><tbody>
-        <tr th:each="x:${xidmetler}"><td class="ps-3"><span class="badge bg-light text-dark border" th:text="${x.kod}"></span></td><td><div class="d-flex gap-2 align-items-center"><span class="avatar avatar-sm bg-info-subtle text-info rounded-circle"><i class="ti ti-stethoscope"></i></span><div><div class="fw-semibold" th:text="${x.ad}"></div><small class="text-muted" th:text="${x.beynelxalqKod?:''}"></small></div></div></td><td th:text="${x.qrupAdi}"></td><td><span class="badge bg-primary-subtle text-primary" th:text="${x.tipAdi}"></span></td><td th:text="${x.muhasibatKoduAdi}"></td><td th:text="${x.hesabatNovuAdi?:'—'}"></td><td><span class="badge" th:classappend="${x.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${x.aktiv} ? #{common.aktiv} : #{common.passiv}"></span></td><td class="text-end pe-3"><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editX${x.id}|" title="Redaktə et" th:title="#{services.redakte_et}"><i class="ti ti-edit"></i></button></td></tr>
+        <tr th:each="x:${xidmetler}"><td class="ps-3"><span class="badge bg-light text-dark border" th:text="${x.kod}"></span></td><td><div class="d-flex gap-2 align-items-center"><span class="avatar avatar-sm rounded-circle" th:classappend="${x.paketXidmet}?'bg-primary-subtle text-primary':'bg-info-subtle text-info'"><i th:class="${x.paketXidmet}?'ti ti-package':'ti ti-stethoscope'"></i></span><div><div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${x.ad}"></span><span th:if="${x.paketXidmet}" class="badge bg-primary-subtle text-primary" th:text="#{services.paket}">Paket</span></div><small class="text-muted" th:text="${x.beynelxalqKod?:''}"></small></div></div></td><td th:text="${x.qrupAdi}"></td><td><span class="badge bg-primary-subtle text-primary" th:text="${x.tipAdi}"></span></td><td th:text="${x.muhasibatKoduAdi}"></td><td th:text="${x.hesabatNovuAdi?:'—'}"></td><td><span class="badge" th:classappend="${x.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${x.aktiv} ? #{common.aktiv} : #{common.passiv}"></span></td><td class="text-end pe-3"><div class="d-inline-flex gap-1"><button th:if="${x.paketXidmet}" type="button" class="btn btn-sm btn-outline-info js-package-open" data-bs-toggle="modal" data-bs-target="#packageContents" th:data-id="${x.id}" th:data-code="${x.kod}" th:data-name="${x.ad}" th:title="#{services.terkibi_idare_et}"><i class="ti ti-package-import"></i></button><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editX${x.id}|" title="Redaktə et" th:title="#{services.redakte_et}"><i class="ti ti-edit"></i></button></div></td></tr>
         <tr th:if="${#lists.isEmpty(xidmetler)}"><td colspan="8" class="text-center text-muted py-5"><i class="ti ti-medical-cross-off fs-2 d-block mb-2"></i><span th:text="${filterApplied} ? #{services.filter_no_result} : (${selectedQrupId != null} ? #{services.group_no_result} : #{services.no_result})"></span></td></tr>
         </tbody></table></div></div>
     </div>
@@ -80,6 +80,7 @@
             <div class="col-md-6"><label class="form-label"><i class="ti ti-language text-primary me-1"></i><span th:text="#{services.beynelxalq_ad}">Beynəlxalq ad</span></label><input class="form-control" name="beynelxalqAd" placeholder="Beynəlxalq ad" th:placeholder="#{services.beynelxalq_ad}"></div>
             <div class="col-md-6"><label class="form-label"><i class="ti ti-report-medical text-primary me-1"></i><span th:text="#{services.hesabat_novu}">Hesabat növü</span></label><select class="form-select" name="hesabatNovuId"><option value="" th:text="#{services.hesabat_novu_yoxdur}">Hesabat növü yoxdur</option><option th:each="o:${hesabatNovleri}" th:value="${o.id}" th:text="${o.ad}"></option></select></div>
             <div class="col-md-6"><label class="form-label"><i class="ti ti-clipboard-check text-primary me-1"></i><span th:text="#{services.hesabat_mecburiyyeti}">Hesabat məcburiyyəti</span></label><select class="form-select" name="hesabatMecburiyyetiId"><option value="" th:text="#{services.hesabat_mecburiyyeti_yoxdur}">Hesabat məcburiyyəti yoxdur</option><option th:each="o:${hesabatMecburiyyetleri}" th:value="${o.id}" th:text="${o.ad}"></option></select></div>
+            <div class="col-12"><div class="d-flex justify-content-between align-items-center border rounded p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle"><i class="ti ti-package"></i></span><div><div class="fw-semibold" th:text="#{services.paket_xidmetdir}">Paket xidmətdir</div><small class="text-muted" th:text="#{services.paket_xidmet_hint}">Xidmət yaradıldıqdan sonra tərkibini idarə edə bilərsiniz</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="paketXidmet" value="true"></div></div></div>
             <div class="col-12"><div class="d-flex justify-content-between align-items-center border rounded p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-power"></i></span><div><div class="fw-semibold" th:text="#{services.aktiv_xidmet}">Aktiv xidmət</div><small class="text-muted" th:text="#{services.xidmet_istifadeye_aciq_yaradils}">Xidmət istifadəyə açıq yaradılsın</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" checked></div></div></div>
         </div></div><div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{services.imtina}">İmtina</button><button class="btn btn-primary"><i class="ti ti-plus me-1"></i><span th:text="#{services.yarat}">Yarat</span></button></div>
     </form></div></div></div>
@@ -95,9 +96,27 @@
             <div class="col-md-6"><label class="form-label"><i class="ti ti-language text-primary me-1"></i><span th:text="#{services.beynelxalq_ad}">Beynəlxalq ad</span></label><input class="form-control" name="beynelxalqAd" th:value="${x.beynelxalqAd}" placeholder="Beynəlxalq ad" th:placeholder="#{services.beynelxalq_ad}"></div>
             <div class="col-md-6"><label class="form-label"><i class="ti ti-report-medical text-primary me-1"></i><span th:text="#{services.hesabat_novu}">Hesabat növü</span></label><select class="form-select" name="hesabatNovuId"><option value="" th:text="#{services.hesabat_novu_yoxdur}">Hesabat növü yoxdur</option><option th:each="o:${hesabatNovleri}" th:value="${o.id}" th:text="${o.ad}" th:selected="${o.id==x.hesabatNovuId}"></option></select></div>
             <div class="col-md-6"><label class="form-label"><i class="ti ti-clipboard-check text-primary me-1"></i><span th:text="#{services.hesabat_mecburiyyeti}">Hesabat məcburiyyəti</span></label><select class="form-select" name="hesabatMecburiyyetiId"><option value="" th:text="#{services.hesabat_mecburiyyeti_yoxdur}">Hesabat məcburiyyəti yoxdur</option><option th:each="o:${hesabatMecburiyyetleri}" th:value="${o.id}" th:text="${o.ad}" th:selected="${o.id==x.hesabatMecburiyyetiId}"></option></select></div>
+            <div class="col-12"><div class="d-flex justify-content-between align-items-center border rounded p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle"><i class="ti ti-package"></i></span><div><div class="fw-semibold" th:text="#{services.paket_xidmetdir}">Paket xidmətdir</div><small class="text-muted" th:text="#{services.paket_status_hint}">Aktiv olduqda xidmətə paket tərkibi əlavə edilə bilər</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="paketXidmet" value="true" th:checked="${x.paketXidmet}"></div></div></div>
             <div class="col-12"><div class="d-flex justify-content-between align-items-center border rounded p-3"><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm bg-success-subtle text-success rounded-circle"><i class="ti ti-power"></i></span><div><div class="fw-semibold" th:text="#{services.aktiv_xidmet}">Aktiv xidmət</div><small class="text-muted" th:text="#{services.xidmetin_aktiv_statusu}">Xidmətin aktiv statusu</small></div></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${x.aktiv}"></div></div></div>
         </div></div><div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{services.imtina}">İmtina</button><button class="btn btn-primary"><i class="ti ti-device-floppy me-1"></i><span th:text="#{services.yadda_saxla}">Yadda saxla</span></button></div>
     </form></div></div></div>
+
+    <div class="modal fade" id="packageContents" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
+            <form method="post" th:action="@{/parXidmet/paket-terkibi}" id="packageForm">
+                <input type="hidden" name="paketXidmetId" id="packageId"><input type="hidden" name="xidmetlerJson" id="packageJson">
+                <div class="modal-header border-0 pb-0"><div class="d-flex gap-3 align-items-center"><span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle"><i class="ti ti-package fs-24"></i></span><div><h5 class="mb-1" th:text="#{services.paket_terkibi}">Paket tərkibi</h5><small class="text-muted" id="packageTitle"></small></div></div><button class="btn-close" type="button" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button></div>
+                <div class="modal-body pt-4">
+                    <div class="row g-3">
+                        <div class="col-lg-7"><div class="border rounded h-100 overflow-hidden"><div class="p-3 bg-light border-bottom"><h6 class="mb-3"><i class="ti ti-search text-primary me-2"></i><span th:text="#{services.elave_edilecek_xidmetler}">Əlavə ediləcək xidmətlər</span></h6><div class="row g-2"><div class="col-md-7"><div class="input-group"><span class="input-group-text bg-white"><i class="ti ti-search"></i></span><input class="form-control" id="packageSearch" th:placeholder="#{services.kod_ve_ya_ada_gore_axtar}" autocomplete="off"></div></div><div class="col-md-5"><select class="form-select" id="packageGroup"><option value="" th:text="#{services.butun_qruplar}">Bütün qruplar</option><option th:each="qrup:${qruplar}" th:value="${qrup.id}" th:text="${qrup.tamYol}"></option></select></div></div></div><div id="packageCandidates" class="package-list"></div><div class="p-3 text-center border-top"><button class="btn btn-sm btn-light" type="button" id="packageMore" hidden><i class="ti ti-chevron-down me-1"></i><span th:text="#{services.daha_cox_goster}">Daha çox göstər</span></button></div></div></div>
+                        <div class="col-lg-5"><div class="border rounded h-100 overflow-hidden"><div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center"><h6 class="mb-0"><i class="ti ti-list-check text-success me-2"></i><span th:text="#{services.paketdeki_xidmetler}">Paketdəki xidmətlər</span></h6><span class="badge bg-primary-subtle text-primary" id="packageCount">0</span></div><div id="packageSelected" class="package-list"></div></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.legv_et}">Ləğv et</button><button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy me-1"></i><span th:text="#{common.yadda_saxla}">Yadda saxla</span></button></div>
+            </form>
+        </div></div>
+    </div>
+    <div id="packageI18n" hidden th:data-add="#{services.elave_et}" th:data-remove="#{services.cixar}" th:data-quantity="#{services.miqdar}" th:data-empty="#{services.paket_bosdur}" th:data-no-results="#{services.xidmet_tapilmadi}" th:data-load-error="#{services.melumat_yuklenmedi}"></div>
     <style>
         .service-group-node{display:flex;align-items:center;min-height:40px;border-radius:.375rem}
         .service-group-node:hover{background:var(--bs-tertiary-bg)}
@@ -106,6 +125,11 @@
         .service-group-toggle{border:0;box-shadow:none!important}
         .service-group-link{display:flex;align-items:center;gap:.5rem;flex:1;min-width:0;padding:.5rem .5rem .5rem 0;color:inherit;text-decoration:none}
         .service-group-link:hover{color:inherit}
+        .package-list{min-height:340px;max-height:420px;overflow:auto}
+        .package-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid var(--bs-border-color)}
+        .package-item:last-child{border-bottom:0}
+        .package-item-info{flex:1;min-width:0}
+        .package-quantity{width:78px}
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -144,6 +168,109 @@
                 render();
             }));
             render();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('packageContents');
+            if (!modal) return;
+            const i18n = document.getElementById('packageI18n').dataset;
+            const idInput = document.getElementById('packageId');
+            const title = document.getElementById('packageTitle');
+            const search = document.getElementById('packageSearch');
+            const group = document.getElementById('packageGroup');
+            const candidatesBox = document.getElementById('packageCandidates');
+            const selectedBox = document.getElementById('packageSelected');
+            const count = document.getElementById('packageCount');
+            const more = document.getElementById('packageMore');
+            const selected = new Map();
+            let candidates = [];
+            let page = 0;
+            let timer;
+            let request;
+
+            const empty = (box, message) => {
+                const div = document.createElement('div');
+                div.className = 'text-center text-muted py-5';
+                const icon = document.createElement('i');
+                icon.className = 'ti ti-package-off fs-2 d-block mb-2';
+                div.append(icon, document.createTextNode(message));
+                box.replaceChildren(div);
+            };
+            const serviceInfo = item => {
+                const info = document.createElement('div');
+                info.className = 'package-item-info';
+                const name = document.createElement('div');
+                name.className = 'fw-semibold text-truncate';
+                name.textContent = item.ad ?? item.xidmetAdi;
+                const meta = document.createElement('small');
+                meta.className = 'text-muted';
+                meta.textContent = [item.kod ?? item.xidmetKodu, item.qrupAdi ?? item.xidmetQrupuAdi, item.tipAdi ?? item.xidmetTipiAdi].filter(Boolean).join(' · ');
+                info.append(name, meta);
+                return info;
+            };
+            const renderSelected = () => {
+                selectedBox.replaceChildren();
+                count.textContent = selected.size;
+                if (!selected.size) return empty(selectedBox, i18n.empty);
+                selected.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'package-item';
+                    const quantity = document.createElement('input');
+                    quantity.type = 'number'; quantity.min = '1'; quantity.step = '1';
+                    quantity.className = 'form-control form-control-sm package-quantity';
+                    quantity.title = i18n.quantity; quantity.value = item.miqdar || 1;
+                    quantity.addEventListener('change', () => item.miqdar = Math.max(1, Number.parseInt(quantity.value, 10) || 1));
+                    const remove = document.createElement('button');
+                    remove.type = 'button'; remove.className = 'btn btn-sm btn-outline-danger'; remove.title = i18n.remove;
+                    const icon = document.createElement('i'); icon.className = 'ti ti-trash'; remove.append(icon);
+                    remove.addEventListener('click', () => { selected.delete(String(item.xidmetId)); renderSelected(); renderCandidates(); });
+                    row.append(serviceInfo(item), quantity, remove); selectedBox.append(row);
+                });
+            };
+            const renderCandidates = () => {
+                candidatesBox.replaceChildren();
+                if (!candidates.length) return empty(candidatesBox, i18n.noResults);
+                candidates.forEach(item => {
+                    const row = document.createElement('div'); row.className = 'package-item';
+                    const add = document.createElement('button'); add.type = 'button'; add.className = 'btn btn-sm btn-outline-primary';
+                    add.disabled = selected.has(String(item.id)); add.title = i18n.add;
+                    const icon = document.createElement('i'); icon.className = add.disabled ? 'ti ti-check' : 'ti ti-plus'; add.append(icon);
+                    add.addEventListener('click', () => { selected.set(String(item.id), {xidmetId:item.id,xidmetKodu:item.kod,xidmetAdi:item.ad,xidmetQrupuAdi:item.qrupAdi,xidmetTipiAdi:item.tipAdi,miqdar:1}); renderSelected(); renderCandidates(); });
+                    row.append(serviceInfo(item), add); candidatesBox.append(row);
+                });
+            };
+            const load = async (append = false) => {
+                if (!append) { page = 0; candidates = []; candidatesBox.innerHTML = '<div class="text-center py-5"><span class="spinner-border spinner-border-sm text-primary"></span></div>'; }
+                request?.abort(); request = new AbortController();
+                const params = new URLSearchParams({paketXidmetId:idInput.value,page:String(page)});
+                if (search.value.trim()) params.set('q', search.value.trim());
+                if (group.value) params.set('qrupId', group.value);
+                try {
+                    const response = await fetch(`/parXidmet/paket-terkibi?${params}`, {signal:request.signal,headers:{Accept:'application/json'}});
+                    if (!response.ok) throw new Error();
+                    const data = await response.json();
+                    if (!append) {
+                        selected.clear();
+                        data.terkib.forEach(item => selected.set(String(item.xidmetId), {...item,miqdar:item.miqdar || 1}));
+                        renderSelected();
+                    }
+                    candidates = append ? candidates.concat(data.xidmetler) : data.xidmetler;
+                    more.hidden = !data.hasMore; renderCandidates();
+                } catch (error) {
+                    if (error.name !== 'AbortError') empty(candidatesBox, i18n.loadError);
+                }
+            };
+            document.querySelectorAll('.js-package-open').forEach(button => button.addEventListener('click', () => {
+                idInput.value = button.dataset.id; title.textContent = `${button.dataset.code} · ${button.dataset.name}`;
+                search.value = ''; group.value = ''; selected.clear(); candidates = []; renderSelected(); load();
+            }));
+            search.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => load(), 300); });
+            group.addEventListener('change', () => load());
+            more.addEventListener('click', () => { page += 1; load(true); });
+            document.getElementById('packageForm').addEventListener('submit', () => {
+                document.getElementById('packageJson').value = JSON.stringify([...selected.values()].map(item => ({xidmet_id:Number(item.xidmetId),miqdar:Math.max(1,Number(item.miqdar)||1)})));
+            });
         });
     </script>
 </div>

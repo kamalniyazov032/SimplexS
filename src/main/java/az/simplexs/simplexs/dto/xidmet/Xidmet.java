@@ -6,4 +6,4 @@ public record Xidmet(Long id, String kod, String ad, Long qrupId, String qrupKod
         Long muhasibatKoduId, String muhasibatKoduAdi, Long tipId, String tipKodu, String tipAdi,
         String beynelxalqKod, String beynelxalqAd, Long hesabatNovuId, String hesabatNovuKodu,
         String hesabatNovuAdi, Long hesabatMecburiyyetiId, String hesabatMecburiyyetiKodu,
-        String hesabatMecburiyyetiAdi, Boolean aktiv, LocalDateTime yaranmaTarixi) {}
+        String hesabatMecburiyyetiAdi, Boolean paketXidmet, Boolean aktiv, LocalDateTime yaranmaTarixi) {}
