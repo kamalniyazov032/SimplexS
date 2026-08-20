@@ -47,6 +47,7 @@ public class XidmetController {
             @RequestParam(required=false)Long xidmetTipiId,
             @RequestParam(required=false)Long muhasibatKoduId,
             @RequestParam(required=false)String status,
+            @RequestParam(required=false)String paketStatusu,
             @RequestParam(required=false)String q,Model m,HttpSession session){
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
@@ -55,13 +56,14 @@ public class XidmetController {
                 .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
                 .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
                 .filter(x->selectedStatus.isBlank()||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
+                .filter(x->!hasText(paketStatusu)||("paket".equals(paketStatusu)==Boolean.TRUE.equals(x.paketXidmet())))
                 .filter(x->matches(x,q)).toList();
         m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",filtered.size());
-        m.addAttribute("filterApplied",xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(q));
+        m.addAttribute("filterApplied",xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(paketStatusu)||hasText(q));
         m.addAttribute("qruplar",qruplar);m.addAttribute("selectedQrupId",qrupId);
         m.addAttribute("selectedQrup",qruplar.stream().filter(x->x.id().equals(qrupId)).findFirst().orElse(null));
         m.addAttribute("selectedXidmetTipiId",xidmetTipiId);m.addAttribute("selectedMuhasibatKoduId",muhasibatKoduId);
-        m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("q",q);
+        m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("selectedPaketStatusu",paketStatusu);m.addAttribute("q",q);
         m.addAttribute("muhasibatKodlari",repo.muhasibatKodlari(kid));m.addAttribute("xidmetTipleri",repo.xidmetTipleri());
         m.addAttribute("hesabatNovleri",repo.hesabatNovleri());m.addAttribute("hesabatMecburiyyetleri",repo.hesabatMecburiyyetleri());
         return "pages/xidmet";

@@ -16,11 +16,12 @@
         <div class="offcanvas-header border-bottom bg-light py-3"><h5 class="mb-0 fw-bold text-primary"><i class="ti ti-filter me-2"></i><span th:text="#{services.xidmetler_uzre_etrafli_axtaris}">Xidmətlər üzrə ətraflı axtarış</span></h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bağla" th:aria-label="#{services.bagla}"></button></div>
         <div class="offcanvas-body py-3"><form method="get" th:action="@{/parXidmet}"><div class="row g-2 align-items-end">
             <input type="hidden" name="qrupId" th:value="${selectedQrupId}">
-            <div class="col-xl-4 col-md-6"><label class="form-label small text-muted" th:text="#{services.axtaris}">Axtarış</label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-search"></i></span><input class="form-control" name="q" th:value="${q}" placeholder="Kod, ad və ya beynəlxalq ad..." th:placeholder="#{services.kod_ad_ve_ya_beynelxalq_ad}"></div></div>
+            <div class="col-xl-3 col-md-6"><label class="form-label small text-muted" th:text="#{services.axtaris}">Axtarış</label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-search"></i></span><input class="form-control" name="q" th:value="${q}" placeholder="Kod, ad və ya beynəlxalq ad..." th:placeholder="#{services.kod_ad_ve_ya_beynelxalq_ad}"></div></div>
             <div class="col-xl-2 col-md-6"><label class="form-label small text-muted" th:text="#{services.xidmet_tipi}">Xidmət tipi</label><select class="form-select" name="xidmetTipiId"><option value="" th:text="#{services.butun_tipler}">Bütün tiplər</option><option th:each="tip:${xidmetTipleri}" th:value="${tip.id}" th:text="${tip.ad}" th:selected="${tip.id==selectedXidmetTipiId}"></option></select></div>
             <div class="col-xl-2 col-md-6"><label class="form-label small text-muted" th:text="#{services.muhasibat_kodu}">Mühasibat kodu</label><select class="form-select" name="muhasibatKoduId"><option value="" th:text="#{services.butun_kodlar}">Bütün kodlar</option><option th:each="kod:${muhasibatKodlari}" th:value="${kod.id}" th:text="${kod.ad}" th:selected="${kod.id==selectedMuhasibatKoduId}"></option></select></div>
             <div class="col-xl-1 col-md-6"><label class="form-label small text-muted" th:text="#{services.status}">Status</label><select class="form-select" name="status"><option value="" th:text="#{services.hamisi}">Hamısı</option><option value="aktiv" th:selected="${selectedStatus=='aktiv'}" th:text="#{services.aktiv}">Aktiv</option><option value="passiv" th:selected="${selectedStatus=='passiv'}" th:text="#{services.passiv}">Passiv</option></select></div>
-            <div class="col-xl-3 col-md-6"><div class="d-flex gap-2"><button class="btn btn-primary flex-fill"><i class="ti ti-search me-1"></i><span th:text="#{services.axtar}">Axtar</span></button><a class="btn btn-light flex-fill" th:href="@{/parXidmet(qrupId=${selectedQrupId})}" th:text="#{services.temizle}">Təmizlə</a></div></div>
+            <div class="col-xl-2 col-md-6"><label class="form-label small text-muted" th:text="#{services.paket_statusu}">Paket statusu</label><select class="form-select" name="paketStatusu"><option value="" th:text="#{services.hamisi}">Hamısı</option><option value="paket" th:selected="${selectedPaketStatusu=='paket'}" th:text="#{services.yalniz_paketler}">Yalnız paketlər</option><option value="adi" th:selected="${selectedPaketStatusu=='adi'}" th:text="#{services.paket_olmayanlar}">Paket olmayanlar</option></select></div>
+            <div class="col-xl-2 col-md-6"><div class="d-flex gap-2"><button class="btn btn-primary flex-fill"><i class="ti ti-search me-1"></i><span th:text="#{services.axtar}">Axtar</span></button><a class="btn btn-light flex-fill" th:href="@{/parXidmet(qrupId=${selectedQrupId})}" th:text="#{services.temizle}">Təmizlə</a></div></div>
         </div></form></div>
     </div>
 
@@ -34,7 +35,7 @@
             <div class="list-group list-group-flush py-2">
                 <a class="list-group-item list-group-item-action border-0 d-flex align-items-center gap-2 mx-2 rounded"
                    th:classappend="${selectedQrupId == null} ? ' active' : ''"
-                   th:href="@{/parXidmet(q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus})}">
+                   th:href="@{/parXidmet(q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu})}">
                     <i class="ti ti-layout-list"></i><span class="fw-semibold" th:text="#{common.all}">Hamısı</span>
                 </a>
                 <div th:each="qrup:${qruplar}" class="service-group-node mx-2"
@@ -48,7 +49,7 @@
                     </button>
                     <span th:unless="${qrup.altQrupuVar}" class="service-group-toggle-placeholder"></span>
                     <a class="service-group-link text-truncate"
-                       th:href="@{/parXidmet(qrupId=${qrup.id},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus})}"
+                       th:href="@{/parXidmet(qrupId=${qrup.id},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu})}"
                        th:title="${qrup.tamYol}">
                         <i th:class="${qrup.altQrupuVar} ? 'ti ti-folder' : 'ti ti-folder-open'"></i>
                         <span class="text-truncate" th:text="${qrup.ad}"></span>
