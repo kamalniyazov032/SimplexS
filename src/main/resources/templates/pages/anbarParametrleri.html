@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content">
+<style>.warehouse-editor .warehouse-section-title{display:flex;align-items:center;gap:.75rem;color:var(--bs-primary);font-weight:600}.warehouse-editor .warehouse-section-title::after{content:"";height:1px;background:var(--bs-border-color);flex:1}.warehouse-editor .warehouse-section-title>i{display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border-radius:var(--bs-border-radius);background:var(--bs-primary-bg-subtle)}.warehouse-editor .warehouse-settings-title{margin-top:.5rem}.warehouse-editor .warehouse-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.warehouse-editor .warehouse-option{display:flex;align-items:center;gap:.75rem;border:1px solid var(--bs-border-color);border-radius:var(--bs-border-radius);padding:1rem;min-height:4rem;cursor:pointer}.warehouse-editor .warehouse-option:hover{border-color:var(--bs-primary)}.warehouse-editor .warehouse-option input{width:1.1rem;height:1.1rem;flex:0 0 auto}.warehouse-editor .warehouse-option i{font-size:1.25rem;color:var(--bs-primary)}.warehouse-editor form{display:flex;flex-direction:column;max-height:calc(100vh - 3.5rem);overflow:hidden}.warehouse-editor .modal-header,.warehouse-editor .modal-footer{flex-shrink:0}.warehouse-editor .modal-body{overflow-y:auto}@media(max-width:767px){.warehouse-editor .warehouse-option-grid{grid-template-columns:1fr}}</style>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+<div>
+<h4 class="mb-1">
+<i class="ti ti-building-warehouse text-primary me-2">
+</i>
+<span th:text="#{|warehouse.tab.${tab}|}">Anbar</span>
+</h4>
+<p class="text-muted mb-0" th:text="#{|warehouse.page.${tab}|}">Anbar məlumatlarının idarə edilməsi</p>
+</div>
+<div class="d-flex gap-2">
+<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#warehouseFilter">
+<i class="ti ti-filter me-1">
+</i>
+<span th:text="#{common.filter}">Filter</span>
+<span th:if="${filterApplied}" class="badge bg-white text-primary ms-2" th:text="#{common.aktiv}">Aktiv</span>
+</button>
+<button class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="|#${tab}Modal|" th:if="${@access.hasPermission(#authentication,selectedKlinikaId,'ANBAR_IDARE_ET')}">
+<i class="ti ti-plus me-1">
+</i>
+<span th:text="#{common.elave_et}">Əlavə et</span>
+</button>
+</div>
+</div>
+<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">
+</div>
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+</div>
+<div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="warehouseFilter" style="--bs-offcanvas-height:190px!important;height:190px!important;min-height:190px!important;max-height:190px!important">
+<div class="offcanvas-header border-bottom bg-light py-3">
+<h5 class="mb-0 fw-bold text-primary">
+<i class="ti ti-filter me-2">
+</i>
+<span th:text="#{warehouse.detailed_filter}">Anbar üzrə ətraflı axtarış</span>
+</h5>
+<button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="offcanvas-body py-3">
+<form method="get" th:action="@{|/anbar/${tab}|}">
+<div class="row g-2 align-items-end">
+<div class="col-xl-6 col-md-6">
+<label class="form-label small text-muted" th:text="#{common.axtaris}">Axtarış</label>
+<div class="input-group">
+<span class="input-group-text bg-light">
+<i class="ti ti-search">
+</i>
+</span>
+<input class="form-control" name="axtaris" th:value="${axtaris}" th:placeholder="#{warehouse.search_placeholder}">
+</div>
+</div>
+<div class="col-xl-2 col-md-6">
+<label class="form-label small text-muted" th:text="#{common.status}">Status</label>
+<select class="form-select" name="status">
+<option value="hamisi" th:selected="${status=='hamisi'}" th:text="#{common.hamisi}">
+</option>
+<option value="aktiv" th:selected="${status=='aktiv'}" th:text="#{common.aktiv}">
+</option>
+<option value="passiv" th:selected="${status=='passiv'}" th:text="#{common.passiv}">
+</option>
+</select>
+</div>
+<div class="col-xl-4 col-md-6">
+<div class="d-flex gap-2">
+<button class="btn btn-primary flex-fill">
+<i class="ti ti-search me-1">
+</i>
+<span th:text="#{common.axtar}">Axtar</span>
+</button>
+<a class="btn btn-light flex-fill" th:href="@{|/anbar/${tab}|}" th:text="#{common.temizle}">Təmizlə</a>
+</div>
+</div>
+</div>
+</form>
+</div>
+</div>
+<div class="card border-0 shadow-sm">
+<div class="card-header d-flex align-items-center justify-content-between gap-3">
+<div>
+<h5 class="mb-1" th:text="#{|warehouse.tab.${tab}|}">
+</h5>
+<small class="text-muted" th:text="#{|warehouse.page.${tab}|}">
+</small>
+</div>
+<a th:if="${filterApplied}" class="btn btn-sm btn-light" th:href="@{|/anbar/${tab}|}">
+<i class="ti ti-x me-1">
+</i>
+<span th:text="#{common.temizle}">
+</span>
+</a>
+</div>
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+<thead class="table-light">
+<tr th:if="${tab=='anbarlar'}">
+<th class="ps-3" th:text="#{common.kod}">Kod</th>
+<th th:text="#{warehouse.warehouse}">Anbar</th>
+<th th:text="#{warehouse.warehouse_type}">Anbar növü</th>
+<th th:text="#{warehouse.settings}">Anbar seçimləri</th>
+<th th:text="#{warehouse.day_limits}">Gün parametrləri</th>
+<th th:text="#{warehouse.lock_period}">Kilid tarixləri</th>
+<th th:text="#{warehouse.cross_code}">Kros anbar kodu</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+<tr th:if="${tab=='firmalar'}">
+<th class="ps-3" th:text="#{warehouse.customer_number}">Müştəri nömrəsi</th>
+<th th:text="#{warehouse.company}">Firma</th>
+<th th:text="#{warehouse.contact_info}">Əlaqə məlumatları</th>
+<th th:text="#{warehouse.bank_tax_info}">Bank və vergi məlumatları</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+<tr th:if="${tab=='vahidler'}">
+<th class="ps-3" th:text="#{warehouse.order_number}">Sıra</th>
+<th th:text="#{warehouse.unit}">Vahid</th>
+<th th:text="#{warehouse.sub_unit}">Alt vahid</th>
+<th th:text="#{warehouse.multiplier}">Vurma əmsalı</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+<tr th:if="${tab=='qruplar'}">
+<th class="ps-3" th:text="#{common.kod}">Kod</th>
+<th th:text="#{warehouse.group}">Qrup</th>
+<th th:text="#{common.aciqlama}">Açıqlama</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+<tr th:if="${tab=='materiallar'}">
+<th class="ps-3" th:text="#{warehouse.barcode}">Barkod</th>
+<th th:text="#{warehouse.material}">Material</th>
+<th th:text="#{warehouse.group}">Qrup</th>
+<th th:text="#{warehouse.quantity_limits}">Miqdar hədləri</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+<tr th:if="${tab=='emeliyyatlar'}">
+<th class="ps-3" th:text="#{common.kod}">Kod</th>
+<th th:text="#{warehouse.operation}">Əməliyyat</th>
+<th th:text="#{warehouse.operation_category}">Kateqoriya</th>
+<th th:text="#{warehouse.direction}">İstiqamət</th>
+<th th:text="#{common.status}">Status</th>
+<th class="pe-3">
+</th>
+</tr>
+</thead>
+<tbody>
+<th:block th:if="${tab=='qruplar'}" th:each="x:${qruplar}">
+<div class="modal fade warehouse-editor" th:id="|edit-qruplar-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/qrup}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.group_edit_title}">
+</h5>
+<small class="text-muted" th:text="#{warehouse.group_edit_hint}">
+</small>
+</div>
+</div>
+<button class="btn-close" type="button" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-category-2">
+</i>
+<span th:text="#{warehouse.group_info}">
+</span>
+</div>
+</div>
+<div class="col-md-4">
+<label class="form-label"><i class="ti ti-category text-primary me-1"></i><span th:text="#{warehouse.group_type}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category"></i></span><select class="form-select" name="qrupNovuId" required>
+<option th:each="n:${qrupNovleri}" th:value="${n.id}" th:text="${n.ad}" th:selected="${n.id==x.qrupNovuId}">
+</option>
+</select></div>
+</div>
+<div class="col-md-4">
+<label class="form-label"><i class="ti ti-hash text-primary me-1"></i><span th:text="#{common.kod}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-hash"></i></span><input class="form-control" name="kod" th:value="${x.kod}" required></div>
+</div>
+<div class="col-md-4">
+<label class="form-label"><i class="ti ti-category-2 text-primary me-1"></i><span th:text="#{common.ad}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category-2"></i></span><input class="form-control" name="ad" th:value="${x.ad}" required></div>
+</div>
+<div class="col-12">
+<label class="form-label"><i class="ti ti-notes text-primary me-1"></i><span th:text="#{common.aciqlama}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-notes"></i></span><input class="form-control" name="aciqlama" th:value="${x.aciqlama}"></div>
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('xesteyeCixis',#{warehouse.patient_issue},${x.xesteyeCixis})}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('sifarisdeGorunsun',#{warehouse.show_in_order},${x.sifarisdeGorunsun})}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('xesteMaterial',#{warehouse.show_patient_material},${x.xesteMaterialCixisindaGorunsun})}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('cihazaCixis',#{warehouse.device_issue},${x.cihazaCixis})}">
+</div>
+<div class="col-12" th:replace="~{::editCheck('aktiv',#{common.aktiv},${x.aktiv})}">
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button class="btn btn-light" type="button" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='materiallar'}" th:each="x:${materiallar}">
+<div class="modal fade warehouse-editor" th:id="|edit-materiallar-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/material}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.material_edit_title}">
+</h5>
+<small class="text-muted" th:text="#{warehouse.material_edit_hint}">
+</small>
+</div>
+</div>
+<button class="btn-close" type="button" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-package">
+</i>
+<span th:text="#{warehouse.material_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-category-2 text-primary me-1"></i><span th:text="#{warehouse.group}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category-2"></i></span><select class="form-select" name="qrupId" required>
+<option th:each="q:${qruplar}" th:value="${q.id}" th:text="${q.ad}" th:selected="${q.id==x.qrupId}">
+</option>
+</select></div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-ruler-measure text-primary me-1"></i><span th:text="#{warehouse.unit}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-ruler-measure"></i></span><select class="form-select" name="vahidId" required>
+<option th:each="v:${vahidler}" th:value="${v.id}" th:text="${v.ad}" th:selected="${v.id==x.vahidId}">
+</option>
+</select></div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-package text-primary me-1"></i><span th:text="#{common.ad}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-package"></i></span><input class="form-control" name="ad" th:value="${x.ad}" required></div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-text-caption text-primary me-1"></i><span th:text="#{warehouse.short_name}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-text-caption"></i></span><input class="form-control" name="qisaAd" th:value="${x.qisaAd}"></div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-barcode text-primary me-1"></i><span th:text="#{warehouse.barcode}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-barcode"></i></span><input class="form-control" name="barkod" th:value="${x.barkod}"></div>
+</div>
+<div class="col-md-3">
+<label class="form-label" th:text="#{warehouse.min_quantity}">
+</label>
+<input class="form-control" type="number" step="any" name="minimumMiqdar" th:value="${x.minimumMiqdar}">
+</div>
+<div class="col-md-3">
+<label class="form-label" th:text="#{warehouse.max_quantity}">
+</label>
+<input class="form-control" type="number" step="any" name="maksimumMiqdar" th:value="${x.maksimumMiqdar}">
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-pill text-primary me-1"></i><span th:text="#{warehouse.pharmaceutical_info}"></span></label>
+<input class="form-control" name="farmasevtikMelumat" th:value="${x.farmasevtikMelumat}">
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-notes text-primary me-1"></i><span th:text="#{warehouse.usage}"></span></label>
+<input class="form-control" name="istifadeQaydasi" th:value="${x.istifadeQaydasi}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('mehvEdileBiler',#{warehouse.can_destroy},${x.mehvEdileBiler})}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('paketdenKenar',#{warehouse.outside_package},${x.paketdenKenar})}">
+</div>
+<div class="col-12" th:replace="~{::editCheck('aktiv',#{common.aktiv},${x.aktiv})}">
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button class="btn btn-light" type="button" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='emeliyyatlar'}" th:each="x:${emeliyyatlar}">
+<div class="modal fade warehouse-editor" th:id="|edit-emeliyyatlar-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/emeliyyat}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.operation_edit_title}">
+</h5>
+<small class="text-muted" th:text="#{warehouse.operation_edit_hint}">
+</small>
+</div>
+</div>
+<button class="btn-close" type="button" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-arrows-exchange">
+</i>
+<span th:text="#{warehouse.operation_info}">
+</span>
+</div>
+</div>
+<div class="col-12">
+<label class="form-label"><i class="ti ti-category text-primary me-1"></i><span th:text="#{warehouse.operation_category}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category"></i></span><select class="form-select" name="kateqoriyaId" required>
+<option th:each="k:${kateqoriyalar}" th:value="${k.id}" th:text="${k.ad}" th:selected="${k.id==x.kateqoriyaId}">
+</option>
+</select></div>
+</div>
+<div class="col-md-5">
+<label class="form-label"><i class="ti ti-hash text-primary me-1"></i><span th:text="#{common.kod}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-hash"></i></span><input class="form-control" name="kod" th:value="${x.kod}" required></div>
+</div>
+<div class="col-md-7">
+<label class="form-label"><i class="ti ti-arrows-exchange text-primary me-1"></i><span th:text="#{common.ad}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-arrows-exchange"></i></span><input class="form-control" name="ad" th:value="${x.ad}" required></div>
+</div>
+<div class="col-12">
+<label class="form-label"><i class="ti ti-notes text-primary me-1"></i><span th:text="#{common.aciqlama}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-notes"></i></span><input class="form-control" name="aciqlama" th:value="${x.aciqlama}"></div>
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('standartdir',#{warehouse.is_default},${x.standartdir})}">
+</div>
+<div class="col-md-6" th:replace="~{::editCheck('aktiv',#{common.aktiv},${x.aktiv})}">
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button class="btn btn-light" type="button" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='anbarlar'}">
+<tr th:each="x:${anbarlar}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.kod}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-building-warehouse">
+</i>
+</span>
+<div>
+<div class="fw-semibold" th:text="${x.ad}">
+</div>
+<small class="text-muted" th:text="${x.aciqlama ?: ''}">
+</small>
+</div>
+</div>
+</td>
+<td>
+<span class="badge bg-info-subtle text-info" th:text="${x.novAdi}">
+</span>
+</td>
+<td>
+<div class="d-flex flex-wrap gap-1">
+<span class="badge bg-primary-subtle text-primary" th:if="${x.telebAnbaridir}">
+<i class="ti ti-clipboard-check me-1">
+</i>
+<span th:text="#{warehouse.demand_warehouse}">
+</span>
+</span>
+<span class="badge bg-primary-subtle text-primary" th:if="${x.telebdeStokGorunsun}">
+<i class="ti ti-clipboard-list me-1">
+</i>
+<span th:text="#{warehouse.show_stock}">
+</span>
+</span>
+<span class="badge bg-primary-subtle text-primary" th:if="${x.dermanPaketi}">
+<i class="ti ti-pill me-1">
+</i>
+<span th:text="#{warehouse.apply_drug_package}">
+</span>
+</span>
+<span class="badge bg-primary-subtle text-primary" th:if="${x.istehsalCixisi}">
+<i class="ti ti-building-factory me-1">
+</i>
+<span th:text="#{warehouse.production_issue}">
+</span>
+</span>
+<span class="badge bg-primary-subtle text-primary" th:if="${x.mehvCixisi}">
+<i class="ti ti-trash me-1">
+</i>
+<span th:text="#{warehouse.destruction_issue}">
+</span>
+</span>
+<span class="text-muted" th:if="${x.telebAnbaridir != true and x.telebdeStokGorunsun != true and x.dermanPaketi != true and x.istehsalCixisi != true and x.mehvCixisi != true}">—</span>
+</div>
+</td>
+<td>
+<div class="small text-nowrap">
+<span class="text-muted" th:text="#{warehouse.issue_days}">
+</span>: <strong th:text="${x.cixisGunSayi ?: '—'}">
+</strong>
+</div>
+<div class="small text-nowrap">
+<span class="text-muted" th:text="#{warehouse.return_days}">
+</span>: <strong th:text="${x.geriyeMualiceGunSayi ?: '—'}">
+</strong>
+</div>
+</td>
+<td>
+<div class="small text-nowrap">
+<i class="ti ti-calendar-event text-primary me-1">
+</i>
+<span th:text="${x.kilidBaslama ?: '—'}">
+</span>
+<span class="mx-1">–</span>
+<span th:text="${x.kilidBitme ?: '—'}">
+</span>
+</div>
+</td>
+<td>
+<span class="badge bg-light text-dark border" th:text="${x.krosAnbarKodu ?: '—'}">
+</span>
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('anbarlar',${x.id})}">
+</td>
+</tr>
+</th:block>
+<th:block th:if="${tab=='firmalar'}">
+<tr th:each="x:${firmalar}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.musteriNomresi ?: '—'}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-building-store">
+</i>
+</span>
+<div>
+<div class="fw-semibold" th:text="${x.ad}">
+</div>
+<small class="text-muted" th:text="${x.unvan ?: ''}">
+</small>
+<small class="d-block text-muted" th:if="${!#strings.isEmpty(x.qeyd)}" th:text="${x.qeyd}">
+</small>
+</div>
+</div>
+</td>
+<td>
+<div class="small text-nowrap">
+<i class="ti ti-phone text-primary me-1">
+</i>
+<span th:text="${x.isTelefonu ?: '—'}">
+</span>
+</div>
+<div class="small text-nowrap">
+<i class="ti ti-mail text-primary me-1">
+</i>
+<span th:text="${x.email ?: '—'}">
+</span>
+</div>
+<div class="small text-nowrap" th:if="${!#strings.isEmpty(x.faksNomresi)}">
+<i class="ti ti-printer text-primary me-1">
+</i>
+<span th:text="${x.faksNomresi}">
+</span>
+</div>
+</td>
+<td>
+<div class="fw-medium" th:text="${x.bankAdi ?: '—'}">
+</div>
+<small class="d-block text-muted" th:text="${x.vergiNomresi ?: '—'}">
+</small>
+<small class="d-block text-muted" th:if="${!#strings.isEmpty(x.bankHesabNomresi)}" th:text="${x.bankHesabNomresi}">
+</small>
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('firmalar',${x.id})}">
+</td>
+</tr>
+</th:block>
+<th:block th:if="${tab=='vahidler'}">
+<tr th:each="x:${vahidler}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.siraNo ?: '—'}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-info-subtle text-info rounded-circle">
+<i class="ti ti-ruler-measure">
+</i>
+</span>
+<span class="fw-semibold" th:text="${x.ad}">
+</span>
+</div>
+</td>
+<td th:text="${x.altVahidAdi ?: '—'}">
+</td>
+<td>
+<span class="badge bg-primary-subtle text-primary" th:text="${x.vurmaEmsali ?: '—'}">
+</span>
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('vahidler',${x.id})}">
+</td>
+</tr>
+</th:block>
+<th:block th:if="${tab=='qruplar'}">
+<tr th:each="x:${qruplar}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.kod}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-warning-subtle text-warning rounded-circle">
+<i class="ti ti-category-2">
+</i>
+</span>
+<span class="fw-semibold" th:text="${x.ad}">
+</span>
+</div>
+</td>
+<td class="text-muted" th:text="${x.aciqlama ?: '—'}">
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('qruplar',${x.id})}">
+</td>
+</tr>
+</th:block>
+<th:block th:if="${tab=='materiallar'}">
+<tr th:each="x:${materiallar}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.barkod ?: '—'}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-success-subtle text-success rounded-circle">
+<i class="ti ti-package">
+</i>
+</span>
+<div>
+<div class="fw-semibold" th:text="${x.ad}">
+</div>
+<small class="text-muted" th:text="${x.qisaAd ?: ''}">
+</small>
+</div>
+</div>
+</td>
+<td th:text="${x.qrupAdi ?: '—'}">
+</td>
+<td>
+<div th:text="${x.vahidAdi ?: '—'}">
+</div>
+<small class="text-muted" th:text="|${x.minimumMiqdar ?: '—'} / ${x.maksimumMiqdar ?: '—'}|">
+</small>
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('materiallar',${x.id})}">
+</td>
+</tr>
+</th:block>
+<th:block th:if="${tab=='emeliyyatlar'}">
+<tr th:each="x:${emeliyyatlar}">
+<td class="ps-3">
+<span class="badge bg-light text-dark border" th:text="${x.kod}">
+</span>
+</td>
+<td>
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-secondary-subtle text-secondary rounded-circle">
+<i class="ti ti-arrows-exchange">
+</i>
+</span>
+<span class="fw-semibold" th:text="${x.ad}">
+</span>
+</div>
+</td>
+<td th:text="${x.kateqoriyaAdi ?: '—'}">
+</td>
+<td>
+<span class="badge" th:classappend="${x.istiqamet=='G'}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'">
+<i class="ti me-1" th:classappend="${x.istiqamet=='G'}?'ti-arrow-down-left':'ti-arrow-up-right'">
+</i>
+<span th:text="${x.istiqamet=='G'}?#{warehouse.incoming}:#{warehouse.outgoing}">
+</span>
+</span>
+</td>
+<td th:replace="~{::status(${x.aktiv})}">
+</td>
+<td th:replace="~{::edit('emeliyyatlar',${x.id})}">
+</td>
+</tr>
+</th:block>
+<tr th:if="${(tab=='anbarlar' and #lists.isEmpty(anbarlar)) or (tab=='firmalar' and #lists.isEmpty(firmalar)) or (tab=='vahidler' and #lists.isEmpty(vahidler)) or (tab=='qruplar' and #lists.isEmpty(qruplar)) or (tab=='materiallar' and #lists.isEmpty(materiallar)) or (tab=='emeliyyatlar' and #lists.isEmpty(emeliyyatlar))}">
+<td th:colspan="${tab=='anbarlar'?9:(tab=='qruplar'?5:6)}" class="text-center text-muted py-5">
+<span class="avatar avatar-lg bg-light text-muted rounded-circle mb-2">
+<i class="ti ti-database-off fs-3">
+</i>
+</span>
+<div class="fw-semibold" th:text="#{common.melumat_tapilmadi}">Məlumat tapılmadı</div>
+<small th:text="#{warehouse.empty_hint}">
+</small>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<template>
+<th:block th:fragment="status(active)">
+<td>
+<span class="badge" th:classappend="${active}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${active}?#{common.aktiv}:#{common.passiv}">
+</span>
+</td>
+</th:block>
+<th:block th:fragment="edit(kind,id)">
+<td class="text-end pe-3">
+<button type="button" th:if="${@access.hasPermission(#authentication,selectedKlinikaId,'ANBAR_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#edit-${kind}-${id}|" th:title="#{common.redakte_et}" th:aria-label="#{common.redakte_et}">
+<i class="ti ti-edit">
+</i>
+</button>
+</td>
+</th:block>
+</template>
+
+<th:block th:if="${tab=='anbarlar'}" th:each="x:${anbarlar}">
+<div class="modal fade warehouse-editor" th:id="|edit-anbarlar-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/anbar}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.edit_title}">Anbarı yenilə</h5>
+<small class="text-muted" th:text="#{warehouse.edit_hint}">
+</small>
+</div>
+</div>
+<button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-info-circle me-1">
+</i>
+<span th:text="#{warehouse.basic_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.warehouse_type}">
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-category">
+</i>
+</span>
+<select class="form-select" name="anbarNovuId" required>
+<option th:each="n:${anbarNovleri}" th:value="${n.id}" th:text="${n.ad}" th:selected="${n.id==x.novId}">
+</option>
+</select>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-hash text-primary me-1">
+</i>
+<span th:text="#{common.kod}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-hash">
+</i>
+</span>
+<input class="form-control" name="kod" th:value="${x.kod}" required>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-building-warehouse text-primary me-1">
+</i>
+<span th:text="#{common.ad}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-building-warehouse">
+</i>
+</span>
+<input class="form-control" name="ad" th:value="${x.ad}" required>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-notes text-primary me-1">
+</i>
+<span th:text="#{common.aciqlama}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-notes">
+</i>
+</span>
+<input class="form-control" name="aciqlama" th:value="${x.aciqlama}">
+</div>
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-adjustments-horizontal me-1">
+</i>
+<span th:text="#{warehouse.settings}">
+</span>
+</div>
+<div class="warehouse-option-grid">
+<label class="warehouse-option">
+<input type="checkbox" name="telebAnbaridir" value="true" th:checked="${x.telebAnbaridir}">
+<i class="ti ti-clipboard-check">
+</i>
+<span th:text="#{warehouse.demand_warehouse}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="telebdeStokGorunsun" value="true" th:checked="${x.telebdeStokGorunsun}">
+<i class="ti ti-clipboard-list">
+</i>
+<span th:text="#{warehouse.show_stock}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="dermanPaketi" value="true" th:checked="${x.dermanPaketi}">
+<i class="ti ti-pill">
+</i>
+<span th:text="#{warehouse.apply_drug_package}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="istehsalCixisi" value="true" th:checked="${x.istehsalCixisi}">
+<i class="ti ti-building-factory">
+</i>
+<span th:text="#{warehouse.production_issue}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="mehvCixisi" value="true" th:checked="${x.mehvCixisi}">
+<i class="ti ti-trash">
+</i>
+<span th:text="#{warehouse.destruction_issue}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="aktiv" value="true" th:checked="${x.aktiv}">
+<i class="ti ti-power">
+</i>
+<span th:text="#{warehouse.active_warehouse}">
+</span>
+</label>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-calendar-minus text-primary me-1">
+</i>
+<span th:text="#{warehouse.issue_days}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-calendar-minus">
+</i>
+</span>
+<input class="form-control" type="number" name="cixisGunSayi" th:value="${x.cixisGunSayi}">
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-calendar-stats text-primary me-1">
+</i>
+<span th:text="#{warehouse.return_days}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-calendar-stats">
+</i>
+</span>
+<input class="form-control" type="number" name="geriyeMualiceGunSayi" th:value="${x.geriyeMualiceGunSayi}">
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">
+<i class="ti ti-link text-primary me-1">
+</i>
+<span th:text="#{warehouse.cross_code}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-link">
+</i>
+</span>
+<input class="form-control" name="krosAnbarKodu" th:value="${x.krosAnbarKodu}">
+</div>
+</div>
+<div class="col-md-6">
+<div class="row g-2">
+<div class="col-6">
+<label class="form-label">
+<i class="ti ti-calendar text-primary me-1">
+</i>
+<span th:text="#{warehouse.lock_start}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-calendar">
+</i>
+</span>
+<input class="form-control" type="date" name="kilidBaslama" th:value="${x.kilidBaslama}">
+</div>
+</div>
+<div class="col-6">
+<label class="form-label">
+<i class="ti ti-calendar-event text-primary me-1">
+</i>
+<span th:text="#{warehouse.lock_end}">
+</span>
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-calendar-event">
+</i>
+</span>
+<input class="form-control" type="date" name="kilidBitme" th:value="${x.kilidBitme}">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='firmalar'}" th:each="x:${firmalar}">
+<div class="modal fade warehouse-editor" th:id="|edit-firmalar-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/firma}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.company_edit_title}">
+</h5>
+<small class="text-muted" th:text="#{warehouse.company_edit_hint}">
+</small>
+</div>
+</div>
+<button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-building-store">
+</i>
+<span th:text="#{warehouse.company_basic_info}">
+</span>
+</div>
+</div>
+<div class="col-md-8">
+<label class="form-label">
+<i class="ti ti-building-store text-primary me-1">
+</i>
+<span th:text="#{common.ad}">
+</span>
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-building-store">
+</i>
+</span>
+<input class="form-control" name="ad" th:value="${x.ad}" required>
+</div>
+</div>
+<div class="col-md-4">
+<label class="form-label">
+<i class="ti ti-id text-primary me-1">
+</i>
+<span th:text="#{warehouse.customer_number}">
+</span>
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-id">
+</i>
+</span>
+<input class="form-control" name="musteriNomresi" th:value="${x.musteriNomresi}">
+</div>
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-address-book">
+</i>
+<span th:text="#{warehouse.contact_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{common.unvan}">
+</label>
+<input class="form-control" name="unvan" th:value="${x.unvan}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{common.telefon}">
+</label>
+<input class="form-control" name="telefon" th:value="${x.isTelefonu}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.fax}">
+</label>
+<input class="form-control" name="faks" th:value="${x.faksNomresi}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{common.email}">
+</label>
+<input class="form-control" type="email" name="email" th:value="${x.email}">
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-building-bank">
+</i>
+<span th:text="#{warehouse.bank_tax_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.tax_number}">
+</label>
+<input class="form-control" name="vergiNomresi" th:value="${x.vergiNomresi}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.tax_office}">
+</label>
+<input class="form-control" name="vergiIdaresi" th:value="${x.vergiIdaresi}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.bank}">
+</label>
+<input class="form-control" name="bankAdi" th:value="${x.bankAdi}">
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.bank_account}">
+</label>
+<input class="form-control" name="bankHesabi" th:value="${x.bankHesabNomresi}">
+</div>
+<div class="col-md-8">
+<label class="form-label" th:text="#{common.qeyd}">
+</label>
+<input class="form-control" name="qeyd" th:value="${x.qeyd}">
+</div>
+<div class="col-md-4">
+<label class="d-flex justify-content-between align-items-center border rounded p-3 h-100">
+<span class="d-flex align-items-center gap-2">
+<i class="ti ti-power text-primary">
+</i>
+<span class="fw-semibold" th:text="#{common.aktiv}">
+</span>
+</span>
+<span class="form-check form-switch mb-0">
+<input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${x.aktiv}">
+</span>
+</label>
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='vahidler'}" th:each="x:${vahidler}">
+<div class="modal fade warehouse-editor" th:id="|edit-vahidler-${x.id}|" tabindex="-1">
+<div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content">
+<form method="post" th:action="@{/parametrler/anbar/vahid}">
+<input type="hidden" name="id" th:value="${x.id}">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-edit fs-24">
+</i>
+</span>
+<div>
+<h5 class="mb-1" th:text="#{warehouse.unit_edit_title}">
+</h5>
+<small class="text-muted" th:text="#{warehouse.unit_edit_hint}">
+</small>
+</div>
+</div>
+<button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-ruler-measure">
+</i>
+<span th:text="#{warehouse.unit_basic_info}">
+</span>
+</div>
+</div>
+<div class="col-12">
+<label class="form-label">
+<i class="ti ti-ruler-measure text-primary me-1">
+</i>
+<span th:text="#{common.ad}">
+</span>
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-ruler-measure">
+</i>
+</span>
+<input class="form-control" name="ad" th:value="${x.ad}" required>
+</div>
+</div>
+<div class="col-md-7">
+<label class="form-label" th:text="#{warehouse.sub_unit}">
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-hierarchy-2">
+</i>
+</span>
+<select class="form-select" name="altVahidId">
+<option value="" th:text="#{common.secin}">
+</option>
+<option th:each="v:${vahidler}" th:if="${v.id!=x.id}" th:value="${v.id}" th:text="${v.ad}" th:selected="${v.id==x.altVahidId}">
+</option>
+</select>
+</div>
+</div>
+<div class="col-md-5">
+<label class="form-label" th:text="#{warehouse.multiplier}">
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-calculator">
+</i>
+</span>
+<input class="form-control" type="number" step="any" name="vurmaEmsali" th:value="${x.vurmaEmsali}">
+</div>
+</div>
+<div class="col-12" th:replace="~{::editCheck('sifarisdeGorunsun',#{warehouse.show_in_order},${x.sifarisdeGorunsun})}">
+</div>
+<div class="col-12" th:replace="~{::editCheck('aktiv',#{common.aktiv},${x.aktiv})}">
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-device-floppy me-1">
+</i>
+<span th:text="#{common.yadda_saxla}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+
+<th:block th:if="${tab=='anbarlar'}">
+<div th:replace="~{::modal('anbarlar',#{warehouse.tab.anbarlar},'/parametrler/anbar/anbar')}">
+</div>
+</th:block>
+<th:block th:if="${tab=='firmalar'}">
+<div th:replace="~{::modal('firmalar',#{warehouse.company_create_title},'/parametrler/anbar/firma')}">
+</div>
+</th:block>
+<th:block th:if="${tab=='vahidler'}">
+<div th:replace="~{::modal('vahidler',#{warehouse.unit_create_title},'/parametrler/anbar/vahid')}">
+</div>
+</th:block>
+<th:block th:if="${tab=='qruplar'}">
+<div th:replace="~{::modal('qruplar',#{warehouse.group_create_title},'/parametrler/anbar/qrup')}">
+</div>
+</th:block>
+<th:block th:if="${tab=='materiallar'}">
+<div th:replace="~{::modal('materiallar',#{warehouse.material_create_title},'/parametrler/anbar/material')}">
+</div>
+</th:block>
+<th:block th:if="${tab=='emeliyyatlar'}">
+<div th:replace="~{::modal('emeliyyatlar',#{warehouse.operation_create_title},'/parametrler/anbar/emeliyyat')}">
+</div>
+</th:block>
+
+<template>
+<th:block th:fragment="modal(kind,title,action)">
+<div class="modal fade warehouse-editor" th:id="|${kind}Modal|" tabindex="-1" th:data-create-title="${title}" th:data-edit-title="#{warehouse.edit_record}" th:data-create-hint="${kind=='anbarlar'}?#{warehouse.form_hint}:#{warehouse.form_hint_generic}" th:data-edit-hint="#{warehouse.edit_hint}" th:data-create-action="#{common.yarat}" th:data-edit-action="#{common.yadda_saxla}">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" th:classappend="${kind=='vahidler' or kind=='emeliyyatlar'}?'modal-md':'modal-lg'">
+<div class="modal-content">
+<form method="post" th:action="${action}" th:id="|${kind}Form|">
+<input type="hidden" name="id">
+<div class="modal-header border-0 pb-0">
+<div class="d-flex gap-3 align-items-center">
+<span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle">
+<i class="modal-mode-icon" th:classappend="${kind=='anbarlar'}?'ti ti-building-warehouse fs-24':(${kind=='firmalar'}?'ti ti-building-store fs-24':(${kind=='vahidler'}?'ti ti-ruler-measure fs-24':(${kind=='qruplar'}?'ti ti-category-2 fs-24':(${kind=='materiallar'}?'ti ti-package fs-24':(${kind=='emeliyyatlar'}?'ti ti-arrows-exchange fs-24':'ti ti-plus fs-24'))))) ">
+</i>
+</span>
+<div>
+<h5 class="mb-1 modal-mode-title" th:text="${title}">
+</h5>
+<small class="text-muted modal-mode-hint" th:text="${kind=='anbarlar'}?#{warehouse.form_hint}:(${kind=='firmalar'}?#{warehouse.company_create_hint}:#{warehouse.form_hint_generic})">
+</small>
+</div>
+</div>
+<button class="btn-close" type="button" data-bs-dismiss="modal" th:aria-label="#{common.bagla}">
+</button>
+</div>
+<div class="modal-body pt-4">
+<div class="row g-3">
+<th:block th:if="${kind=='firmalar'}">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-building-store">
+</i>
+<span th:text="#{warehouse.company_basic_info}">
+</span>
+</div>
+</div>
+<div class="col-md-8" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-building-store','text',#{warehouse.company_name_placeholder})}">
+</div>
+<div class="col-md-4" th:insert="~{::iconText('musteriNomresi',#{warehouse.customer_number},false,'ti ti-id','text',#{warehouse.customer_number})}">
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-address-book">
+</i>
+<span th:text="#{warehouse.contact_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6" th:insert="~{::iconText('unvan',#{common.unvan},false,'ti ti-map-pin','text',#{common.unvan})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('telefon',#{common.telefon},false,'ti ti-phone','text',#{common.telefon})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('faks',#{warehouse.fax},false,'ti ti-printer','text',#{warehouse.fax})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('email',#{common.email},false,'ti ti-mail','email',#{common.email})}">
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-building-bank">
+</i>
+<span th:text="#{warehouse.bank_tax_info}">
+</span>
+</div>
+</div>
+<div class="col-md-6" th:insert="~{::iconText('vergiNomresi',#{warehouse.tax_number},false,'ti ti-receipt-tax','text',#{warehouse.tax_number})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('vergiIdaresi',#{warehouse.tax_office},false,'ti ti-building-community','text',#{warehouse.tax_office})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('bankAdi',#{warehouse.bank},false,'ti ti-building-bank','text',#{warehouse.bank})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('bankHesabi',#{warehouse.bank_account},false,'ti ti-credit-card','text',#{warehouse.bank_account})}">
+</div>
+<div class="col-12" th:insert="~{::iconText('qeyd',#{common.qeyd},false,'ti ti-note','text',#{common.qeyd})}">
+</div>
+</th:block>
+<th:block th:if="${kind=='vahidler'}">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-ruler-measure">
+</i>
+<span th:text="#{warehouse.unit_basic_info}">
+</span>
+</div>
+</div>
+<div class="col-12" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-ruler-measure','text',#{warehouse.unit_name_placeholder})}">
+</div>
+<div class="col-md-7">
+<label class="form-label" th:text="#{warehouse.sub_unit}">
+</label>
+<div class="input-group">
+<span class="input-group-text">
+<i class="ti ti-hierarchy-2">
+</i>
+</span>
+<select class="form-select" name="altVahidId">
+<option value="" th:text="#{common.secin}">
+</option>
+<option th:each="v:${vahidler}" th:value="${v.id}" th:text="${v.ad}">
+</option>
+</select>
+</div>
+</div>
+<div class="col-md-5" th:insert="~{::iconText('vurmaEmsali',#{warehouse.multiplier},false,'ti ti-calculator','number',#{warehouse.multiplier})}">
+</div>
+<div class="col-12" th:replace="~{::check('sifarisdeGorunsun',#{warehouse.show_in_order})}">
+</div>
+</th:block>
+<th:block th:if="${kind=='qruplar'}">
+<div class="col-12"><div class="warehouse-section-title"><i class="ti ti-category-2"></i><span th:text="#{warehouse.group_info}"></span></div></div>
+<div class="col-md-4">
+<label class="form-label"><i class="ti ti-category text-primary me-1"></i><span th:text="#{warehouse.group_type}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category"></i></span><select class="form-select" name="qrupNovuId" required>
+<option th:each="n:${qrupNovleri}" th:value="${n.id}" th:text="${n.ad}">
+</option>
+</select></div>
+</div>
+<div class="col-md-4" th:insert="~{::iconText('kod',#{common.kod},true,'ti ti-hash','text',#{common.kod})}">
+</div>
+<div class="col-md-4" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-category-2','text',#{common.ad})}">
+</div>
+<div class="col-12" th:insert="~{::iconText('aciqlama',#{common.aciqlama},false,'ti ti-notes','text',#{common.aciqlama})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('xesteyeCixis',#{warehouse.patient_issue})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('sifarisdeGorunsun',#{warehouse.show_in_order})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('xesteMaterial',#{warehouse.show_patient_material})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('cihazaCixis',#{warehouse.device_issue})}">
+</div>
+</th:block>
+<th:block th:if="${kind=='materiallar'}">
+<div class="col-12"><div class="warehouse-section-title"><i class="ti ti-package"></i><span th:text="#{warehouse.material_info}"></span></div></div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-category-2 text-primary me-1"></i><span th:text="#{warehouse.group}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category-2"></i></span><select class="form-select" name="qrupId" required>
+<option th:each="q:${qruplar}" th:value="${q.id}" th:text="${q.ad}">
+</option>
+</select></div>
+</div>
+<div class="col-md-6">
+<label class="form-label"><i class="ti ti-ruler-measure text-primary me-1"></i><span th:text="#{warehouse.unit}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-ruler-measure"></i></span><select class="form-select" name="vahidId" required>
+<option th:each="v:${vahidler}" th:value="${v.id}" th:text="${v.ad}">
+</option>
+</select></div>
+</div>
+<div class="col-md-6" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-package','text',#{common.ad})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('qisaAd',#{warehouse.short_name},false,'ti ti-text-caption','text',#{warehouse.short_name})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('barkod',#{warehouse.barcode},false,'ti ti-barcode','text',#{warehouse.barcode})}">
+</div>
+<div class="col-md-3" th:insert="~{::iconText('minimumMiqdar',#{warehouse.min_quantity},false,'ti ti-minus','number',#{warehouse.min_quantity})}">
+</div>
+<div class="col-md-3" th:insert="~{::iconText('maksimumMiqdar',#{warehouse.max_quantity},false,'ti ti-plus','number',#{warehouse.max_quantity})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('mehvEdileBiler',#{warehouse.can_destroy})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('paketdenKenar',#{warehouse.outside_package})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('farmasevtikMelumat',#{warehouse.pharmaceutical_info},false,'ti ti-pill','text',#{warehouse.pharmaceutical_info})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('istifadeQaydasi',#{warehouse.usage},false,'ti ti-notes','text',#{warehouse.usage})}">
+</div>
+</th:block>
+<th:block th:if="${kind=='emeliyyatlar'}">
+<div class="col-12"><div class="warehouse-section-title"><i class="ti ti-arrows-exchange"></i><span th:text="#{warehouse.operation_info}"></span></div></div>
+<div class="col-12">
+<label class="form-label"><i class="ti ti-category text-primary me-1"></i><span th:text="#{warehouse.operation_category}"></span></label>
+<div class="input-group"><span class="input-group-text"><i class="ti ti-category"></i></span><select class="form-select" name="kateqoriyaId" required>
+<option th:each="k:${kateqoriyalar}" th:value="${k.id}" th:text="${k.ad}">
+</option>
+</select></div>
+</div>
+<div class="col-md-5" th:insert="~{::iconText('kod',#{common.kod},true,'ti ti-hash','text',#{common.kod})}">
+</div>
+<div class="col-md-7" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-arrows-exchange','text',#{common.ad})}">
+</div>
+<div class="col-12" th:insert="~{::iconText('aciqlama',#{common.aciqlama},false,'ti ti-notes','text',#{common.aciqlama})}">
+</div>
+<div class="col-md-6" th:replace="~{::check('standartdir',#{warehouse.is_default})}">
+</div>
+</th:block>
+<th:block th:if="${kind=='anbarlar'}">
+<div class="col-12">
+<div class="warehouse-section-title">
+<i class="ti ti-info-circle">
+</i>
+<span th:text="#{warehouse.basic_info}">Əsas məlumatlar</span>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label" th:text="#{warehouse.warehouse_type}">
+</label>
+<div class="input-group warehouse-input">
+<span class="input-group-text">
+<i class="ti ti-category">
+</i>
+</span>
+<select class="form-select" name="anbarNovuId" required>
+<option th:each="n:${anbarNovleri}" th:value="${n.id}" th:text="${n.ad}">
+</option>
+</select>
+</div>
+</div>
+<div class="col-md-6" th:insert="~{::iconText('kod',#{common.kod},true,'ti ti-hash','text',#{warehouse.code_placeholder})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('ad',#{common.ad},true,'ti ti-building-warehouse','text',#{warehouse.name_placeholder})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('aciqlama',#{common.aciqlama},false,'ti ti-notes','text',#{warehouse.description_placeholder})}">
+</div>
+<div class="col-12">
+<div class="warehouse-section-title warehouse-settings-title">
+<i class="ti ti-adjustments-horizontal">
+</i>
+<span th:text="#{warehouse.settings}">Anbar seçimləri</span>
+</div>
+<div class="warehouse-option-grid">
+<label class="warehouse-option">
+<input type="checkbox" name="telebAnbaridir" value="true">
+<i class="ti ti-clipboard-check">
+</i>
+<span th:text="#{warehouse.demand_warehouse}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="telebdeStokGorunsun" value="true">
+<i class="ti ti-clipboard-list">
+</i>
+<span th:text="#{warehouse.show_stock}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="dermanPaketi" value="true">
+<i class="ti ti-pill">
+</i>
+<span th:text="#{warehouse.apply_drug_package}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="istehsalCixisi" value="true">
+<i class="ti ti-building-factory">
+</i>
+<span th:text="#{warehouse.production_issue}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="mehvCixisi" value="true">
+<i class="ti ti-trash">
+</i>
+<span th:text="#{warehouse.destruction_issue}">
+</span>
+</label>
+<label class="warehouse-option">
+<input type="checkbox" name="aktiv" value="true" checked>
+<i class="ti ti-power">
+</i>
+<span th:text="#{warehouse.active_warehouse}">
+</span>
+</label>
+</div>
+</div>
+<div class="col-md-6" th:insert="~{::iconText('cixisGunSayi',#{warehouse.issue_days},false,'ti ti-calendar-minus','number',#{warehouse.days_placeholder})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('geriyeMualiceGunSayi',#{warehouse.return_days},false,'ti ti-calendar-stats','number',#{warehouse.days_placeholder})}">
+</div>
+<div class="col-md-6" th:insert="~{::iconText('krosAnbarKodu',#{warehouse.cross_code},false,'ti ti-link','text',#{warehouse.cross_code_placeholder})}">
+</div>
+<div class="col-md-6">
+<div class="row g-2">
+<div class="col-6" th:insert="~{::iconText('kilidBaslama',#{warehouse.lock_start},false,'ti ti-calendar','date',#{warehouse.date_placeholder})}">
+</div>
+<div class="col-6" th:insert="~{::iconText('kilidBitme',#{warehouse.lock_end},false,'ti ti-calendar-event','date',#{warehouse.date_placeholder})}">
+</div>
+</div>
+</div>
+</th:block>
+<div class="col-12 d-none warehouse-active" th:if="${kind!='anbarlar'}">
+<div class="d-flex justify-content-between align-items-center border rounded p-3">
+<div class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-success-subtle text-success rounded-circle">
+<i class="ti ti-power">
+</i>
+</span>
+<div>
+<div class="fw-semibold" th:text="#{warehouse.active_warehouse}">
+</div>
+<small class="text-muted" th:text="#{warehouse.active_hint}">
+</small>
+</div>
+</div>
+<div class="form-check form-switch mb-0">
+<input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${kind=='anbarlar'}">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer border-0 pt-0">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}">
+</button>
+<button class="btn btn-primary">
+<i class="ti ti-plus me-1 modal-action-icon">
+</i>
+<span class="modal-action-label" th:text="#{common.yarat}">
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</th:block>
+<th:block th:fragment="text(name,label,required)">
+<label class="form-label">
+<i class="ti ti-edit text-primary me-1">
+</i>
+<span th:text="${label}">
+</span>
+</label>
+<input class="form-control" th:name="${name}" th:required="${required}">
+</th:block>
+<th:block th:fragment="number(name,label)">
+<label class="form-label">
+<i class="ti ti-calculator text-primary me-1">
+</i>
+<span th:text="${label}">
+</span>
+</label>
+<input class="form-control" type="number" step="any" th:name="${name}">
+</th:block>
+<th:block th:fragment="check(name,label)">
+<label class="d-flex justify-content-between align-items-center border rounded p-3 h-100">
+<span class="d-flex align-items-center gap-2">
+<span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle">
+<i class="ti ti-check">
+</i>
+</span>
+<span class="fw-medium" th:text="${label}">
+</span>
+</span>
+<span class="form-check form-switch mb-0">
+<input class="form-check-input" type="checkbox" th:name="${name}" value="true">
+</span>
+</label>
+</th:block>
+<th:block th:fragment="iconText(name,label,required,icon,type,placeholder)">
+<label class="form-label">
+<i th:class="|${icon} text-primary me-1|">
+</i>
+<span th:text="${label}">
+</span>
+</label>
+<input class="form-control" th:type="${type}" th:name="${name}" th:required="${required}" th:placeholder="${placeholder}">
+</th:block>
+<th:block th:fragment="editCheck(name,label,checked)">
+<label class="d-flex justify-content-between align-items-center border rounded p-3 h-100">
+<span class="fw-medium" th:text="${label}">
+</span>
+<span class="form-check form-switch mb-0">
+<input class="form-check-input" type="checkbox" th:name="${name}" value="true" th:checked="${checked}">
+</span>
+</label>
+</th:block>
+</template>
+</div>
+<th:block layout:fragment="scripts">
+<script th:inline="javascript">
+const warehouseData={anbarlar:/*[[${anbarlar}]]*/[],firmalar:/*[[${firmalar}]]*/[],vahidler:/*[[${vahidler}]]*/[],qruplar:/*[[${qruplar}]]*/[],materiallar:/*[[${materiallar}]]*/[],emeliyyatlar:/*[[${emeliyyatlar}]]*/[]};
+const setModalMode=(modal,editing)=>{modal.querySelector('.modal-mode-title').textContent=editing?modal.dataset.editTitle:modal.dataset.createTitle;modal.querySelector('.modal-mode-hint').textContent=editing?modal.dataset.editHint:modal.dataset.createHint;modal.querySelector('.modal-action-label').textContent=editing?modal.dataset.editAction:modal.dataset.createAction;const icon=modal.querySelector('.modal-mode-icon');const createIcon=modal.id==='anbarlarModal'?'ti-building-warehouse':modal.id==='firmalarModal'?'ti-building-store':modal.id==='vahidlerModal'?'ti-ruler-measure':modal.id==='qruplarModal'?'ti-category-2':modal.id==='materiallarModal'?'ti-package':modal.id==='emeliyyatlarModal'?'ti-arrows-exchange':'ti-plus';icon.className=`modal-mode-icon ti ${editing?'ti-edit':createIcon} fs-24`;const actionIcon=modal.querySelector('.modal-action-icon');actionIcon.className=`modal-action-icon ti ${editing?'ti-device-floppy':'ti-plus'} me-1`;};
+document.querySelectorAll('[data-edit-kind]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.editKind,item=(warehouseData[kind]||[]).find(x=>String(x.id)===button.dataset.editId),form=document.getElementById(kind+'Form'),modal=document.getElementById(kind+'Modal');if(!item||!form||!modal)return;form.reset();const values={...item,anbarNovuId:item.novId??item.anbarNovuId,telefon:item.isTelefonu??item.telefon,faks:item.faksNomresi??item.faks,bankHesabi:item.bankHesabNomresi??item.bankHesabi};Object.entries(values).forEach(([key,value])=>{const el=form.elements.namedItem(key);if(!el)return;if(el.type==='checkbox')el.checked=value===true;else el.value=value??''});form.querySelector('.warehouse-active')?.classList.remove('d-none');setModalMode(modal,true)}));
+document.querySelectorAll('.modal').forEach(modal=>modal.addEventListener('hidden.bs.modal',()=>{const form=modal.querySelector('form');form?.reset();if(form?.elements.namedItem('id'))form.elements.namedItem('id').value='';if(modal.id!=='anbarlarModal')form?.querySelector('.warehouse-active')?.classList.add('d-none');if(modal.querySelector('.modal-mode-title'))setModalMode(modal,false)}));
+</script>
+</th:block>
+</body>
+</html>
