@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.context.i18n.LocaleContextHolder;
 import az.simplexs.simplexs.dto.teskilat.Teskilat;
 import az.simplexs.simplexs.dto.teskilat.TeskilatTipi;
 
@@ -21,9 +22,14 @@ public class TeskilatRepository {
     }
 
     public List<Teskilat> siyahi(Long klinikaId) {
-        return jdbc.query("SELECT * FROM public.fn_teskilat_siyahisi(p_klinika_id=>CAST(:klinika AS bigint),p_aktiv=>CAST(:aktiv AS boolean)) ORDER BY sira_no NULLS LAST,ad",
-            new MapSqlParameterSource("aktiv",null).addValue("klinika",klinikaId),
-            (r,n) -> new Teskilat(l(r,"teskilat_id"),l(r,"klinika_id"),l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi"),r.getString("ad"),r.getString("qisa_ad"),r.getString("bank_hesab_nomresi"),r.getString("seher_nomresi"),r.getString("mobil_nomre"),r.getString("vergi_nomresi"),r.getString("selahiyyetli_sexs"),i(r,"sira_no"),r.getObject("standartdir",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id")));
+        return jdbc.query("""
+            SELECT f.*,COALESCE(NULLIF(t.deyer,''),f.ad) lokallasdirilmis_ad
+            FROM public.fn_teskilat_siyahisi(p_klinika_id=>CAST(:klinika AS bigint),p_aktiv=>CAST(:aktiv AS boolean)) f
+            LEFT JOIN public.kn_diller d ON d.kod=:dil AND d.aktiv
+            LEFT JOIN public.kn_melumat_tercumeleri t ON t.melumat_novu='TESKILAT' AND t.menbe_id=f.teskilat_id AND t.saha='ad' AND t.dil_id=d.id
+            ORDER BY f.sira_no NULLS LAST,lokallasdirilmis_ad
+            """,new MapSqlParameterSource("aktiv",null).addValue("klinika",klinikaId).addValue("dil",LocaleContextHolder.getLocale().getLanguage()),
+            (r,n) -> new Teskilat(l(r,"teskilat_id"),l(r,"klinika_id"),l(r,"teskilat_tipi_id"),r.getString("teskilat_tipi_kodu"),r.getString("teskilat_tipi_adi"),r.getString("lokallasdirilmis_ad"),r.getString("qisa_ad"),r.getString("bank_hesab_nomresi"),r.getString("seher_nomresi"),r.getString("mobil_nomre"),r.getString("vergi_nomresi"),r.getString("selahiyyetli_sexs"),i(r,"sira_no"),r.getObject("standartdir",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id")));
     }
 
     public Map<String,Object> yarat(Long klinikaId,Long tipId,String ad,String qisaAd,String bank,String seher,String mobil,String vergi,String sexs,boolean standart,Long personalId) {

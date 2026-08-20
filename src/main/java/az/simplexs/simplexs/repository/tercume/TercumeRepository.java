@@ -23,7 +23,8 @@ public class TercumeRepository {
         Map.entry("OLKE","SELECT id,iso2_kod kod,ad,'ad' saha FROM public.fn_olke_siyahisi()"),
         Map.entry("SEHER","SELECT id,id::text kod,ad,'ad' saha FROM public.fn_seher_siyahisi(NULL)"),
         Map.entry("MODUL","SELECT id,kod,ad,'ad' saha FROM public.rn_modullar WHERE aktiv"),
-        Map.entry("XIDMET","SELECT id,kod,ad,'ad' saha FROM public.rn_xidmetler WHERE aktiv"));
+        Map.entry("XIDMET","SELECT id,kod,ad,'ad' saha FROM public.rn_xidmetler WHERE aktiv"),
+        Map.entry("TESKILAT","SELECT id,COALESCE(qisa_ad,id::text) kod,ad,'ad' saha FROM public.rn_teskilatlar WHERE aktiv"));
     private final NamedParameterJdbcTemplate jdbc;
     private volatile boolean schemaAvailable=true;
     private final AtomicLong version=new AtomicLong();
@@ -95,7 +96,7 @@ public class TercumeRepository {
         new MelumatNovu("AILE_VEZIYYETI","Ailə vəziyyəti","ti ti-users"),new MelumatNovu("SENED_NOVU","Sənəd növü","ti ti-id"),
         new MelumatNovu("QAN_QRUPU","Qan qrupları","ti ti-droplet"),new MelumatNovu("OLKE","Ölkələr","ti ti-world"),
         new MelumatNovu("SEHER","Şəhərlər","ti ti-building-community"),new MelumatNovu("MODUL","Modullar","ti ti-apps"),
-        new MelumatNovu("XIDMET","Xidmətlər","ti ti-medical-cross"));}
+        new MelumatNovu("XIDMET","Xidmətlər","ti ti-medical-cross"),new MelumatNovu("TESKILAT","Təşkilatlar","ti ti-building-bank"));}
 
     public List<MelumatTercumeSetri> melumatSetirleri(String nov){
         String sql=MELUMAT_SQL.get(nov);if(sql==null)throw new IllegalArgumentException("Naməlum məlumat növü");

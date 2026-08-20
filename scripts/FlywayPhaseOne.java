@@ -15,7 +15,7 @@ public class FlywayPhaseOne {
         Properties p=new Properties();try(var in=Files.newInputStream(Path.of("src/main/resources/application.properties"))){p.load(in);}
         String url=property(p,"spring.datasource.url"),user=property(p,"spring.datasource.username"),password=property(p,"spring.datasource.password");
         Flyway flyway=Flyway.configure().dataSource(url,user,password)
-                .locations("filesystem:src/main/resources/db/migration").baselineOnMigrate(true).baselineVersion("0").target("34").load();
+                .locations("filesystem:src/main/resources/db/migration").baselineOnMigrate(true).baselineVersion("0").target("35").load();
         List<String> pending=Arrays.stream(flyway.info().pending()).map(MigrationInfo::getVersion).map(String::valueOf).toList();
         System.out.println("Pending migration-lar: "+pending);
         if(args.length>0&&"verify".equals(args[0])){try(Connection c=DriverManager.getConnection(url,user,password);Statement s=c.createStatement()){
@@ -31,7 +31,7 @@ public class FlywayPhaseOne {
             try(ResultSet r=s.executeQuery("SELECT 'system' nov,kod,ad FROM public.rn_sistemler WHERE aktiv UNION ALL SELECT 'module',kod,ad FROM public.rn_modullar WHERE aktiv AND menyuda_gorunsun ORDER BY 1,2")){while(r.next())System.out.println(r.getString(1)+"|"+r.getString(2)+"|"+r.getString(3));}
         }return;}
         if(args.length==0||!"migrate".equals(args[0]))return;
-        if(!pending.equals(List.of("34")))throw new IllegalStateException("Təhlükəsizlik dayandırması: yalnız V34 gözlənilirdi, alındı "+pending);
+        if(!pending.equals(List.of("35")))throw new IllegalStateException("Təhlükəsizlik dayandırması: yalnız V35 gözlənilirdi, alındı "+pending);
         var result=flyway.migrate();System.out.println("Tətbiq edilən migration sayı: "+result.migrationsExecuted);
     }
 }
