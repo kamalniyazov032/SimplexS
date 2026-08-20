@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import az.simplexs.simplexs.dto.personal.PersonalListItem;
+import az.simplexs.simplexs.dto.personal.PersonalAnbar;
 import az.simplexs.simplexs.dto.personal.PersonalKlinika;
 import az.simplexs.simplexs.dto.personal.PersonalKassa;
 import az.simplexs.simplexs.dto.personal.PersonalRol;
@@ -188,6 +189,25 @@ public class PersonalRepository {
 
     public Map<String, Object> sobeleriSaxla(Long klinikaId, Long personalId, String json, Long emelEdenId) {
         return one("SELECT * FROM public.fn_personal_sobeler_yadda_saxla(p_klinika_id=>:klinika,p_personal_id=>:personal,p_sobeler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:emelEden)",
+                new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId)
+                        .addValue("json", json).addValue("emelEden", emelEdenId));
+    }
+
+    public List<PersonalAnbar> anbarlar(Long klinikaId, Long personalId) {
+        return jdbc.query("""
+                SELECT * FROM public.fn_personal_anbar_siyahisi(
+                    p_klinika_id=>CAST(:klinika AS bigint), p_personal_id=>CAST(:personal AS bigint))
+                ORDER BY anbar_adi
+                """, new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId),
+                (r, n) -> new PersonalAnbar(l(r, "anbar_id"), r.getString("anbar_kodu"),
+                        r.getString("anbar_adi"), l(r, "anbar_novu_id"), r.getString("anbar_novu_kodu"),
+                        r.getString("anbar_novu_adi"), r.getObject("secilib", Boolean.class),
+                        r.getObject("izlesin", Boolean.class), r.getObject("islesin", Boolean.class),
+                        r.getObject("elaqe_aktiv", Boolean.class)));
+    }
+
+    public Map<String, Object> anbarlariSaxla(Long klinikaId, Long personalId, String json, Long emelEdenId) {
+        return one("SELECT * FROM public.fn_personal_anbarlar_yadda_saxla(p_klinika_id=>:klinika,p_personal_id=>:personal,p_anbarlar=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:emelEden)",
                 new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId)
                         .addValue("json", json).addValue("emelEden", emelEdenId));
     }

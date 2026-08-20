@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,15 +41,18 @@ public class PersonalController {
     private final PasswordEncoder passwordEncoder;
     private final KlinikaRepository klinikaRepository;
     private final AccessService accessService;
+    private final MessageSource messageSource;
 
     public PersonalController(PersonalRepository repo, VezifeRepository vezife, RolRepository rol,
-            PasswordEncoder passwordEncoder, KlinikaRepository klinikaRepository, AccessService accessService) {
+            PasswordEncoder passwordEncoder, KlinikaRepository klinikaRepository, AccessService accessService,
+            MessageSource messageSource) {
         this.repo = repo;
         this.vezife = vezife;
         this.rol = rol;
         this.passwordEncoder = passwordEncoder;
         this.klinikaRepository = klinikaRepository;
         this.accessService = accessService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/emekdash")
@@ -118,6 +123,8 @@ public class PersonalController {
                 id -> id, id -> repo.kassalar(klinikaId, id))));
         model.addAttribute("personalSobeler", personalIds.stream().collect(Collectors.toMap(
                 id -> id, id -> repo.sobeler(klinikaId, id))));
+        model.addAttribute("personalAnbarlar", personalIds.stream().collect(Collectors.toMap(
+                id -> id, id -> repo.anbarlar(klinikaId, id))));
         return "pages/emekdash";
     }
 
@@ -206,6 +213,21 @@ public class PersonalController {
         } else {
             addResultMessage(repo.sobeleriSaxla((Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID),
                     personalId, sobelerJson, emelEden.personalId()), attributes);
+        }
+        return redirectToFilter(returnUrl);
+    }
+
+    @PostMapping("/emekdash/anbarlar")
+    public String saveWarehouses(@RequestParam Long personalId, @RequestParam String anbarlarJson,
+            @RequestParam(required = false) String returnUrl, HttpSession session,
+            @AuthenticationPrincipal AuthenticatedPersonal emelEden, RedirectAttributes attributes) {
+        if (!validJsonArray(anbarlarJson)) {
+            attributes.addFlashAttribute("errorMessage", messageSource.getMessage(
+                    "personal.anbar_melumatlari_duzgun_deyil", null, LocaleContextHolder.getLocale()));
+        } else {
+            addResultMessage(repo.anbarlariSaxla(
+                    (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID),
+                    personalId, anbarlarJson, emelEden.personalId()), attributes);
         }
         return redirectToFilter(returnUrl);
     }
