@@ -108,6 +108,16 @@ public class XidmetRepository {
                 .addValue("offset",offset),this::mapXidmet);
     }
 
+    public List<Xidmet> paketler(Long klinikaId,Boolean aktiv,String query){
+        String sql="""
+                SELECT f.* FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),NULL,CAST(:aktiv AS boolean),true) f
+                WHERE COALESCE(f.paket_xidmet,false)=true
+                  AND (CAST(:q AS text) IS NULL OR f.xidmet_adi ILIKE '%'||:q||'%' OR f.xidmet_kodu ILIKE '%'||:q||'%')
+                ORDER BY f.xidmet_adi
+                """;
+        return jdbc.query(sql,new MapSqlParameterSource("klinika",klinikaId).addValue("aktiv",aktiv).addValue("q",blank(query)),this::mapXidmet);
+    }
+
     public Map<String,Object> paketXidmetleriniSaxla(Long paketXidmetId,String json,Long personalId){
         return one("SELECT * FROM public.fn_paket_xidmetlerini_yadda_saxla(p_paket_xidmet_id=>:paket,p_xidmetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:personal)",
                 new MapSqlParameterSource("paket",paketXidmetId).addValue("json",json).addValue("personal",personalId));

@@ -46,14 +46,6 @@ public class HomeController {
         return "pages/pasienQebulu/xesteKarti";
     }
 
-    @GetMapping("/parPaket")
-    public String parPaket(Model model) {
-        model.addAttribute("pageTitle", "Paketlər");
-        model.addAttribute("activeMenuGroup", "adminPanel");
-        model.addAttribute("activeMenu", "parPaket");
-        return "pages/paket";
-    }
-
     @GetMapping("/kassa")
     public String kassa(Model model) {
         model.addAttribute("pageTitle", "Home");
