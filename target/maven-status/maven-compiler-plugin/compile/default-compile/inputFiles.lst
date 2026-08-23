@@ -16,11 +16,13 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/QiymetController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/RolController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/RutinController.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/SebebController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/SobeController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/SobeXidmetController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/TercumeController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/TeskilatController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/VezifeController.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/XesteQeydiyyatiController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/XetaJurnaliController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/XidmetController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/YataqController.java
@@ -63,6 +65,8 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rol/RolSelahiyyet.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rutin/Rutin.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/rutin/RutinXidmet.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sebeb/Sebeb.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sebeb/SebebNovu.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sobe/PersonalOption.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sobe/SobeListItem.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/sobe/SobeOperationResult.java
@@ -76,6 +80,9 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/teskilat/Teskilat.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/teskilat/TeskilatTipi.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/vezife/Vezife.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xeste/Xeste.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xeste/XesteForm.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xeste/XesteSecim.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xeta/XetaJurnali.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xidmet/PaketXidmetItem.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/xidmet/SobeXidmeti.java
@@ -98,10 +105,12 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/qiymet/QiymetRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/rol/RolRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/rutin/RutinRepository.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/sebeb/SebebRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/sobe/SobeRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/tercume/TercumeRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/teskilat/TeskilatRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/vezife/VezifeRepository.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xeste/XesteRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xeta/XetaJurnaliRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xidmet/SobeXidmetRepository.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/repository/xidmet/XidmetRepository.java
