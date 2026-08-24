@@ -1,12 +1,510 @@
-<!DOCTYPE html><html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}"><body><div layout:fragment="content">
-<div class="d-flex align-items-center gap-3 mb-4"><a class="btn btn-light btn-icon" th:href="@{/xeste-qeydiyyati}"><i class="ti ti-arrow-left"></i></a><span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle"><i class="ti ti-id fs-24"></i></span><div><h4 class="mb-1" th:text="${xeste==null?#messages.msg('patients.new'):#messages.msg('patients.edit')}"></h4><p class="text-muted mb-0" th:text="${xeste==null?#messages.msg('patients.new_hint'):xeste.kod+' · '+xeste.tamAd()}"></p></div></div>
-<form method="post" th:action="${xeste==null?'/xeste-qeydiyyati/yeni':'/xeste-qeydiyyati/yenile'}"><input th:if="${xeste}" type="hidden" name="xesteId" th:value="${xeste.id}"><div class="row g-3">
-<div class="col-xl-8"><div class="card border-0 shadow-sm"><div class="card-header bg-white"><h6 class="mb-0"><i class="ti ti-user text-primary me-2"></i><span th:text="#{patients.personal_info}"></span></h6></div><div class="card-body"><div class="row g-3">
-<div class="col-md-4"><label class="form-label" th:text="#{patients.first_name}"></label><input class="form-control" name="ad" required maxlength="100" th:value="${xeste?.ad}"></div><div class="col-md-4"><label class="form-label" th:text="#{patients.last_name}"></label><input class="form-control" name="soyad" required maxlength="100" th:value="${xeste?.soyad}"></div><div class="col-md-4"><label class="form-label" th:text="#{patients.father_name}"></label><input class="form-control" name="ataAdi" maxlength="100" th:value="${xeste?.ataAdi}"></div>
-<div class="col-md-4"><label class="form-label" th:text="#{patients.gender}"></label><select class="form-select" name="cinsId" required><option value="" th:text="#{common.select}"></option><option th:each="o:${cinsler}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.cinsId==o.id}"></option></select></div><div class="col-md-4"><label class="form-label" th:text="#{patients.birth_date}"></label><input class="form-control" type="date" name="dogumTarixi" required th:value="${xeste?.dogumTarixi}"></div><div class="col-md-4"><label class="form-label" th:text="#{patients.blood_group}"></label><select class="form-select" name="qanQrupuId"><option value="" th:text="#{common.select}"></option><option th:each="o:${qanQruplari}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.qanQrupuId==o.id}"></option></select></div>
-<div class="col-md-6"><label class="form-label" th:text="#{patients.marital_status}"></label><select class="form-select" name="aileVeziyyetiId"><option value="" th:text="#{common.select}"></option><option th:each="o:${aileVeziyyetleri}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.aileVeziyyetiId==o.id}"></option></select></div><div class="col-md-6"><label class="form-label" th:text="#{patients.education}"></label><select class="form-select" name="tehsilId"><option value="" th:text="#{common.select}"></option><option th:each="o:${tehsiller}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.tehsilId==o.id}"></option></select></div></div></div></div>
-<div class="card border-0 shadow-sm mt-3"><div class="card-header bg-white"><h6 class="mb-0"><i class="ti ti-map-pin text-primary me-2"></i><span th:text="#{patients.address_info}"></span></h6></div><div class="card-body"><div class="row g-3"><div class="col-md-6"><label class="form-label" th:text="#{patients.birth_country}"></label><select class="form-select js-country" name="dogulduguOlkeId" data-city="#birthCity"><option value="" th:text="#{common.select}"></option><option th:each="o:${olkeler}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.dogulduguOlkeId==o.id}"></option></select></div><div class="col-md-6"><label class="form-label" th:text="#{patients.birth_city}"></label><select class="form-select" id="birthCity" name="dogulduguSeherId"><option value="" th:text="#{common.select}"></option><option th:each="o:${seherler}" th:value="${o.id}" th:text="${o.ad}" th:data-parent="${o.parentId}" th:selected="${xeste!=null and xeste.dogulduguSeherId==o.id}"></option></select></div><div class="col-md-6"><label class="form-label" th:text="#{patients.country}"></label><select class="form-select js-country" name="olkeId" data-city="#livingCity"><option value="" th:text="#{common.select}"></option><option th:each="o:${olkeler}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.olkeId==o.id}"></option></select></div><div class="col-md-6"><label class="form-label" th:text="#{patients.city}"></label><select class="form-select" id="livingCity" name="seherId"><option value="" th:text="#{common.select}"></option><option th:each="o:${seherler}" th:value="${o.id}" th:text="${o.ad}" th:data-parent="${o.parentId}" th:selected="${xeste!=null and xeste.seherId==o.id}"></option></select></div><div class="col-12"><label class="form-label" th:text="#{patients.address}"></label><textarea class="form-control" name="unvan" rows="2" th:text="${xeste?.unvan}"></textarea></div></div></div></div></div>
-<div class="col-xl-4"><div class="card border-0 shadow-sm"><div class="card-header bg-white"><h6 class="mb-0"><i class="ti ti-id-badge text-primary me-2"></i><span th:text="#{patients.document_info}"></span></h6></div><div class="card-body"><div class="row g-3"><div class="col-12"><label class="form-label" th:text="#{patients.organization}"></label><select class="form-select" name="defaultTeskilatId" required><option value="" th:text="#{common.select}"></option><option th:each="o:${teskilatlar}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.defaultTeskilatId==o.id}"></option></select></div><div class="col-12"><label class="form-label" th:text="#{patients.document_type}"></label><select class="form-select" name="vesiqeNovuId" required><option value="" th:text="#{common.select}"></option><option th:each="o:${vesiqeNovleri}" th:value="${o.id}" th:text="${o.ad}" th:selected="${xeste!=null and xeste.vesiqeNovuId==o.id}"></option></select></div><div class="col-12"><label class="form-label" th:text="#{patients.document_number}"></label><input class="form-control" name="vesiqeNomresi" required th:value="${xeste?.vesiqeNomresi}"></div><div class="col-12"><label class="form-label" th:text="#{patients.fin}"></label><input class="form-control text-uppercase" name="finKodu" required maxlength="20" th:value="${xeste?.finKodu}"></div><div class="col-12"><label class="form-label" th:text="#{patients.social_card}"></label><input class="form-control" name="sosialKartNomresi" th:value="${xeste?.sosialKartNomresi}"></div></div></div></div>
-<div class="card border-0 shadow-sm mt-3"><div class="card-header bg-white"><h6 class="mb-0"><i class="ti ti-phone text-primary me-2"></i><span th:text="#{patients.contact_work}"></span></h6></div><div class="card-body"><div class="row g-3"><div class="col-12"><label class="form-label" th:text="#{patients.mobile}"></label><input class="form-control" name="mobilNomre" th:value="${xeste?.mobilNomre}" placeholder="+994..."></div><div class="col-12"><label class="form-label" th:text="#{patients.second_mobile}"></label><input class="form-control" name="ikinciMobilNomre" th:value="${xeste?.ikinciMobilNomre}"></div><div class="col-12"><label class="form-label" th:text="#{patients.email}"></label><input class="form-control" type="email" name="email" th:value="${xeste?.email}"></div><div class="col-12"><label class="form-label" th:text="#{patients.workplace}"></label><input class="form-control" name="isYeri" th:value="${xeste?.isYeri}"></div><div class="col-md-6"><label class="form-label" th:text="#{patients.position}"></label><input class="form-control" name="vezifesi" th:value="${xeste?.vezifesi}"></div><div class="col-md-6"><label class="form-label" th:text="#{patients.profession}"></label><input class="form-control" name="pesesi" th:value="${xeste?.pesesi}"></div></div></div></div></div>
-<div class="col-12"><div class="card border-0 shadow-sm"><div class="card-body"><label class="form-label" th:text="#{patients.note}"></label><textarea class="form-control" name="qeyd" rows="3" th:text="${xeste?.qeyd}"></textarea><label th:if="${xeste}" class="border rounded p-3 d-flex justify-content-between align-items-center mt-3 mb-0"><span class="fw-semibold" th:text="#{patients.active_card}"></span><span class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="aktiv" value="true" th:checked="${xeste.aktiv}"></span></label></div><div class="card-footer bg-white d-flex justify-content-end gap-2"><a class="btn btn-light" th:href="@{/xeste-qeydiyyati}" th:text="#{common.legv_et}"></a><button class="btn btn-primary"><i class="ti ti-device-floppy me-1"></i><span th:text="#{common.yadda_saxla}"></span></button></div></div></div></div></form>
-<script>document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.js-country').forEach(country=>{const city=document.querySelector(country.dataset.city);const filter=()=>[...city.options].forEach((o,i)=>{if(i)o.hidden=!!country.value&&o.dataset.parent!==country.value});country.addEventListener('change',()=>{city.value='';filter()});filter()}));</script></div></body></html>
+<!doctype html>
+<html
+  lang="az"
+  th:lang="${#locale.language}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/main}"
+>
+  <body>
+    <div layout:fragment="content">
+      <form
+        method="post"
+        th:action="${xeste==null?'/xeste-qeydiyyati/yeni':'/xeste-qeydiyyati/yenile'}"
+      >
+        <input
+          th:if="${xeste}"
+          type="hidden"
+          name="xesteId"
+          th:value="${xeste.id}"
+        />
+        <input
+          th:if="${xeste==null and returnTo!=null}"
+          type="hidden"
+          name="returnTo"
+          th:value="${returnTo}"
+        />
+        <div
+          class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
+        >
+          <div>
+            <h4
+              class="mb-1"
+              th:text="${xeste==null?#messages.msg('patients.registration'):#messages.msg('patients.edit')}"
+            ></h4>
+            <p
+              class="text-muted mb-0"
+              th:text="${xeste==null?#messages.msg('patients.new_hint'):xeste.kod+' · '+xeste.tamAd()}"
+            ></p>
+          </div>
+          <div class="d-flex gap-2">
+            <a
+              class="btn btn-outline-primary"
+              th:href="@{/xeste-qeydiyyati/siyahi}"
+              ><i class="ti ti-list me-1"></i
+              ><span th:text="#{patients.patient_list}"></span></a
+            ><button class="btn btn-primary">
+              <i class="ti ti-device-floppy me-1"></i
+              ><span th:text="#{common.yadda_saxla}"></span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="card border-0 shadow-sm overflow-hidden patient-registration-form"
+        >
+          <div class="row g-0">
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-user"></i><span>1.</span
+                ><span th:text="#{patients.personal_info}"></span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.first_name}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="ad"
+                    required
+                    maxlength="100"
+                    th:value="${xeste?.ad}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.last_name}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="soyad"
+                    required
+                    maxlength="100"
+                    th:value="${xeste?.soyad}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.father_name}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="ataAdi"
+                    maxlength="100"
+                    th:value="${xeste?.ataAdi}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.gender}"
+                  ></label
+                  ><select class="form-select select2" name="cinsId" required>
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${cinsler}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.cinsId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.birth_date}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    type="date"
+                    name="dogumTarixi"
+                    required
+                    th:value="${xeste?.dogumTarixi}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.blood_group}"
+                  ></label
+                  ><select class="form-select select2" name="qanQrupuId">
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${qanQruplari}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.qanQrupuId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+              </div>
+            </section>
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-id-badge"></i><span>2.</span
+                ><span th:text="#{patients.document_info}"></span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-5">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.document_type}"
+                  ></label
+                  ><select class="form-select select2" name="vesiqeNovuId" required>
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${vesiqeNovleri}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.vesiqeNovuId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.document_number}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="vesiqeNomresi"
+                    required
+                    th:value="${xeste?.vesiqeNomresi}"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label
+                    class="form-label required"
+                    th:text="#{patients.fin}"
+                  ></label
+                  ><input
+                    class="form-control text-uppercase"
+                    name="finKodu"
+                    required
+                    maxlength="20"
+                    th:value="${xeste?.finKodu}"
+                  />
+                </div>
+              </div>
+            </section>
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-phone"></i><span>3.</span
+                ><span th:text="#{patients.contact_work}"></span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" th:text="#{patients.mobile}"></label
+                  ><input
+                    class="form-control"
+                    name="mobilNomre"
+                    th:value="${xeste?.mobilNomre}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.second_mobile}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="ikinciMobilNomre"
+                    th:value="${xeste?.ikinciMobilNomre}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" th:text="#{patients.email}"></label
+                  ><input
+                    class="form-control"
+                    type="email"
+                    name="email"
+                    th:value="${xeste?.email}"
+                  />
+                </div>
+              </div>
+            </section>
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-map-pin"></i><span>4.</span
+                ><span th:text="#{patients.address_info}"></span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.country}"
+                  ></label
+                  ><select
+                    class="form-select select2 js-country"
+                    name="olkeId"
+                    data-city="#livingCity"
+                  >
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${olkeler}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.olkeId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" th:text="#{patients.city}"></label
+                  ><select class="form-select select2" id="livingCity" name="seherId">
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${seherler}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:data-parent="${o.parentId}"
+                      th:selected="${xeste!=null and xeste.seherId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.address}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="unvan"
+                    th:value="${xeste?.unvan}"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.birth_country}"
+                  ></label
+                  ><select
+                    class="form-select select2 js-country"
+                    name="dogulduguOlkeId"
+                    data-city="#birthCity"
+                  >
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${olkeler}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.dogulduguOlkeId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.birth_city}"
+                  ></label
+                  ><select
+                    class="form-select select2"
+                    id="birthCity"
+                    name="dogulduguSeherId"
+                  >
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${seherler}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:data-parent="${o.parentId}"
+                      th:selected="${xeste!=null and xeste.dogulduguSeherId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+              </div>
+            </section>
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-info-circle"></i><span>5.</span
+                ><span th:text="#{patients.additional_info}"></span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.marital_status}"
+                  ></label
+                  ><select class="form-select select2" name="aileVeziyyetiId">
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${aileVeziyyetleri}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.aileVeziyyetiId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.education}"
+                  ></label
+                  ><select class="form-select select2" name="tehsilId">
+                    <option value="" th:text="#{common.select}"></option>
+                    <option
+                      th:each="o:${tehsiller}"
+                      th:value="${o.id}"
+                      th:text="${o.ad}"
+                      th:selected="${xeste!=null and xeste.tehsilId==o.id}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.social_card}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="sosialKartNomresi"
+                    th:value="${xeste?.sosialKartNomresi}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.workplace}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="isYeri"
+                    th:value="${xeste?.isYeri}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.position}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="vezifesi"
+                    th:value="${xeste?.vezifesi}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.profession}"
+                  ></label
+                  ><input
+                    class="form-control"
+                    name="pesesi"
+                    th:value="${xeste?.pesesi}"
+                  />
+                </div>
+              </div>
+            </section>
+            <section class="col-xl-6 patient-section">
+              <h6>
+                <i class="ti ti-building-bank"></i><span>6.</span
+                ><span th:text="#{patients.organization}"></span>
+              </h6>
+              <label
+                class="form-label required"
+                th:text="#{patients.default_organization}"
+              ></label
+              ><select class="form-select select2" name="defaultTeskilatId" required>
+                <option value="" th:text="#{common.select}"></option>
+                <option
+                  th:each="o:${teskilatlar}"
+                  th:value="${o.id}"
+                  th:text="${o.ad}"
+                  th:selected="${xeste!=null and xeste.defaultTeskilatId==o.id}"
+                ></option></select
+              ><label
+                th:if="${xeste}"
+                class="border rounded p-3 d-flex justify-content-between align-items-center mt-3 mb-0"
+                ><span
+                  class="fw-semibold"
+                  th:text="#{patients.active_card}"
+                ></span
+                ><span class="form-check form-switch mb-0"
+                  ><input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="aktiv"
+                    value="true"
+                    th:checked="${xeste.aktiv}" /></span
+              ></label>
+            </section>
+            <section class="col-12 patient-section">
+              <h6>
+                <i class="ti ti-note"></i><span>7.</span
+                ><span th:text="#{patients.note}"></span>
+              </h6>
+              <textarea
+                class="form-control"
+                name="qeyd"
+                rows="3"
+                maxlength="500"
+                th:text="${xeste?.qeyd}"
+                th:placeholder="#{patients.note}"
+              ></textarea>
+            </section>
+          </div>
+        </div>
+      </form>
+      <script>
+        document.addEventListener("DOMContentLoaded", () =>
+          document.querySelectorAll(".js-country").forEach((country) => {
+            const city = document.querySelector(country.dataset.city);
+            const filter = () =>
+              [...city.options].forEach((option, index) => {
+                if (index)
+                  option.hidden =
+                    !!country.value && option.dataset.parent !== country.value;
+              });
+            country.addEventListener("change", () => {
+              city.value = "";
+              filter();
+            });
+            filter();
+          }),
+        );
+      </script>
+      <style>
+        .patient-registration-form .patient-section {
+          padding: 24px;
+          border-right: 1px solid var(--bs-border-color);
+          border-bottom: 1px solid var(--bs-border-color);
+          min-height: 190px;
+        }
+        .patient-registration-form .patient-section:nth-child(even) {
+          border-right: 0;
+        }
+        .patient-registration-form .patient-section:last-child {
+          border-right: 0;
+          border-bottom: 0;
+          min-height: auto;
+        }
+        .patient-registration-form h6 {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-weight: 700;
+          margin-bottom: 20px;
+        }
+        .patient-registration-form h6 i {
+          color: var(--bs-primary);
+          font-size: 1.25rem;
+        }
+        .patient-registration-form .required:after {
+          content: " *";
+          color: var(--bs-danger);
+        }
+        @media (max-width: 1199.98px) {
+          .patient-registration-form .patient-section {
+            border-right: 0;
+          }
+          .patient-registration-form .patient-section:last-child {
+            border-bottom: 0;
+          }
+        }
+      </style>
+    </div>
+  </body>
+</html>

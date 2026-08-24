@@ -1,114 +1,15 @@
 package az.simplexs.simplexs.controller.ambulator;
-
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import az.simplexs.simplexs.dto.ambulator.AmbulatorLookups;
-import az.simplexs.simplexs.dto.ambulator.PatientDocumentFilter;
-import az.simplexs.simplexs.dto.ambulator.PatientDocumentForm;
-import az.simplexs.simplexs.dto.ambulator.PatientDocumentListItem;
-import az.simplexs.simplexs.service.ambulator.AmbulatorService;
-
-@Controller
-public class AmbulatorController {
-    private final AmbulatorService ambulatorService;
-
-    public AmbulatorController(AmbulatorService ambulatorService) {
-        this.ambulatorService = ambulatorService;
-    }
-
-    @GetMapping("/ambulatorQebul")
-    public String ambulatorQebul(@ModelAttribute("patientFilter") PatientDocumentFilter patientFilter, Model model) {
-        addPageAttributes(model);
-        addLookups(model);
-        addPatientDocuments(model, patientFilter);
-        if (!model.containsAttribute("patientDocumentForm")) {
-            model.addAttribute("patientDocumentForm", new PatientDocumentForm());
-        }
-        return "pages/pasienQebulu/ambulator/ambulatorQebul";
-    }
-
-    @PostMapping("/ambulatorQebul/patient")
-    public String createPatient(
-        @ModelAttribute PatientDocumentForm patientDocumentForm,
-        Principal principal,
-        RedirectAttributes redirectAttributes
-    ) {
-        String createdBy = principal == null ? "admin" : principal.getName();
-        try {
-            Map<String, Object> result = ambulatorService.createPatientDocument(patientDocumentForm, createdBy);
-            String patientCode = ambulatorService.toText(result.get("patient_code"));
-            String message = patientCode.isBlank()
-                ? "Yeni ambulator pasient yaradıldı."
-                : "Yeni ambulator pasient yaradıldı. Pasient kodu: " + patientCode;
-            redirectAttributes.addFlashAttribute("successMessage", message);
-        } catch (DataAccessException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMostSpecificCause().getMessage());
-            redirectAttributes.addFlashAttribute("patientDocumentForm", patientDocumentForm);
-        } catch (IllegalStateException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-            redirectAttributes.addFlashAttribute("patientDocumentForm", patientDocumentForm);
-        }
-        return "redirect:/ambulatorQebul";
-    }
-
-    private void addPageAttributes(Model model) {
-        model.addAttribute("pageTitle", "Ambulator qəbul");
-        model.addAttribute("activeMenuGroup", "pasientQebulu");
-        model.addAttribute("activeMenu", "ambulatorQebul");
-    }
-
-    private void addLookups(Model model) {
-        try {
-            AmbulatorLookups lookups = ambulatorService.getLookups();
-            model.addAttribute("lookups", lookups);
-        } catch (DataAccessException ex) {
-            model.addAttribute("lookups", emptyLookups());
-            model.addAttribute("errorMessage", ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    private AmbulatorLookups emptyLookups() {
-        return new AmbulatorLookups(
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of()
-        );
-    }
-
-    private void addPatientDocuments(Model model, PatientDocumentFilter patientFilter) {
-        try {
-            List<PatientDocumentListItem> patientDocuments = ambulatorService.getPatientDocuments(patientFilter);
-            model.addAttribute("patientDocuments", patientDocuments);
-            model.addAttribute("filterApplied", patientFilter != null && patientFilter.hasFilters());
-            model.addAttribute("patientResultLimit", patientFilter == null ? PatientDocumentFilter.DEFAULT_LIMIT : patientFilter.getLimit());
-            model.addAttribute("activePatientCount", ambulatorService.countActivePatientDocuments());
-            model.addAttribute("todayPatientCount", ambulatorService.countTodayPatientDocuments());
-        } catch (DataAccessException ex) {
-            model.addAttribute("patientDocuments", List.of());
-            model.addAttribute("filterApplied", patientFilter != null && patientFilter.hasFilters());
-            model.addAttribute("patientResultLimit", PatientDocumentFilter.DEFAULT_LIMIT);
-            model.addAttribute("activePatientCount", 0);
-            model.addAttribute("todayPatientCount", 0);
-            if (!model.containsAttribute("errorMessage")) {
-                model.addAttribute("errorMessage", ex.getMostSpecificCause().getMessage());
-            }
-        }
-    }
+import java.time.*;import java.util.*;import org.springframework.context.*;import org.springframework.context.i18n.*;import org.springframework.format.annotation.DateTimeFormat;import org.springframework.security.core.annotation.AuthenticationPrincipal;import org.springframework.stereotype.Controller;import org.springframework.ui.Model;import org.springframework.web.bind.annotation.*;import org.springframework.web.servlet.mvc.support.RedirectAttributes;import az.simplexs.simplexs.controller.KlinikaController;import az.simplexs.simplexs.dto.ambulator.*;import az.simplexs.simplexs.repository.ambulator.AmbulatorRepository;import az.simplexs.simplexs.security.AuthenticatedPersonal;import jakarta.servlet.http.HttpSession;
+@Controller public class AmbulatorController{
+ private final AmbulatorRepository repo;private final MessageSource messages;public AmbulatorController(AmbulatorRepository repo,MessageSource messages){this.repo=repo;this.messages=messages;}
+ @GetMapping("/ambulatorQebul")public String index(){return "redirect:/ambulatorQebul/siyahi";}
+ @GetMapping("/ambulatorQebul/yeni")public String yeni(@RequestParam(required=false)Long xesteId,Model m,HttpSession s){form(m,s,null,xesteId==null?null:repo.xeste(kid(s),xesteId));return "pages/pasienQebulu/ambulator/gelisFormu";}
+ @GetMapping("/ambulatorQebul/{id}")public String edit(@PathVariable Long id,Model m,HttpSession s){form(m,s,repo.gelis(kid(s),id),null);return "pages/pasienQebulu/ambulator/gelisFormu";}
+ @GetMapping("/ambulatorQebul/siyahi")public String list(@RequestParam(required=false)Long xesteId,@RequestParam(required=false)Long gelisNovuId,@RequestParam(required=false)Long teskilatId,@RequestParam(required=false)@DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate tarixBaslama,@RequestParam(required=false)@DateTimeFormat(iso=DateTimeFormat.ISO.DATE)LocalDate tarixBitme,@RequestParam(required=false)String randevu,@RequestParam(defaultValue="aktiv")String status,@RequestParam(required=false)String q,@RequestParam(required=false)Long cursor,Model m,HttpSession s){Boolean aktiv=status.isBlank()?null:!"passiv".equals(status);Boolean r=randevu==null||randevu.isBlank()?null:"beli".equals(randevu);var rows=repo.gelisler(kid(s),xesteId,gelisNovuId,teskilatId,tarixBaslama,tarixBitme,r,aktiv,q,cursor,26);boolean hasNext=rows.size()>25;var gelisler=hasNext?rows.subList(0,25):rows;m.addAttribute("gelisler",gelisler);m.addAttribute("hasNext",hasNext);m.addAttribute("nextCursor",hasNext?gelisler.getLast().id():null);m.addAttribute("filterApplied",(q!=null&&!q.isBlank())||xesteId!=null||gelisNovuId!=null||teskilatId!=null||tarixBaslama!=null||tarixBitme!=null||(randevu!=null&&!randevu.isBlank())||!"aktiv".equals(status));m.addAttribute("selectedXesteId",xesteId);m.addAttribute("selectedGelisNovuId",gelisNovuId);m.addAttribute("selectedTeskilatId",teskilatId);m.addAttribute("tarixBaslama",tarixBaslama);m.addAttribute("tarixBitme",tarixBitme);m.addAttribute("selectedRandevu",randevu);m.addAttribute("selectedStatus",status);m.addAttribute("q",q);base(m,s);return "pages/pasienQebulu/ambulator/gelisSiyahisi";}
+ @GetMapping("/ambulatorQebul/xeste-axtar")@ResponseBody public Map<String,Object> xesteAxtar(@RequestParam(required=false)String q,@RequestParam(defaultValue="aktiv")String status,@RequestParam(required=false)Long cursor,HttpSession s){Boolean aktiv=status.isBlank()?null:!"passiv".equals(status);var rows=repo.xesteAxtar(kid(s),aktiv,q,cursor,26);boolean more=rows.size()>25;var page=more?rows.subList(0,25):rows;return Map.of("results",page.stream().map(x->Map.of("id",x.id(),"kod",x.kod(),"ad",x.ad(),"meta",x.meta()==null?"":x.meta(),"teskilatId",x.teskilatId()==null?0:x.teskilatId(),"text",x.ad()+" · "+x.kod())).toList(),"pagination",Map.of("more",more),"nextCursor",more?page.getLast().id():0);}
+ @PostMapping("/ambulatorQebul/yarat")public String yarat(@ModelAttribute GelisForm f,HttpSession s,@AuthenticationPrincipal AuthenticatedPersonal p,RedirectAttributes a){flash(repo.gelisYarat(kid(s),f,p.personalId()),a);return "redirect:/ambulatorQebul/siyahi";}
+ @PostMapping("/ambulatorQebul/yenile")public String yenile(@ModelAttribute GelisForm f,HttpSession s,@AuthenticationPrincipal AuthenticatedPersonal p,RedirectAttributes a){flash(repo.gelisYenile(kid(s),f,p.personalId()),a);return "redirect:/ambulatorQebul/siyahi";}
+ private void form(Model m,HttpSession s,Gelis g,GelisOption selected){base(m,s);m.addAttribute("gelis",g);m.addAttribute("selectedXeste",selected);m.addAttribute("today",LocalDate.now());m.addAttribute("now",LocalTime.now().withSecond(0).withNano(0));}
+ private void base(Model m,HttpSession s){Long k=kid(s);m.addAttribute("pageTitle",msg("visits.title"));m.addAttribute("activeMenuGroup","pasientQebulu");m.addAttribute("activeMenu","ambulatorQebul");m.addAttribute("gelisNovleri",repo.gelisNovleri());m.addAttribute("teskilatlar",repo.teskilatlar(k));m.addAttribute("hekimler",repo.hekimler(k));}
+ private Long kid(HttpSession s){return(Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);}private String msg(String k){return messages.getMessage(k,null,LocaleContextHolder.getLocale());}private void flash(Map<String,Object>r,RedirectAttributes a){String s=String.valueOf(r.getOrDefault("status_kodu",""));a.addFlashAttribute(s.contains("UGUR")?"successMessage":"errorMessage",String.valueOf(r.getOrDefault("mesaj",msg("visits.saved"))));}
 }

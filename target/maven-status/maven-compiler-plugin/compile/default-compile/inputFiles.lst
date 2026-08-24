@@ -28,6 +28,9 @@
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/YataqController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/controller/ambulator/AmbulatorController.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/AmbulatorLookups.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/Gelis.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/GelisForm.java
+/Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/GelisOption.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/LookupOption.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/PatientDocumentFilter.java
 /Users/user/Documents/GitHub/SimplexS/src/main/java/az/simplexs/simplexs/dto/ambulator/PatientDocumentForm.java

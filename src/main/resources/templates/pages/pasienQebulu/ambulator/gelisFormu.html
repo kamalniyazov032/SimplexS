@@ -1,0 +1,257 @@
+<!doctype html>
+<html
+  lang="az"
+  th:lang="${#locale.language}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/main}"
+>
+  <body>
+    <div layout:fragment="content">
+      <form
+        method="post"
+        th:action="${gelis==null?'/ambulatorQebul/yarat':'/ambulatorQebul/yenile'}"
+      >
+        <input
+          th:if="${gelis}"
+          type="hidden"
+          name="gelisId"
+          th:value="${gelis.id}"
+        />
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4
+              th:text="${gelis==null?#messages.msg('visits.new'):#messages.msg('patients.edit')}"
+            ></h4>
+          </div>
+          <div class="d-flex gap-2">
+            <a
+              class="btn btn-outline-primary"
+              th:href="@{/ambulatorQebul/siyahi}"
+              th:text="#{visits.list}"
+            ></a
+            ><button
+              class="btn btn-primary"
+              th:text="#{common.yadda_saxla}"
+            ></button>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="text-primary">
+              1. <span th:text="#{visits.patient}"></span>
+            </h6>
+            <div class="input-group">
+              <input
+                id="ambulatorSelectedPatient"
+                class="form-control"
+                readonly
+                th:placeholder="#{visits.select_patient}"
+                th:value="${gelis!=null?gelis.xesteAd+' '+gelis.xesteSoyad+' · '+gelis.xesteKodu:(selectedXeste!=null?selectedXeste.ad+' · '+selectedXeste.kod+(selectedXeste.meta!=null?' · '+selectedXeste.meta:''):'')}"
+              /><button
+                th:if="${gelis==null}"
+                class="btn btn-outline-primary"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#patientSelectionModal"
+              >
+                <i class="ti ti-search"></i>
+                <span th:text="#{common.search}"></span>
+              </button>
+            </div>
+            <input
+              id="ambulatorPatientId"
+              type="hidden"
+              name="xesteId"
+              th:value="${gelis!=null?gelis.xesteId:(selectedXeste!=null?selectedXeste.id:null)}"
+              required
+            />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h6 class="text-primary">
+              2. <span th:text="#{visits.title}"></span>
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" th:text="#{visits.type}"></label
+                ><select class="form-select select2" name="gelisNovuId" required>
+                  <option
+                    th:each="o:${gelisNovleri}"
+                    th:value="${o.id}"
+                    th:text="${o.ad}"
+                    th:selected="${gelis!=null and gelis.gelisNovuId==o.id}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label
+                  class="form-label"
+                  th:text="#{patients.organization}"
+                ></label
+                ><select class="form-select select2" name="teskilatId">
+                  <option
+                    value=""
+                    th:text="#{patients.default_organization}"
+                  ></option>
+                  <option
+                    th:each="o:${teskilatlar}"
+                    th:value="${o.id}"
+                    th:text="${o.ad}"
+                    th:selected="${(gelis!=null and gelis.teskilatId==o.id) or (gelis==null and selectedXeste!=null and selectedXeste.teskilatId==o.id)}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" th:text="#{visits.date}"></label
+                ><input
+                  class="form-control"
+                  type="date"
+                  name="gelisTarixi"
+                  required
+                  th:value="${gelis!=null?gelis.gelisTarixi:today}"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" th:text="#{visits.time}"></label
+                ><input
+                  class="form-control"
+                  type="time"
+                  name="gelisSaati"
+                  required
+                  th:value="${gelis!=null?gelis.gelisSaati:now}"
+                />
+              </div>
+              <div class="col-md-6">
+                <label
+                  class="form-label"
+                  th:text="#{visits.referring_doctor}"
+                ></label
+                ><select class="form-select select2" name="gonderenHekimId">
+                  <option value="" th:text="#{common.select}"></option>
+                  <option
+                    th:each="o:${hekimler}"
+                    th:value="${o.id}"
+                    th:text="${o.ad}"
+                    th:selected="${gelis!=null and gelis.gonderenHekimId==o.id}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label
+                  class="border rounded p-3 w-100 d-flex justify-content-between"
+                  ><span th:text="#{visits.appointment}"></span
+                  ><input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="randevudur"
+                    value="true"
+                    th:checked="${gelis!=null and gelis.randevudur}"
+                /></label>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" th:text="#{visits.message}"></label
+                ><textarea
+                  class="form-control"
+                  name="mesaj"
+                  rows="3"
+                  maxlength="500"
+                  th:text="${gelis?.mesaj}"
+                ></textarea>
+              </div>
+              <div class="col-md-6">
+                <label
+                  class="form-label"
+                  th:text="#{visits.description}"
+                ></label
+                ><textarea
+                  class="form-control"
+                  name="aciqlama"
+                  rows="3"
+                  maxlength="1000"
+                  th:text="${gelis?.aciqlama}"
+                ></textarea>
+              </div>
+              <div th:if="${gelis}" class="col-12">
+                <label class="border rounded p-3 d-flex justify-content-between"
+                  ><span th:text="#{common.aktiv}"></span
+                  ><input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="aktiv"
+                    value="true"
+                    th:checked="${gelis.aktiv}"
+                /></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="modal fade" id="patientSelectionModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" th:text="#{patients.patient_list}"></h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="row g-2 mb-3">
+                <div class="col-md-8">
+                  <label
+                    class="form-label"
+                    th:text="#{patients.search_label}"
+                  ></label
+                  ><input
+                    id="patientModalSearch"
+                    class="form-control"
+                    th:placeholder="#{patients.search}"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label" th:text="#{patients.status}"></label
+                  ><select id="patientModalStatus" class="form-select select2">
+                    <option value="aktiv" th:text="#{common.active}"></option>
+                    <option value="" th:text="#{common.all}"></option>
+                    <option value="passiv" th:text="#{common.passive}"></option>
+                  </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button
+                    id="patientModalSearchButton"
+                    type="button"
+                    class="btn btn-primary w-100"
+                    th:text="#{common.search}"
+                  ></button>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th th:text="#{patients.patient_code}"></th>
+                      <th th:text="#{patients.full_name}"></th>
+                      <th th:text="#{patients.document_fin}"></th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="patientModalResults"></tbody>
+                </table>
+              </div>
+              <button
+                id="patientModalMore"
+                type="button"
+                class="btn btn-outline-primary w-100 d-none"
+                th:text="#{common.show_more}"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

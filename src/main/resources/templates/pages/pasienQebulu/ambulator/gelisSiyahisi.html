@@ -1,0 +1,285 @@
+<!doctype html>
+<html
+  lang="az"
+  th:lang="${#locale.language}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/main}"
+>
+  <body>
+    <div layout:fragment="content">
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
+      >
+        <div>
+          <h4 class="mb-1">
+            <i class="ti ti-stethoscope text-primary me-2"></i
+            ><span th:text="#{visits.list}"></span>
+          </h4>
+          <p class="text-muted mb-0" th:text="#{visits.list_description}"></p>
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-primary"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#visitFilter"
+          >
+            <i class="ti ti-filter me-1"></i
+            ><span th:text="#{common.filter}"></span
+            ><span
+              th:if="${filterApplied}"
+              class="badge bg-white text-primary ms-2"
+              th:text="#{common.active}"
+            ></span></button
+          ><a
+            class="btn btn-outline-primary"
+            th:href="@{/xeste-qeydiyyati/yeni(returnTo='ambulator')}"
+            ><i class="ti ti-user-plus me-1"></i
+            ><span th:text="#{patients.new}"></span></a
+          ><a class="btn btn-primary" th:href="@{/ambulatorQebul/yeni}"
+            ><i class="ti ti-plus me-1"></i><span th:text="#{visits.new}"></span
+          ></a>
+        </div>
+      </div>
+      <div
+        th:if="${successMessage}"
+        class="alert alert-success"
+        th:text="${successMessage}"
+      ></div>
+      <div
+        th:if="${errorMessage}"
+        class="alert alert-danger"
+        th:text="${errorMessage}"
+      ></div>
+      <div
+        class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg"
+        id="visitFilter"
+        tabindex="-1"
+        style="
+          --bs-offcanvas-height: 210px !important;
+          height: 210px !important;
+          min-height: 210px !important;
+          max-height: 210px !important;
+        "
+      >
+        <div class="offcanvas-header border-bottom bg-light py-3">
+          <h5 class="mb-0 fw-bold text-primary">
+            <i class="ti ti-filter me-2"></i
+            ><span th:text="#{visits.detailed_search}"></span>
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            th:aria-label="#{common.bagla}"
+          ></button>
+        </div>
+        <div class="offcanvas-body py-3">
+          <form method="get" th:action="@{/ambulatorQebul/siyahi}">
+            <div class="row g-2 align-items-end">
+              <div class="col-xl-3 col-md-6">
+                <label
+                  class="form-label small text-muted"
+                  th:text="#{common.axtaris}"
+                ></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"
+                    ><i class="ti ti-search"></i></span
+                  ><input
+                    class="form-control"
+                    name="q"
+                    th:value="${q}"
+                    th:placeholder="#{visits.search_placeholder}"
+                  />
+                </div>
+              </div>
+              <div class="col-xl-2 col-md-6">
+                <label
+                  class="form-label small text-muted"
+                  th:text="#{visits.type}"
+                ></label
+                ><select class="form-select select2" name="gelisNovuId">
+                  <option value="" th:text="#{common.hamisi}"></option>
+                  <option
+                    th:each="o:${gelisNovleri}"
+                    th:value="${o.id}"
+                    th:text="${o.ad}"
+                    th:selected="${o.id==selectedGelisNovuId}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-xl-2 col-md-6">
+                <label
+                  class="form-label small text-muted"
+                  th:text="#{visits.date_from}"
+                ></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"
+                    ><i class="ti ti-calendar"></i></span
+                  ><input
+                    class="form-control"
+                    type="date"
+                    name="tarixBaslama"
+                    th:value="${tarixBaslama}"
+                  />
+                </div>
+              </div>
+              <div class="col-xl-2 col-md-6">
+                <label
+                  class="form-label small text-muted"
+                  th:text="#{visits.date_to}"
+                ></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"
+                    ><i class="ti ti-calendar"></i></span
+                  ><input
+                    class="form-control"
+                    type="date"
+                    name="tarixBitme"
+                    th:value="${tarixBitme}"
+                  />
+                </div>
+              </div>
+              <div class="col-xl-1 col-md-6">
+                <label
+                  class="form-label small text-muted"
+                  th:text="#{common.status}"
+                ></label
+                ><select class="form-select select2" name="status">
+                  <option
+                    value="aktiv"
+                    th:selected="${selectedStatus=='aktiv'}"
+                    th:text="#{common.aktiv}"
+                  ></option>
+                  <option
+                    value="passiv"
+                    th:selected="${selectedStatus=='passiv'}"
+                    th:text="#{common.passiv}"
+                  ></option>
+                  <option
+                    value=""
+                    th:selected="${selectedStatus==''}"
+                    th:text="#{common.hamisi}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-xl-2 col-md-6">
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary flex-fill">
+                    <i class="ti ti-search me-1"></i
+                    ><span th:text="#{common.axtar}"></span></button
+                  ><a
+                    class="btn btn-light flex-fill"
+                    th:href="@{/ambulatorQebul/siyahi}"
+                    ><i class="ti ti-x me-1"></i
+                    ><span th:text="#{common.temizle}"></span
+                  ></a>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <div>
+            <h5 class="mb-1" th:text="#{visits.list}"></h5>
+            <small
+              th:if="${filterApplied}"
+              class="text-muted"
+              th:text="#{visits.filter_result}"
+            ></small>
+          </div>
+          <a
+            th:if="${filterApplied}"
+            class="btn btn-sm btn-light"
+            th:href="@{/ambulatorQebul/siyahi}"
+            ><i class="ti ti-x me-1"></i
+            ><span th:text="#{common.filteri_temizle}"></span
+          ></a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-3" th:text="#{visits.protocol}"></th>
+                  <th th:text="#{visits.patient}"></th>
+                  <th th:text="#{visits.type}"></th>
+                  <th th:text="#{patients.organization}"></th>
+                  <th th:text="#{visits.date}"></th>
+                  <th th:text="#{visits.appointment}"></th>
+                  <th th:text="#{common.status}"></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="g:${gelisler}">
+                  <td
+                    class="ps-3 fw-semibold text-primary"
+                    th:text="${g.protokolKodu}"
+                  ></td>
+                  <td>
+                    <strong th:text="|${g.xesteAd} ${g.xesteSoyad}|"></strong
+                    ><small
+                      class="d-block text-muted"
+                      th:text="${g.xesteKodu}"
+                    ></small>
+                  </td>
+                  <td th:text="${g.gelisNovuAdi}"></td>
+                  <td th:text="${g.teskilatAdi?:'—'}"></td>
+                  <td
+                    th:text="|${#temporals.format(g.gelisTarixi,'dd.MM.yyyy')} ${g.gelisSaati}|"
+                  ></td>
+                  <td
+                    th:text="${g.randevudur}?#{common.beli}:#{common.xeyr}"
+                  ></td>
+                  <td>
+                    <span
+                      class="badge"
+                      th:classappend="${g.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'"
+                      th:text="${g.aktiv}?#{common.aktiv}:#{common.passiv}"
+                    ></span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-1">
+                    <a
+                      class="btn btn-sm btn-outline-success"
+                      th:href="@{/ambulatorQebul/yeni(xesteId=${g.xesteId})}"
+                      th:title="#{visits.new_for_patient}"
+                      ><i class="ti ti-plus"></i
+                    ></a>
+                    <a
+                      class="btn btn-sm btn-outline-primary"
+                      th:href="@{/ambulatorQebul/{id}(id=${g.id})}"
+                      th:title="#{patients.edit}"
+                      ><i class="ti ti-edit"></i
+                    ></a>
+                    </div>
+                  </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(gelisler)}">
+                  <td colspan="8" class="text-center text-muted py-5">
+                    <i class="ti ti-stethoscope-off fs-2 d-block mb-2"></i
+                    ><span th:text="#{patients.empty}"></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div th:if="${hasNext}" class="card-footer text-center">
+          <a
+            class="btn btn-outline-primary"
+            th:href="@{/ambulatorQebul/siyahi(q=${q},gelisNovuId=${selectedGelisNovuId},teskilatId=${selectedTeskilatId},tarixBaslama=${tarixBaslama},tarixBitme=${tarixBitme},randevu=${selectedRandevu},status=${selectedStatus},cursor=${nextCursor})}"
+            ><i class="ti ti-chevron-down me-1"></i
+            ><span th:text="#{common.show_more}"></span
+          ></a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
