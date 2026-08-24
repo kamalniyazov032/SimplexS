@@ -41,8 +41,9 @@
                 <div th:each="qrup:${qruplar}" class="service-group-node mx-2"
                      th:classappend="${qrup.id == selectedQrupId} ? ' active' : ''"
                      th:data-group-id="${qrup.id}" th:data-parent-id="${qrup.parentId}"
+                     th:data-level="${qrup.seviye}"
                      th:data-has-children="${qrup.altQrupuVar}" th:data-selected="${qrup.id == selectedQrupId}"
-                     th:style="|padding-left:${qrup.seviye * 18}px|">
+                     th:style="|padding-left:${qrup.seviye * 18}px;--group-level:${qrup.seviye}|">
                     <button th:if="${qrup.altQrupuVar}" class="btn btn-sm p-0 service-group-toggle" type="button"
                             th:attr="aria-label=|${qrup.ad} alt qruplarını aç|" aria-expanded="false">
                         <i class="ti ti-chevron-right"></i>
@@ -119,7 +120,9 @@
     </div>
     <div id="packageI18n" hidden th:data-add="#{services.elave_et}" th:data-remove="#{services.cixar}" th:data-quantity="#{services.miqdar}" th:data-empty="#{services.paket_bosdur}" th:data-no-results="#{services.xidmet_tapilmadi}" th:data-load-error="#{services.melumat_yuklenmedi}"></div>
     <style>
-        .service-group-node{display:flex;align-items:center;min-height:40px;border-radius:.375rem}
+        .service-group-node{position:relative;display:flex;align-items:center;min-height:42px;border-radius:.5rem}
+        .service-group-node::before{content:"";position:absolute;top:-10px;bottom:-10px;left:calc((var(--group-level,0) * 18px) + 13px);border-left:1px solid var(--bs-border-color);opacity:0}
+        .service-group-node[data-level]:not([data-level="0"])::before{opacity:1}
         .service-group-node:hover{background:var(--bs-tertiary-bg)}
         .service-group-node.active{background:var(--bs-primary);color:#fff}
         .service-group-toggle,.service-group-toggle-placeholder{width:28px;min-width:28px;color:inherit}
@@ -136,7 +139,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             const nodes = [...document.querySelectorAll('.service-group-node')];
             const byId = new Map(nodes.map(node => [node.dataset.groupId, node]));
-            const expanded = new Set();
+            const storageKey = 'simplexs.serviceGroups.expanded';
+            let stored = [];
+            try { stored = JSON.parse(sessionStorage.getItem(storageKey) || '[]'); } catch (error) { stored = []; }
+            const expanded = new Set(stored.filter(id => byId.has(String(id))).map(String));
 
             let selected = nodes.find(node => node.dataset.selected === 'true');
             while (selected && selected.dataset.parentId) {
@@ -166,6 +172,7 @@
             nodes.forEach(node => node.querySelector('.service-group-toggle')?.addEventListener('click', () => {
                 const id = node.dataset.groupId;
                 expanded.has(id) ? expanded.delete(id) : expanded.add(id);
+                sessionStorage.setItem(storageKey, JSON.stringify([...expanded]));
                 render();
             }));
             render();

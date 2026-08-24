@@ -77,7 +77,7 @@ public class XidmetController {
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
         Boolean aktivFilter=selectedStatus.isBlank()?null:"aktiv".equals(selectedStatus);
-        Long kid=klinikaId(session);var qruplar=repo.qruplar(kid);var all=repo.xidmetler(kid,qrupId,aktivFilter);
+        Long kid=klinikaId(session);var qruplar=hierarchyOrder(repo.qruplar(kid));var all=repo.xidmetler(kid,qrupId,aktivFilter);
         var filtered=all.stream()
                 .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
                 .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
