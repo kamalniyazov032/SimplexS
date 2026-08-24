@@ -18,7 +18,15 @@ public class RutinRepository {
     public RutinRepository(NamedParameterJdbcTemplate jdbc){this.jdbc=jdbc;}
 
     public List<Rutin> siyahi(Long klinikaId,Boolean aktiv,String query){
-        return jdbc.query("SELECT * FROM public.fn_rutin_siyahisi(p_klinika_id=>:klinika,p_aktiv=>:aktiv,p_axtaris=>:q)",
+        return jdbc.query("""
+                SELECT r.*, q.umumi_qiymet
+                FROM public.fn_rutin_siyahisi(p_klinika_id=>:klinika,p_aktiv=>:aktiv,p_axtaris=>:q) r
+                LEFT JOIN LATERAL (
+                    SELECT SUM(x.qiymet) umumi_qiymet
+                    FROM public.fn_rutin_xidmet_siyahisi(p_rutin_id=>r.rutin_id,p_aktiv=>true) x
+                    WHERE x.qiymet IS NOT NULL
+                ) q ON true
+                """,
                 new MapSqlParameterSource("klinika",klinikaId).addValue("aktiv",aktiv).addValue("q",blank(query)),this::mapRutin);
     }
     public Map<String,Object> yarat(Long klinikaId,String kod,String ad,String aciqlama,boolean rutinQiymeti,Long personalId){
@@ -49,7 +57,15 @@ public class RutinRepository {
         return one("SELECT * FROM public.fn_rutin_xidmetlerini_yadda_saxla(p_rutin_id=>:rutin,p_xidmetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:personal)",
                 new MapSqlParameterSource("rutin",rutinId).addValue("json",json).addValue("personal",personalId));
     }
-    private Rutin mapRutin(ResultSet r,int n)throws SQLException{return new Rutin(l(r,"rutin_id"),l(r,"klinika_id"),r.getString("kod"),r.getString("ad"),r.getString("aciqlama"),r.getObject("rutin_qiymetlerinden_istifade_et",Boolean.class),i(r,"xidmet_sayi"),i(r,"sira_no"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id"));}
+    public boolean rutinQiymetlerindenIstifadeEdir(Long klinikaId,Long rutinId){
+        Boolean value=jdbc.queryForObject("""
+                SELECT rutin_qiymetlerinden_istifade_et
+                FROM public.fn_rutin_siyahisi(p_klinika_id=>:klinika,p_aktiv=>NULL,p_axtaris=>NULL)
+                WHERE rutin_id=:id
+                """,new MapSqlParameterSource("klinika",klinikaId).addValue("id",rutinId),Boolean.class);
+        return Boolean.TRUE.equals(value);
+    }
+    private Rutin mapRutin(ResultSet r,int n)throws SQLException{return new Rutin(l(r,"rutin_id"),l(r,"klinika_id"),r.getString("kod"),r.getString("ad"),r.getString("aciqlama"),r.getObject("rutin_qiymetlerinden_istifade_et",Boolean.class),i(r,"xidmet_sayi"),r.getBigDecimal("umumi_qiymet"),i(r,"sira_no"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id"));}
     private RutinXidmet mapRutinXidmet(ResultSet r,int n)throws SQLException{return new RutinXidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getBigDecimal("qiymet"),i(r,"sira_no"),r.getObject("xidmet_aktiv",Boolean.class),r.getObject("elaqe_aktiv",Boolean.class));}
     private Xidmet mapXidmet(ResultSet r,int n)throws SQLException{return new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("paket_xidmet",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class));}
     private Map<String,Object> one(String sql,MapSqlParameterSource p){var rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}

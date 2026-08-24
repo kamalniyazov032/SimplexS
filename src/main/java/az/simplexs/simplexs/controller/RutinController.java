@@ -1,6 +1,8 @@
 package az.simplexs.simplexs.controller;
 
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,8 +20,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/parametrler/rutinler")
 public class RutinController {
     private static final int PAGE_SIZE=30;
-    private final RutinRepository repo; private final XidmetRepository xidmetRepo; private final MessageSource messages;
-    public RutinController(RutinRepository repo,XidmetRepository xidmetRepo,MessageSource messages){this.repo=repo;this.xidmetRepo=xidmetRepo;this.messages=messages;}
+    private final RutinRepository repo; private final XidmetRepository xidmetRepo; private final MessageSource messages; private final JsonMapper jsonMapper;
+    public RutinController(RutinRepository repo,XidmetRepository xidmetRepo,MessageSource messages,JsonMapper jsonMapper){this.repo=repo;this.xidmetRepo=xidmetRepo;this.messages=messages;this.jsonMapper=jsonMapper;}
 
     @GetMapping
     public String siyahi(@RequestParam(required=false)String q,@RequestParam(defaultValue="aktiv")String status,
@@ -55,11 +57,25 @@ public class RutinController {
     }
     @PostMapping("/xidmetler")
     public String terkibiSaxla(@RequestParam Long rutinId,@RequestParam String xidmetlerJson,
-            @AuthenticationPrincipal AuthenticatedPersonal personal,RedirectAttributes flash){
+            @AuthenticationPrincipal AuthenticatedPersonal personal,HttpSession session,RedirectAttributes flash){
         String value=xidmetlerJson.trim();
-        if(value.length()>1_000_000||!value.startsWith("[")||!value.endsWith("]"))flash.addFlashAttribute("errorMessage",msg("routines.invalid_contents"));
+        if(value.length()>1_000_000||!validContents(klinikaId(session),rutinId,value))flash.addFlashAttribute("errorMessage",msg("routines.invalid_contents"));
         else result(repo.terkibiSaxla(rutinId,value,personal.personalId()),flash,msg("routines.contents_saved"));
         return redirect(rutinId);
+    }
+    private boolean validContents(Long klinikaId,Long rutinId,String value){
+        try{
+            JsonNode rows=jsonMapper.readTree(value);
+            if(!rows.isArray())return false;
+            boolean priceRequired=repo.rutinQiymetlerindenIstifadeEdir(klinikaId,rutinId);
+            for(JsonNode row:rows){
+                JsonNode serviceId=row.get("xidmet_id"),price=row.get("qiymet");
+                if(serviceId==null||!serviceId.canConvertToLong()||serviceId.longValue()<=0)return false;
+                if(priceRequired&&(price==null||!price.isNumber()||price.decimalValue().signum()<0))return false;
+                if(!priceRequired&&price!=null&&!price.isNull()&&(!price.isNumber()||price.decimalValue().signum()<0))return false;
+            }
+            return true;
+        }catch(Exception e){return false;}
     }
     private Long klinikaId(HttpSession s){return (Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);}
     private void result(Map<String,Object> r,RedirectAttributes f,String fallback){String status=String.valueOf(r.getOrDefault("status_kodu",""));String message=String.valueOf(r.getOrDefault("mesaj",fallback));f.addFlashAttribute(status.toUpperCase().contains("UGUR")||"1".equals(status)?"successMessage":"errorMessage",message);}
