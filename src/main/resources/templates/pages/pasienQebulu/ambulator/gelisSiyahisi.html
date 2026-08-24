@@ -8,6 +8,9 @@
 >
   <body>
     <div layout:fragment="content">
+      <style>
+        .visit-summary-card{transition:transform .2s ease,box-shadow .2s ease}.visit-summary-card:hover{transform:translateY(-2px);box-shadow:0 .5rem 1.25rem rgba(15,23,42,.08)!important}.visit-summary-card .avatar{width:3.5rem;height:3.5rem}.visit-patient-avatar{width:2.75rem;height:2.75rem;flex:0 0 2.75rem;font-size:1rem;font-weight:700}.visit-cell-icon{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;flex:0 0 2rem;border-radius:.5rem}.visit-table tbody tr{height:4.5rem}.visit-table th{white-space:nowrap}.visit-table td{white-space:nowrap}
+      </style>
       <div
         class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
       >
@@ -41,6 +44,12 @@
             ><i class="ti ti-plus me-1"></i><span th:text="#{visits.new}"></span
           ></a>
         </div>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6"><div class="card visit-summary-card border-0 shadow-sm h-100 mb-0"><div class="card-body py-3 d-flex gap-3 align-items-center"><span class="avatar avatar-lg rounded-3 bg-primary-subtle text-primary"><i class="ti ti-calendar-event fs-24"></i></span><div><small class="text-muted" th:text="#{visits.today_total}"></small><h3 class="mb-0" th:text="${bugunkuStatistika.umumi}">0</h3></div></div></div></div>
+        <div class="col-xl-3 col-md-6"><div class="card visit-summary-card border-0 shadow-sm h-100 mb-0"><div class="card-body py-3 d-flex gap-3 align-items-center"><span class="avatar avatar-lg rounded-3 bg-warning-subtle text-warning"><i class="ti ti-refresh fs-24"></i></span><div><small class="text-muted" th:text="#{visits.repeat_examination}"></small><h3 class="mb-0" th:text="${bugunkuStatistika.tekrarMuayine}">0</h3></div></div></div></div>
+        <div class="col-xl-3 col-md-6"><div class="card visit-summary-card border-0 shadow-sm h-100 mb-0"><div class="card-body py-3 d-flex gap-3 align-items-center"><span class="avatar avatar-lg rounded-3 bg-success-subtle text-success"><i class="ti ti-user-heart fs-24"></i></span><div><small class="text-muted" th:text="#{visits.doctor_examination}"></small><h3 class="mb-0" th:text="${bugunkuStatistika.hekimMuayinesi}">0</h3></div></div></div></div>
+        <div class="col-xl-3 col-md-6"><div class="card visit-summary-card border-0 shadow-sm h-100 mb-0"><div class="card-body py-3 d-flex gap-3 align-items-center"><span class="avatar avatar-lg rounded-3 bg-info-subtle text-info"><i class="ti ti-microscope fs-24"></i></span><div><small class="text-muted" th:text="#{visits.diagnostic_examination}"></small><h3 class="mb-0" th:text="${bugunkuStatistika.diaqnostikMuayine}">0</h3></div></div></div></div>
       </div>
       <div
         th:if="${successMessage}"
@@ -203,7 +212,7 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table visit-table table-hover align-middle mb-0">
               <thead class="bg-light">
                 <tr>
                   <th class="ps-3" th:text="#{visits.protocol}"></th>
@@ -223,20 +232,12 @@
                     th:text="${g.protokolKodu}"
                   ></td>
                   <td>
-                    <strong th:text="|${g.xesteAd} ${g.xesteSoyad}|"></strong
-                    ><small
-                      class="d-block text-muted"
-                      th:text="${g.xesteKodu}"
-                    ></small>
+                    <div class="d-flex align-items-center gap-3"><span class="avatar visit-patient-avatar rounded-circle bg-primary-subtle text-primary" th:text="${#strings.substring(g.xesteAd,0,1)}">A</span><div><strong th:text="|${g.xesteAd} ${g.xesteSoyad}|"></strong><small class="d-block text-muted" th:text="${g.xesteKodu}"></small></div></div>
                   </td>
-                  <td th:text="${g.gelisNovuAdi}"></td>
-                  <td th:text="${g.teskilatAdi?:'—'}"></td>
-                  <td
-                    th:text="|${#temporals.format(g.gelisTarixi,'dd.MM.yyyy')} ${g.gelisSaati}|"
-                  ></td>
-                  <td
-                    th:text="${g.randevudur}?#{common.beli}:#{common.xeyr}"
-                  ></td>
+                  <td><div class="d-flex align-items-center gap-2"><span class="visit-cell-icon" th:classappend="${g.gelisNovuKodu=='KONTROL_MUAYINE'}?'bg-warning-subtle text-warning':(${g.gelisNovuKodu=='DIAQNOSTIK_MUAYINE'}?'bg-info-subtle text-info':'bg-success-subtle text-success')"><i class="ti" th:classappend="${g.gelisNovuKodu=='KONTROL_MUAYINE'}?'ti-refresh':(${g.gelisNovuKodu=='DIAQNOSTIK_MUAYINE'}?'ti-microscope':'ti-user-heart')"></i></span><span class="fw-medium" th:text="${g.gelisNovuAdi}"></span></div></td>
+                  <td><div class="d-flex align-items-center gap-2"><i class="ti ti-building-hospital fs-5 text-muted"></i><span th:text="${g.teskilatAdi?:'—'}"></span></div></td>
+                  <td><div class="d-flex align-items-center gap-2"><i class="ti ti-calendar fs-5 text-muted"></i><span th:text="|${#temporals.format(g.gelisTarixi,'dd.MM.yyyy')} ${#temporals.format(g.gelisSaati,'HH:mm')}|"></span></div></td>
+                  <td><div class="d-flex align-items-center gap-2"><i class="ti ti-calendar-check fs-5 text-muted"></i><span th:text="${g.randevudur}?#{common.beli}:#{common.xeyr}"></span></div></td>
                   <td>
                     <span
                       class="badge"

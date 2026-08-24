@@ -245,9 +245,7 @@
               <tr>
                 <th>#</th>
                 <th th:text="#{patients.patient_code}"></th>
-                <th th:text="#{patients.first_name}"></th>
-                <th th:text="#{patients.last_name}"></th>
-                <th th:text="#{patients.father_name}"></th>
+                <th th:text="#{visits.patient}"></th>
                 <th th:text="#{patients.birth_date}"></th>
                 <th th:text="#{patients.gender}"></th>
                 <th th:text="#{patients.fin}"></th>
@@ -263,22 +261,18 @@
                 <td th:text="${i.count}"></td>
                 <td>
                   <a
-                    class="fw-semibold"
+                    class="fw-semibold text-primary"
                     th:href="@{/xeste-qeydiyyati/{id}(id=${x.id})}"
                     th:text="${x.kod}"
                   ></a>
                 </td>
-                <td th:text="${x.ad}"></td>
-                <td th:text="${x.soyad}"></td>
-                <td th:text="${x.ataAdi?:'—'}"></td>
-                <td
-                  th:text="${x.dogumTarixi!=null?#temporals.format(x.dogumTarixi,'dd.MM.yyyy'):'—'}"
-                ></td>
-                <td th:text="${x.cinsAdi?:'—'}"></td>
-                <td th:text="${x.finKodu?:'—'}"></td>
-                <td th:text="${x.vesiqeNomresi?:'—'}"></td>
-                <td th:text="${x.mobilNomre?:'—'}"></td>
-                <td th:text="${x.defaultTeskilatAdi?:'—'}"></td>
+                <td><div class="d-flex align-items-center gap-3"><span class="avatar patient-avatar rounded-circle" th:classappend="${i.index%4==0}?'bg-primary-subtle text-primary':(${i.index%4==1}?'bg-success-subtle text-success':(${i.index%4==2}?'bg-warning-subtle text-warning':'bg-info-subtle text-info'))" th:text="${#strings.substring(x.ad,0,1)}">A</span><div><a class="fw-semibold text-dark" th:href="@{/xeste-qeydiyyati/{id}(id=${x.id})}" th:text="|${x.ad} ${x.soyad}|"></a><small class="d-block text-muted" th:text="${x.ataAdi?:'—'}"></small></div></div></td>
+                <td><div class="d-flex align-items-center gap-2"><i class="ti ti-calendar fs-5 text-muted"></i><span th:text="${x.dogumTarixi!=null?#temporals.format(x.dogumTarixi,'dd.MM.yyyy'):'—'}"></span></div></td>
+                <td><span class="badge bg-light text-dark"><i class="ti ti-user me-1 text-muted"></i><span th:text="${x.cinsAdi?:'—'}"></span></span></td>
+                <td><span class="fw-medium" th:text="${x.finKodu?:'—'}"></span></td>
+                <td><div class="d-flex align-items-center gap-2"><i class="ti ti-id fs-5 text-muted"></i><span th:text="${x.vesiqeNomresi?:'—'}"></span></div></td>
+                <td><div class="d-flex align-items-center gap-2"><i class="ti ti-phone fs-5 text-muted"></i><span th:text="${x.mobilNomre?:'—'}"></span></div></td>
+                <td><div class="d-flex align-items-center gap-2"><i class="ti ti-building-hospital fs-5 text-muted"></i><span th:text="${x.defaultTeskilatAdi?:'—'}"></span></div></td>
                 <td>
                   <span
                     class="badge"
@@ -286,7 +280,7 @@
                     th:text="${x.aktiv}?#{common.aktiv}:#{common.passiv}"
                   ></span>
                 </td>
-                <td class="d-flex gap-1">
+                <td><div class="d-flex gap-1">
                   <a
                     th:if="${x.aktiv}"
                     class="btn btn-sm btn-outline-success"
@@ -300,11 +294,11 @@
                     th:title="#{patients.edit}"
                     ><i class="ti ti-edit"></i
                   ></a>
-                </td>
+                </div></td>
               </tr>
               <tr th:if="${#lists.isEmpty(xesteler)}">
                 <td
-                  colspan="13"
+                  colspan="11"
                   class="text-center text-muted py-5"
                   th:text="#{patients.empty}"
                 ></td>
@@ -356,6 +350,9 @@
         .patient-list-table th {
           padding: 0.8rem;
         }
+        .patient-list-table tbody tr { height: 4.75rem; }
+        .patient-list-table .patient-avatar { width: 2.75rem; height: 2.75rem; flex: 0 0 2.75rem; font-size: 1rem; font-weight: 700; }
+        .patient-list-table tbody tr { transition: background-color .15s ease; }
       </style>
     </div>
   </body>
