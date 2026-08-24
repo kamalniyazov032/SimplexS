@@ -1,17 +1,94 @@
 package az.simplexs.simplexs.repository.xeste;
-import java.sql.*;import java.util.*;import org.springframework.jdbc.core.namedparam.*;import org.springframework.stereotype.Repository;
+
+import java.sql.*;
+import java.util.*;
+
+import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.stereotype.Repository;
 import az.simplexs.simplexs.dto.xeste.*;
-@Repository public class XesteRepository{
- private final NamedParameterJdbcTemplate jdbc;public XesteRepository(NamedParameterJdbcTemplate jdbc){this.jdbc=jdbc;}
- public List<Xeste> siyahi(Long klinika,Boolean aktiv,String q,Long teskilatId,Long cursor,int limit){return jdbc.query("SELECT * FROM public.fn_xeste_siyahisi_sehifeli(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>CAST(:a AS boolean),p_axtaris=>:q,p_teskilat_id=>CAST(:t AS bigint),p_son_xeste_id=>CAST(:cursor AS bigint),p_limit=>:limit)",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",blank(q)).addValue("t",teskilatId).addValue("cursor",cursor).addValue("limit",limit),this::map);}
- public List<Xeste> siyahi(Long klinika,Boolean aktiv,String q,String xesteKodu,Long vesiqeNovuId,Long teskilatId,Long cinsId,java.time.LocalDate dogumBaslangic,java.time.LocalDate dogumBitme,Long olkeId,Long seherId,Long cursor,int limit){String sql="SELECT * FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>CAST(:a AS boolean),p_axtaris=>:q) WHERE (CAST(:kod AS varchar) IS NULL OR lower(xeste_kodu) LIKE lower(CAST(:kod AS varchar))||'%') AND (CAST(:vn AS bigint) IS NULL OR sexsiyyet_vesiqesi_novu_id=:vn) AND (CAST(:t AS bigint) IS NULL OR default_teskilat_id=:t) AND (CAST(:c AS bigint) IS NULL OR cins_id=:c) AND (CAST(:db AS date) IS NULL OR dogum_tarixi>=:db) AND (CAST(:ds AS date) IS NULL OR dogum_tarixi<=:ds) AND (CAST(:o AS bigint) IS NULL OR olke_id=:o) AND (CAST(:s AS bigint) IS NULL OR seher_id=:s) AND (CAST(:cursor AS bigint) IS NULL OR xeste_id<:cursor) ORDER BY xeste_id DESC LIMIT :limit";return jdbc.query(sql,new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",blank(q)).addValue("kod",blank(xesteKodu)).addValue("vn",vesiqeNovuId).addValue("t",teskilatId).addValue("c",cinsId).addValue("db",dogumBaslangic).addValue("ds",dogumBitme).addValue("o",olkeId).addValue("s",seherId).addValue("cursor",cursor).addValue("limit",limit),this::map);}
- public Xeste tap(Long klinika,Long id){return jdbc.query("SELECT * FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>NULL,p_axtaris=>NULL) WHERE xeste_id=:id",new MapSqlParameterSource("k",klinika).addValue("id",id),this::map).stream().findFirst().orElseThrow();}
- public Map<String,Object> yarat(Long klinika,XesteForm f,Long personal){String sql="SELECT * FROM public.fn_xeste_yarat(p_klinika_id=>:k,p_default_teskilat_id=>:t,p_ad=>:ad,p_soyad=>:soyad,p_ata_adi=>:ata,p_sexsiyyet_vesiqesi_novu_id=>:vn,p_sexsiyyet_vesiqesi_nomresi=>:vno,p_fin_kodu=>:fin,p_cins_id=>:cins,p_dogum_tarixi=>:dogum,p_aile_veziyyeti_id=>:aile,p_tehsil_id=>:tehsil,p_doguldugu_olke_id=>:dolke,p_doguldugu_seher_id=>:dseher,p_olke_id=>:olke,p_seher_id=>:seher,p_qan_qrupu_id=>:qan,p_mobil_nomre=>:mobil,p_ikinci_mobil_nomre=>:mobil2,p_email=>:email,p_sosial_kart_nomresi=>:sosial,p_is_yeri=>:isYeri,p_vezifesi=>:vezife,p_pesesi=>:pese,p_unvan=>:unvan,p_qeyd=>:qeyd,p_yaradan_personal_id=>:personal)";return one(sql,params(f).addValue("k",klinika).addValue("personal",personal));}
- public Map<String,Object> yenile(Long klinika,XesteForm f,Long personal){String sql="SELECT * FROM public.fn_xeste_yenile(p_xeste_id=>:id,p_klinika_id=>:k,p_default_teskilat_id=>:t,p_ad=>:ad,p_soyad=>:soyad,p_ata_adi=>:ata,p_ata_adi_deyisdirilsin=>true,p_sexsiyyet_vesiqesi_novu_id=>:vn,p_sexsiyyet_vesiqesi_nomresi=>:vno,p_fin_kodu=>:fin,p_cins_id=>:cins,p_dogum_tarixi=>:dogum,p_aile_veziyyeti_id=>:aile,p_aile_veziyyeti_deyisdirilsin=>true,p_tehsil_id=>:tehsil,p_tehsil_deyisdirilsin=>true,p_doguldugu_olke_id=>:dolke,p_doguldugu_olke_deyisdirilsin=>true,p_doguldugu_seher_id=>:dseher,p_doguldugu_seher_deyisdirilsin=>true,p_olke_id=>:olke,p_olke_deyisdirilsin=>true,p_seher_id=>:seher,p_seher_deyisdirilsin=>true,p_qan_qrupu_id=>:qan,p_qan_qrupu_deyisdirilsin=>true,p_mobil_nomre=>:mobil,p_mobil_nomre_deyisdirilsin=>true,p_ikinci_mobil_nomre=>:mobil2,p_ikinci_mobil_nomre_deyisdirilsin=>true,p_email=>:email,p_email_deyisdirilsin=>true,p_sosial_kart_nomresi=>:sosial,p_sosial_kart_nomresi_deyisdirilsin=>true,p_is_yeri=>:isYeri,p_is_yeri_deyisdirilsin=>true,p_vezifesi=>:vezife,p_vezifesi_deyisdirilsin=>true,p_pesesi=>:pese,p_pesesi_deyisdirilsin=>true,p_unvan=>:unvan,p_unvan_deyisdirilsin=>true,p_qeyd=>:qeyd,p_qeyd_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)";return one(sql,params(f).addValue("id",f.xesteId).addValue("k",klinika).addValue("aktiv",Boolean.TRUE.equals(f.aktiv)).addValue("personal",personal));}
- public List<XesteSecim> vesiqeNovleri(){return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_sexsiyyet_vesiqesi_novu_siyahisi()");}
- public List<XesteSecim> cinsler(){return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_cins_siyahisi()");}public List<XesteSecim> aileVeziyyetleri(){return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_aile_veziyyeti_siyahisi()");}public List<XesteSecim> tehsiller(){return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_tehsil_siyahisi()");}public List<XesteSecim> qanQruplari(){return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_qan_qrupu_siyahisi()");}public List<XesteSecim> olkeler(){return options("SELECT id,iso2_kod kod,ad,NULL::bigint parent_id FROM public.fn_olke_siyahisi()");}public List<XesteSecim> seherler(){return options("SELECT id,NULL::text kod,ad,olke_id parent_id FROM public.fn_seher_siyahisi(NULL)");}
- private List<XesteSecim> options(String sql){return jdbc.query(sql,(r,n)->new XesteSecim(l(r,"id"),r.getString("kod"),r.getString("ad"),l(r,"parent_id")));}
- private MapSqlParameterSource params(XesteForm f){return new MapSqlParameterSource("t",f.defaultTeskilatId).addValue("ad",f.ad.trim()).addValue("soyad",f.soyad.trim()).addValue("ata",blank(f.ataAdi)).addValue("vn",f.vesiqeNovuId).addValue("vno",blank(f.vesiqeNomresi)).addValue("fin",blank(f.finKodu)).addValue("cins",f.cinsId).addValue("dogum",f.dogumTarixi).addValue("aile",f.aileVeziyyetiId).addValue("tehsil",f.tehsilId).addValue("dolke",f.dogulduguOlkeId).addValue("dseher",f.dogulduguSeherId).addValue("olke",f.olkeId).addValue("seher",f.seherId).addValue("qan",f.qanQrupuId).addValue("mobil",blank(f.mobilNomre)).addValue("mobil2",blank(f.ikinciMobilNomre)).addValue("email",blank(f.email)).addValue("sosial",blank(f.sosialKartNomresi)).addValue("isYeri",blank(f.isYeri)).addValue("vezife",blank(f.vezifesi)).addValue("pese",blank(f.pesesi)).addValue("unvan",blank(f.unvan)).addValue("qeyd",blank(f.qeyd));}
- private Xeste map(ResultSet r,int n)throws SQLException{return new Xeste(l(r,"xeste_id"),l(r,"klinika_id"),r.getString("xeste_kodu"),l(r,"default_teskilat_id"),r.getString("default_teskilat_adi"),r.getString("ad"),r.getString("soyad"),r.getString("ata_adi"),l(r,"sexsiyyet_vesiqesi_novu_id"),r.getString("sexsiyyet_vesiqesi_novu_kodu"),r.getString("sexsiyyet_vesiqesi_novu_adi"),r.getString("sexsiyyet_vesiqesi_nomresi"),r.getString("fin_kodu"),l(r,"cins_id"),r.getString("cins_kodu"),r.getString("cins_adi"),r.getObject("dogum_tarixi",java.time.LocalDate.class),l(r,"aile_veziyyeti_id"),r.getString("aile_veziyyeti_kodu"),r.getString("aile_veziyyeti_adi"),l(r,"tehsil_id"),r.getString("tehsil_kodu"),r.getString("tehsil_adi"),l(r,"doguldugu_olke_id"),r.getString("doguldugu_olke_adi"),l(r,"doguldugu_seher_id"),r.getString("doguldugu_seher_adi"),l(r,"olke_id"),r.getString("olke_adi"),l(r,"seher_id"),r.getString("seher_adi"),l(r,"qan_qrupu_id"),r.getString("qan_qrupu_kodu"),r.getString("qan_qrupu_adi"),r.getString("mobil_nomre"),r.getString("ikinci_mobil_nomre"),r.getString("email"),r.getString("sosial_kart_nomresi"),r.getString("is_yeri"),r.getString("vezifesi"),r.getString("pesesi"),r.getString("unvan"),r.getString("qeyd"),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class),l(r,"yaradan_personal_id"),r.getObject("yenilenme_tarixi",java.time.LocalDateTime.class),l(r,"yenileyen_personal_id"));}
- private Map<String,Object> one(String sql,MapSqlParameterSource p){var rows=jdbc.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}private static String blank(String s){return s==null||s.isBlank()?null:s.trim();}private static Long l(ResultSet r,String c)throws SQLException{Object x=r.getObject(c);return x instanceof Number n?n.longValue():null;}
+
+@Repository
+public class XesteRepository {
+    private final NamedParameterJdbcTemplate jdbc;
+
+    public XesteRepository(NamedParameterJdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    public List<Xeste> siyahi(Long klinika, Boolean aktiv, String q, Long teskilatId, Long cursor, int limit) {
+        return jdbc.query("SELECT * FROM public.fn_xeste_siyahisi_sehifeli(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>CAST(:a AS boolean),p_axtaris=>:q,p_teskilat_id=>CAST(:t AS bigint),p_son_xeste_id=>CAST(:cursor AS bigint),p_limit=>:limit)", new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blank(q)).addValue("t", teskilatId).addValue("cursor", cursor).addValue("limit", limit), this::map);
+    }
+
+    public List<Xeste> siyahi(Long klinika, Boolean aktiv, String q, String xesteKodu, Long vesiqeNovuId, Long teskilatId, Long cinsId, java.time.LocalDate dogumBaslangic, java.time.LocalDate dogumBitme, Long olkeId, Long seherId, Long cursor, int limit) {
+        String sql = "SELECT * FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>CAST(:a AS boolean),p_axtaris=>:q) WHERE (CAST(:kod AS varchar) IS NULL OR lower(xeste_kodu) LIKE lower(CAST(:kod AS varchar))||'%') AND (CAST(:vn AS bigint) IS NULL OR sexsiyyet_vesiqesi_novu_id=:vn) AND (CAST(:t AS bigint) IS NULL OR default_teskilat_id=:t) AND (CAST(:c AS bigint) IS NULL OR cins_id=:c) AND (CAST(:db AS date) IS NULL OR dogum_tarixi>=:db) AND (CAST(:ds AS date) IS NULL OR dogum_tarixi<=:ds) AND (CAST(:o AS bigint) IS NULL OR olke_id=:o) AND (CAST(:s AS bigint) IS NULL OR seher_id=:s) AND (CAST(:cursor AS bigint) IS NULL OR xeste_id<:cursor) ORDER BY xeste_id DESC LIMIT :limit";
+        return jdbc.query(sql, new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blank(q)).addValue("kod", blank(xesteKodu)).addValue("vn", vesiqeNovuId).addValue("t", teskilatId).addValue("c", cinsId).addValue("db", dogumBaslangic).addValue("ds", dogumBitme).addValue("o", olkeId).addValue("s", seherId).addValue("cursor", cursor).addValue("limit", limit), this::map);
+    }
+
+    public Xeste tap(Long klinika, Long id) {
+        return jdbc.query("SELECT * FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>NULL,p_axtaris=>NULL) WHERE xeste_id=:id", new MapSqlParameterSource("k", klinika).addValue("id", id), this::map).stream().findFirst().orElseThrow();
+    }
+
+    public Map<String, Object> yarat(Long klinika, XesteForm f, Long personal) {
+        String sql = "SELECT * FROM public.fn_xeste_yarat(p_klinika_id=>:k,p_default_teskilat_id=>:t,p_ad=>:ad,p_soyad=>:soyad,p_ata_adi=>:ata,p_sexsiyyet_vesiqesi_novu_id=>:vn,p_sexsiyyet_vesiqesi_nomresi=>:vno,p_fin_kodu=>:fin,p_cins_id=>:cins,p_dogum_tarixi=>:dogum,p_aile_veziyyeti_id=>:aile,p_tehsil_id=>:tehsil,p_doguldugu_olke_id=>:dolke,p_doguldugu_seher_id=>:dseher,p_olke_id=>:olke,p_seher_id=>:seher,p_qan_qrupu_id=>:qan,p_mobil_nomre=>:mobil,p_ikinci_mobil_nomre=>:mobil2,p_email=>:email,p_sosial_kart_nomresi=>:sosial,p_is_yeri=>:isYeri,p_vezifesi=>:vezife,p_pesesi=>:pese,p_unvan=>:unvan,p_qeyd=>:qeyd,p_yaradan_personal_id=>:personal)";
+        return one(sql, params(f).addValue("k", klinika).addValue("personal", personal));
+    }
+
+    public Map<String, Object> yenile(Long klinika, XesteForm f, Long personal) {
+        String sql = "SELECT * FROM public.fn_xeste_yenile(p_xeste_id=>:id,p_klinika_id=>:k,p_default_teskilat_id=>:t,p_ad=>:ad,p_soyad=>:soyad,p_ata_adi=>:ata,p_ata_adi_deyisdirilsin=>true,p_sexsiyyet_vesiqesi_novu_id=>:vn,p_sexsiyyet_vesiqesi_nomresi=>:vno,p_fin_kodu=>:fin,p_cins_id=>:cins,p_dogum_tarixi=>:dogum,p_aile_veziyyeti_id=>:aile,p_aile_veziyyeti_deyisdirilsin=>true,p_tehsil_id=>:tehsil,p_tehsil_deyisdirilsin=>true,p_doguldugu_olke_id=>:dolke,p_doguldugu_olke_deyisdirilsin=>true,p_doguldugu_seher_id=>:dseher,p_doguldugu_seher_deyisdirilsin=>true,p_olke_id=>:olke,p_olke_deyisdirilsin=>true,p_seher_id=>:seher,p_seher_deyisdirilsin=>true,p_qan_qrupu_id=>:qan,p_qan_qrupu_deyisdirilsin=>true,p_mobil_nomre=>:mobil,p_mobil_nomre_deyisdirilsin=>true,p_ikinci_mobil_nomre=>:mobil2,p_ikinci_mobil_nomre_deyisdirilsin=>true,p_email=>:email,p_email_deyisdirilsin=>true,p_sosial_kart_nomresi=>:sosial,p_sosial_kart_nomresi_deyisdirilsin=>true,p_is_yeri=>:isYeri,p_is_yeri_deyisdirilsin=>true,p_vezifesi=>:vezife,p_vezifesi_deyisdirilsin=>true,p_pesesi=>:pese,p_pesesi_deyisdirilsin=>true,p_unvan=>:unvan,p_unvan_deyisdirilsin=>true,p_qeyd=>:qeyd,p_qeyd_deyisdirilsin=>true,p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)";
+        return one(sql, params(f).addValue("id", f.xesteId).addValue("k", klinika).addValue("aktiv", Boolean.TRUE.equals(f.aktiv)).addValue("personal", personal));
+    }
+
+    public List<XesteSecim> vesiqeNovleri() {
+        return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_sexsiyyet_vesiqesi_novu_siyahisi()");
+    }
+
+    public List<XesteSecim> cinsler() {
+        return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_cins_siyahisi()");
+    }
+
+    public List<XesteSecim> aileVeziyyetleri() {
+        return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_aile_veziyyeti_siyahisi()");
+    }
+
+    public List<XesteSecim> tehsiller() {
+        return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_tehsil_siyahisi()");
+    }
+
+    public List<XesteSecim> qanQruplari() {
+        return options("SELECT id,kod,ad,NULL::bigint parent_id FROM public.fn_qan_qrupu_siyahisi()");
+    }
+
+    public List<XesteSecim> olkeler() {
+        return options("SELECT id,iso2_kod kod,ad,NULL::bigint parent_id FROM public.fn_olke_siyahisi()");
+    }
+
+    public List<XesteSecim> seherler() {
+        return options("SELECT id,NULL::text kod,ad,olke_id parent_id FROM public.fn_seher_siyahisi(NULL)");
+    }
+
+    private List<XesteSecim> options(String sql) {
+        return jdbc.query(sql, (r, n) -> new XesteSecim(l(r, "id"), r.getString("kod"), r.getString("ad"), l(r, "parent_id")));
+    }
+
+    private MapSqlParameterSource params(XesteForm f) {
+        return new MapSqlParameterSource("t", f.defaultTeskilatId).addValue("ad", f.ad.trim()).addValue("soyad", f.soyad.trim()).addValue("ata", blank(f.ataAdi)).addValue("vn", f.vesiqeNovuId).addValue("vno", blank(f.vesiqeNomresi)).addValue("fin", blank(f.finKodu)).addValue("cins", f.cinsId).addValue("dogum", f.dogumTarixi).addValue("aile", f.aileVeziyyetiId).addValue("tehsil", f.tehsilId).addValue("dolke", f.dogulduguOlkeId).addValue("dseher", f.dogulduguSeherId).addValue("olke", f.olkeId).addValue("seher", f.seherId).addValue("qan", f.qanQrupuId).addValue("mobil", blank(f.mobilNomre)).addValue("mobil2", blank(f.ikinciMobilNomre)).addValue("email", blank(f.email)).addValue("sosial", blank(f.sosialKartNomresi)).addValue("isYeri", blank(f.isYeri)).addValue("vezife", blank(f.vezifesi)).addValue("pese", blank(f.pesesi)).addValue("unvan", blank(f.unvan)).addValue("qeyd", blank(f.qeyd));
+    }
+
+    private Xeste map(ResultSet r, int n) throws SQLException {
+        return new Xeste(l(r, "xeste_id"), l(r, "klinika_id"), r.getString("xeste_kodu"), l(r, "default_teskilat_id"), r.getString("default_teskilat_adi"), r.getString("ad"), r.getString("soyad"), r.getString("ata_adi"), l(r, "sexsiyyet_vesiqesi_novu_id"), r.getString("sexsiyyet_vesiqesi_novu_kodu"), r.getString("sexsiyyet_vesiqesi_novu_adi"), r.getString("sexsiyyet_vesiqesi_nomresi"), r.getString("fin_kodu"), l(r, "cins_id"), r.getString("cins_kodu"), r.getString("cins_adi"), r.getObject("dogum_tarixi", java.time.LocalDate.class), l(r, "aile_veziyyeti_id"), r.getString("aile_veziyyeti_kodu"), r.getString("aile_veziyyeti_adi"), l(r, "tehsil_id"), r.getString("tehsil_kodu"), r.getString("tehsil_adi"), l(r, "doguldugu_olke_id"), r.getString("doguldugu_olke_adi"), l(r, "doguldugu_seher_id"), r.getString("doguldugu_seher_adi"), l(r, "olke_id"), r.getString("olke_adi"), l(r, "seher_id"), r.getString("seher_adi"), l(r, "qan_qrupu_id"), r.getString("qan_qrupu_kodu"), r.getString("qan_qrupu_adi"), r.getString("mobil_nomre"), r.getString("ikinci_mobil_nomre"), r.getString("email"), r.getString("sosial_kart_nomresi"), r.getString("is_yeri"), r.getString("vezifesi"), r.getString("pesesi"), r.getString("unvan"), r.getString("qeyd"), r.getObject("aktiv", Boolean.class), r.getObject("yaranma_tarixi", java.time.LocalDateTime.class), l(r, "yaradan_personal_id"), r.getObject("yenilenme_tarixi", java.time.LocalDateTime.class), l(r, "yenileyen_personal_id"));
+    }
+
+    private Map<String, Object> one(String sql, MapSqlParameterSource p) {
+        var rows = jdbc.queryForList(sql, p);
+        return rows.isEmpty() ? Map.of() : rows.getFirst();
+    }
+
+    private static String blank(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
+    }
+
+    private static Long l(ResultSet r, String c) throws SQLException {
+        Object x = r.getObject(c);
+        return x instanceof Number n ? n.longValue() : null;
+    }
 }
