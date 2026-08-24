@@ -2,6 +2,11 @@ package az.simplexs.simplexs.controller;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,7 +30,7 @@ public class XidmetController {
             @RequestParam(required=false)String qrupTipi,Model m,HttpSession session){
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmət qrupları","xidmetQruplari");
-        var all=repo.qruplar(klinikaId(session));
+        var all=hierarchyOrder(repo.qruplar(klinikaId(session)));
         String query=hasText(q)?q.trim().toLowerCase(Locale.forLanguageTag("az")):null;
         var filtered=all.stream()
                 .filter(x->query==null||contains(x.kod(),query)||contains(x.ad(),query)||contains(x.tamYol(),query))
@@ -36,6 +41,26 @@ public class XidmetController {
         m.addAttribute("filterApplied",hasText(q)||!"aktiv".equals(selectedStatus)||hasText(qrupTipi));
         m.addAttribute("q",q);m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("selectedQrupTipi",qrupTipi);
         return "pages/xidmetQruplari";
+    }
+    private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups){
+        Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order=Comparator
+                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo,Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad,String.CASE_INSENSITIVE_ORDER);
+        var children=new HashMap<Long,List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
+        var ids=new HashSet<Long>();groups.forEach(x->ids.add(x.id()));
+        groups.forEach(x->children.computeIfAbsent(x.parentId(),ignored->new ArrayList<>()).add(x));
+        children.values().forEach(list->list.sort(order));
+        var result=new ArrayList<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>();var visited=new HashSet<Long>();
+        var roots=groups.stream().filter(x->x.parentId()==null||!ids.contains(x.parentId())).sorted(order).toList();
+        roots.forEach(x->appendGroup(x,children,visited,result));
+        groups.stream().filter(x->!visited.contains(x.id())).sorted(order).forEach(x->appendGroup(x,children,visited,result));
+        return result;
+    }
+    private void appendGroup(az.simplexs.simplexs.dto.xidmet.XidmetQrupu group,
+            Map<Long,List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>> children,HashSet<Long> visited,
+            List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> result){
+        if(!visited.add(group.id()))return;
+        result.add(group);children.getOrDefault(group.id(),List.of()).forEach(x->appendGroup(x,children,visited,result));
     }
     @PostMapping("/xidmetQruplari/yeni")
     public String qrupYarat(@RequestParam(required=false)Long parentId,@RequestParam String ad,HttpSession s,RedirectAttributes a){flash(repo.qrupYarat(klinikaId(s),parentId,ad),a,"Xidmət qrupu yaradıldı.");return "redirect:/xidmetQruplari";}
@@ -51,7 +76,8 @@ public class XidmetController {
             @RequestParam(required=false)String q,Model m,HttpSession session){
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
-        Long kid=klinikaId(session);var qruplar=repo.qruplar(kid);var all=repo.xidmetler(kid,qrupId);
+        Boolean aktivFilter=selectedStatus.isBlank()?null:"aktiv".equals(selectedStatus);
+        Long kid=klinikaId(session);var qruplar=repo.qruplar(kid);var all=repo.xidmetler(kid,qrupId,aktivFilter);
         var filtered=all.stream()
                 .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
                 .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
