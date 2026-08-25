@@ -3,7 +3,9 @@
 <body><div layout:fragment="content">
   <style>
     #bulkPriceForm .card-header{padding:.7rem 1rem}
+    #bulkPriceForm>.card>.table-responsive{height:max(360px,calc(100dvh - 320px));overflow:auto}
     #bulkPriceForm table{font-size:12.5px;line-height:1.2}
+    #bulkPriceForm thead{position:sticky;top:0;z-index:2}
     #bulkPriceForm thead th{font-size:11.5px;padding:.5rem .45rem;white-space:nowrap}
     #bulkPriceForm tbody td{padding:.38rem .45rem;vertical-align:middle}
     #bulkPriceForm tbody b{font-size:12.5px;line-height:1.15}
@@ -12,6 +14,7 @@
     #bulkPriceForm .btn-sm{padding:.2rem .4rem;font-size:11.5px;line-height:1.25}
     #bulkPriceForm .form-check-input{width:14px;height:14px;margin-top:0}
     #bulkPriceForm .card-footer{padding:.55rem 1rem}
+    @media(max-width:767.98px){#bulkPriceForm>.card>.table-responsive{height:max(300px,calc(100dvh - 360px))}}
   </style>
   <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
     <div><a class="text-muted text-decoration-none" th:href="@{/xidmetQiymetleri(basliqId=${cedvel.basliqId},qrupId=${cedvel.qrupId})}"><i class="ti ti-arrow-left me-1"></i><span>Qiymət cədvəllərinə qayıt</span></a><h4 class="mt-2 mb-1"><i class="ti ti-currency-manat text-primary me-2"></i><span th:text="${cedvel.qrupAdi}"></span></h4><p class="text-muted mb-0" th:text="|${cedvel.basliqAdi} • ${#temporals.format(cedvel.baslamaTarixi,'dd.MM.yyyy')} — ${#temporals.format(cedvel.bitmeTarixi,'dd.MM.yyyy')}|"></p></div>
