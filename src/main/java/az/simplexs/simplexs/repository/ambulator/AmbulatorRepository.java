@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import az.simplexs.simplexs.dto.ambulator.AmbulatorLookups;
+import az.simplexs.simplexs.dto.ambulator.AmbulatorPatient;
 import az.simplexs.simplexs.dto.ambulator.LookupOption;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentFilter;
 import az.simplexs.simplexs.dto.ambulator.PatientDocumentForm;
@@ -28,12 +29,27 @@ public class AmbulatorRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<GelisOption> xesteAxtar(Long klinika,Boolean aktiv,String q,Long cursor,int limit){return jdbcTemplate.query("SELECT xeste_id id,xeste_kodu kod,concat_ws(' ',ad,soyad,ata_adi) ad,concat_ws(' · ',fin_kodu,mobil_nomre,sexsiyyet_vesiqesi_nomresi) meta,default_teskilat_id FROM public.fn_xeste_siyahisi_sehifeli(CAST(:k AS bigint),CAST(:a AS boolean),CAST(:q AS varchar),NULL,CAST(:cursor AS bigint),:limit)",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",blankToNull(q)).addValue("cursor",cursor).addValue("limit",limit),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),r.getString("meta"),toLong(r.getObject("default_teskilat_id"))));}
-    public GelisOption xeste(Long klinika,Long id){return jdbcTemplate.query("SELECT xeste_id id,xeste_kodu kod,concat_ws(' ',ad,soyad,ata_adi) ad,concat_ws(' · ',fin_kodu,mobil_nomre,sexsiyyet_vesiqesi_nomresi) meta,default_teskilat_id FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),NULL,NULL) WHERE xeste_id=:id",new MapSqlParameterSource("k",klinika).addValue("id",id),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),r.getString("meta"),toLong(r.getObject("default_teskilat_id")))).stream().findFirst().orElseThrow();}
+    public List<AmbulatorPatient> xesteAxtar(Long klinika,Boolean aktiv,String q,Long cursor,int limit){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi_sehifeli(CAST(:k AS bigint),CAST(:a AS boolean),CAST(:q AS varchar),NULL,CAST(:cursor AS bigint),:limit)",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",blankToNull(q)).addValue("cursor",cursor).addValue("limit",limit),this::mapAmbulatorPatient);}
+    public long xesteAxtarSayi(Long klinika,Boolean aktiv,String q){Long count=jdbcTemplate.queryForObject("SELECT count(*) FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),CAST(:a AS boolean),CAST(:q AS varchar))",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",q.trim()),Long.class);return count==null?0:count;}
+    public AmbulatorPatient xeste(Long klinika,Long id){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),NULL,NULL) WHERE xeste_id=:id",new MapSqlParameterSource("k",klinika).addValue("id",id),this::mapAmbulatorPatient).stream().findFirst().orElseThrow();}
     public List<GelisOption> gelisNovleri(){return jdbcTemplate.query("SELECT id,kod,ad,NULL::text meta FROM public.rn_xeste_gelis_novleri WHERE aktiv ORDER BY id",(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),null,null));}
     public List<GelisOption> teskilatlar(Long klinika){return jdbcTemplate.query("SELECT teskilat_id id,teskilat_tipi_kodu kod,ad,NULL::text meta FROM public.fn_teskilat_siyahisi(CAST(:k AS bigint),true) ORDER BY ad",new MapSqlParameterSource("k",klinika),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),null,null));}
     public List<GelisOption> hekimler(Long klinika){return jdbcTemplate.query("SELECT personal_id id,personal_kodu kod,tam_ad ad,vezife_adi meta FROM public.fn_personal_siyahisi(CAST(:k AS bigint),true) WHERE hekimdir ORDER BY tam_ad",new MapSqlParameterSource("k",klinika),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),r.getString("meta"),null));}
     public List<Gelis> gelisler(Long klinika,Long xeste,Long nov,Long teskilat,java.time.LocalDate baslama,java.time.LocalDate bitme,Boolean randevu,Boolean aktiv,String q,Long cursor,int limit){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),CAST(:x AS bigint),CAST(:n AS bigint),CAST(:t AS bigint),CAST(:b AS date),CAST(:bt AS date),CAST(:r AS boolean),CAST(:a AS boolean),CAST(:q AS varchar),CAST(:cursor AS bigint),:limit)",new MapSqlParameterSource("k",klinika).addValue("x",xeste).addValue("n",nov).addValue("t",teskilat).addValue("b",baslama).addValue("bt",bitme).addValue("r",randevu).addValue("a",aktiv).addValue("q",blankToNull(q)).addValue("cursor",cursor).addValue("limit",limit),this::mapGelis);}
+    public long gelisSayi(Long klinika,Long xeste,Long nov,Long teskilat,java.time.LocalDate baslama,java.time.LocalDate bitme,Boolean randevu,Boolean aktiv,String q){Long count=jdbcTemplate.queryForObject("""
+        SELECT count(*)
+          FROM public.rn_xeste_gelisleri g
+          JOIN public.rn_xesteler x ON x.id=g.xeste_id AND x.klinika_id=g.klinika_id
+         WHERE g.klinika_id=:k
+           AND (CAST(:x AS bigint) IS NULL OR g.xeste_id=CAST(:x AS bigint))
+           AND (CAST(:n AS bigint) IS NULL OR g.gelis_novu_id=CAST(:n AS bigint))
+           AND (CAST(:t AS bigint) IS NULL OR g.teskilat_id=CAST(:t AS bigint))
+           AND (CAST(:b AS date) IS NULL OR g.gelis_tarixi>=CAST(:b AS date))
+           AND (CAST(:bt AS date) IS NULL OR g.gelis_tarixi<=CAST(:bt AS date))
+           AND (CAST(:r AS boolean) IS NULL OR g.randevudur=CAST(:r AS boolean))
+           AND (CAST(:a AS boolean) IS NULL OR g.aktiv=CAST(:a AS boolean))
+           AND (CAST(:q AS varchar) IS NULL OR g.protokol_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR x.kod ILIKE '%'||CAST(:q AS varchar)||'%' OR x.fin_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR x.sexsiyyet_vesiqesi_nomresi ILIKE '%'||CAST(:q AS varchar)||'%' OR x.ad ILIKE '%'||CAST(:q AS varchar)||'%' OR x.soyad ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(x.ata_adi,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(x.mobil_nomre,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR (x.ad||' '||x.soyad||' '||coalesce(x.ata_adi,'')) ILIKE '%'||CAST(:q AS varchar)||'%')
+        """,new MapSqlParameterSource("k",klinika).addValue("x",xeste).addValue("n",nov).addValue("t",teskilat).addValue("b",baslama).addValue("bt",bitme).addValue("r",randevu).addValue("a",aktiv).addValue("q",blankToNull(q)),Long.class);return count==null?0:count;}
     public GelisStatistikasi bugunkuGelisStatistikasi(Long klinika){return jdbcTemplate.queryForObject("""
         SELECT COUNT(*) umumi,
                COUNT(*) FILTER (WHERE gn.kod='KONTROL_MUAYINE') tekrar_muayine,
@@ -49,6 +65,7 @@ public class AmbulatorRepository {
     private MapSqlParameterSource gelisParams(GelisForm f){return new MapSqlParameterSource("n",f.gelisNovuId).addValue("t",f.teskilatId).addValue("d",f.gelisTarixi).addValue("s",f.gelisSaati).addValue("r",f.randevudur).addValue("h",f.gonderenHekimId).addValue("m",blankToNull(f.mesaj)).addValue("ac",blankToNull(f.aciqlama));}
     private Map<String,Object> one(String sql,MapSqlParameterSource p){var rows=jdbcTemplate.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}
     private Gelis mapGelis(ResultSet r,int n)throws SQLException{return new Gelis(toLong(r.getObject("gelis_id")),toLong(r.getObject("xeste_id")),r.getString("xeste_kodu"),r.getString("xeste_ad"),r.getString("xeste_soyad"),r.getString("xeste_ata_adi"),r.getString("fin_kodu"),r.getString("sexsiyyet_vesiqesi_nomresi"),r.getString("mobil_nomre"),toLong(r.getObject("gelis_novu_id")),r.getString("gelis_novu_kodu"),r.getString("gelis_novu_adi"),toLong(r.getObject("teskilat_id")),r.getString("teskilat_adi"),r.getString("protokol_kodu"),r.getObject("gelis_tarixi",java.time.LocalDate.class),r.getObject("gelis_saati",java.time.LocalTime.class),r.getObject("randevudur",Boolean.class),toLong(r.getObject("gonderen_hekim_id")),String.join(" ",java.util.stream.Stream.of(r.getString("gonderen_hekim_ad"),r.getString("gonderen_hekim_soyad"),r.getString("gonderen_hekim_ata_adi")).filter(x->x!=null&&!x.isBlank()).toList()),r.getString("mesaj"),r.getString("aciqlama"),r.getObject("aktiv",Boolean.class));}
+    private AmbulatorPatient mapAmbulatorPatient(ResultSet r,int n)throws SQLException{return new AmbulatorPatient(toLong(r.getObject("xeste_id")),r.getString("xeste_kodu"),String.join(" ",java.util.stream.Stream.of(r.getString("ad"),r.getString("soyad"),r.getString("ata_adi")).filter(x->x!=null&&!x.isBlank()).toList()),String.join(" · ",java.util.stream.Stream.of(r.getString("fin_kodu"),r.getString("mobil_nomre"),r.getString("sexsiyyet_vesiqesi_nomresi")).filter(x->x!=null&&!x.isBlank()).toList()),toLong(r.getObject("default_teskilat_id")),r.getString("default_teskilat_adi"),r.getString("sexsiyyet_vesiqesi_nomresi"),r.getObject("dogum_tarixi",java.time.LocalDate.class),r.getString("cins_adi"),r.getString("qan_qrupu_adi"),r.getString("mobil_nomre"),r.getString("sosial_kart_nomresi"),r.getString("unvan"),r.getObject("aktiv",Boolean.class));}
 
     public AmbulatorLookups getLookups() {
         return new AmbulatorLookups(

@@ -10,6 +10,126 @@
   border-radius: 4px;
 }
 
+/* Yeni ambulator müraciət */
+.ambulatory-form {
+  --ambulatory-blue: #087cc5;
+  --ambulatory-border: #dfe7ef;
+  --ambulatory-ink: #15233d;
+  color: var(--ambulatory-ink);
+}
+
+.ambulatory-page-header,
+.ambulatory-heading,
+.ambulatory-actions {
+  display: flex;
+  align-items: center;
+}
+
+.ambulatory-page-header {
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 14px;
+}
+
+.ambulatory-heading { gap: 14px; }
+.ambulatory-heading h4 { color: var(--ambulatory-ink); font-weight: 700; }
+.ambulatory-heading p { color: #75839a; }
+.ambulatory-actions { gap: 12px; }
+.ambulatory-actions .btn { min-height: 40px; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+.ambulatory-back { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--ambulatory-blue); background: #edf7ff; font-size: 20px; }
+
+.ambulatory-card {
+  border: 1px solid var(--ambulatory-border);
+  border-radius: 10px;
+  box-shadow: 0 5px 18px rgba(25, 56, 89, .035);
+}
+
+.ambulatory-card .card-body { padding: 16px 20px; }
+.ambulatory-section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: var(--ambulatory-ink); font-size: 17px; font-weight: 700; }
+.ambulatory-step { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--ambulatory-blue); font-size: 15px; }
+
+.ambulatory-form .form-label { color: #26334b; font-weight: 600; margin-bottom: 5px; }
+.ambulatory-form .form-control,
+.ambulatory-form .form-select,
+.ambulatory-form .select2-container .select2-selection--single { min-height: 42px; border-color: var(--ambulatory-border); border-radius: 7px; }
+.ambulatory-form .form-control,
+.ambulatory-form .form-select { min-height: 42px; padding: 8px 14px; }
+.ambulatory-form .form-control:focus,
+.ambulatory-form .form-select:focus { border-color: #79bde9; box-shadow: 0 0 0 3px rgba(8, 124, 197, .09); }
+.ambulatory-field { position: relative; }
+.ambulatory-field-icon { position: absolute; z-index: 3; left: 26px; top: 38px; color: var(--ambulatory-blue); font-size: 19px; line-height: 1; pointer-events: none; }
+.ambulatory-field > .form-control,
+.ambulatory-field > .form-select { padding-left: 42px; }
+.ambulatory-field .select2-container .select2-selection__rendered { padding-left: 41px !important; }
+.ambulatory-field .select2-container .select2-selection--single .select2-selection__rendered { line-height: 40px; }
+.ambulatory-input-group .input-group-text { color: var(--ambulatory-blue); background: #f8fbff; border-color: var(--ambulatory-border); padding-left: 18px; font-size: 20px; }
+.ambulatory-input-group .form-control { border-left: 0; }
+.ambulatory-input-group .btn { margin-left: 16px !important; border-radius: 7px !important; padding-inline: 24px; font-weight: 600; }
+.ambulatory-form textarea.form-control { min-height: 64px; height: 64px; padding: 10px 12px 10px 42px; resize: vertical; }
+.ambulatory-textarea { position: relative; }
+.ambulatory-check { min-height: 42px; margin-top: 25px; padding: 9px 14px; align-items: center; border: 1px solid var(--ambulatory-border); border-radius: 7px; font-weight: 600; }
+.ambulatory-check > span { display: inline-flex; align-items: center; gap: 12px; }
+.ambulatory-check i { color: var(--ambulatory-blue); font-size: 20px; }
+.ambulatory-check .form-check-input { margin: 0; }
+
+.ambulatory-note { position: relative; overflow: hidden; display: flex; gap: 12px; align-items: center; margin-top: 12px; padding: 12px 20px; border-radius: 9px; color: #5f7089; background: linear-gradient(105deg, #edf7ff, #f7fbff); }
+.ambulatory-note h6 { color: #174872; font-weight: 700; margin-bottom: 8px; }
+.ambulatory-note p { margin: 0; }
+.ambulatory-note-icon { color: var(--ambulatory-blue); font-size: 24px; }
+.ambulatory-note-art { position: absolute; right: 54px; bottom: -18px; color: rgba(44, 143, 211, .1); font-size: 92px; }
+
+.ambulatory-patient-card { display: flex; align-items: center; gap: 18px; margin-top: 12px; padding: 12px 16px; border: 1px solid #d5e7f7; border-radius: 8px; background: linear-gradient(105deg, #f7fbff, #fff); }
+.ambulatory-patient-avatar { width: 62px; height: 62px; flex: 0 0 62px; display: grid; place-items: center; border-radius: 50%; color: var(--ambulatory-blue); background: #e8f3ff; font-size: 34px; }
+.ambulatory-patient-content { min-width: 0; flex: 1; }
+.ambulatory-patient-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.ambulatory-patient-name-row strong { font-size: 17px; }
+.ambulatory-patient-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px 18px; }
+.ambulatory-patient-grid > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ambulatory-patient-grid i { flex: 0 0 auto; color: var(--ambulatory-blue); font-size: 18px; }
+.ambulatory-patient-grid span { min-width: 0; display: flex; flex-direction: column; }
+.ambulatory-patient-grid small { color: #77859a; font-size: 11px; line-height: 1.15; }
+.ambulatory-patient-grid b { overflow: hidden; color: #26334b; font-size: 12px; font-weight: 600; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.ambulatory-form .row.g-3 { --bs-gutter-y: .65rem; }
+.ambulatory-form .card.mb-4 { margin-bottom: 12px !important; }
+.ambulatory-search-hint { display: grid; min-height: 190px; place-items: center; padding: 24px; border: 1px dashed #d5e2ee; border-radius: 8px; color: #718096; text-align: center; background: #f9fbfd; }
+.ambulatory-patient-results { max-height: 420px; overflow-y: auto; border: 1px solid var(--ambulatory-border); border-radius: 8px; }
+.ambulatory-patient-results thead th { position: sticky; z-index: 2; top: 0; background: #f5f9fd; }
+.ambulatory-patient-results .table { margin-bottom: 0; }
+.ambulatory-search-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 4px 2px; color: #4d5d73; font-weight: 600; }
+
+/* Ambulator müraciətlər siyahısı: scroll yalnız cədvəldədir */
+.ambulatory-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden; }
+.ambulatory-list-page > .visit-list-card { min-height: 0; flex: 1 1 auto; margin-bottom: 0; overflow: hidden; }
+.ambulatory-list-page .visit-list-card { display: flex; flex-direction: column; }
+.ambulatory-list-page .visit-list-card-body { display: flex; min-height: 0; flex: 1 1 auto; overflow: hidden; }
+.ambulatory-list-page .visit-list-scroll { width: 100%; height: 100%; overflow: auto; }
+.ambulatory-list-page .visit-list-scroll thead th { position: sticky; z-index: 2; top: 0; background: #f5f7fa; box-shadow: inset 0 -1px #e5e7eb; }
+.ambulatory-list-page .visit-list-card > .card-header,
+.ambulatory-list-page .visit-list-card > .card-footer { flex: 0 0 auto; }
+
+/* Xəstə siyahısı: əsas səhifə sabit, scroll cədvəlin daxilində */
+.patient-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden; }
+.patient-list-page > .patient-list-card { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; margin-bottom: 0; overflow: hidden; }
+.patient-list-page .patient-list-scroll { width: 100%; min-height: 0; flex: 1 1 auto; overflow: auto; }
+.patient-list-page .patient-list-scroll thead th { position: sticky; z-index: 2; top: 0; background: #f5f7fa; box-shadow: inset 0 -1px #e5e7eb; }
+.patient-list-page .patient-list-card > .card-header,
+.patient-list-page .patient-list-card > .card-footer { flex: 0 0 auto; }
+
+@media (max-width: 767.98px) {
+  .ambulatory-page-header { align-items: flex-start; flex-direction: column; margin-bottom: 22px; }
+  .ambulatory-actions { width: 100%; }
+  .ambulatory-actions .btn { flex: 1; justify-content: center; padding-inline: 12px; }
+  .ambulatory-card .card-body { padding: 20px; }
+  .ambulatory-input-group { flex-wrap: wrap; }
+  .ambulatory-input-group .form-control { width: calc(100% - 52px); }
+  .ambulatory-input-group .btn { width: 100%; margin: 12px 0 0 !important; }
+  .ambulatory-check { margin-top: 0; }
+  .ambulatory-note { margin-top: 24px; padding: 22px; }
+  .ambulatory-patient-card { align-items: flex-start; }
+  .ambulatory-patient-avatar { display: none; }
+  .ambulatory-patient-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* Başlığın yuxarıda sabit qalması üçün (Sticky Header) */
 .table-scroll-container_ka thead th {
   position: sticky;

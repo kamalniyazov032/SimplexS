@@ -24,6 +24,12 @@ public class XesteRepository {
         return jdbc.query(sql, new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blank(q)).addValue("kod", blank(xesteKodu)).addValue("vn", vesiqeNovuId).addValue("t", teskilatId).addValue("c", cinsId).addValue("db", dogumBaslangic).addValue("ds", dogumBitme).addValue("o", olkeId).addValue("s", seherId).addValue("cursor", cursor).addValue("limit", limit), this::map);
     }
 
+    public long siyahiSayi(Long klinika, Boolean aktiv, String q, String xesteKodu, Long vesiqeNovuId, Long teskilatId, Long cinsId, java.time.LocalDate dogumBaslangic, java.time.LocalDate dogumBitme, Long olkeId, Long seherId) {
+        String sql = "SELECT count(*) FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>CAST(:a AS boolean),p_axtaris=>:q) WHERE (CAST(:kod AS varchar) IS NULL OR lower(xeste_kodu) LIKE lower(CAST(:kod AS varchar))||'%') AND (CAST(:vn AS bigint) IS NULL OR sexsiyyet_vesiqesi_novu_id=:vn) AND (CAST(:t AS bigint) IS NULL OR default_teskilat_id=:t) AND (CAST(:c AS bigint) IS NULL OR cins_id=:c) AND (CAST(:db AS date) IS NULL OR dogum_tarixi>=:db) AND (CAST(:ds AS date) IS NULL OR dogum_tarixi<=:ds) AND (CAST(:o AS bigint) IS NULL OR olke_id=:o) AND (CAST(:s AS bigint) IS NULL OR seher_id=:s)";
+        Long count = jdbc.queryForObject(sql, new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blank(q)).addValue("kod", blank(xesteKodu)).addValue("vn", vesiqeNovuId).addValue("t", teskilatId).addValue("c", cinsId).addValue("db", dogumBaslangic).addValue("ds", dogumBitme).addValue("o", olkeId).addValue("s", seherId), Long.class);
+        return count == null ? 0 : count;
+    }
+
     public Xeste tap(Long klinika, Long id) {
         return jdbc.query("SELECT * FROM public.fn_xeste_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_aktiv=>NULL,p_axtaris=>NULL) WHERE xeste_id=:id", new MapSqlParameterSource("k", klinika).addValue("id", id), this::map).stream().findFirst().orElseThrow();
     }

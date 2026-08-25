@@ -9,6 +9,7 @@
   <body>
     <div layout:fragment="content">
       <form
+        class="ambulatory-form"
         method="post"
         th:action="${gelis==null?'/ambulatorQebul/yarat':'/ambulatorQebul/yenile'}"
       >
@@ -18,30 +19,35 @@
           name="gelisId"
           th:value="${gelis.id}"
         />
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h4
+        <div class="ambulatory-page-header">
+          <div class="ambulatory-heading">
+            <a class="ambulatory-back" th:href="@{/ambulatorQebul/siyahi}" th:title="#{common.back}">
+              <i class="ti ti-arrow-left"></i>
+            </a>
+            <div>
+            <h4 class="mb-1"
               th:text="${gelis==null?#messages.msg('visits.new'):#messages.msg('patients.edit')}"
             ></h4>
+            <p class="mb-0" th:text="#{visits.form_subtitle}"></p>
+            </div>
           </div>
-          <div class="d-flex gap-2">
+          <div class="ambulatory-actions">
             <a
               class="btn btn-outline-primary"
               th:href="@{/ambulatorQebul/siyahi}"
-              th:text="#{visits.list}"
-            ></a
+            ><i class="ti ti-list-details"></i><span th:text="#{visits.list}"></span></a
             ><button
               class="btn btn-primary"
-              th:text="#{common.yadda_saxla}"
-            ></button>
+            ><i class="ti ti-device-floppy"></i><span th:text="#{common.yadda_saxla}"></span></button>
           </div>
         </div>
-        <div class="card mb-3">
+        <div class="card ambulatory-card mb-4">
           <div class="card-body">
-            <h6 class="text-primary">
-              1. <span th:text="#{visits.patient}"></span>
+            <h6 class="ambulatory-section-title">
+              <span class="ambulatory-step">1</span><span th:text="#{visits.choose_patient}"></span>
             </h6>
-            <div class="input-group">
+            <div class="input-group ambulatory-input-group">
+              <span class="input-group-text"><i class="ti ti-user-search"></i></span>
               <input
                 id="ambulatorSelectedPatient"
                 class="form-control"
@@ -66,17 +72,36 @@
               th:value="${gelis!=null?gelis.xesteId:(selectedXeste!=null?selectedXeste.id:null)}"
               required
             />
+            <div id="ambulatoryPatientCard" class="ambulatory-patient-card" th:classappend="${selectedXeste==null} ? ' d-none'">
+              <div class="ambulatory-patient-avatar"><i class="ti ti-user"></i></div>
+              <div class="ambulatory-patient-content">
+                <div class="ambulatory-patient-name-row">
+                  <strong id="ambulatoryPatientName" th:text="${selectedXeste?.ad}"></strong>
+                  <span id="ambulatoryPatientStatus" class="badge bg-success-subtle text-success" th:text="${selectedXeste?.aktiv==false} ? #{common.passive} : #{common.active}"></span>
+                </div>
+                <div class="ambulatory-patient-grid">
+                  <div><i class="ti ti-id"></i><span><small th:text="#{patients.document_number}"></small><b id="ambulatoryPatientDocument" th:text="${selectedXeste?.vesiqeNomresi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-calendar"></i><span><small th:text="#{patients.birth_date}"></small><b id="ambulatoryPatientBirthDate" th:text="${selectedXeste?.dogumTarixi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-gender-bigender"></i><span><small th:text="#{patients.gender}"></small><b id="ambulatoryPatientGender" th:text="${selectedXeste?.cinsAdi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-droplet"></i><span><small th:text="#{patients.blood_group}"></small><b id="ambulatoryPatientBlood" th:text="${selectedXeste?.qanQrupuAdi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-phone"></i><span><small th:text="#{patients.mobile}"></small><b id="ambulatoryPatientPhone" th:text="${selectedXeste?.mobilNomre} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-building-hospital"></i><span><small th:text="#{patients.organization}"></small><b id="ambulatoryPatientOrganization" th:text="${selectedXeste?.teskilatAdi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-card"></i><span><small th:text="#{patients.social_card}"></small><b id="ambulatoryPatientSocialCard" th:text="${selectedXeste?.sosialKartNomresi} ?: '-'"></b></span></div>
+                  <div><i class="ti ti-map-pin"></i><span><small th:text="#{patients.address}"></small><b id="ambulatoryPatientAddress" th:text="${selectedXeste?.unvan} ?: '-'"></b></span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card">
+        <div class="card ambulatory-card">
           <div class="card-body">
-            <h6 class="text-primary">
-              2. <span th:text="#{visits.title}"></span>
+            <h6 class="ambulatory-section-title">
+              <span class="ambulatory-step">2</span><span th:text="#{visits.title}"></span>
             </h6>
             <div class="row g-3">
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="clipboard-text">
                 <label class="form-label" th:text="#{visits.type}"></label
-                ><select class="form-select select2" name="gelisNovuId" required>
+                ><i class="ti ti-stethoscope ambulatory-field-icon"></i><select class="form-select select2" name="gelisNovuId" required>
                   <option
                     th:each="o:${gelisNovleri}"
                     th:value="${o.id}"
@@ -85,12 +110,12 @@
                   ></option>
                 </select>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="building-hospital">
                 <label
                   class="form-label"
                   th:text="#{patients.organization}"
                 ></label
-                ><select class="form-select select2" name="teskilatId">
+                ><i class="ti ti-building-bank ambulatory-field-icon"></i><select class="form-select select2" name="teskilatId">
                   <option
                     value=""
                     th:text="#{patients.default_organization}"
@@ -103,9 +128,9 @@
                   ></option>
                 </select>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field" data-icon="calendar-event">
                 <label class="form-label" th:text="#{visits.date}"></label
-                ><input
+                ><i class="ti ti-calendar-event ambulatory-field-icon"></i><input
                   class="form-control"
                   type="date"
                   name="gelisTarixi"
@@ -113,9 +138,9 @@
                   th:value="${gelis!=null?gelis.gelisTarixi:today}"
                 />
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field" data-icon="clock">
                 <label class="form-label" th:text="#{visits.time}"></label
-                ><input
+                ><i class="ti ti-clock ambulatory-field-icon"></i><input
                   class="form-control"
                   type="time"
                   name="gelisSaati"
@@ -123,12 +148,12 @@
                   th:value="${gelis!=null?gelis.gelisSaati:now}"
                 />
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="user-search">
                 <label
                   class="form-label"
                   th:text="#{visits.referring_doctor}"
                 ></label
-                ><select class="form-select select2" name="gonderenHekimId">
+                ><i class="ti ti-user-search ambulatory-field-icon"></i><select class="form-select select2" name="gonderenHekimId">
                   <option value="" th:text="#{common.select}"></option>
                   <option
                     th:each="o:${hekimler}"
@@ -138,10 +163,10 @@
                   ></option>
                 </select>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field">
                 <label
-                  class="border rounded p-3 w-100 d-flex justify-content-between"
-                  ><span th:text="#{visits.appointment}"></span
+                  class="ambulatory-check w-100 d-flex justify-content-between"
+                  ><span><i class="ti ti-calendar-check"></i><span th:text="#{visits.appointment}"></span></span
                   ><input
                     class="form-check-input"
                     type="checkbox"
@@ -150,26 +175,28 @@
                     th:checked="${gelis!=null and gelis.randevudur}"
                 /></label>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field ambulatory-textarea" data-icon="message-circle">
                 <label class="form-label" th:text="#{visits.message}"></label
-                ><textarea
+                ><i class="ti ti-message-circle ambulatory-field-icon"></i><textarea
                   class="form-control"
                   name="mesaj"
                   rows="3"
                   maxlength="500"
+                  th:placeholder="#{visits.message_placeholder}"
                   th:text="${gelis?.mesaj}"
                 ></textarea>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 ambulatory-field ambulatory-textarea" data-icon="note">
                 <label
                   class="form-label"
                   th:text="#{visits.description}"
                 ></label
-                ><textarea
+                ><i class="ti ti-notes ambulatory-field-icon"></i><textarea
                   class="form-control"
                   name="aciqlama"
                   rows="3"
                   maxlength="1000"
+                  th:placeholder="#{visits.description_placeholder}"
                   th:text="${gelis?.aciqlama}"
                 ></textarea>
               </div>
@@ -187,8 +214,13 @@
             </div>
           </div>
         </div>
+        <div class="ambulatory-note" th:if="${gelis==null}">
+          <div class="ambulatory-note-icon"><i class="ti ti-info-circle-filled"></i></div>
+          <div><h6 th:text="#{common.note}"></h6><p th:text="#{visits.patient_autofill_note}"></p></div>
+          <i class="ti ti-medical-cross ambulatory-note-art" aria-hidden="true"></i>
+        </div>
       </form>
-      <div class="modal fade" id="patientSelectionModal" tabindex="-1">
+      <div class="modal fade" id="patientSelectionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
@@ -229,7 +261,15 @@
                   ></button>
                 </div>
               </div>
-              <div class="table-responsive">
+              <div
+                id="patientModalHint"
+                class="ambulatory-search-hint"
+                th:text="#{visits.patient_search_hint}"
+                th:data-initial="#{visits.patient_search_hint}"
+                th:data-empty="#{patients.empty}"
+                th:data-error="#{visits.patient_search_error}"
+              ></div>
+              <div id="patientModalTable" class="table-responsive ambulatory-patient-results d-none">
                 <table class="table table-hover">
                   <thead>
                     <tr>
@@ -242,12 +282,17 @@
                   <tbody id="patientModalResults"></tbody>
                 </table>
               </div>
-              <button
-                id="patientModalMore"
-                type="button"
-                class="btn btn-outline-primary w-100 d-none"
-                th:text="#{common.show_more}"
-              ></button>
+              <div id="patientModalPagination" class="ambulatory-search-pagination d-none" th:data-template="#{visits.patient_page_info}">
+                <span id="patientModalPageInfo"></span>
+                <div class="btn-group">
+                  <button id="patientModalPrevious" type="button" class="btn btn-outline-primary btn-sm">
+                    <i class="ti ti-arrow-left me-1"></i><span th:text="#{common.previous}"></span>
+                  </button>
+                  <button id="patientModalNext" type="button" class="btn btn-outline-primary btn-sm">
+                    <span th:text="#{common.next}"></span><i class="ti ti-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

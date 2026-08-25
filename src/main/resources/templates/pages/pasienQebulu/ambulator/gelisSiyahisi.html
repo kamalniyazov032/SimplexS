@@ -7,7 +7,7 @@
   layout:decorate="~{layouts/main}"
 >
   <body>
-    <div layout:fragment="content">
+    <div id="ambulatoryListPage" class="ambulatory-list-page" layout:fragment="content">
       <style>
         .visit-summary-card{transition:transform .2s ease,box-shadow .2s ease}.visit-summary-card:hover{transform:translateY(-2px);box-shadow:0 .5rem 1.25rem rgba(15,23,42,.08)!important}.visit-summary-card .avatar{width:3.5rem;height:3.5rem}.visit-patient-avatar{width:2.75rem;height:2.75rem;flex:0 0 2.75rem;font-size:1rem;font-weight:700}.visit-cell-icon{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;flex:0 0 2rem;border-radius:.5rem}.visit-table tbody tr{height:4.5rem}.visit-table th{white-space:nowrap}.visit-table td{white-space:nowrap}
       </style>
@@ -190,7 +190,7 @@
           </form>
         </div>
       </div>
-      <div class="card border-0 shadow-sm">
+      <div class="card border-0 shadow-sm visit-list-card">
         <div
           class="card-header d-flex justify-content-between align-items-center"
         >
@@ -210,8 +210,8 @@
             ><span th:text="#{common.filteri_temizle}"></span
           ></a>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
+        <div class="card-body p-0 visit-list-card-body">
+          <div class="table-responsive visit-list-scroll">
             <table class="table visit-table table-hover align-middle mb-0">
               <thead class="bg-light">
                 <tr>
@@ -272,13 +272,24 @@
             </table>
           </div>
         </div>
-        <div th:if="${hasNext}" class="card-footer text-center">
+        <div class="card-footer d-flex align-items-center justify-content-between gap-3">
+          <span class="text-muted fw-medium" th:text="#{visits.list_page_info(${pageNumber},${totalPages},${shownFrom},${shownTo},${totalRecords})}"></span>
+          <div class="btn-group">
           <a
+            th:if="${hasPrevious}"
             class="btn btn-outline-primary"
-            th:href="@{/ambulatorQebul/siyahi(q=${q},gelisNovuId=${selectedGelisNovuId},teskilatId=${selectedTeskilatId},tarixBaslama=${tarixBaslama},tarixBitme=${tarixBitme},randevu=${selectedRandevu},status=${selectedStatus},cursor=${nextCursor})}"
-            ><i class="ti ti-chevron-down me-1"></i
-            ><span th:text="#{common.show_more}"></span
+            th:href="@{/ambulatorQebul/siyahi(q=${q},gelisNovuId=${selectedGelisNovuId},teskilatId=${selectedTeskilatId},tarixBaslama=${tarixBaslama},tarixBitme=${tarixBitme},randevu=${selectedRandevu},status=${selectedStatus},cursor=${previousCursor},cursorTrail=${previousCursorTrail})}"
+            ><i class="ti ti-arrow-left me-1"></i
+            ><span th:text="#{common.previous}"></span
           ></a>
+          <a
+            th:if="${hasNext}"
+            class="btn btn-outline-primary"
+            th:href="@{/ambulatorQebul/siyahi(q=${q},gelisNovuId=${selectedGelisNovuId},teskilatId=${selectedTeskilatId},tarixBaslama=${tarixBaslama},tarixBitme=${tarixBitme},randevu=${selectedRandevu},status=${selectedStatus},cursor=${nextCursor},cursorTrail=${nextCursorTrail})}"
+            ><span th:text="#{common.next}"></span
+            ><i class="ti ti-arrow-right ms-1"></i
+          ></a>
+          </div>
         </div>
       </div>
     </div>

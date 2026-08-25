@@ -20,8 +20,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/xeste-qeydiyyati")
 public class XesteQeydiyyatiController {
-    private static final int DEFAULT_SIZE = 25;
-    private static final Set<Integer> ALLOWED_SIZES = Set.of(25, 50, 100);
+    private static final int PAGE_SIZE = 100;
     private final XesteRepository repo;
     private final TeskilatRepository teskilatRepo;
     private final MessageSource messages;
@@ -33,14 +32,23 @@ public class XesteQeydiyyatiController {
     }
 
     @GetMapping("/siyahi")
-    public String siyahi(@RequestParam(required = false) String q, @RequestParam(required = false) String xesteKodu, @RequestParam(required = false) Long vesiqeNovuId, @RequestParam(defaultValue = "aktiv") String status, @RequestParam(required = false) Long teskilatId, @RequestParam(required = false) Long cinsId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dogumBaslangic, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dogumBitme, @RequestParam(required = false) Long olkeId, @RequestParam(required = false) Long seherId, @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "25") int size, Model m, HttpSession s) {
-        size = ALLOWED_SIZES.contains(size) ? size : DEFAULT_SIZE;
+    public String siyahi(@RequestParam(required = false) String q, @RequestParam(required = false) String xesteKodu, @RequestParam(required = false) Long vesiqeNovuId, @RequestParam(defaultValue = "aktiv") String status, @RequestParam(required = false) Long teskilatId, @RequestParam(required = false) Long cinsId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dogumBaslangic, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dogumBitme, @RequestParam(required = false) Long olkeId, @RequestParam(required = false) Long seherId, @RequestParam(required = false) Long cursor, @RequestParam(required = false) String cursorTrail, Model m, HttpSession s) {
         Boolean aktiv = status.isBlank() ? null : !"passiv".equals(status);
         Long k = klinika(s);
-        List<az.simplexs.simplexs.dto.xeste.Xeste> rows = repo.siyahi(k, aktiv, q, xesteKodu, vesiqeNovuId, teskilatId, cinsId, dogumBaslangic, dogumBitme, olkeId, seherId, cursor, size + 1);
-        boolean hasNext = rows.size() > size;
-        List<az.simplexs.simplexs.dto.xeste.Xeste> xesteler = hasNext ? rows.subList(0, size) : rows;
+        List<az.simplexs.simplexs.dto.xeste.Xeste> rows = repo.siyahi(k, aktiv, q, xesteKodu, vesiqeNovuId, teskilatId, cinsId, dogumBaslangic, dogumBitme, olkeId, seherId, cursor, PAGE_SIZE + 1);
+        boolean hasNext = rows.size() > PAGE_SIZE;
+        List<az.simplexs.simplexs.dto.xeste.Xeste> xesteler = hasNext ? rows.subList(0, PAGE_SIZE) : rows;
         Long nextCursor = hasNext ? xesteler.getLast().id() : null;
+        String trail = cursorTrail == null ? "" : cursorTrail;
+        String[] trailParts = trail.isBlank() ? new String[0] : trail.split(",");
+        Long previousCursor = trailParts.length == 0 ? null : ("0".equals(trailParts[trailParts.length - 1]) ? null : Long.valueOf(trailParts[trailParts.length - 1]));
+        String previousTrail = trailParts.length <= 1 ? "" : String.join(",", Arrays.copyOf(trailParts, trailParts.length - 1));
+        String nextTrail = trail.isBlank() ? String.valueOf(cursor == null ? 0 : cursor) : trail + "," + (cursor == null ? 0 : cursor);
+        long totalRecords = repo.siyahiSayi(k, aktiv, q, xesteKodu, vesiqeNovuId, teskilatId, cinsId, dogumBaslangic, dogumBitme, olkeId, seherId);
+        int pageNumber = trailParts.length + 1;
+        long shownFrom = xesteler.isEmpty() ? 0 : (long) (pageNumber - 1) * PAGE_SIZE + 1;
+        long shownTo = xesteler.isEmpty() ? 0 : shownFrom + xesteler.size() - 1;
+        boolean filterApplied = (q != null && !q.isBlank()) || (xesteKodu != null && !xesteKodu.isBlank()) || vesiqeNovuId != null || teskilatId != null || cinsId != null || dogumBaslangic != null || dogumBitme != null || olkeId != null || seherId != null || !"aktiv".equals(status);
         m.addAttribute("pageTitle", msg("patients.patient_list"));
         m.addAttribute("activeMenuGroup", "pasientQebulu");
         m.addAttribute("activeMenu", "xesteQeydiyyati");
@@ -55,10 +63,20 @@ public class XesteQeydiyyatiController {
         m.addAttribute("dogumBitme", dogumBitme);
         m.addAttribute("selectedOlkeId", olkeId);
         m.addAttribute("selectedSeherId", seherId);
-        m.addAttribute("selectedSize", size);
+        m.addAttribute("selectedSize", PAGE_SIZE);
         m.addAttribute("hasNext", hasNext);
+        m.addAttribute("hasPrevious", cursor != null);
         m.addAttribute("nextCursor", nextCursor);
-        m.addAttribute("count", xesteler.size());
+        m.addAttribute("nextCursorTrail", nextTrail);
+        m.addAttribute("previousCursor", previousCursor);
+        m.addAttribute("previousCursorTrail", previousTrail);
+        m.addAttribute("totalRecords", totalRecords);
+        m.addAttribute("pageNumber", pageNumber);
+        m.addAttribute("totalPages", Math.max(1, (totalRecords + PAGE_SIZE - 1) / PAGE_SIZE));
+        m.addAttribute("shownFrom", shownFrom);
+        m.addAttribute("shownTo", shownTo);
+        m.addAttribute("filterApplied", filterApplied);
+        m.addAttribute("count", totalRecords);
         lookups(m, k);
         return "pages/pasienQebulu/xesteQeydiyyati";
     }

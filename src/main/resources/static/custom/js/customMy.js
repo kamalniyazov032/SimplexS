@@ -50,36 +50,106 @@ function initSelect2Fields(context, forceReinit) {
 $(document).ready(function () {
     initSelect2Fields(document);
 
+    const ambulatoryListPage = document.getElementById('ambulatoryListPage');
+    if (ambulatoryListPage) {
+        const fitAmbulatoryList = () => {
+            const top = ambulatoryListPage.getBoundingClientRect().top;
+            const bottomGap = 20;
+            ambulatoryListPage.style.height = `${Math.max(240, window.innerHeight - top - bottomGap)}px`;
+        };
+        fitAmbulatoryList();
+        window.addEventListener('resize', fitAmbulatoryList);
+    }
+
+    const patientListPage = document.getElementById('patientListPage');
+    if (patientListPage) {
+        const fitPatientList = () => {
+            const top = patientListPage.getBoundingClientRect().top;
+            patientListPage.style.height = `${Math.max(240, window.innerHeight - top - 20)}px`;
+        };
+        fitPatientList();
+        window.addEventListener('resize', fitPatientList);
+    }
+
     const modal = document.getElementById('patientSelectionModal');
     if (modal) {
         let cursor = null;
-        const loadPatients = (append) => {
-            if (!append) cursor = null;
+        let cursorHistory = [null];
+        let pageNumber = 1;
+        const loadPatients = (direction = 'search') => {
+            const query = $('#patientModalSearch').val().trim();
+            const $body = $('#patientModalResults');
+            const $hint = $('#patientModalHint');
+            if (!query) {
+                $body.empty();
+                $('#patientModalTable, #patientModalPagination').addClass('d-none');
+                $hint.text($hint.data('initial')).removeClass('d-none');
+                return;
+            }
+            if (direction === 'search') {
+                cursor = null;
+                cursorHistory = [null];
+                pageNumber = 1;
+            } else if (direction === 'next') {
+                cursorHistory.push(cursor);
+                pageNumber++;
+            } else if (direction === 'previous') {
+                cursorHistory.pop();
+                cursor = cursorHistory[cursorHistory.length - 1] || null;
+                pageNumber--;
+            }
             $.get('/ambulatorQebul/xeste-axtar', {
-                q: $('#patientModalSearch').val(),
+                q: query,
                 status: $('#patientModalStatus').val(),
                 cursor: cursor
             }).done(data => {
-                const $body = $('#patientModalResults');
-                if (!append) $body.empty();
+                $body.empty();
                 data.results.forEach(patient => {
                     const $button = $('<button type="button" class="btn btn-sm btn-primary"><i class="ti ti-check"></i></button>');
                     $button.on('click', () => {
                         $('#ambulatorPatientId').val(patient.id);
                         $('#ambulatorSelectedPatient').val(patient.ad + ' · ' + patient.kod + (patient.meta ? ' · ' + patient.meta : ''));
                         if (patient.teskilatId) $('[name="teskilatId"]').val(String(patient.teskilatId)).trigger('change');
+                        const value = key => patient[key] || '-';
+                        $('#ambulatoryPatientName').text(patient.ad);
+                        $('#ambulatoryPatientDocument').text(value('vesiqeNomresi'));
+                        $('#ambulatoryPatientBirthDate').text(value('dogumTarixi'));
+                        $('#ambulatoryPatientGender').text(value('cinsAdi'));
+                        $('#ambulatoryPatientBlood').text(value('qanQrupuAdi'));
+                        $('#ambulatoryPatientPhone').text(value('mobilNomre'));
+                        $('#ambulatoryPatientOrganization').text(value('teskilatAdi'));
+                        $('#ambulatoryPatientSocialCard').text(value('sosialKartNomresi'));
+                        $('#ambulatoryPatientAddress').text(value('unvan'));
+                        $('#ambulatoryPatientStatus')
+                            .text(patient.aktiv === false ? (window.SimplexI18n?.passive || 'Passiv') : (window.SimplexI18n?.active || 'Aktiv'))
+                            .toggleClass('bg-success-subtle text-success', patient.aktiv !== false)
+                            .toggleClass('bg-secondary-subtle text-secondary', patient.aktiv === false);
+                        $('#ambulatoryPatientCard').removeClass('d-none');
                         bootstrap.Modal.getInstance(modal).hide();
                     });
                     $('<tr>').append($('<td>').text(patient.kod), $('<td>').text(patient.ad), $('<td>').text(patient.meta), $('<td>').append($button)).appendTo($body);
                 });
+                const hasResults = data.results.length > 0;
+                $('#patientModalTable').toggleClass('d-none', !hasResults);
+                $hint.text($hint.data('empty')).toggleClass('d-none', hasResults);
                 cursor = data.nextCursor || null;
-                $('#patientModalMore').toggleClass('d-none', !data.pagination.more);
+                const totalPages = Math.max(1, Math.ceil(data.total / 100));
+                const template = $('#patientModalPagination').data('template');
+                $('#patientModalPageInfo').text(template.replace('__PAGE__', pageNumber).replace('__PAGES__', totalPages).replace('__TOTAL__', data.total));
+                $('#patientModalPrevious').prop('disabled', pageNumber === 1);
+                $('#patientModalNext').prop('disabled', !data.more);
+                $('#patientModalPagination').toggleClass('d-none', !hasResults);
+                if (direction !== 'search') $('#patientModalTable').scrollTop(0);
+            }).fail(() => {
+                $('#patientModalTable, #patientModalPagination').addClass('d-none');
+                $hint.text($hint.data('error')).removeClass('d-none');
             });
         };
-        modal.addEventListener('shown.bs.modal', () => loadPatients(false));
-        $('#patientModalSearchButton').on('click', () => loadPatients(false));
-        $('#patientModalSearch').on('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); loadPatients(false); } });
-        $('#patientModalMore').on('click', () => loadPatients(true));
+        modal.addEventListener('shown.bs.modal', () => $('#patientModalSearch').trigger('focus'));
+        $('#patientModalSearchButton').on('click', () => loadPatients('search'));
+        $('#patientModalSearch').on('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); loadPatients('search'); } });
+        $('#patientModalPrevious').on('click', () => loadPatients('previous'));
+        $('#patientModalNext').on('click', () => loadPatients('next'));
     }
 });
 

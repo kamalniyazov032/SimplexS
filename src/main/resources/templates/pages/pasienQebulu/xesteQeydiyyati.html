@@ -7,7 +7,7 @@
   layout:decorate="~{layouts/main}"
 >
   <body>
-    <div layout:fragment="content">
+    <div id="patientListPage" class="patient-list-page" layout:fragment="content">
       <div
         class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
       >
@@ -28,7 +28,8 @@
             aria-controls="patientListFilter"
           >
             <i class="ti ti-filter me-1"></i
-            ><span th:text="#{common.filter}"></span></button
+            ><span th:text="#{common.filter}"></span
+            ><span th:if="${filterApplied}" class="badge bg-primary text-white ms-2" th:text="#{common.active}"></span></button
           ><a class="btn btn-outline-primary" th:href="@{/xeste-qeydiyyati}"
             ><i class="ti ti-plus me-1"></i
             ><span th:text="#{patients.new_patient}"></span
@@ -235,11 +236,14 @@
           </form>
         </div>
       </div>
-      <div class="card border-0 shadow-sm overflow-hidden">
-        <div class="card-header bg-white py-3">
+      <div class="card border-0 shadow-sm overflow-hidden patient-list-card">
+        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
           <strong th:text="#{patients.result_count(${count})}"></strong>
+          <a th:if="${filterApplied}" class="btn btn-sm btn-light" th:href="@{/xeste-qeydiyyati/siyahi}">
+            <i class="ti ti-x me-1"></i><span th:text="#{common.filteri_temizle}"></span>
+          </a>
         </div>
-        <div class="table-responsive">
+        <div class="table-responsive patient-list-scroll">
           <table class="table table-hover align-middle mb-0 patient-list-table">
             <thead>
               <tr>
@@ -258,7 +262,7 @@
             </thead>
             <tbody>
               <tr th:each="x,i:${xesteler}">
-                <td th:text="${i.count}"></td>
+                <td th:text="${shownFrom + i.index}"></td>
                 <td>
                   <a
                     class="fw-semibold text-primary"
@@ -309,15 +313,17 @@
         <div
           class="card-footer bg-white d-flex justify-content-between align-items-center"
         >
-          <select class="form-select form-select-sm select2 w-auto" disabled>
-            <option th:text="${selectedSize}"></option></select
-          ><a
-            th:if="${hasNext}"
-            class="btn btn-sm btn-outline-primary"
-            th:href="@{/xeste-qeydiyyati/siyahi(q=${q},xesteKodu=${xesteKodu},vesiqeNovuId=${selectedVesiqeNovuId},status=${selectedStatus},teskilatId=${selectedTeskilatId},cinsId=${selectedCinsId},dogumBaslangic=${dogumBaslangic},dogumBitme=${dogumBitme},olkeId=${selectedOlkeId},seherId=${selectedSeherId},size=${selectedSize},cursor=${nextCursor})}"
-            ><span th:text="#{patients.next_records}"></span
-            ><i class="ti ti-chevron-right ms-1"></i
-          ></a>
+          <span class="text-muted fw-medium" th:text="#{patients.list_page_info(${pageNumber},${totalPages},${shownFrom},${shownTo},${totalRecords})}"></span>
+          <div class="btn-group">
+            <a th:if="${hasPrevious}" class="btn btn-sm btn-outline-primary"
+              th:href="@{/xeste-qeydiyyati/siyahi(q=${q},xesteKodu=${xesteKodu},vesiqeNovuId=${selectedVesiqeNovuId},status=${selectedStatus},teskilatId=${selectedTeskilatId},cinsId=${selectedCinsId},dogumBaslangic=${dogumBaslangic},dogumBitme=${dogumBitme},olkeId=${selectedOlkeId},seherId=${selectedSeherId},cursor=${previousCursor},cursorTrail=${previousCursorTrail})}">
+              <i class="ti ti-arrow-left me-1"></i><span th:text="#{common.previous}"></span>
+            </a>
+            <a th:if="${hasNext}" class="btn btn-sm btn-outline-primary"
+              th:href="@{/xeste-qeydiyyati/siyahi(q=${q},xesteKodu=${xesteKodu},vesiqeNovuId=${selectedVesiqeNovuId},status=${selectedStatus},teskilatId=${selectedTeskilatId},cinsId=${selectedCinsId},dogumBaslangic=${dogumBaslangic},dogumBitme=${dogumBitme},olkeId=${selectedOlkeId},seherId=${selectedSeherId},cursor=${nextCursor},cursorTrail=${nextCursorTrail})}">
+              <span th:text="#{common.next}"></span><i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
         </div>
       </div>
       <script>
