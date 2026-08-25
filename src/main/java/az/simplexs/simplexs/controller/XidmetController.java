@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -22,118 +23,177 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 public class XidmetController {
     private final XidmetRepository repo;
     private final MessageSource messageSource;
-    public XidmetController(XidmetRepository repo,MessageSource messageSource){this.repo=repo;this.messageSource=messageSource;}
+
+    public XidmetController(XidmetRepository repo, MessageSource messageSource) {
+        this.repo = repo;
+        this.messageSource = messageSource;
+    }
 
     @GetMapping("/xidmetQruplari")
-    public String qruplar(@RequestParam(required=false)String q,@RequestParam(required=false)String status,
-            @RequestParam(required=false)String qrupTipi,Model m,HttpSession session){
-        String selectedStatus=status==null?"aktiv":status;
-        base(m,"Xidmət qrupları","xidmetQruplari");
-        var all=hierarchyOrder(repo.qruplar(klinikaId(session)));
-        String query=hasText(q)?q.trim().toLowerCase(Locale.forLanguageTag("az")):null;
-        var filtered=all.stream()
-                .filter(x->query==null||contains(x.kod(),query)||contains(x.ad(),query)||contains(x.tamYol(),query))
-                .filter(x->!hasText(selectedStatus)||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
-                .filter(x->!hasText(qrupTipi)||("esas".equals(qrupTipi)==Boolean.TRUE.equals(x.kokQrupdur())))
+    public String qruplar(@RequestParam(required = false) String q, @RequestParam(required = false) String status,
+                          @RequestParam(required = false) String qrupTipi, Model m, HttpSession session) {
+        String selectedStatus = status == null ? "aktiv" : status;
+        base(m, "Xidmət qrupları", "xidmetQruplari");
+        var all = hierarchyOrder(repo.qruplar(klinikaId(session)));
+        String query = hasText(q) ? q.trim().toLowerCase(Locale.forLanguageTag("az")) : null;
+        var filtered = all.stream()
+                .filter(x -> query == null || contains(x.kod(), query) || contains(x.ad(), query) || contains(x.tamYol(), query))
+                .filter(x -> !hasText(selectedStatus) || ("aktiv".equals(selectedStatus) == Boolean.TRUE.equals(x.aktiv())))
+                .filter(x -> !hasText(qrupTipi) || ("esas".equals(qrupTipi) == Boolean.TRUE.equals(x.kokQrupdur())))
                 .toList();
-        m.addAttribute("qruplar",filtered);m.addAttribute("allQruplar",all);m.addAttribute("qrupCount",filtered.size());
-        m.addAttribute("filterApplied",hasText(q)||!"aktiv".equals(selectedStatus)||hasText(qrupTipi));
-        m.addAttribute("q",q);m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("selectedQrupTipi",qrupTipi);
+        m.addAttribute("qruplar", filtered);
+        m.addAttribute("allQruplar", all);
+        m.addAttribute("qrupCount", filtered.size());
+        m.addAttribute("filterApplied", hasText(q) || !"aktiv".equals(selectedStatus) || hasText(qrupTipi));
+        m.addAttribute("q", q);
+        m.addAttribute("selectedStatus", selectedStatus);
+        m.addAttribute("selectedQrupTipi", qrupTipi);
         return "pages/xidmetQruplari";
     }
-    private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups){
-        Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order=Comparator
-                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo,Comparator.nullsLast(Integer::compareTo))
-                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad,String.CASE_INSENSITIVE_ORDER);
-        var children=new HashMap<Long,List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
-        var ids=new HashSet<Long>();groups.forEach(x->ids.add(x.id()));
-        groups.forEach(x->children.computeIfAbsent(x.parentId(),ignored->new ArrayList<>()).add(x));
-        children.values().forEach(list->list.sort(order));
-        var result=new ArrayList<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>();var visited=new HashSet<Long>();
-        var roots=groups.stream().filter(x->x.parentId()==null||!ids.contains(x.parentId())).sorted(order).toList();
-        roots.forEach(x->appendGroup(x,children,visited,result));
-        groups.stream().filter(x->!visited.contains(x.id())).sorted(order).forEach(x->appendGroup(x,children,visited,result));
+
+    private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups) {
+        Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order = Comparator
+                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo, Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad, String.CASE_INSENSITIVE_ORDER);
+        var children = new HashMap<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
+        var ids = new HashSet<Long>();
+        groups.forEach(x -> ids.add(x.id()));
+        groups.forEach(x -> children.computeIfAbsent(x.parentId(), ignored -> new ArrayList<>()).add(x));
+        children.values().forEach(list -> list.sort(order));
+        var result = new ArrayList<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>();
+        var visited = new HashSet<Long>();
+        var roots = groups.stream().filter(x -> x.parentId() == null || !ids.contains(x.parentId())).sorted(order).toList();
+        roots.forEach(x -> appendGroup(x, children, visited, result));
+        groups.stream().filter(x -> !visited.contains(x.id())).sorted(order).forEach(x -> appendGroup(x, children, visited, result));
         return result;
     }
+
     private void appendGroup(az.simplexs.simplexs.dto.xidmet.XidmetQrupu group,
-            Map<Long,List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>> children,HashSet<Long> visited,
-            List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> result){
-        if(!visited.add(group.id()))return;
-        result.add(group);children.getOrDefault(group.id(),List.of()).forEach(x->appendGroup(x,children,visited,result));
+                             Map<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>> children, HashSet<Long> visited,
+                             List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> result) {
+        if (!visited.add(group.id())) return;
+        result.add(group);
+        children.getOrDefault(group.id(), List.of()).forEach(x -> appendGroup(x, children, visited, result));
     }
+
     @PostMapping("/xidmetQruplari/yeni")
-    public String qrupYarat(@RequestParam(required=false)Long parentId,@RequestParam String ad,HttpSession s,RedirectAttributes a){flash(repo.qrupYarat(klinikaId(s),parentId,ad),a,"Xidmət qrupu yaradıldı.");return "redirect:/xidmetQruplari";}
+    public String qrupYarat(@RequestParam(required = false) Long parentId, @RequestParam String ad, HttpSession s, RedirectAttributes a) {
+        flash(repo.qrupYarat(klinikaId(s), parentId, ad), a, "Xidmət qrupu yaradıldı.");
+        return "redirect:/xidmetQruplari";
+    }
+
     @PostMapping("/xidmetQruplari/yenile")
-    public String qrupYenile(@RequestParam Long xidmetQrupuId,@RequestParam String ad,@RequestParam(required=false)Long parentId,@RequestParam(defaultValue="false")boolean aktiv,RedirectAttributes a){flash(repo.qrupYenile(xidmetQrupuId,ad,parentId,aktiv),a,"Xidmət qrupu yeniləndi.");return "redirect:/xidmetQruplari";}
+    public String qrupYenile(@RequestParam Long xidmetQrupuId, @RequestParam String ad, @RequestParam(required = false) Long parentId, @RequestParam(defaultValue = "false") boolean aktiv, RedirectAttributes a) {
+        flash(repo.qrupYenile(xidmetQrupuId, ad, parentId, aktiv), a, "Xidmət qrupu yeniləndi.");
+        return "redirect:/xidmetQruplari";
+    }
 
     @GetMapping("/parXidmet")
-    public String xidmetler(@RequestParam(required=false)Long qrupId,
-            @RequestParam(required=false)Long xidmetTipiId,
-            @RequestParam(required=false)Long muhasibatKoduId,
-            @RequestParam(required=false)String status,
-            @RequestParam(required=false)String paketStatusu,
-            @RequestParam(required=false)String q,@RequestParam(defaultValue="0")int page,Model m,HttpSession session){
-        final int pageSize=100;
-        page=Math.max(0,page);
-        String selectedStatus=status==null?"aktiv":status;
-        base(m,"Xidmətlər","xidmetler");
-        Boolean aktivFilter=selectedStatus.isBlank()?null:"aktiv".equals(selectedStatus);
-        Long kid=klinikaId(session);var qruplar=hierarchyOrder(repo.qruplar(kid));
-        long xidmetCount=repo.countXidmetler(kid,qrupId,aktivFilter,xidmetTipiId,muhasibatKoduId,paketStatusu,q);
-        int totalPages=(int)Math.ceil(xidmetCount/(double)pageSize);
-        if(page>0&&page>=totalPages)page=Math.max(0,totalPages-1);
-        var filtered=repo.xidmetlerPage(kid,qrupId,aktivFilter,xidmetTipiId,muhasibatKoduId,paketStatusu,q,pageSize,page*pageSize);
-        m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",xidmetCount);
-        m.addAttribute("page",page);m.addAttribute("totalPages",totalPages);
-        m.addAttribute("filterApplied",xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(paketStatusu)||hasText(q));
-        m.addAttribute("qruplar",qruplar);m.addAttribute("selectedQrupId",qrupId);
-        m.addAttribute("selectedQrup",qruplar.stream().filter(x->x.id().equals(qrupId)).findFirst().orElse(null));
-        m.addAttribute("selectedXidmetTipiId",xidmetTipiId);m.addAttribute("selectedMuhasibatKoduId",muhasibatKoduId);
-        m.addAttribute("selectedStatus",selectedStatus);m.addAttribute("selectedPaketStatusu",paketStatusu);m.addAttribute("q",q);
-        m.addAttribute("muhasibatKodlari",repo.muhasibatKodlari(kid));m.addAttribute("xidmetTipleri",repo.xidmetTipleri());
-        m.addAttribute("hesabatNovleri",repo.hesabatNovleri());m.addAttribute("hesabatMecburiyyetleri",repo.hesabatMecburiyyetleri());
+    public String xidmetler(@RequestParam(required = false) Long qrupId,
+                            @RequestParam(required = false) Long xidmetTipiId,
+                            @RequestParam(required = false) Long muhasibatKoduId,
+                            @RequestParam(required = false) String status,
+                            @RequestParam(required = false) String paketStatusu,
+                            @RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page, Model m, HttpSession session) {
+        final int pageSize = 100;
+        page = Math.max(0, page);
+        String selectedStatus = status == null ? "aktiv" : status;
+        base(m, "Xidmətlər", "xidmetler");
+        Boolean aktivFilter = selectedStatus.isBlank() ? null : "aktiv".equals(selectedStatus);
+        Long kid = klinikaId(session);
+        var qruplar = hierarchyOrder(repo.qruplar(kid));
+        long xidmetCount = repo.countXidmetler(kid, qrupId, aktivFilter, xidmetTipiId, muhasibatKoduId, paketStatusu, q);
+        int totalPages = (int) Math.ceil(xidmetCount / (double) pageSize);
+        if (page > 0 && page >= totalPages) page = Math.max(0, totalPages - 1);
+        var filtered = repo.xidmetlerPage(kid, qrupId, aktivFilter, xidmetTipiId, muhasibatKoduId, paketStatusu, q, pageSize, page * pageSize);
+        m.addAttribute("xidmetler", filtered);
+        m.addAttribute("xidmetCount", xidmetCount);
+        m.addAttribute("page", page);
+        m.addAttribute("totalPages", totalPages);
+        m.addAttribute("filterApplied", xidmetTipiId != null || muhasibatKoduId != null || !"aktiv".equals(selectedStatus) || hasText(paketStatusu) || hasText(q));
+        m.addAttribute("qruplar", qruplar);
+        m.addAttribute("selectedQrupId", qrupId);
+        m.addAttribute("selectedQrup", qruplar.stream().filter(x -> x.id().equals(qrupId)).findFirst().orElse(null));
+        m.addAttribute("selectedXidmetTipiId", xidmetTipiId);
+        m.addAttribute("selectedMuhasibatKoduId", muhasibatKoduId);
+        m.addAttribute("selectedStatus", selectedStatus);
+        m.addAttribute("selectedPaketStatusu", paketStatusu);
+        m.addAttribute("q", q);
+        m.addAttribute("muhasibatKodlari", repo.muhasibatKodlari(kid));
+        m.addAttribute("xidmetTipleri", repo.xidmetTipleri());
+        m.addAttribute("hesabatNovleri", repo.hesabatNovleri());
+        m.addAttribute("hesabatMecburiyyetleri", repo.hesabatMecburiyyetleri());
         return "pages/xidmet";
     }
+
     @PostMapping("/parXidmet/yeni")
-    public String xidmetYarat(@RequestParam String kod,@RequestParam String ad,@RequestParam Long qrupId,
-            @RequestParam Long muhasibatKoduId,@RequestParam Long xidmetTipiId,
-            @RequestParam(required=false)String beynelxalqKod,@RequestParam(required=false)String beynelxalqAd,
-            @RequestParam(required=false)Long hesabatNovuId,@RequestParam(required=false)Long hesabatMecburiyyetiId,
-            @RequestParam(defaultValue="false")boolean paketXidmet,
-            @RequestParam(defaultValue="true")boolean aktiv,HttpSession s,RedirectAttributes a){
-        flash(repo.xidmetYarat(klinikaId(s),kod,ad,qrupId,muhasibatKoduId,xidmetTipiId,beynelxalqKod,beynelxalqAd,
-                hesabatNovuId,hesabatMecburiyyetiId,paketXidmet,aktiv),a,"Xidmət yaradıldı.");return "redirect:/parXidmet";}
+    public String xidmetYarat(@RequestParam String kod, @RequestParam String ad, @RequestParam Long qrupId,
+                              @RequestParam Long muhasibatKoduId, @RequestParam Long xidmetTipiId,
+                              @RequestParam(required = false) String beynelxalqKod, @RequestParam(required = false) String beynelxalqAd,
+                              @RequestParam(required = false) Long hesabatNovuId, @RequestParam(required = false) Long hesabatMecburiyyetiId,
+                              @RequestParam(defaultValue = "false") boolean paketXidmet,
+                              @RequestParam(defaultValue = "true") boolean aktiv, HttpSession s, RedirectAttributes a) {
+        flash(repo.xidmetYarat(klinikaId(s), kod, ad, qrupId, muhasibatKoduId, xidmetTipiId, beynelxalqKod, beynelxalqAd,
+                hesabatNovuId, hesabatMecburiyyetiId, paketXidmet, aktiv), a, "Xidmət yaradıldı.");
+        return "redirect:/parXidmet";
+    }
+
     @PostMapping("/parXidmet/yenile")
-    public String xidmetYenile(@RequestParam Long xidmetId,@RequestParam String ad,@RequestParam Long qrupId,@RequestParam Long muhasibatKoduId,@RequestParam Long xidmetTipiId,@RequestParam(required=false)String beynelxalqKod,@RequestParam(required=false)String beynelxalqAd,@RequestParam(required=false)Long hesabatNovuId,@RequestParam(required=false)Long hesabatMecburiyyetiId,@RequestParam(defaultValue="false")boolean paketXidmet,@RequestParam(defaultValue="false")boolean aktiv,RedirectAttributes a){flash(repo.xidmetYenile(xidmetId,ad,qrupId,muhasibatKoduId,xidmetTipiId,beynelxalqKod,beynelxalqAd,hesabatNovuId,hesabatMecburiyyetiId,paketXidmet,aktiv),a,"Xidmət yeniləndi.");return "redirect:/parXidmet";}
+    public String xidmetYenile(@RequestParam Long xidmetId, @RequestParam String ad, @RequestParam Long qrupId, @RequestParam Long muhasibatKoduId, @RequestParam Long xidmetTipiId, @RequestParam(required = false) String beynelxalqKod, @RequestParam(required = false) String beynelxalqAd, @RequestParam(required = false) Long hesabatNovuId, @RequestParam(required = false) Long hesabatMecburiyyetiId, @RequestParam(defaultValue = "false") boolean paketXidmet, @RequestParam(defaultValue = "false") boolean aktiv, RedirectAttributes a) {
+        flash(repo.xidmetYenile(xidmetId, ad, qrupId, muhasibatKoduId, xidmetTipiId, beynelxalqKod, beynelxalqAd, hesabatNovuId, hesabatMecburiyyetiId, paketXidmet, aktiv), a, "Xidmət yeniləndi.");
+        return "redirect:/parXidmet";
+    }
 
     @GetMapping("/parXidmet/paket-terkibi")
     @ResponseBody
-    public Map<String,Object> paketTerkibi(@RequestParam Long paketXidmetId,
-            @RequestParam(required=false)Long qrupId,@RequestParam(required=false)String q,
-            @RequestParam(defaultValue="0")int page,HttpSession session){
-        int safePage=Math.max(0,page);int size=30;
-        var candidates=repo.paketUcunAxtar(klinikaId(session),paketXidmetId,qrupId,q,size+1,safePage*size);
-        boolean hasMore=candidates.size()>size;
-        return Map.of("terkib",repo.paketXidmetleri(paketXidmetId),
-                "xidmetler",hasMore?candidates.subList(0,size):candidates,"hasMore",hasMore,"page",safePage);
+    public Map<String, Object> paketTerkibi(@RequestParam Long paketXidmetId,
+                                            @RequestParam(required = false) Long qrupId, @RequestParam(required = false) String q,
+                                            @RequestParam(defaultValue = "0") int page, HttpSession session) {
+        int safePage = Math.max(0, page);
+        int size = 30;
+        var candidates = repo.paketUcunAxtar(klinikaId(session), paketXidmetId, qrupId, q, size + 1, safePage * size);
+        boolean hasMore = candidates.size() > size;
+        return Map.of("terkib", repo.paketXidmetleri(paketXidmetId),
+                "xidmetler", hasMore ? candidates.subList(0, size) : candidates, "hasMore", hasMore, "page", safePage);
     }
 
     @PostMapping("/parXidmet/paket-terkibi")
-    public String paketTerkibiniSaxla(@RequestParam Long paketXidmetId,@RequestParam String xidmetlerJson,
-            @AuthenticationPrincipal AuthenticatedPersonal personal,RedirectAttributes a){
-        if(xidmetlerJson.length()>1_000_000||!xidmetlerJson.trim().startsWith("[")||!xidmetlerJson.trim().endsWith("]")){
-            a.addFlashAttribute("errorMessage",msg("services.paket_terkibi_duzgun_deyil"));
-        }else{
-            flash(repo.paketXidmetleriniSaxla(paketXidmetId,xidmetlerJson,personal.personalId()),a,
+    public String paketTerkibiniSaxla(@RequestParam Long paketXidmetId, @RequestParam String xidmetlerJson,
+                                      @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
+        if (xidmetlerJson.length() > 1_000_000 || !xidmetlerJson.trim().startsWith("[") || !xidmetlerJson.trim().endsWith("]")) {
+            a.addFlashAttribute("errorMessage", msg("services.paket_terkibi_duzgun_deyil"));
+        } else {
+            flash(repo.paketXidmetleriniSaxla(paketXidmetId, xidmetlerJson, personal.personalId()), a,
                     msg("services.paket_terkibi_yenilendi"));
         }
         return "redirect:/parXidmet";
     }
 
-    private void base(Model m,String title,String active){m.addAttribute("pageTitle",title);m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu",active);}
-    private Long klinikaId(HttpSession s){return (Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);}
-    private void flash(Map<String,Object> result,RedirectAttributes a,String fallback){String status=String.valueOf(result.getOrDefault("status_kodu",""));String message=String.valueOf(result.getOrDefault("mesaj",fallback));a.addFlashAttribute(status.toUpperCase().contains("UGUR")||status.equals("1")?"successMessage":"errorMessage",message);}
-    private boolean contains(String value,String query){return value!=null&&value.toLowerCase(Locale.forLanguageTag("az")).contains(query);}
-    private boolean hasText(String value){return value!=null&&!value.isBlank();}
-    private String msg(String key){return messageSource.getMessage(key,null,LocaleContextHolder.getLocale());}
+    private void base(Model m, String title, String active) {
+        m.addAttribute("pageTitle", title);
+        m.addAttribute("activeMenuGroup", "adminPanel");
+        m.addAttribute("activeMenu", active);
+    }
+
+    private Long klinikaId(HttpSession s) {
+        return (Long) s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
+    }
+
+    private void flash(Map<String, Object> result, RedirectAttributes a, String fallback) {
+        String status = String.valueOf(result.getOrDefault("status_kodu", ""));
+        String message = String.valueOf(result.getOrDefault("mesaj", fallback));
+        a.addFlashAttribute(status.toUpperCase().contains("UGUR") || status.equals("1") ? "successMessage" : "errorMessage", message);
+    }
+
+    private boolean contains(String value, String query) {
+        return value != null && value.toLowerCase(Locale.forLanguageTag("az")).contains(query);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private String msg(String key) {
+        return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
+    }
 }
