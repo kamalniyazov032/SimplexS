@@ -72,18 +72,22 @@ public class XidmetRepository {
     }
     public List<Xidmet> availableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query,int limit,int offset){
         String sql="""
-                SELECT f.* FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true) f
+                SELECT f.* FROM public.fn_xidmet_siyahisi(
+                    CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true,
+                    NULL,NULL,NULL,NULL,CAST(:dil AS varchar),NULL,0) f
                 WHERE (CAST(:q AS text) IS NULL OR f.xidmet_adi ILIKE '%'||:q||'%' OR f.xidmet_kodu ILIKE '%'||:q||'%')
                 AND NOT EXISTS (SELECT 1 FROM public.fn_xidmet_sobe_siyahisi(CAST(:sobe AS bigint),true) s WHERE s.xidmet_id=f.xidmet_id)
                 ORDER BY f.xidmet_adi LIMIT :limit OFFSET :offset""";
-        return jdbc.query(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)).addValue("limit",limit).addValue("offset",offset),this::mapXidmet);
+        return jdbc.query(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)).addValue("dil",LocaleContextHolder.getLocale().getLanguage()).addValue("limit",limit).addValue("offset",offset),this::mapXidmet);
     }
     public long countAvailableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query){
         String sql="""
-                SELECT count(*) FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true) f
+                SELECT count(*) FROM public.fn_xidmet_siyahisi(
+                    CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true,
+                    NULL,NULL,NULL,NULL,CAST(:dil AS varchar),NULL,0) f
                 WHERE (CAST(:q AS text) IS NULL OR f.xidmet_adi ILIKE '%'||:q||'%' OR f.xidmet_kodu ILIKE '%'||:q||'%')
                 AND NOT EXISTS (SELECT 1 FROM public.fn_xidmet_sobe_siyahisi(CAST(:sobe AS bigint),true) s WHERE s.xidmet_id=f.xidmet_id)""";
-        Long count=jdbc.queryForObject(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)),Long.class);return count==null?0:count;
+        Long count=jdbc.queryForObject(sql,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("sobe",sobeId).addValue("qrup",qrupId).addValue("q",blank(query)).addValue("dil",LocaleContextHolder.getLocale().getLanguage()),Long.class);return count==null?0:count;
     }
     public List<XidmetOption> muhasibatKodlari(Long klinikaId){return options("SELECT muhasibat_kodu_id id,tip_kodu kod,ad FROM public.fn_muhasibat_kodu_siyahisi(CAST("+klinikaId+" AS bigint),true)");}
     public List<XidmetOption> xidmetTipleri(){return options("SELECT xidmet_tipi_id id,xidmet_tipi_kodu kod,xidmet_tipi_adi ad FROM public.fn_xidmet_tipi_siyahisi()");}
