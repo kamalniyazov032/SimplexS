@@ -84,25 +84,42 @@ public class QiymetRepository {
     }
 
     public List<QiymetXidmeti> xidmetler(Long cedvelId, Long xidmetQrupuId, String query, String status,
-            int limit, int offset) {
+            String hekimQiymetStatus, Long hekimPersonalId, int limit, int offset) {
         String sql = """
-                SELECT * FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
+                SELECT f.*,
+                    COALESCE(f.xeste_pay, qc.xeste_payi) AS effektiv_xeste_pay,
+                    COALESCE(f.qurum_payi, qc.sigorta_payi) AS effektiv_qurum_payi,
+                    COALESCE(f.xeste_endirim, qc.xeste_endirim) AS effektiv_xeste_endirim,
+                    COALESCE(f.qurum_endirim, qc.sigorta_endirim) AS effektiv_qurum_endirim
+                FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
                     p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),
                     p_xidmet_qrupu_id=>CAST(:xidmetQrupu AS bigint),
                     p_alt_qruplar_daxil=>true, p_aktiv=>true) f
+                JOIN public.rn_qiymet_cedveli qc ON qc.id=CAST(:cedvel AS bigint)
                 WHERE (CAST(:axtar AS text) IS NULL OR f.xidmet_adi ILIKE '%%'||CAST(:axtar AS text)||'%%'
                     OR f.xidmet_kodu ILIKE '%%'||CAST(:axtar AS text)||'%%')
                   AND (CAST(:status AS text) IS NULL
                     OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true)
                     OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false))
+                  AND (CAST(:hekim AS bigint) IS NULL OR EXISTS (
+                    SELECT 1 FROM public.rn_hekim_xidmet_qiymetleri hxq
+                    WHERE hxq.qiymet_cedveli_id=CAST(:cedvel AS bigint)
+                      AND hxq.xidmet_id=f.xidmet_id AND hxq.hekim_personal_id=CAST(:hekim AS bigint)
+                      AND hxq.aktiv=true))
+                  AND (CAST(:hekimStatus AS text) IS NULL
+                    OR (CAST(:hekimStatus AS text)='var' AND EXISTS (
+                      SELECT 1 FROM public.rn_hekim_xidmet_qiymetleri hxq
+                      WHERE hxq.qiymet_cedveli_id=CAST(:cedvel AS bigint)
+                        AND hxq.xidmet_id=f.xidmet_id AND hxq.aktiv=true)))
                 ORDER BY f.xidmet_qrupu_adi, f.xidmet_sira_no NULLS LAST, f.xidmet_adi
                 LIMIT :limit OFFSET :offset
                 """;
-        return jdbc.query(sql, filterParams(cedvelId, xidmetQrupuId, query, status)
+        return jdbc.query(sql, filterParams(cedvelId, xidmetQrupuId, query, status, hekimQiymetStatus, hekimPersonalId)
                 .addValue("limit", limit).addValue("offset", offset), (r, n) -> mapXidmet(r));
     }
 
-    public long xidmetSayi(Long cedvelId, Long xidmetQrupuId, String query, String status) {
+    public long xidmetSayi(Long cedvelId, Long xidmetQrupuId, String query, String status,
+            String hekimQiymetStatus, Long hekimPersonalId) {
         return jdbc.queryForObject("""
                 SELECT count(*) FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
                     p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),
@@ -113,7 +130,17 @@ public class QiymetRepository {
                   AND (CAST(:status AS text) IS NULL
                     OR (CAST(:status AS text)='teyin' AND f.qiymet_teyin_edilib=true)
                     OR (CAST(:status AS text)='teyin_deyil' AND f.qiymet_teyin_edilib=false))
-                """, filterParams(cedvelId, xidmetQrupuId, query, status), Long.class);
+                  AND (CAST(:hekim AS bigint) IS NULL OR EXISTS (
+                    SELECT 1 FROM public.rn_hekim_xidmet_qiymetleri hxq
+                    WHERE hxq.qiymet_cedveli_id=CAST(:cedvel AS bigint)
+                      AND hxq.xidmet_id=f.xidmet_id AND hxq.hekim_personal_id=CAST(:hekim AS bigint)
+                      AND hxq.aktiv=true))
+                  AND (CAST(:hekimStatus AS text) IS NULL
+                    OR (CAST(:hekimStatus AS text)='var' AND EXISTS (
+                      SELECT 1 FROM public.rn_hekim_xidmet_qiymetleri hxq
+                      WHERE hxq.qiymet_cedveli_id=CAST(:cedvel AS bigint)
+                        AND hxq.xidmet_id=f.xidmet_id AND hxq.aktiv=true)))
+                """, filterParams(cedvelId, xidmetQrupuId, query, status, hekimQiymetStatus, hekimPersonalId), Long.class);
     }
 
     public Map<String, Object> basliqYarat(Long klinikaId, String ad, String aciqlama, Long personalId) {
@@ -241,17 +268,19 @@ public class QiymetRepository {
         return result;
     }
 
-    private MapSqlParameterSource filterParams(Long cedvel, Long qrup, String axtar, String status) {
+    private MapSqlParameterSource filterParams(Long cedvel, Long qrup, String axtar, String status,
+            String hekimQiymetStatus, Long hekimPersonalId) {
         return new MapSqlParameterSource("cedvel", cedvel).addValue("xidmetQrupu", qrup)
-                .addValue("axtar", blank(axtar)).addValue("status", blank(status));
+                .addValue("axtar", blank(axtar)).addValue("status", blank(status))
+                .addValue("hekimStatus", blank(hekimQiymetStatus)).addValue("hekim", hekimPersonalId);
     }
 
     private QiymetXidmeti mapXidmet(ResultSet r) throws SQLException {
         return new QiymetXidmeti(l(r, "xidmet_id"), r.getString("xidmet_kodu"), r.getString("xidmet_adi"),
                 l(r, "xidmet_qrupu_id"), r.getString("xidmet_qrupu_kodu"), r.getString("xidmet_qrupu_adi"),
                 l(r, "xidmet_tipi_id"), r.getString("xidmet_tipi_kodu"), r.getString("xidmet_tipi_adi"),
-                l(r, "xidmet_qiymeti_id"), r.getBigDecimal("qiymet"), r.getBigDecimal("xeste_pay"),
-                r.getBigDecimal("qurum_payi"), r.getBigDecimal("xeste_endirim"), r.getBigDecimal("qurum_endirim"),
+                l(r, "xidmet_qiymeti_id"), r.getBigDecimal("qiymet"), r.getBigDecimal("effektiv_xeste_pay"),
+                r.getBigDecimal("effektiv_qurum_payi"), r.getBigDecimal("effektiv_xeste_endirim"), r.getBigDecimal("effektiv_qurum_endirim"),
                 r.getObject("edv_aktivdir", Boolean.class), r.getObject("qiymet_aktiv", Boolean.class),
                 r.getObject("qiymet_teyin_edilib", Boolean.class), i(r, "xidmet_sira_no"));
     }

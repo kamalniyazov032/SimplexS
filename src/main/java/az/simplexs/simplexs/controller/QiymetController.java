@@ -81,19 +81,26 @@ public class QiymetController {
             @RequestParam(required = false) Long xidmetQrupuId,
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String qiymetStatus,
+            @RequestParam(required = false) String hekimQiymetStatus,
+            @RequestParam(required = false) Long hekimPersonalId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "100") int size,
             Model model, HttpSession session) {
         Long klinikaId = klinikaId(session);
         var cedvel = repo.cedvel(klinikaId, cedvelId);
-        size = Math.max(20, Math.min(size, 100));
-        long total = repo.xidmetSayi(cedvelId, xidmetQrupuId, q, qiymetStatus);
-        int totalPages = Math.max(1, (int) Math.ceil((double) total / size));
-        page = Math.max(1, Math.min(page, totalPages));
         var hekimler = personalRepo.find(klinikaId).stream()
                 .filter(p -> Boolean.TRUE.equals(p.hekimdir()) && Boolean.TRUE.equals(p.personalAktiv())
                         && Boolean.TRUE.equals(p.klinikaElagesiAktiv()))
                 .toList();
+        Long selectedHekimId = hekimPersonalId;
+        if (selectedHekimId != null && hekimler.stream().noneMatch(h -> h.personalId().equals(selectedHekimId))) {
+            hekimPersonalId = null;
+        }
+        size = Math.max(20, Math.min(size, 100));
+        long total = repo.xidmetSayi(cedvelId, xidmetQrupuId, q, qiymetStatus,
+                hekimQiymetStatus, hekimPersonalId);
+        int totalPages = Math.max(1, (int) Math.ceil((double) total / size));
+        page = Math.max(1, Math.min(page, totalPages));
         var hekimQiymetleri = repo.hekimQiymetleri(cedvelId, null, null);
         var hekimQiymetSaylari = hekimQiymetleri.stream().collect(java.util.stream.Collectors.groupingBy(
                         az.simplexs.simplexs.dto.qiymet.HekimXidmetQiymeti::xidmetId,
@@ -104,15 +111,19 @@ public class QiymetController {
         model.addAttribute("activeMenu", "xidmetQiymetleri");
         model.addAttribute("cedvel", cedvel);
         model.addAttribute("xidmetQruplari", hierarchyOrder(xidmetRepo.qruplar(klinikaId)));
-        model.addAttribute("xidmetler", repo.xidmetler(cedvelId, xidmetQrupuId, q, qiymetStatus, size, (page - 1) * size));
+        model.addAttribute("xidmetler", repo.xidmetler(cedvelId, xidmetQrupuId, q, qiymetStatus,
+                hekimQiymetStatus, hekimPersonalId, size, (page - 1) * size));
         model.addAttribute("hekimQiymetleri", hekimQiymetleri);
         model.addAttribute("hekimQiymetSaylari", hekimQiymetSaylari);
         model.addAttribute("hekimler", hekimler);
         model.addAttribute("selectedXidmetQrupuId", xidmetQrupuId);
         model.addAttribute("q", q);
         model.addAttribute("qiymetStatus", qiymetStatus);
+        model.addAttribute("hekimQiymetStatus", hekimQiymetStatus);
+        model.addAttribute("selectedHekimPersonalId", hekimPersonalId);
         model.addAttribute("filterApplied", xidmetQrupuId != null
-                || (q != null && !q.isBlank()) || (qiymetStatus != null && !qiymetStatus.isBlank()));
+                || (q != null && !q.isBlank()) || (qiymetStatus != null && !qiymetStatus.isBlank())
+                || (hekimQiymetStatus != null && !hekimQiymetStatus.isBlank()) || hekimPersonalId != null);
         model.addAttribute("totalCount", total);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
