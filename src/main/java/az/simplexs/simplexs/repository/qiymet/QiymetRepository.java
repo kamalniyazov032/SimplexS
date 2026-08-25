@@ -182,6 +182,49 @@ public class QiymetRepository {
                         .addValue("se", sigortaEndirim).addValue("personal", personalId));
     }
 
+    @Transactional
+    public Map<String, Object> cedvelYaratVeKlonla(Long klinikaId, Long qrupId, LocalDate baslamaTarixi,
+            LocalDate bitmeTarixi, BigDecimal xestePayi, BigDecimal xesteEndirim,
+            BigDecimal sigortaEndirim, Long menbeCedvelId, Long personalId) {
+        if (menbeCedvelId != null) {
+            Boolean menbeUygundur = jdbc.queryForObject("""
+                    SELECT EXISTS(SELECT 1 FROM public.rn_qiymet_cedveli
+                        WHERE id=CAST(:menbe AS bigint) AND klinika_id=CAST(:klinika AS bigint))
+                    """, new MapSqlParameterSource("menbe", menbeCedvelId).addValue("klinika", klinikaId),
+                    Boolean.class);
+            if (!Boolean.TRUE.equals(menbeUygundur)) {
+                return Map.of("status_kodu", "MENBE_CEDVEL_UYGUN_DEYIL",
+                        "mesaj", "Klonlanacaq qiymət cədvəli seçilmiş klinikaya aid deyil");
+            }
+        }
+
+        Map<String, Object> yaradildi = cedvelYarat(klinikaId, qrupId, baslamaTarixi, bitmeTarixi,
+                xestePayi, xesteEndirim, sigortaEndirim, personalId);
+        if (!successful(yaradildi) || menbeCedvelId == null) return yaradildi;
+
+        Object idValue = yaradildi.get("qiymet_cedveli_id");
+        if (!(idValue instanceof Number number)) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return Map.of("status_kodu", "SISTEM_XETASI", "mesaj", "Yeni qiymət cədvəlinin ID-si alınmadı");
+        }
+        String qiymetlerJson = jdbc.queryForObject("""
+                SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                    'xidmet_id', xidmet_id, 'qiymet', qiymet,
+                    'edv_aktivdir', COALESCE(edv_aktivdir,false))), '[]'::jsonb)::text
+                FROM public.fn_xidmet_qiymet_siyahisi(CAST(:menbe AS bigint),CAST(NULL AS boolean))
+                WHERE qiymet IS NOT NULL
+                """, new MapSqlParameterSource("menbe", menbeCedvelId), String.class);
+        if (qiymetlerJson == null || "[]".equals(qiymetlerJson)) return yaradildi;
+
+        Map<String, Object> klonlandi = qiymetleriSaxla(number.longValue(), qiymetlerJson, personalId);
+        if (!successful(klonlandi)) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return klonlandi;
+        }
+        return Map.of("status_kodu", "UGURLU", "qiymet_cedveli_id", number.longValue(),
+                "mesaj", "Qiymət cədvəli yaradıldı və xidmət qiymətləri klonlandı");
+    }
+
     public Map<String, Object> cedvelYenile(Long id, LocalDate baslamaTarixi, LocalDate bitmeTarixi,
             BigDecimal xestePayi, BigDecimal xesteEndirim, BigDecimal sigortaEndirim,
             boolean aktiv, Long personalId) {
@@ -297,6 +340,11 @@ public class QiymetRepository {
 
     private static String blank(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private static boolean successful(Map<String, Object> result) {
+        String status = String.valueOf(result.getOrDefault("status_kodu", ""));
+        return status.toUpperCase().contains("UGUR") || "1".equals(status);
     }
 
     private static Long l(ResultSet r, String column) throws SQLException {

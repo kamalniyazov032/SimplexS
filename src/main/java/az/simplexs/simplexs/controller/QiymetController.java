@@ -63,6 +63,7 @@ public class QiymetController {
         model.addAttribute("basliqlar", basliqlar);
         model.addAttribute("qruplar", qruplar);
         model.addAttribute("cedveller", cedveller);
+        model.addAttribute("klonCedveller", repo.cedveller(klinikaId, null, null, null));
         model.addAttribute("selectedBasliqId", basliqId);
         model.addAttribute("selectedQrupId", qrupId);
         model.addAttribute("selectedBasliq", basliqlar.stream().filter(x -> x.id().equals(selectedBasliqId)).findFirst().orElse(null));
@@ -204,9 +205,11 @@ public class QiymetController {
             @RequestParam(required = false) BigDecimal xestePayi,
             @RequestParam(required = false) BigDecimal xesteEndirimi,
             @RequestParam(required = false) BigDecimal sigortaEndirimi,
+            @RequestParam(required = false) Long menbeCedvelId,
             HttpSession session, @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
-        flash(repo.cedvelYarat(klinikaId(session), qrupId, baslamaTarixi, bitmeTarixi, xestePayi,
-                xesteEndirimi, sigortaEndirimi, personal.personalId()), a, "Qiymət cədvəli yaradıldı.");
+        flash(repo.cedvelYaratVeKlonla(klinikaId(session), qrupId, baslamaTarixi, bitmeTarixi, xestePayi,
+                xesteEndirimi, sigortaEndirimi, menbeCedvelId, personal.personalId()), a,
+                menbeCedvelId == null ? "Qiymət cədvəli yaradıldı." : "Qiymət cədvəli klonlanaraq yaradıldı.");
         return redirect(basliqId, qrupId);
     }
 
