@@ -205,7 +205,7 @@ public class QiymetController {
             @RequestParam(required = false) BigDecimal xestePayi,
             @RequestParam(required = false) BigDecimal xesteEndirimi,
             @RequestParam(required = false) BigDecimal sigortaEndirimi,
-            @RequestParam(required = false) Long menbeCedvelId,
+            @RequestParam Long menbeCedvelId,
             HttpSession session, @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
         flash(repo.cedvelYaratVeKlonla(klinikaId(session), qrupId, baslamaTarixi, bitmeTarixi, xestePayi,
                 xesteEndirimi, sigortaEndirimi, menbeCedvelId, personal.personalId()), a,
