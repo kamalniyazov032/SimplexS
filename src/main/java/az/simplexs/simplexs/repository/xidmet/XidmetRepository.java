@@ -39,6 +39,37 @@ public class XidmetRepository {
                 """,new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("qrup",qrupId).addValue("aktiv",aktiv).addValue("alt",true).addValue("dil",LocaleContextHolder.getLocale().getLanguage()),
                 (r,n)->new Xidmet(l(r,"xidmet_id"),r.getString("xidmet_kodu"),r.getString("lokallasdirilmis_xidmet_adi"),l(r,"xidmet_qrupu_id"),r.getString("xidmet_qrupu_kodu"),r.getString("xidmet_qrupu_adi"),l(r,"muhasibat_kodu_id"),r.getString("muhasibat_kodu_adi"),l(r,"xidmet_tipi_id"),r.getString("xidmet_tipi_kodu"),r.getString("xidmet_tipi_adi"),r.getString("beynelxalq_kod"),r.getString("beynelxalq_ad"),l(r,"hesabat_novu_id"),r.getString("hesabat_novu_kodu"),r.getString("hesabat_novu_adi"),l(r,"hesabat_mecburiyyeti_id"),r.getString("hesabat_mecburiyyeti_kodu"),r.getString("hesabat_mecburiyyeti_adi"),r.getObject("paket_xidmet",Boolean.class),r.getObject("aktiv",Boolean.class),r.getObject("yaranma_tarixi",java.time.LocalDateTime.class)));
     }
+    public List<Xidmet> xidmetlerPage(Long klinikaId,Long qrupId,Boolean aktiv,Long xidmetTipiId,
+            Long muhasibatKoduId,String paketStatusu,String query,int limit,int offset) {
+        String sql="""
+                SELECT * FROM public.fn_xidmet_siyahisi(
+                    CAST(:klinika AS bigint),CAST(:qrup AS bigint),CAST(:aktiv AS boolean),true,
+                    CAST(:tip AS bigint),CAST(:muh AS bigint),CAST(:paket AS boolean),CAST(:q AS text),
+                    CAST(:dil AS varchar),CAST(:limit AS integer),CAST(:offset AS integer))
+                """;
+        return jdbc.query(sql,xidmetFilterParams(klinikaId,qrupId,aktiv,xidmetTipiId,muhasibatKoduId,
+                paketStatusu,query).addValue("limit",limit).addValue("offset",offset),this::mapXidmet);
+    }
+    public long countXidmetler(Long klinikaId,Long qrupId,Boolean aktiv,Long xidmetTipiId,
+            Long muhasibatKoduId,String paketStatusu,String query) {
+        String sql="""
+                SELECT count(*) FROM public.fn_xidmet_siyahisi(
+                    CAST(:klinika AS bigint),CAST(:qrup AS bigint),CAST(:aktiv AS boolean),true,
+                    CAST(:tip AS bigint),CAST(:muh AS bigint),CAST(:paket AS boolean),CAST(:q AS text),
+                    CAST(:dil AS varchar),NULL,0)
+                """;
+        Long count=jdbc.queryForObject(sql,xidmetFilterParams(klinikaId,qrupId,aktiv,xidmetTipiId,
+                muhasibatKoduId,paketStatusu,query),Long.class);
+        return count==null?0:count;
+    }
+    private MapSqlParameterSource xidmetFilterParams(Long klinikaId,Long qrupId,Boolean aktiv,Long xidmetTipiId,
+            Long muhasibatKoduId,String paketStatusu,String query){
+        Boolean paket="paket".equals(paketStatusu)?Boolean.TRUE:
+                "adi".equals(paketStatusu)?Boolean.FALSE:null;
+        return new MapSqlParameterSource("klinika",klinikaId).addValue("qrup",qrupId).addValue("aktiv",aktiv)
+                .addValue("tip",xidmetTipiId).addValue("muh",muhasibatKoduId).addValue("paket",paket)
+                .addValue("q",blank(query)).addValue("dil",LocaleContextHolder.getLocale().getLanguage());
+    }
     public List<Xidmet> availableForDepartment(Long klinikaId,Long sobeId,Long qrupId,String query,int limit,int offset){
         String sql="""
                 SELECT f.* FROM public.fn_xidmet_siyahisi(CAST(:klinika AS bigint),CAST(:qrup AS bigint),true,true) f

@@ -13,7 +13,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import az.simplexs.simplexs.dto.xidmet.Xidmet;
 import az.simplexs.simplexs.repository.xidmet.XidmetRepository;
 import az.simplexs.simplexs.security.AuthenticatedPersonal;
 import jakarta.servlet.http.HttpSession;
@@ -73,18 +72,19 @@ public class XidmetController {
             @RequestParam(required=false)Long muhasibatKoduId,
             @RequestParam(required=false)String status,
             @RequestParam(required=false)String paketStatusu,
-            @RequestParam(required=false)String q,Model m,HttpSession session){
+            @RequestParam(required=false)String q,@RequestParam(defaultValue="0")int page,Model m,HttpSession session){
+        final int pageSize=100;
+        page=Math.max(0,page);
         String selectedStatus=status==null?"aktiv":status;
         base(m,"Xidmətlər","xidmetler");
         Boolean aktivFilter=selectedStatus.isBlank()?null:"aktiv".equals(selectedStatus);
-        Long kid=klinikaId(session);var qruplar=hierarchyOrder(repo.qruplar(kid));var all=repo.xidmetler(kid,qrupId,aktivFilter);
-        var filtered=all.stream()
-                .filter(x->xidmetTipiId==null||xidmetTipiId.equals(x.tipId()))
-                .filter(x->muhasibatKoduId==null||muhasibatKoduId.equals(x.muhasibatKoduId()))
-                .filter(x->selectedStatus.isBlank()||("aktiv".equals(selectedStatus)==Boolean.TRUE.equals(x.aktiv())))
-                .filter(x->!hasText(paketStatusu)||("paket".equals(paketStatusu)==Boolean.TRUE.equals(x.paketXidmet())))
-                .filter(x->matches(x,q)).toList();
-        m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",filtered.size());
+        Long kid=klinikaId(session);var qruplar=hierarchyOrder(repo.qruplar(kid));
+        long xidmetCount=repo.countXidmetler(kid,qrupId,aktivFilter,xidmetTipiId,muhasibatKoduId,paketStatusu,q);
+        int totalPages=(int)Math.ceil(xidmetCount/(double)pageSize);
+        if(page>0&&page>=totalPages)page=Math.max(0,totalPages-1);
+        var filtered=repo.xidmetlerPage(kid,qrupId,aktivFilter,xidmetTipiId,muhasibatKoduId,paketStatusu,q,pageSize,page*pageSize);
+        m.addAttribute("xidmetler",filtered);m.addAttribute("xidmetCount",xidmetCount);
+        m.addAttribute("page",page);m.addAttribute("totalPages",totalPages);
         m.addAttribute("filterApplied",xidmetTipiId!=null||muhasibatKoduId!=null||!"aktiv".equals(selectedStatus)||hasText(paketStatusu)||hasText(q));
         m.addAttribute("qruplar",qruplar);m.addAttribute("selectedQrupId",qrupId);
         m.addAttribute("selectedQrup",qruplar.stream().filter(x->x.id().equals(qrupId)).findFirst().orElse(null));
@@ -133,7 +133,6 @@ public class XidmetController {
     private void base(Model m,String title,String active){m.addAttribute("pageTitle",title);m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu",active);}
     private Long klinikaId(HttpSession s){return (Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);}
     private void flash(Map<String,Object> result,RedirectAttributes a,String fallback){String status=String.valueOf(result.getOrDefault("status_kodu",""));String message=String.valueOf(result.getOrDefault("mesaj",fallback));a.addFlashAttribute(status.toUpperCase().contains("UGUR")||status.equals("1")?"successMessage":"errorMessage",message);}
-    private boolean matches(Xidmet x,String query){if(!hasText(query))return true;String n=query.trim().toLowerCase(Locale.forLanguageTag("az"));return contains(x.kod(),n)||contains(x.ad(),n)||contains(x.beynelxalqKod(),n)||contains(x.beynelxalqAd(),n);}
     private boolean contains(String value,String query){return value!=null&&value.toLowerCase(Locale.forLanguageTag("az")).contains(query);}
     private boolean hasText(String value){return value!=null&&!value.isBlank();}
     private String msg(String key){return messageSource.getMessage(key,null,LocaleContextHolder.getLocale());}

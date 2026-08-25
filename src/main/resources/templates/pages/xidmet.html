@@ -32,7 +32,7 @@
     <div class="col-xl-3 col-lg-4">
         <div class="card border-0 shadow-sm service-group-panel">
             <div class="card-header bg-white"><h6 class="mb-1"><i class="ti ti-hierarchy-2 text-primary me-2"></i><span th:text="#{services.groups}">Xidmət qrupları</span></h6><small class="text-muted" th:text="#{services.groupHint}">Siyahını qrupa görə seçin</small></div>
-            <div class="list-group list-group-flush py-2">
+            <div class="list-group list-group-flush py-2 service-group-scroll">
                 <a class="list-group-item list-group-item-action border-0 d-flex align-items-center gap-2 mx-2 rounded"
                    th:classappend="${selectedQrupId == null} ? ' active' : ''"
                    th:href="@{/parXidmet(q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu})}">
@@ -62,10 +62,21 @@
     <div class="col-xl-9 col-lg-8">
     <div class="card border-0 shadow-sm">
         <div class="card-header d-flex align-items-center justify-content-between gap-3"><div><h5 class="mb-1" th:text="${selectedQrup != null ? selectedQrup.ad : #messages.msg('services.all')}">Xidmət siyahısı</h5><small class="text-muted" th:text="#{services.count(${xidmetCount})}"></small></div><a th:if="${filterApplied}" class="btn btn-sm btn-light" th:href="@{/parXidmet(qrupId=${selectedQrupId})}"><i class="ti ti-x me-1"></i><span th:text="#{common.clear}">Təmizlə</span></a></div>
-        <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3" th:text="#{services.kod}">Kod</th><th th:text="#{services.xidmet}">Xidmət</th><th th:text="#{services.qrup}">Qrup</th><th th:text="#{services.tip}">Tip</th><th th:text="#{services.muhasibat}">Mühasibat</th><th th:text="#{services.hesabat}">Hesabat</th><th th:text="#{services.status}">Status</th><th></th></tr></thead><tbody>
+        <div class="card-body p-0"><div class="table-responsive service-table-scroll"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3" th:text="#{services.kod}">Kod</th><th th:text="#{services.xidmet}">Xidmət</th><th th:text="#{services.qrup}">Qrup</th><th th:text="#{services.tip}">Tip</th><th th:text="#{services.muhasibat}">Mühasibat</th><th th:text="#{services.hesabat}">Hesabat</th><th th:text="#{services.status}">Status</th><th></th></tr></thead><tbody>
         <tr th:each="x:${xidmetler}"><td class="ps-3"><span class="badge bg-light text-dark border" th:text="${x.kod}"></span></td><td><div class="d-flex gap-2 align-items-center"><span class="avatar avatar-sm rounded-circle" th:classappend="${x.paketXidmet}?'bg-primary-subtle text-primary':'bg-info-subtle text-info'"><i th:class="${x.paketXidmet}?'ti ti-package':'ti ti-stethoscope'"></i></span><div><div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${x.ad}"></span><span th:if="${x.paketXidmet}" class="badge bg-primary-subtle text-primary" th:text="#{services.paket}">Paket</span></div><small class="text-muted" th:text="${x.beynelxalqKod?:''}"></small></div></div></td><td th:text="${x.qrupAdi}"></td><td><span class="badge bg-primary-subtle text-primary" th:text="${x.tipAdi}"></span></td><td th:text="${x.muhasibatKoduAdi}"></td><td th:text="${x.hesabatNovuAdi?:'—'}"></td><td><span class="badge" th:classappend="${x.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${x.aktiv} ? #{common.aktiv} : #{common.passiv}"></span></td><td class="text-end pe-3"><div class="d-inline-flex gap-1"><button th:if="${x.paketXidmet}" type="button" class="btn btn-sm btn-outline-info js-package-open" data-bs-toggle="modal" data-bs-target="#packageContents" th:data-id="${x.id}" th:data-code="${x.kod}" th:data-name="${x.ad}" th:title="#{services.terkibi_idare_et}"><i class="ti ti-package-import"></i></button><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editX${x.id}|" title="Redaktə et" th:title="#{services.redakte_et}"><i class="ti ti-edit"></i></button></div></td></tr>
         <tr th:if="${#lists.isEmpty(xidmetler)}"><td colspan="8" class="text-center text-muted py-5"><i class="ti ti-medical-cross-off fs-2 d-block mb-2"></i><span th:text="${filterApplied} ? #{services.filter_no_result} : (${selectedQrupId != null} ? #{services.group_no_result} : #{services.no_result})"></span></td></tr>
         </tbody></table></div></div>
+        <div th:if="${totalPages > 1}" class="card-footer bg-white d-flex justify-content-between align-items-center gap-2">
+            <small class="text-muted" th:text="#{services.page_info(${page + 1},${totalPages})}"></small>
+            <div class="btn-group">
+                <a class="btn btn-sm btn-outline-primary" th:classappend="${page == 0} ? ' disabled' : ''"
+                   th:href="@{/parXidmet(qrupId=${selectedQrupId},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu},page=${page - 1})}"
+                   th:text="#{common.evvelki}">Əvvəlki</a>
+                <a class="btn btn-sm btn-outline-primary" th:classappend="${page + 1 >= totalPages} ? ' disabled' : ''"
+                   th:href="@{/parXidmet(qrupId=${selectedQrupId},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu},page=${page + 1})}"
+                   th:text="#{common.novbeti}">Növbəti</a>
+            </div>
+        </div>
     </div>
     </div>
     </div>
@@ -130,6 +141,9 @@
         .service-group-link{display:flex;align-items:center;gap:.5rem;flex:1;min-width:0;padding:.5rem .5rem .5rem 0;color:inherit;text-decoration:none}
         .service-group-link:hover{color:inherit}
         .service-group-select{min-height:44px;font-weight:500}.service-group-select option{font-weight:500;padding-block:6px}
+        .service-group-scroll{max-height:var(--service-group-height,calc(100vh - 260px));overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
+        .service-table-scroll{max-height:var(--service-table-height,calc(100vh - 330px));overflow:auto;overscroll-behavior:contain}
+        .service-table-scroll thead th{position:sticky;top:0;z-index:2;background:var(--bs-tertiary-bg);box-shadow:inset 0 -1px var(--bs-border-color)}
         .package-list{min-height:340px;max-height:420px;overflow:auto}
         .package-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid var(--bs-border-color)}
         .package-item:last-child{border-bottom:0}
@@ -138,6 +152,24 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const tableScroll = document.querySelector('.service-table-scroll');
+            const groupScroll = document.querySelector('.service-group-scroll');
+            if (tableScroll || groupScroll) {
+                const fitListsToViewport = () => {
+                    if (groupScroll) {
+                        const available = window.innerHeight - groupScroll.getBoundingClientRect().top - 20;
+                        groupScroll.style.setProperty('--service-group-height', `${Math.max(280, available)}px`);
+                    }
+                    if (!tableScroll) return;
+                    const footer = tableScroll.closest('.card')?.querySelector('.card-footer');
+                    const available = window.innerHeight - tableScroll.getBoundingClientRect().top
+                        - (footer?.offsetHeight || 0) - 20;
+                    tableScroll.style.setProperty('--service-table-height', `${Math.max(280, available)}px`);
+                };
+                fitListsToViewport();
+                window.addEventListener('resize', fitListsToViewport, { passive: true });
+            }
+
             const nodes = [...document.querySelectorAll('.service-group-node')];
             const byId = new Map(nodes.map(node => [node.dataset.groupId, node]));
             const storageKey = 'simplexs.serviceGroups.expanded';
