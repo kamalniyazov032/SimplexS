@@ -11,6 +11,8 @@ import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import az.simplexs.simplexs.dto.qiymet.HekimXidmetQiymeti;
 import az.simplexs.simplexs.dto.qiymet.QiymetBasligi;
@@ -184,8 +186,41 @@ public class QiymetRepository {
                         .addValue("aktiv", aktiv).addValue("personal", personalId));
     }
 
+    @Transactional
+    public Map<String, Object> hekimQiymetleriniTopluSaxla(Long klinikaId, Long cedvelId, Long xidmetId,
+            List<Long> hekimIds, BigDecimal qiymet, boolean aktiv, Long personalId) {
+        if (hekimIds == null || hekimIds.isEmpty()) {
+            return Map.of("status_kodu", "HEKIM_SECILMEYIB", "mesaj", "Ən azı bir həkim seçilməlidir");
+        }
+        Map<String, Object> last = Map.of();
+        for (Long hekimId : hekimIds.stream().distinct().toList()) {
+            last = hekimQiymetiSaxla(klinikaId, cedvelId, xidmetId, hekimId, qiymet, aktiv, personalId);
+            String status = String.valueOf(last.getOrDefault("status_kodu", ""));
+            if (!status.toUpperCase().contains("UGUR") && !"1".equals(status)) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return last;
+            }
+        }
+        return last;
+    }
+
     public List<HekimXidmetQiymeti> hekimQiymetleri(Long cedvelId, Long xidmetId, Boolean aktiv) {
-        return jdbc.query("SELECT * FROM public.fn_hekim_xidmet_qiymet_siyahisi(p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),p_xidmet_id=>CAST(:xidmet AS bigint),p_aktiv=>CAST(:aktiv AS boolean))",
+        return jdbc.query("""
+                SELECT hxq.id hekim_xidmet_qiymeti_id,hxq.qiymet_cedveli_id,hxq.xidmet_id,
+                       x.kod xidmet_kodu,x.ad xidmet_adi,p.id hekim_personal_id,p.kod hekim_kodu,
+                       concat_ws(' ',p.ad,p.soyad)::varchar hekim_ad_soyad,xqi.qiymet umumi_qiymet,
+                       hxq.qiymet hekim_qiymeti,hxq.aktiv,hxq.yaranma_tarixi,hxq.yaradan_personal_id,
+                       hxq.yenilenme_tarixi,hxq.yenileyen_personal_id
+                FROM public.rn_hekim_xidmet_qiymetleri hxq
+                JOIN public.rn_xidmetler x ON x.id=hxq.xidmet_id
+                JOIN public.rn_personallar p ON p.id=hxq.hekim_personal_id
+                LEFT JOIN public.rn_xidmet_qiymetleri xqi
+                  ON xqi.qiymet_cedveli_id=hxq.qiymet_cedveli_id AND xqi.xidmet_id=hxq.xidmet_id
+                WHERE hxq.qiymet_cedveli_id=CAST(:cedvel AS bigint)
+                  AND (CAST(:xidmet AS bigint) IS NULL OR hxq.xidmet_id=CAST(:xidmet AS bigint))
+                  AND (CAST(:aktiv AS boolean) IS NULL OR hxq.aktiv=CAST(:aktiv AS boolean))
+                ORDER BY x.ad,p.ad,p.soyad,p.kod
+                """,
                 new MapSqlParameterSource("cedvel", cedvelId).addValue("xidmet", xidmetId).addValue("aktiv", aktiv),
                 (r, n) -> new HekimXidmetQiymeti(l(r, "hekim_xidmet_qiymeti_id"), l(r, "qiymet_cedveli_id"),
                         l(r, "xidmet_id"), r.getString("xidmet_kodu"), r.getString("xidmet_adi"),

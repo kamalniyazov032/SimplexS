@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import az.simplexs.simplexs.repository.personal.PersonalRepository;
 import az.simplexs.simplexs.repository.qiymet.QiymetRepository;
-import az.simplexs.simplexs.repository.rol.RolRepository;
 import az.simplexs.simplexs.repository.teskilat.TeskilatRepository;
 import az.simplexs.simplexs.repository.xidmet.XidmetRepository;
 import az.simplexs.simplexs.security.AuthenticatedPersonal;
@@ -28,15 +31,13 @@ public class QiymetController {
     private final QiymetRepository repo;
     private final XidmetRepository xidmetRepo;
     private final TeskilatRepository teskilatRepo;
-    private final RolRepository rolRepo;
     private final PersonalRepository personalRepo;
 
     public QiymetController(QiymetRepository repo, XidmetRepository xidmetRepo,
-            TeskilatRepository teskilatRepo, RolRepository rolRepo, PersonalRepository personalRepo) {
+            TeskilatRepository teskilatRepo, PersonalRepository personalRepo) {
         this.repo = repo;
         this.xidmetRepo = xidmetRepo;
         this.teskilatRepo = teskilatRepo;
-        this.rolRepo = rolRepo;
         this.personalRepo = personalRepo;
     }
 
@@ -80,7 +81,6 @@ public class QiymetController {
             @RequestParam(required = false) Long xidmetQrupuId,
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String qiymetStatus,
-            @RequestParam(required = false) Long hekimRolId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "100") int size,
             Model model, HttpSession session) {
@@ -90,26 +90,64 @@ public class QiymetController {
         long total = repo.xidmetSayi(cedvelId, xidmetQrupuId, q, qiymetStatus);
         int totalPages = Math.max(1, (int) Math.ceil((double) total / size));
         page = Math.max(1, Math.min(page, totalPages));
-        var rollar = rolRepo.findAll(klinikaId).stream().filter(r -> Boolean.TRUE.equals(r.aktiv())).toList();
+        var hekimler = personalRepo.find(klinikaId).stream()
+                .filter(p -> Boolean.TRUE.equals(p.hekimdir()) && Boolean.TRUE.equals(p.personalAktiv())
+                        && Boolean.TRUE.equals(p.klinikaElagesiAktiv()))
+                .toList();
+        var hekimQiymetleri = repo.hekimQiymetleri(cedvelId, null, null);
+        var hekimQiymetSaylari = hekimQiymetleri.stream().collect(java.util.stream.Collectors.groupingBy(
+                        az.simplexs.simplexs.dto.qiymet.HekimXidmetQiymeti::xidmetId,
+                        java.util.stream.Collectors.counting()));
 
         model.addAttribute("pageTitle", cedvel.qrupAdi());
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "xidmetQiymetleri");
         model.addAttribute("cedvel", cedvel);
-        model.addAttribute("xidmetQruplari", xidmetRepo.qruplar(klinikaId));
+        model.addAttribute("xidmetQruplari", hierarchyOrder(xidmetRepo.qruplar(klinikaId)));
         model.addAttribute("xidmetler", repo.xidmetler(cedvelId, xidmetQrupuId, q, qiymetStatus, size, (page - 1) * size));
-        model.addAttribute("hekimQiymetleri", repo.hekimQiymetleri(cedvelId, null, null));
-        model.addAttribute("rollar", rollar);
-        model.addAttribute("hekimRolId", hekimRolId);
-        model.addAttribute("hekimler", hekimRolId == null ? List.of() : personalRepo.findByRole(hekimRolId, true));
+        model.addAttribute("hekimQiymetleri", hekimQiymetleri);
+        model.addAttribute("hekimQiymetSaylari", hekimQiymetSaylari);
+        model.addAttribute("hekimler", hekimler);
         model.addAttribute("selectedXidmetQrupuId", xidmetQrupuId);
         model.addAttribute("q", q);
         model.addAttribute("qiymetStatus", qiymetStatus);
+        model.addAttribute("filterApplied", xidmetQrupuId != null
+                || (q != null && !q.isBlank()) || (qiymetStatus != null && !qiymetStatus.isBlank()));
         model.addAttribute("totalCount", total);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", size);
         return "pages/xidmetQiymetTarifleri";
+    }
+
+    private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(
+            List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups) {
+        Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order = Comparator
+                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo,
+                        Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad,
+                        String.CASE_INSENSITIVE_ORDER);
+        var children = new HashMap<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
+        var ids = new HashSet<Long>();
+        groups.forEach(group -> ids.add(group.id()));
+        groups.forEach(group -> children.computeIfAbsent(group.parentId(), ignored -> new ArrayList<>()).add(group));
+        children.values().forEach(list -> list.sort(order));
+        var result = new ArrayList<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>();
+        var visited = new HashSet<Long>();
+        groups.stream().filter(group -> group.parentId() == null || !ids.contains(group.parentId()))
+                .sorted(order).forEach(group -> appendGroup(group, children, visited, result));
+        groups.stream().filter(group -> !visited.contains(group.id())).sorted(order)
+                .forEach(group -> appendGroup(group, children, visited, result));
+        return result;
+    }
+
+    private void appendGroup(az.simplexs.simplexs.dto.xidmet.XidmetQrupu group,
+            Map<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>> children, HashSet<Long> visited,
+            List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> result) {
+        if (!visited.add(group.id())) return;
+        result.add(group);
+        children.getOrDefault(group.id(), List.of())
+                .forEach(child -> appendGroup(child, children, visited, result));
     }
 
     @PostMapping("/xidmetQiymetleri/basliq/yeni")
@@ -198,10 +236,10 @@ public class QiymetController {
 
     @PostMapping("/xidmetQiymetleri/hekim-qiymeti")
     public String hekimQiymeti(@RequestParam Long cedvelId, @RequestParam Long xidmetId,
-            @RequestParam Long hekimPersonalId, @RequestParam BigDecimal qiymet,
-            @RequestParam(defaultValue = "true") boolean aktiv, HttpSession session,
+            @RequestParam List<Long> hekimPersonalIds, @RequestParam BigDecimal qiymet,
+            @RequestParam(defaultValue = "false") boolean aktiv, HttpSession session,
             @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
-        flash(repo.hekimQiymetiSaxla(klinikaId(session), cedvelId, xidmetId, hekimPersonalId,
+        flash(repo.hekimQiymetleriniTopluSaxla(klinikaId(session), cedvelId, xidmetId, hekimPersonalIds,
                 qiymet, aktiv, personal.personalId()), a, "Həkimə özəl qiymət yadda saxlanıldı.");
         return tarifRedirect(cedvelId);
     }
