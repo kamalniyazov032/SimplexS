@@ -9,6 +9,7 @@
   <body>
     <div layout:fragment="content">
       <form
+        class="patient-registration-page"
         method="post"
         th:action="${xeste==null?'/xeste-qeydiyyati/yeni':'/xeste-qeydiyyati/yenile'}"
       >
@@ -25,7 +26,7 @@
           th:value="${returnTo}"
         />
         <div
-          class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
+          class="patient-registration-header d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3"
         >
           <div>
             <h4
@@ -50,9 +51,9 @@
           </div>
         </div>
         <div
-          class="card border-0 shadow-sm overflow-hidden patient-registration-form"
+          class="patient-registration-form"
         >
-          <div class="row g-0">
+          <div class="row g-3">
             <section class="col-xl-6 patient-section">
               <h6>
                 <i class="ti ti-user"></i><span>1.</span
@@ -169,7 +170,7 @@
                     th:text="#{patients.document_number}"
                   ></label
                   ><input
-                    class="form-control"
+                    class="form-control text-uppercase"
                     name="vesiqeNomresi"
                     required
                     th:value="${xeste?.vesiqeNomresi}"
@@ -431,7 +432,7 @@
                     th:checked="${xeste.aktiv}" /></span
               ></label>
             </section>
-            <section class="col-12 patient-section">
+            <section class="col-12 patient-section patient-note-section">
               <h6>
                 <i class="ti ti-note"></i><span>7.</span
                 ><span th:text="#{patients.note}"></span>
@@ -467,41 +468,106 @@
         );
       </script>
       <style>
+        .patient-registration-form > .row {
+          align-items: stretch;
+        }
         .patient-registration-form .patient-section {
-          padding: 24px;
-          border-right: 1px solid var(--bs-border-color);
-          border-bottom: 1px solid var(--bs-border-color);
-          min-height: 190px;
-        }
-        .patient-registration-form .patient-section:nth-child(even) {
-          border-right: 0;
-        }
-        .patient-registration-form .patient-section:last-child {
-          border-right: 0;
-          border-bottom: 0;
-          min-height: auto;
+          padding: 18px;
+          background: var(--bs-body-bg);
+          border: 1px solid var(--bs-border-color);
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
         }
         .patient-registration-form h6 {
           display: flex;
           align-items: center;
           gap: 7px;
           font-weight: 700;
-          margin-bottom: 20px;
+          margin-bottom: 14px;
         }
         .patient-registration-form h6 i {
           color: var(--bs-primary);
           font-size: 1.25rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          border-radius: 8px;
+          background: rgba(var(--bs-primary-rgb), 0.1);
         }
         .patient-registration-form .required:after {
           content: " *";
           color: var(--bs-danger);
         }
+        .patient-registration-form .form-label {
+          margin-bottom: 5px;
+          font-size: 0.8125rem;
+          font-weight: 600;
+        }
+        .patient-registration-form .form-control,
+        .patient-registration-form .form-select,
+        .patient-registration-form .select2-container .select2-selection--single {
+          min-height: 36px;
+        }
+
+        @media (min-width: 1200px) and (min-height: 780px) {
+          .patient-registration-page {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - var(--topbar-height) - 3rem);
+          }
+          .patient-registration-header {
+            flex: 0 0 auto;
+          }
+          .patient-registration-form {
+            flex: 1 1 auto;
+            min-height: 0;
+          }
+          .patient-registration-form > .row {
+            display: grid;
+            height: 100%;
+            margin: 0;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-rows:
+              minmax(max-content, 1.08fr)
+              minmax(max-content, 1fr)
+              minmax(max-content, 0.9fr)
+              minmax(118px, max-content);
+            gap: 12px;
+          }
+          .patient-registration-form > .row > .patient-section {
+            width: auto;
+            max-width: none;
+            min-height: 0;
+            margin: 0;
+          }
+          .patient-registration-form > .row > .patient-note-section {
+            grid-column: 1 / -1;
+          }
+          .patient-registration-form .patient-section {
+            padding: 12px 16px;
+          }
+          .patient-registration-form h6 {
+            margin-bottom: 8px;
+          }
+          .patient-registration-form h6 i {
+            width: 30px;
+            height: 30px;
+          }
+          .patient-registration-form .row.g-3 {
+            --bs-gutter-y: 0.6rem;
+            --bs-gutter-x: 1rem;
+          }
+          .patient-registration-form textarea.form-control {
+            height: calc(100% - 47px);
+            min-height: 42px;
+            resize: none;
+          }
+        }
         @media (max-width: 1199.98px) {
           .patient-registration-form .patient-section {
-            border-right: 0;
-          }
-          .patient-registration-form .patient-section:last-child {
-            border-bottom: 0;
+            min-height: auto;
           }
         }
       </style>
