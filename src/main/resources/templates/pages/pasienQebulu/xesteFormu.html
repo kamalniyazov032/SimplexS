@@ -509,6 +509,28 @@
         .patient-registration-form .form-select,
         .patient-registration-form .select2-container .select2-selection--single {
           min-height: 36px;
+          border-color: color-mix(
+            in srgb,
+            var(--bs-border-color) 68%,
+            var(--bs-body-color)
+          );
+          color: var(--bs-body-color);
+          font-weight: 500;
+        }
+        .patient-registration-form .form-control::placeholder {
+          color: color-mix(
+            in srgb,
+            var(--bs-secondary-color) 75%,
+            var(--bs-body-color)
+          );
+          opacity: 1;
+        }
+        .patient-registration-form
+          .select2-container
+          .select2-selection--single
+          .select2-selection__rendered {
+          color: var(--bs-body-color);
+          font-weight: 500;
         }
 
         @media (min-width: 1200px) and (min-height: 780px) {
