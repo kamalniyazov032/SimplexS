@@ -511,16 +511,20 @@
           min-height: 36px;
           border-color: color-mix(
             in srgb,
-            var(--bs-border-color) 68%,
+            var(--bs-border-color) 82%,
             var(--bs-body-color)
           );
-          color: var(--bs-body-color);
-          font-weight: 500;
+          color: color-mix(
+            in srgb,
+            var(--bs-secondary-color) 75%,
+            var(--bs-body-color)
+          );
+          font-weight: 400;
         }
         .patient-registration-form .form-control::placeholder {
           color: color-mix(
             in srgb,
-            var(--bs-secondary-color) 75%,
+            var(--bs-secondary-color) 90%,
             var(--bs-body-color)
           );
           opacity: 1;
@@ -529,8 +533,12 @@
           .select2-container
           .select2-selection--single
           .select2-selection__rendered {
-          color: var(--bs-body-color);
-          font-weight: 500;
+          color: color-mix(
+            in srgb,
+            var(--bs-secondary-color) 75%,
+            var(--bs-body-color)
+          );
+          font-weight: 400;
         }
 
         @media (min-width: 1200px) and (min-height: 780px) {
