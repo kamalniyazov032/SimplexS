@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const money = value => `${Number(value || 0).toFixed(2)} ${tr.currency}`;
   const doctorName = h => [h.hekim_kodu, h.hekim_ad, h.hekim_soyad, h.hekim_ata_adi].filter(Boolean).join(' ');
   const option = (value, label) => { const o = document.createElement('option'); o.value = value ?? ''; o.textContent = label; return o; };
-  const newService = row => ({ id: Number(row.id), kod: text(row.kod), ad: text(row.ad), qiymet: Number(row.qiymet || 0), miqdar: Number(row.miqdar || 1), gonderenHekimId: Number(referringDoctor.dataset.defaultId) || null, sobeId: null, sobeAdi: '', isteyenHekimId: null, icraEdenHekimId: null, icraEdenHekimAdi: '', tecili: false, aciqlama: null });
+  const newService = row => ({ id: Number(row.id), kod: text(row.kod), ad: text(row.ad), qiymet: Number(row.qiymet || 0), miqdar: Number(row.miqdar || 1), gonderenHekimId: null, sobeId: null, sobeAdi: '', hekimSecimQaydasiKodu: 'SECIMLI', isteyenHekimId: null, icraEdenHekimId: null, icraEdenHekimAdi: '', tecili: false, aciqlama: null });
   const currentService = () => selected.get(editingId) || (draft && String(draft.id) === editingId ? draft : null);
 
   function showError(message) { alertMessage.textContent = message || tr.loadError; alert.classList.remove('d-none'); }
@@ -104,7 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     syncDetails();
     const department = document.getElementById('serviceDepartment');
     const performing = document.getElementById('performingDoctor');
-    const invalid = [department, performing].find(field => !field.value);
+    const doctorRequired = department.selectedOptions[0]?.dataset.doctorRule === 'MECBURI';
+    const invalid = [department, ...(doctorRequired ? [performing] : [])].find(field => !field.value);
     [department, performing].forEach(field => field.classList.toggle('is-invalid', field === invalid));
     if (invalid) { invalid.focus(); showError(tr.selectionRequired); return; }
     selected.set(id, { ...draft }); draft = null; clearError();
@@ -144,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const department = document.getElementById('serviceDepartment'); department.replaceChildren(option('', tr.select));
     try {
       request?.abort(); request = new AbortController(); const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobeler`);
-      rows.forEach(x => department.append(option(x.sobe_id, x.sobe_adi))); department.value = row.sobeId ?? '';
+      rows.forEach(x => { const departmentOption = option(x.sobe_id, x.sobe_adi); departmentOption.dataset.doctorRule = text(x.hekim_secim_qaydasi_kodu) || 'SECIMLI'; department.append(departmentOption); }); department.value = row.sobeId ?? '';
       if (!rows.length) department.append(option('', tr.noDepartment));
       await loadDoctors();
     } catch (e) { if (e.name !== 'AbortError') department.append(option('', tr.loadError)); }
@@ -157,7 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDoctors() {
     const row = currentService(), department = document.getElementById('serviceDepartment'), doctors = document.getElementById('performingDoctor');
-    doctors.replaceChildren(option('', tr.select)); doctors.disabled = !department.value; if (!department.value || !row) return;
+    const doctorRule = department.selectedOptions[0]?.dataset.doctorRule || 'SECIMLI';
+    doctors.replaceChildren(option('', tr.select)); doctors.disabled = !department.value || doctorRule === 'SECILMIR';
+    if (row) { row.hekimSecimQaydasiKodu = doctorRule; if (doctorRule === 'SECILMIR') { row.icraEdenHekimId = null; row.icraEdenHekimAdi = ''; } }
+    if (!department.value || !row || doctorRule === 'SECILMIR') return;
     try { const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${department.value}/hekimler`); rows.forEach(x => doctors.append(option(x.hekim_id, doctorName(x)))); doctors.value = row.icraEdenHekimId ?? ''; }
     catch (e) { if (e.name !== 'AbortError') doctors.append(option('', tr.loadError)); }
   }
@@ -196,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('serviceDepartment').addEventListener('change', async () => { syncDetails(); await loadDoctors(); syncDetails(); });
   ['referringDoctor','requestingDoctor','performingDoctor','serviceUrgent'].forEach(id => document.getElementById(id).addEventListener('change', syncDetails));
   ['serviceQuantity','serviceNote'].forEach(id => document.getElementById(id).addEventListener('input', syncDetails));
-  document.getElementById('selectedForm').addEventListener('submit', e => { const invalid = [...selected.values()].find(x => !x.sobeId); if (invalid) { e.preventDefault(); openDetails(String(invalid.id)); return; } document.getElementById('servicesJson').value = JSON.stringify([...selected.values()].map(x => ({ xidmet_id: x.id, sobe_id: x.sobeId, hekim_menbe_novu: x.isteyenHekimId ? 'ISTEYEN' : (x.gonderenHekimId ? 'GONDEREN' : null), isteyen_hekim_id: x.isteyenHekimId, icra_eden_hekim_id: x.icraEdenHekimId, miqdar: x.miqdar, tecili: x.tecili, aciqlama: x.aciqlama }))); });
+  document.getElementById('selectedForm').addEventListener('submit', e => { const invalid = [...selected.values()].find(x => !x.sobeId || (x.hekimSecimQaydasiKodu === 'MECBURI' && !x.icraEdenHekimId)); if (invalid) { e.preventDefault(); openDetails(String(invalid.id)); return; } document.getElementById('servicesJson').value = JSON.stringify([...selected.values()].map(x => ({ xidmet_id: x.id, sobe_id: x.sobeId, hekim_menbe_novu: x.isteyenHekimId ? 'ISTEYEN' : (x.gonderenHekimId ? 'GONDEREN' : null), isteyen_hekim_id: x.isteyenHekimId, icra_eden_hekim_id: x.icraEdenHekimId, miqdar: x.miqdar, tecili: x.tecili, aciqlama: x.aciqlama }))); });
   document.body.classList.add('patient-services-open');
   const fitWorkspace = () => { const top = root.getBoundingClientRect().top; root.style.height = `${Math.max(320, window.innerHeight - top - 10)}px`; };
   fitWorkspace(); window.addEventListener('resize', fitWorkspace);

@@ -50,7 +50,7 @@
       <div id="detailsEmpty" class="psw-empty"><i class="ti ti-adjustments-horizontal"></i><span th:text="#{patient_services.select_service_hint}"></span></div>
       <div id="detailsForm" class="d-none">
         <label class="form-label" for="referringDoctor" th:text="#{visits.referring_doctor}"></label>
-        <select id="referringDoctor" class="form-select mb-3" th:data-default-id="${gonderenHekim.gonderen_hekim_id}"><option value="" th:text="#{patient_services.no_referring_doctor}"></option><option th:if="${!#maps.isEmpty(gonderenHekim)}" th:value="${gonderenHekim.gonderen_hekim_id}" th:text="|${gonderenHekim.gonderen_hekim_ad} ${gonderenHekim.gonderen_hekim_soyad} ${gonderenHekim.gonderen_hekim_ata_adi ?: ''}|" selected></option></select>
+        <select id="referringDoctor" class="form-select mb-3"><option value="" th:text="#{patient_services.no_referring_doctor}"></option><option th:if="${!#maps.isEmpty(gonderenHekim)}" th:value="${gonderenHekim.gonderen_hekim_id}" th:text="|${gonderenHekim.gonderen_hekim_ad} ${gonderenHekim.gonderen_hekim_soyad} ${gonderenHekim.gonderen_hekim_ata_adi ?: ''}|"></option></select>
         <label class="form-label" for="requestingDoctor" th:text="#{patient_services.requesting_doctor}"></label>
         <select id="requestingDoctor" class="form-select mb-3"><option value="" th:text="#{common.secin}"></option><option th:each="h:${isteyenHekimler}" th:value="${h.hekim_id}" th:text="|${h.hekim_ad} ${h.hekim_soyad} ${h.hekim_ata_adi ?: ''}|"></option></select>
         <label class="form-label" for="serviceDepartment" th:text="#{patient_services.department}"></label><select id="serviceDepartment" class="form-select mb-3"><option value="" th:text="#{common.secin}"></option></select>
