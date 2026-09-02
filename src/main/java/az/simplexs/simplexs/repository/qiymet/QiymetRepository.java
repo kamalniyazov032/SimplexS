@@ -225,37 +225,13 @@ public class QiymetRepository {
                 "mesaj", "Qiymət cədvəli yaradıldı və xidmət qiymətləri klonlandı");
     }
 
-    @Transactional
     public Map<String, Object> cedvelYenile(Long id, LocalDate baslamaTarixi, LocalDate bitmeTarixi,
             BigDecimal xestePayi, BigDecimal xesteEndirim, BigDecimal sigortaEndirim,
             boolean aktiv, Long personalId) {
-        MapSqlParameterSource params = new MapSqlParameterSource("id", id)
-                .addValue("bas", baslamaTarixi).addValue("bit", bitmeTarixi)
-                .addValue("xp", xestePayi).addValue("xe", xesteEndirim)
-                .addValue("se", sigortaEndirim).addValue("aktiv", aktiv).addValue("personal", personalId);
-        Map<String, Object> result = one("SELECT * FROM public.fn_qiymet_cedveli_yenile(p_qiymet_cedveli_id=>:id,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_xeste_payi=>CAST(NULL AS numeric),p_xeste_endirim=>CAST(NULL AS numeric),p_sigorta_endirim=>CAST(NULL AS numeric),p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)", params);
-        if (!successful(result)) return result;
-
-        jdbc.update("""
-                UPDATE public.rn_qiymet_cedveli
-                   SET xeste_payi=COALESCE(CAST(:xp AS numeric),xeste_payi),
-                       sigorta_payi=CASE WHEN CAST(:xp AS numeric) IS NULL THEN sigorta_payi ELSE 100-CAST(:xp AS numeric) END,
-                       xeste_endirim=COALESCE(CAST(:xe AS numeric),xeste_endirim),
-                       sigorta_endirim=COALESCE(CAST(:se AS numeric),sigorta_endirim),
-                       yenilenme_tarixi=now(), yenileyen_personal_id=:personal
-                 WHERE id=:id
-                """, params);
-        if (xestePayi != null || xesteEndirim != null || sigortaEndirim != null) {
-            jdbc.update("""
-                    UPDATE public.rn_xidmet_qiymetleri xqi
-                       SET xeste_payi=qc.xeste_payi, sigorta_payi=qc.sigorta_payi,
-                           xeste_endirim=qc.xeste_endirim, sigorta_endirim=qc.sigorta_endirim,
-                           yenilenme_tarixi=now(), yenileyen_personal_id=:personal
-                      FROM public.rn_qiymet_cedveli qc
-                     WHERE qc.id=:id AND xqi.qiymet_cedveli_id=qc.id
-                    """, params);
-        }
-        return result;
+        return one("SELECT * FROM public.fn_qiymet_cedveli_yenile(p_qiymet_cedveli_id=>:id,p_baslama_tarixi=>:bas,p_bitme_tarixi=>:bit,p_xeste_payi=>:xp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_aktiv=>:aktiv,p_yenileyen_personal_id=>:personal)",
+                new MapSqlParameterSource("id", id).addValue("bas", baslamaTarixi).addValue("bit", bitmeTarixi)
+                        .addValue("xp", xestePayi).addValue("xe", xesteEndirim)
+                        .addValue("se", sigortaEndirim).addValue("aktiv", aktiv).addValue("personal", personalId));
     }
 
     public Map<String, Object> qiymetleriSaxla(Long cedvelId, String json, Long personalId) {
