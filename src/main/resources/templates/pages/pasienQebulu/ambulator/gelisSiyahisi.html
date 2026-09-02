@@ -248,6 +248,12 @@
                   <td>
                     <div class="d-flex gap-1">
                     <a
+                      class="btn btn-sm btn-outline-info"
+                      th:href="@{/xeste-xidmetleri/{id}(id=${g.id})}"
+                      th:title="#{patient_services.add}"
+                      ><i class="ti ti-medical-cross"></i
+                    ></a>
+                    <a
                       class="btn btn-sm btn-outline-success"
                       th:href="@{/ambulatorQebul/yeni(xesteId=${g.xesteId})}"
                       th:title="#{visits.new_for_patient}"

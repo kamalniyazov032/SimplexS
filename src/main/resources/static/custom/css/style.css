@@ -10,6 +10,24 @@
   border-radius: 4px;
 }
 
+/* Xəstə kartına xidmət əlavəetmə iş sahəsi */
+.patient-services-open{overflow:hidden!important}.patient-service-workspace{--psw-border:#dfe6ef;--psw-blue:#1262d6;display:flex;min-height:0;flex-direction:column;overflow:hidden;color:#162238;font-size:.82rem}
+.psw-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;padding:9px 12px;background:var(--bs-body-bg);border:1px solid var(--psw-border);border-radius:9px;box-shadow:0 3px 12px rgba(28,55,88,.05)}
+.psw-header h4{font-size:1.12rem;font-weight:750}.psw-header p{font-size:.78rem}.psw-close{width:32px;height:32px;display:grid;place-items:center;padding:0}.psw-patient{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;color:var(--psw-blue);font-size:.8rem;font-weight:600;background:#eaf3ff;border-radius:6px}
+.psw-main{display:grid;grid-template-columns:220px minmax(0,1fr) 285px;min-height:0;flex:1 1 auto;background:var(--bs-body-bg);border:1px solid var(--psw-border);border-radius:9px 9px 0 0;overflow:hidden}
+.psw-browser,.psw-catalog,.psw-details{min-width:0;min-height:0;padding:11px}.psw-browser,.psw-catalog{border-right:1px solid var(--psw-border)}.psw-browser,.psw-catalog{display:flex;flex-direction:column}.psw-details{overflow-y:auto}.psw-browser .form-select,.psw-browser .form-control,.psw-details .form-select,.psw-details .form-control{min-height:34px;padding-top:5px;padding-bottom:5px;font-size:.8rem}.psw-browser .mb-3,.psw-details .mb-3{margin-bottom:.65rem!important}
+.psw-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}.psw-section-head h5{color:var(--psw-blue);font-size:.98rem;font-weight:700}.psw-section-head small{font-size:.73rem}
+.psw-catalog-head{align-items:center}.psw-catalog-tools{display:flex;align-items:center;gap:8px;min-width:300px}.psw-catalog-tools .input-group{width:270px}.psw-catalog-tools .form-control,.psw-catalog-tools .input-group-text{font-size:.76rem}.psw-catalog-tools .badge{flex:0 0 auto}
+.psw-tree,.psw-collections{min-height:0;flex:1 1 auto;overflow:auto}.psw-tree-item,.psw-collection-item{width:100%;display:flex;align-items:center;gap:7px;padding:6px 8px;color:var(--bs-body-color);font-size:.8rem;text-align:left;background:transparent;border:0;border-radius:6px}
+.psw-tree-item{padding-left:calc(10px + var(--level,0) * 14px)}.psw-tree-item:hover,.psw-tree-item.active,.psw-collection-item:hover,.psw-collection-item.active{color:#fff;background:linear-gradient(100deg,#1b64dc,#0c55c8)}
+.psw-collection-item{display:grid;grid-template-columns:20px 1fr;grid-template-areas:'icon name' 'icon meta'}.psw-collection-item i{grid-area:icon}.psw-collection-item span{grid-area:name;font-weight:600}.psw-collection-item small{grid-area:meta;opacity:.72}
+.psw-table{font-size:.78rem;table-layout:fixed}.psw-table thead th{padding:7px 8px;color:#5d697b;font-size:.72rem;font-weight:700;background:#f7f9fc;border-bottom-color:var(--psw-border);white-space:nowrap}.psw-table tbody td{padding:7px 8px;border-bottom-color:#edf0f5;vertical-align:middle}.psw-table tbody td strong{font-size:.79rem;line-height:1.25}.psw-table tbody td small{font-size:.69rem;line-height:1.2}.psw-table tbody tr:hover{background:#f4f8fe}.psw-service-table tbody tr{cursor:pointer}.psw-service-table tbody tr.psw-service-active{background:#eaf3ff;box-shadow:inset 3px 0 var(--psw-blue)}.psw-service-table .psw-code-col{width:13%}.psw-service-table .psw-name-col{width:46%}.psw-service-table .psw-group-col{width:25%}.psw-service-table .psw-price-col{width:11%}.psw-service-table .psw-action-col{width:5%}.psw-service-table td:first-child .badge{font-size:.68rem}.psw-service-table td:nth-child(3){overflow:hidden;text-overflow:ellipsis}.psw-service-table th:nth-child(4),.psw-service-table td:nth-child(4){padding-right:3px}.psw-service-table th:last-child,.psw-service-table td:last-child{padding-left:3px;text-align:center}.psw-service-table .btn-sm{width:28px;height:27px;padding:2px}
+.psw-empty{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8793a5;text-align:center}.psw-empty i{font-size:30px}.psw-empty-small{min-height:100px}
+.psw-pager{display:flex;align-items:center;justify-content:center;gap:9px;padding-top:7px;font-size:.75rem}.psw-pager .btn{padding:4px 8px;font-size:.72rem}.psw-details .form-label{font-size:.75rem;font-weight:650;margin-bottom:3px}.psw-switch{height:34px;display:flex;align-items:center;gap:7px;padding:0 8px;background:#fff8ec;border:1px solid #ffe0a8;border-radius:6px}.psw-add-hint{display:flex;gap:7px;padding:8px;color:#43617f;font-size:.73rem;line-height:1.35;background:#eef6ff;border-radius:6px}
+.psw-catalog-table{min-height:0;flex:1 1 auto;overflow:auto}.psw-catalog-table thead{position:sticky;z-index:2;top:0}.psw-alert{flex:0 0 auto;margin-bottom:7px;padding:8px 11px;font-size:.78rem}.psw-selected{display:flex;min-height:190px;max-height:38%;flex:0 0 285px;flex-direction:column;overflow:hidden;padding:10px 12px;background:var(--bs-body-bg);border:1px solid var(--psw-border);border-top:0;border-radius:0 0 9px 9px}.psw-selected .psw-section-head{flex:0 0 auto;margin-bottom:6px}.psw-selected-table{min-height:0;flex:1 1 auto;overflow:auto}.psw-selected-table thead{position:sticky;z-index:2;top:0}.psw-submit{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:8px;margin-top:6px}.psw-submit .btn{padding:5px 10px;font-size:.76rem}.psw-selected tfoot td{padding:8px;background:#f8fbff;text-align:center}
+@media(max-width:1199.98px){.psw-main{grid-template-columns:240px 1fr}.psw-details{grid-column:1/-1;border-top:1px solid var(--psw-border)}.psw-details #detailsForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px}.psw-details #detailsForm.d-none{display:none}.psw-details #applyDetails{grid-column:1/-1}}
+@media(max-width:767.98px){body.patient-services-open{overflow:auto!important}.patient-service-workspace{height:auto!important;overflow:visible}.psw-header{align-items:flex-start;flex-direction:column}.psw-main{display:block}.psw-browser,.psw-catalog{border-right:0;border-bottom:1px solid var(--psw-border)}.psw-details #detailsForm{display:block}.psw-details #detailsForm.d-none{display:none}.psw-catalog-head{align-items:stretch;flex-direction:column}.psw-catalog-tools,.psw-catalog-tools .input-group{width:100%;min-width:0}}
+
 /* Yeni ambulator müraciət */
 .ambulatory-form {
   --ambulatory-blue: #087cc5;
@@ -98,7 +116,7 @@
 .ambulatory-search-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 4px 2px; color: #4d5d73; font-weight: 600; }
 
 /* Ambulator müraciətlər siyahısı: scroll yalnız cədvəldədir */
-.ambulatory-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden; }
+.ambulatory-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden; padding: 12px; border-radius: 10px; }
 .ambulatory-list-page > .visit-list-card { min-height: 0; flex: 1 1 auto; margin-bottom: 0; overflow: hidden; }
 .ambulatory-list-page .visit-list-card { display: flex; flex-direction: column; }
 .ambulatory-list-page .visit-list-card-body { display: flex; min-height: 0; flex: 1 1 auto; overflow: hidden; }
@@ -435,3 +453,9 @@
     padding-right: 8px;
   }
 }
+
+.psw-table{table-layout:auto}
+.psw-service-table{table-layout:fixed}
+.psw-service-table tbody tr.psw-service-added{background:#eef9f2;box-shadow:inset 3px 0 #28a745}
+.psw-service-table tbody tr.psw-service-active,.psw-service-table tbody tr.psw-service-active:hover{background:#dcecff!important;box-shadow:inset 4px 0 #1672e8,0 0 0 1px rgba(22,114,232,.12)}
+.psw-service-table tbody tr.psw-service-active>td,.psw-service-table tbody tr.psw-service-active:hover>td{background-color:#dcecff!important}

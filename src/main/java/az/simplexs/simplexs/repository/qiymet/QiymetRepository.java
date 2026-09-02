@@ -87,10 +87,10 @@ public class QiymetRepository {
             String hekimQiymetStatus, Long hekimPersonalId, int limit, int offset) {
         String sql = """
                 SELECT f.*,
-                    COALESCE(f.xeste_pay, qc.xeste_payi) AS effektiv_xeste_pay,
-                    COALESCE(f.qurum_payi, qc.sigorta_payi) AS effektiv_qurum_payi,
+                    COALESCE(f.xeste_payi, qc.xeste_payi) AS effektiv_xeste_pay,
+                    COALESCE(f.sigorta_payi, qc.sigorta_payi) AS effektiv_qurum_payi,
                     COALESCE(f.xeste_endirim, qc.xeste_endirim) AS effektiv_xeste_endirim,
-                    COALESCE(f.qurum_endirim, qc.sigorta_endirim) AS effektiv_qurum_endirim
+                    COALESCE(f.sigorta_endirim, qc.sigorta_endirim) AS effektiv_qurum_endirim
                 FROM public.fn_qiymet_cedveli_xidmet_siyahisi(
                     p_qiymet_cedveli_id=>CAST(:cedvel AS bigint),
                     p_xidmet_qrupu_id=>CAST(:xidmetQrupu AS bigint),
