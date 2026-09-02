@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const money = value => `${Number(value || 0).toFixed(2)} ${tr.currency}`;
   const doctorName = h => [h.hekim_kodu, h.hekim_ad, h.hekim_soyad, h.hekim_ata_adi].filter(Boolean).join(' ');
   const option = (value, label) => { const o = document.createElement('option'); o.value = value ?? ''; o.textContent = label; return o; };
-  const newService = row => ({ id: Number(row.id), kod: text(row.kod), ad: text(row.ad), qiymet: Number(row.qiymet || 0), miqdar: Number(row.miqdar || 1), gonderenHekimId: null, sobeId: null, sobeAdi: '', hekimSecimQaydasiKodu: 'SECIMLI', isteyenHekimId: null, icraEdenHekimId: null, icraEdenHekimAdi: '', tecili: false, aciqlama: null });
+  const newService = row => ({ id: Number(row.id), kod: text(row.kod), ad: text(row.ad), standartQiymet: Number(row.qiymet || 0), qiymet: Number(row.qiymet || 0), miqdar: Number(row.miqdar || 1), gonderenHekimId: null, sobeId: null, sobeAdi: '', hekimSecimQaydasiKodu: 'SECIMLI', isteyenHekimId: null, icraEdenHekimId: null, icraEdenHekimAdi: '', tecili: false, aciqlama: null });
   const currentService = () => selected.get(editingId) || (draft && String(draft.id) === editingId ? draft : null);
 
   function showError(message) { alertMessage.textContent = message || tr.loadError; alert.classList.remove('d-none'); }
@@ -160,9 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const row = currentService(), department = document.getElementById('serviceDepartment'), doctors = document.getElementById('performingDoctor');
     const doctorRule = department.selectedOptions[0]?.dataset.doctorRule || 'SECIMLI';
     doctors.replaceChildren(option('', tr.select)); doctors.disabled = !department.value || doctorRule === 'SECILMIR';
-    if (row) { row.hekimSecimQaydasiKodu = doctorRule; if (doctorRule === 'SECILMIR') { row.icraEdenHekimId = null; row.icraEdenHekimAdi = ''; } }
+    if (row) { row.hekimSecimQaydasiKodu = doctorRule; if (doctorRule === 'SECILMIR') { row.icraEdenHekimId = null; row.icraEdenHekimAdi = ''; row.qiymet = row.standartQiymet; } }
     if (!department.value || !row || doctorRule === 'SECILMIR') return;
-    try { const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${department.value}/hekimler`); rows.forEach(x => doctors.append(option(x.hekim_id, doctorName(x)))); doctors.value = row.icraEdenHekimId ?? ''; }
+    try { const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${department.value}/hekimler`); rows.forEach(x => { const name = doctorName(x); const doctorOption = option(x.hekim_id, `${name} (${money(x.yekun_qiymet)})`); doctorOption.dataset.doctorName = name; doctorOption.dataset.finalPrice = Number(x.yekun_qiymet ?? row.standartQiymet); doctors.append(doctorOption); }); doctors.value = row.icraEdenHekimId ?? ''; }
     catch (e) { if (e.name !== 'AbortError') doctors.append(option('', tr.loadError)); }
   }
 
@@ -172,7 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
     row.gonderenHekimId = Number(referringDoctor.value) || null;
     row.sobeId = Number(department.value) || null; row.sobeAdi = department.value ? department.options[department.selectedIndex].text : '';
     row.isteyenHekimId = Number(document.getElementById('requestingDoctor').value) || null;
-    row.icraEdenHekimId = Number(doctors.value) || null; row.icraEdenHekimAdi = doctors.value ? doctors.options[doctors.selectedIndex].text : '';
+    row.icraEdenHekimId = Number(doctors.value) || null; row.icraEdenHekimAdi = doctors.value ? doctors.options[doctors.selectedIndex].dataset.doctorName : '';
+    row.qiymet = doctors.value ? Number(doctors.options[doctors.selectedIndex].dataset.finalPrice ?? row.standartQiymet) : row.standartQiymet;
     row.miqdar = Math.max(1, Number(document.getElementById('serviceQuantity').value) || 1); row.tecili = document.getElementById('serviceUrgent').checked; row.aciqlama = document.getElementById('serviceNote').value.trim() || null;
     if (selected.has(editingId)) renderSelected();
   }
