@@ -8,7 +8,9 @@
 
 ## Canlı verilənlər bazasına dəyişiklik
 
-- `kn_` prefiksli cədvəllərin yaradılması və həmin cədvəllərdə `INSERT`, `UPDATE`, `DELETE`, DDL və Flyway migrate əməliyyatları üçün agent ayrıca təsdiq almadan dəyişiklik edə və canlı DB-yə tətbiq edə bilər.
+- Agent cədvəl prefiksindən asılı olmayaraq istifadəçidən həmin konkret əməliyyat üçün ayrıca və açıq razılıq almadan canlı DB-də heç bir dəyişiklik edə bilməz.
+- Bu məhdudiyyət `INSERT`, `UPDATE`, `DELETE`, DDL, funksiya/prosedur dəyişiklikləri və Flyway migrate daxil olmaqla bütün yazma əməliyyatlarına aiddir.
+- Diaqnostika üçün məlumatı dəyişməyən `SELECT` sorğuları işlədilə bilər; agent bunun yalnız oxuma əməliyyatı olduğunu istifadəçiyə bildirməlidir.
 - `rn_` prefiksli mövcud və ya yeni cədvəllərə, onların məlumatlarına və əlaqəli DB obyektlərinə hər hansı dəyişiklik yalnız istifadəçinin həmin dəyişiklik üçün ayrıca və açıq razılığı ilə tətbiq edilə bilər.
 - Bir migration həm `kn_`, həm də `rn_` obyektlərinə toxunursa, canlı DB-yə tətbiqdən əvvəl ayrıca razılıq alınmalıdır.
 - Migration faylının hazırlanması `rn_` dəyişikliklərini canlı DB-yə tətbiq etməyə icazə sayılmır.
