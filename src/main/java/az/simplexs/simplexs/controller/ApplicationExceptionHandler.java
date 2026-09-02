@@ -2,10 +2,14 @@ package az.simplexs.simplexs.controller;
 
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import az.simplexs.simplexs.config.RequestCorrelationFilter;
 import az.simplexs.simplexs.repository.xeta.XetaJurnaliRepository;
 import az.simplexs.simplexs.security.AuthenticatedPersonal;
 
@@ -28,12 +33,14 @@ public class ApplicationExceptionHandler {
         this.xetaJurnaliRepository = xetaJurnaliRepository;
     }
 
-    @ExceptionHandler(DataAccessException.class)
-    public ModelAndView handleDatabaseError(DataAccessException exception, HttpServletRequest request) {
+    private static final String APPLICATION_PACKAGE = "az.simplexs.simplexs.";
+    private static final String ERROR_CODE_MDC_KEY = "errorCode";
+
+    @ExceptionHandler({DataAccessException.class, SQLException.class})
+    public ModelAndView handleDatabaseError(Exception exception, HttpServletRequest request) {
         String reference = reference();
         boolean connectionError = isConnectionError(exception);
-        log.error("Xəta kodu {} - {} sorğusunda verilənlər bazası xətası", reference,
-                request.getRequestURI(), exception);
+        logException(reference, "DATABASE_ERROR", exception, request);
 
         if (!connectionError) {
             journalIfAvailable(reference, "DB_XETASI", exception, request);
@@ -57,8 +64,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleUnexpectedError(Exception exception, HttpServletRequest request) {
         String reference = reference();
-        log.error("Xəta kodu {} - {} sorğusunda gözlənilməz xəta", reference,
-                request.getRequestURI(), exception);
+        logException(reference, "SYSTEM_ERROR", exception, request);
         journalIfAvailable(reference, "SISTEM_XETASI", exception, request);
         return errorPage(HttpStatus.INTERNAL_SERVER_ERROR, reference,
                 "Gözlənilməz sistem xətası",
@@ -99,6 +105,37 @@ public class ApplicationExceptionHandler {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
+    private void logException(String errorCode, String type, Throwable error, HttpServletRequest request) {
+        Throwable root = rootCause(error);
+        ApplicationLocation location = applicationLocation(error);
+        String requestId = requestId(request);
+        String summary = """
+                ==================================================
+                ERROR_CODE : %s
+                REQUEST_ID : %s
+                METHOD     : %s
+                PATH       : %s
+                USER       : %s
+                TYPE       : %s
+                CLASS      : %s
+                FUNCTION   : %s
+                EXCEPTION  : %s
+                ROOT_CAUSE : %s
+                ==================================================
+                """.formatted(
+                    safe(errorCode), safe(requestId), safe(request.getMethod()), safe(request.getRequestURI()),
+                    safe(username()), safe(type), safe(location.className()), safe(location.methodName()),
+                    safe(error.getClass().getName()), safe(rootMessage(root)));
+
+        String previousRequestId = MDC.get(RequestCorrelationFilter.MDC_KEY);
+        if (previousRequestId == null) MDC.put(RequestCorrelationFilter.MDC_KEY, requestId);
+        try (MDC.MDCCloseable ignored = MDC.putCloseable(ERROR_CODE_MDC_KEY, errorCode)) {
+            log.error(summary, error);
+        } finally {
+            if (previousRequestId == null) MDC.remove(RequestCorrelationFilter.MDC_KEY);
+        }
+    }
+
     private void journalIfAvailable(String reference, String type, Throwable error, HttpServletRequest request) {
         try {
             HttpSession session = request.getSession(false);
@@ -118,9 +155,51 @@ public class ApplicationExceptionHandler {
         }
     }
 
-    private Throwable rootCause(Throwable error) {
-        Throwable result=error;
-        while(result.getCause()!=null) result=result.getCause();
+    static Throwable rootCause(Throwable error) {
+        Throwable result = error;
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        visited.add(result);
+        while (result.getCause() != null && visited.add(result.getCause())) result = result.getCause();
         return result;
     }
+
+    static ApplicationLocation applicationLocation(Throwable error) {
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Throwable current = error; current != null && visited.add(current); current = current.getCause()) {
+            for (StackTraceElement frame : current.getStackTrace()) {
+                String className = frame.getClassName();
+                if (className.startsWith(APPLICATION_PACKAGE)
+                        && !className.equals(ApplicationExceptionHandler.class.getName())) {
+                    int separator = className.lastIndexOf('.');
+                    return new ApplicationLocation(className.substring(separator + 1), frame.getMethodName());
+                }
+            }
+        }
+        return new ApplicationLocation("UNKNOWN", "UNKNOWN");
+    }
+
+    private String requestId(HttpServletRequest request) {
+        Object value = request.getAttribute(RequestCorrelationFilter.REQUEST_ATTRIBUTE);
+        if (value instanceof String id && !id.isBlank()) return id;
+        String mdcValue = MDC.get(RequestCorrelationFilter.MDC_KEY);
+        return mdcValue == null || mdcValue.isBlank() ? RequestCorrelationFilter.newId() : mdcValue;
+    }
+
+    private String username() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication == null ? "ANONYMOUS" : authentication.getName();
+    }
+
+    private static String rootMessage(Throwable root) {
+        return root.getMessage() == null || root.getMessage().isBlank()
+                ? root.getClass().getName() : root.getMessage();
+    }
+
+    private static String safe(String value) {
+        if (value == null || value.isBlank()) return "UNKNOWN";
+        String sanitized = value.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+        return sanitized.length() <= 2000 ? sanitized : sanitized.substring(0, 2000) + "…";
+    }
+
+    record ApplicationLocation(String className, String methodName) {}
 }

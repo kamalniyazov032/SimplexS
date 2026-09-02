@@ -1,7 +1,6 @@
 package az.simplexs.simplexs.controller;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Map;
 
 import org.springframework.context.MessageSource;
@@ -64,11 +63,11 @@ public class AnbarController {
     @PostMapping("/parametrler/anbar/emeliyyat")
     public String emeliyyat(@RequestParam Map<String,String> f,HttpSession s,@AuthenticationPrincipal AuthenticatedPersonal p,RedirectAttributes a){Long id=L(f,"id");flash(repository.emeliyyatYaddaSaxla(id==null,id,clinic(s),L(f,"kateqoriyaId"),f.get("kod"),f.get("ad"),B(f,"standartdir"),f.get("aciqlama"),B(f,"aktiv"),p.personalId()),a);return back("emeliyyatlar");}
     @PostMapping("/parametrler/anbar/anbar")
-    public String anbar(@RequestParam Map<String,String> f,HttpSession s,@AuthenticationPrincipal AuthenticatedPersonal p,RedirectAttributes a){Long id=L(f,"id");flash(repository.anbarYaddaSaxla(id==null,id,clinic(s),L(f,"anbarNovuId"),f.get("kod"),f.get("ad"),f.get("aciqlama"),B(f,"telebAnbaridir"),B(f,"telebdeStokGorunsun"),B(f,"dermanPaketi"),B(f,"istehsalCixisi"),B(f,"mehvCixisi"),I(f,"cixisGunSayi"),I(f,"geriyeMualiceGunSayi"),date(f,"kilidBaslama"),date(f,"kilidBitme"),f.get("krosAnbarKodu"),B(f,"aktiv"),p.personalId()),a);return back("anbarlar");}
+    public String anbar(@RequestParam Map<String,String> f,HttpSession s,@AuthenticationPrincipal AuthenticatedPersonal p,RedirectAttributes a){Long id=L(f,"id");flash(repository.anbarYaddaSaxla(id==null,id,clinic(s),L(f,"anbarNovuId"),f.get("kod"),f.get("ad"),f.get("aciqlama"),B(f,"telebAnbaridir"),B(f,"telebdeStokGorunsun"),B(f,"dermanPaketi"),B(f,"istehsalCixisi"),B(f,"mehvCixisi"),B(f,"aktiv"),p.personalId()),a);return back("anbarlar");}
 
     private Long clinic(HttpSession s){return (Long)s.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);} private Boolean status(String s){return "hamisi".equals(s)?null:!"passiv".equals(s);} private String back(String tab){return "redirect:/anbar/"+tab;}
     private void flash(Map<String,Object> r,RedirectAttributes a){String code=String.valueOf(r.getOrDefault("status_kodu",""));boolean ok=code.equals("1")||code.toUpperCase().contains("UGUR");a.addFlashAttribute(ok?"successMessage":"errorMessage",String.valueOf(r.getOrDefault("mesaj",msg(ok?"warehouse.saved":"warehouse.save_failed"))));}
     private String msg(String k){return messages.getMessage(k,null,LocaleContextHolder.getLocale());}
     private static boolean matches(String query,String... values){if(query==null||query.isBlank())return true;String q=query.trim().toLowerCase(java.util.Locale.ROOT);return java.util.Arrays.stream(values).filter(java.util.Objects::nonNull).anyMatch(v->v.toLowerCase(java.util.Locale.ROOT).contains(q));}
-    private static boolean B(Map<String,String>f,String k){return "true".equals(f.get(k));} private static Long L(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:Long.valueOf(f.get(k));}catch(Exception e){return null;}} private static Integer I(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:Integer.valueOf(f.get(k));}catch(Exception e){return null;}} private static BigDecimal D(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:new BigDecimal(f.get(k));}catch(Exception e){return null;}} private static LocalDate date(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:LocalDate.parse(f.get(k));}catch(Exception e){return null;}}
+    private static boolean B(Map<String,String>f,String k){return "true".equals(f.get(k));} private static Long L(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:Long.valueOf(f.get(k));}catch(Exception e){return null;}} private static BigDecimal D(Map<String,String>f,String k){try{return f.get(k)==null||f.get(k).isBlank()?null:new BigDecimal(f.get(k));}catch(Exception e){return null;}}
 }

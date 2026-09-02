@@ -101,9 +101,6 @@
 <th th:text="#{warehouse.warehouse}">Anbar</th>
 <th th:text="#{warehouse.warehouse_type}">Anbar növü</th>
 <th th:text="#{warehouse.settings}">Anbar seçimləri</th>
-<th th:text="#{warehouse.day_limits}">Gün parametrləri</th>
-<th th:text="#{warehouse.lock_period}">Kilid tarixləri</th>
-<th th:text="#{warehouse.cross_code}">Kros anbar kodu</th>
 <th th:text="#{common.status}">Status</th>
 <th class="pe-3">
 </th>
@@ -465,33 +462,6 @@
 <span class="text-muted" th:if="${x.telebAnbaridir != true and x.telebdeStokGorunsun != true and x.dermanPaketi != true and x.istehsalCixisi != true and x.mehvCixisi != true}">—</span>
 </div>
 </td>
-<td>
-<div class="small text-nowrap">
-<span class="text-muted" th:text="#{warehouse.issue_days}">
-</span>: <strong th:text="${x.cixisGunSayi ?: '—'}">
-</strong>
-</div>
-<div class="small text-nowrap">
-<span class="text-muted" th:text="#{warehouse.return_days}">
-</span>: <strong th:text="${x.geriyeMualiceGunSayi ?: '—'}">
-</strong>
-</div>
-</td>
-<td>
-<div class="small text-nowrap">
-<i class="ti ti-calendar-event text-primary me-1">
-</i>
-<span th:text="${x.kilidBaslama ?: '—'}">
-</span>
-<span class="mx-1">–</span>
-<span th:text="${x.kilidBitme ?: '—'}">
-</span>
-</div>
-</td>
-<td>
-<span class="badge bg-light text-dark border" th:text="${x.krosAnbarKodu ?: '—'}">
-</span>
-</td>
 <td th:replace="~{::status(${x.aktiv})}">
 </td>
 <td th:replace="~{::edit('anbarlar',${x.id})}">
@@ -845,85 +815,6 @@
 <span th:text="#{warehouse.active_warehouse}">
 </span>
 </label>
-</div>
-</div>
-<div class="col-md-6">
-<label class="form-label">
-<i class="ti ti-calendar-minus text-primary me-1">
-</i>
-<span th:text="#{warehouse.issue_days}">
-</span>
-</label>
-<div class="input-group warehouse-input">
-<span class="input-group-text">
-<i class="ti ti-calendar-minus">
-</i>
-</span>
-<input class="form-control" type="number" name="cixisGunSayi" th:value="${x.cixisGunSayi}">
-</div>
-</div>
-<div class="col-md-6">
-<label class="form-label">
-<i class="ti ti-calendar-stats text-primary me-1">
-</i>
-<span th:text="#{warehouse.return_days}">
-</span>
-</label>
-<div class="input-group warehouse-input">
-<span class="input-group-text">
-<i class="ti ti-calendar-stats">
-</i>
-</span>
-<input class="form-control" type="number" name="geriyeMualiceGunSayi" th:value="${x.geriyeMualiceGunSayi}">
-</div>
-</div>
-<div class="col-md-6">
-<label class="form-label">
-<i class="ti ti-link text-primary me-1">
-</i>
-<span th:text="#{warehouse.cross_code}">
-</span>
-</label>
-<div class="input-group warehouse-input">
-<span class="input-group-text">
-<i class="ti ti-link">
-</i>
-</span>
-<input class="form-control" name="krosAnbarKodu" th:value="${x.krosAnbarKodu}">
-</div>
-</div>
-<div class="col-md-6">
-<div class="row g-2">
-<div class="col-6">
-<label class="form-label">
-<i class="ti ti-calendar text-primary me-1">
-</i>
-<span th:text="#{warehouse.lock_start}">
-</span>
-</label>
-<div class="input-group warehouse-input">
-<span class="input-group-text">
-<i class="ti ti-calendar">
-</i>
-</span>
-<input class="form-control" type="date" name="kilidBaslama" th:value="${x.kilidBaslama}">
-</div>
-</div>
-<div class="col-6">
-<label class="form-label">
-<i class="ti ti-calendar-event text-primary me-1">
-</i>
-<span th:text="#{warehouse.lock_end}">
-</span>
-</label>
-<div class="input-group warehouse-input">
-<span class="input-group-text">
-<i class="ti ti-calendar-event">
-</i>
-</span>
-<input class="form-control" type="date" name="kilidBitme" th:value="${x.kilidBitme}">
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1321,8 +1212,6 @@
 </div>
 <div class="col-md-5" th:insert="~{::iconText('vurmaEmsali',#{warehouse.multiplier},false,'ti ti-calculator','number',#{warehouse.multiplier})}">
 </div>
-<div class="col-12" th:replace="~{::check('sifarisdeGorunsun',#{warehouse.show_in_order})}">
-</div>
 </th:block>
 <th:block th:if="${kind=='qruplar'}">
 <div class="col-12"><div class="warehouse-section-title"><i class="ti ti-category-2"></i><span th:text="#{warehouse.group_info}"></span></div></div>
@@ -1478,20 +1367,6 @@
 <span th:text="#{warehouse.active_warehouse}">
 </span>
 </label>
-</div>
-</div>
-<div class="col-md-6" th:insert="~{::iconText('cixisGunSayi',#{warehouse.issue_days},false,'ti ti-calendar-minus','number',#{warehouse.days_placeholder})}">
-</div>
-<div class="col-md-6" th:insert="~{::iconText('geriyeMualiceGunSayi',#{warehouse.return_days},false,'ti ti-calendar-stats','number',#{warehouse.days_placeholder})}">
-</div>
-<div class="col-md-6" th:insert="~{::iconText('krosAnbarKodu',#{warehouse.cross_code},false,'ti ti-link','text',#{warehouse.cross_code_placeholder})}">
-</div>
-<div class="col-md-6">
-<div class="row g-2">
-<div class="col-6" th:insert="~{::iconText('kilidBaslama',#{warehouse.lock_start},false,'ti ti-calendar','date',#{warehouse.date_placeholder})}">
-</div>
-<div class="col-6" th:insert="~{::iconText('kilidBitme',#{warehouse.lock_end},false,'ti ti-calendar-event','date',#{warehouse.date_placeholder})}">
-</div>
 </div>
 </div>
 </th:block>

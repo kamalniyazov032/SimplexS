@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/parPaket")
 public class PaketController {
-    private static final int PAGE_SIZE=30;
+    private static final int PAGE_SIZE=100;
     private final XidmetRepository repo; private final MessageSource messages;
     public PaketController(XidmetRepository repo,MessageSource messages){this.repo=repo;this.messages=messages;}
 

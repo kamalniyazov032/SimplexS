@@ -1,5 +1,7 @@
 package az.simplexs.simplexs.controller;
 
+import java.util.Locale;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,24 +14,50 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class SobeController {
+    private static final Locale AZ = Locale.forLanguageTag("az");
     private final SobeRepository repository;
 
     public SobeController(SobeRepository repository) { this.repository = repository; }
 
     @GetMapping("/shobe")
-    public String list(Model model, HttpSession session) {
+    public String list(@RequestParam(required = false) String q,
+                       @RequestParam(required = false) Long sobeTipiId,
+                       @RequestParam(required = false) Long hekimSecimQaydasiId,
+                       @RequestParam(required = false) Long cinsId,
+                       @RequestParam(required = false) String status,
+                       Model model, HttpSession session) {
         Long klinikaId = klinikaId(session);
         model.addAttribute("pageTitle", "Şöbələr");
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "shobe");
-        var sobeler = repository.findByKlinikaId(klinikaId);
+        var butunSobeler = repository.findByKlinikaId(klinikaId);
+        String query = q == null ? "" : q.trim().toLowerCase(AZ);
+        String selectedStatus = status == null ? "" : status;
+        var sobeler = butunSobeler.stream()
+            .filter(s -> query.isEmpty() || contains(s.sobeAdi(), query) || contains(s.sobeTipiAdi(), query)
+                || contains(s.hekimSecimQaydasiAdi(), query) || contains(s.sobeMudiriAdi(), query)
+                || contains(s.boyukTibbBacisiAdi(), query))
+            .filter(s -> sobeTipiId == null || sobeTipiId.equals(s.sobeTipiId()))
+            .filter(s -> hekimSecimQaydasiId == null || hekimSecimQaydasiId.equals(s.hekimSecimQaydasiId()))
+            .filter(s -> cinsId == null || cinsId.equals(s.cinsId()))
+            .filter(s -> selectedStatus.isBlank()
+                || ("aktiv".equals(selectedStatus) == Boolean.TRUE.equals(s.aktiv())))
+            .toList();
         model.addAttribute("sobeler", sobeler);
-        model.addAttribute("aktivSobeSayi", sobeler.stream().filter(s -> Boolean.TRUE.equals(s.aktiv())).count());
-        model.addAttribute("passivSobeSayi", sobeler.stream().filter(s -> !Boolean.TRUE.equals(s.aktiv())).count());
+        model.addAttribute("umumiSobeSayi", butunSobeler.size());
+        model.addAttribute("aktivSobeSayi", butunSobeler.stream().filter(s -> Boolean.TRUE.equals(s.aktiv())).count());
+        model.addAttribute("passivSobeSayi", butunSobeler.stream().filter(s -> !Boolean.TRUE.equals(s.aktiv())).count());
         model.addAttribute("sobeTipleri", repository.findSobeTipleri());
         model.addAttribute("hekimSecimQaydalari", repository.findHekimSecimQaydalari());
         model.addAttribute("cinsler", repository.findCinsler());
         model.addAttribute("personallar", repository.findPersonallar(klinikaId));
+        model.addAttribute("q", q);
+        model.addAttribute("selectedSobeTipiId", sobeTipiId);
+        model.addAttribute("selectedHekimSecimQaydasiId", hekimSecimQaydasiId);
+        model.addAttribute("selectedCinsId", cinsId);
+        model.addAttribute("selectedStatus", selectedStatus);
+        model.addAttribute("filterApplied", !query.isEmpty() || sobeTipiId != null
+            || hekimSecimQaydasiId != null || cinsId != null || !selectedStatus.isBlank());
         return "pages/shobe";
     }
 
@@ -53,6 +81,7 @@ public class SobeController {
 
     @PostMapping("/shobe/yenile")
     public String update(@RequestParam Long sobeId,
+                         @RequestParam String ad,
                          @RequestParam(required = false) Long hekimSecimQaydasiId,
                          @RequestParam(required = false) Long sobeMudiriPersonalId,
                          @RequestParam(required = false) Long boyukTibbBacisiPersonalId,
@@ -62,13 +91,16 @@ public class SobeController {
         Long klinikaId = klinikaId(session);
         boolean belongs = repository.findByKlinikaId(klinikaId).stream().anyMatch(s -> s.sobeId().equals(sobeId));
         if (!belongs) return error(attributes, "Şöbə seçilmiş klinikaya aid deyil.");
-        var result = repository.update(sobeId, hekimSecimQaydasiId, sobeMudiriPersonalId,
+        var result = repository.update(sobeId, ad, hekimSecimQaydasiId, sobeMudiriPersonalId,
             boyukTibbBacisiPersonalId, cinsId, aktiv, null);
         message(result.ugurludur(), result.mesaj(), attributes);
         return "redirect:/shobe";
     }
 
     private Long klinikaId(HttpSession session) { return (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID); }
+    private static boolean contains(String value, String query) {
+        return value != null && value.toLowerCase(AZ).contains(query);
+    }
     private String error(RedirectAttributes a, String m) { a.addFlashAttribute("errorMessage", m); return "redirect:/shobe"; }
     private void message(boolean success, String text, RedirectAttributes a) {
         a.addFlashAttribute(success ? "successMessage" : "errorMessage",
