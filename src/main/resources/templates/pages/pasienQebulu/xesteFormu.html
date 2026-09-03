@@ -472,11 +472,24 @@
           align-items: stretch;
         }
         .patient-registration-form .patient-section {
+          position: relative;
           padding: 18px;
           background: var(--bs-body-bg);
           border: 1px solid var(--bs-border-color);
           border-radius: 8px;
           box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+          overflow: hidden;
+        }
+
+        .patient-registration-form .patient-section::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 14px;
+          bottom: 14px;
+          width: 4px;
+          background: #0d6efd;
+          border-radius: 0 4px 4px 0;
         }
         .patient-registration-form h6 {
           display: flex;
@@ -507,20 +520,7 @@
         }
         .patient-registration-form .form-control,
         .patient-registration-form .form-select,
-        .patient-registration-form .select2-container .select2-selection--single {
-          min-height: 36px;
-          border-color: color-mix(
-            in srgb,
-            var(--bs-border-color) 82%,
-            var(--bs-body-color)
-          );
-          color: color-mix(
-            in srgb,
-            var(--bs-secondary-color) 75%,
-            var(--bs-body-color)
-          );
-          font-weight: 400;
-        }
+
         .patient-registration-form .form-control::placeholder {
           color: color-mix(
             in srgb,
