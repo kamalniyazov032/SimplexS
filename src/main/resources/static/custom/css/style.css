@@ -116,7 +116,7 @@
 .ambulatory-search-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 4px 2px; color: #4d5d73; font-weight: 600; }
 
 /* Ambulator müraciətlər siyahısı: scroll yalnız cədvəldədir */
-.ambulatory-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden; padding: 12px; border-radius: 10px; }
+.ambulatory-list-page { display: flex; min-height: 0; flex-direction: column; overflow: hidden;}
 .ambulatory-list-page > .visit-list-card { min-height: 0; flex: 1 1 auto; margin-bottom: 0; overflow: hidden; }
 .ambulatory-list-page .visit-list-card { display: flex; flex-direction: column; }
 .ambulatory-list-page .visit-list-card-body { display: flex; min-height: 0; flex: 1 1 auto; overflow: hidden; }
