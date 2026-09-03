@@ -1,8 +1,28 @@
 <!DOCTYPE html>
-<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title th:text="#{common.giris_qadagandir_simplexs}">Giriş qadağandır - SimplexS</title><link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet"><link th:href="@{/assets/plugins/tabler-icons/tabler-icons.min.css}" rel="stylesheet"></head>
-<body class="bg-light"><main class="min-vh-100 d-flex align-items-center justify-content-center p-4"><section class="card border-0 shadow-sm text-center" style="max-width:620px;border-radius:20px"><div class="card-body p-5">
-<span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle text-danger" style="width:88px;height:88px"><i class="ti ti-shield-lock" style="font-size:46px"></i></span>
-<h2 class="mt-4" th:text="#{common.bu_bolmeye_giris_icazeniz_yoxdur}">Bu bölməyə giriş icazəniz yoxdur</h2><p class="text-muted" th:text="#{common.modul_ve_ya_emeliyyat_selahiyyeti}">Modul və ya əməliyyat səlahiyyəti üçün sistem administratoruna müraciət edin.</p>
-<a class="btn btn-primary" th:href="@{/dashboard}"><i class="ti ti-home me-1"></i><span th:text="#{common.dashboard_a_qayit}">Dashboard-a qayıt</span></a>
-</div></section></main></body></html>
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title th:text="#{common.giris_qadagandir_simplexs}">Giriş qadağandır - SimplexS</title>
+    <link rel="icon"
+          type="image/png"
+          th:href="@{/custom/logo/icons/SS-Icon-White.png}">
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/plugins/tabler-icons/tabler-icons.min.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<main class="min-vh-100 d-flex align-items-center justify-content-center p-4">
+    <section class="card border-0 shadow-sm text-center" style="max-width:620px;border-radius:20px">
+        <div class="card-body p-5">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle text-danger"
+                  style="width:88px;height:88px"><i class="ti ti-shield-lock" style="font-size:46px"></i></span>
+            <h2 class="mt-4" th:text="#{common.bu_bolmeye_giris_icazeniz_yoxdur}">Bu bölməyə giriş icazəniz yoxdur</h2>
+            <p class="text-muted" th:text="#{common.modul_ve_ya_emeliyyat_selahiyyeti}">Modul və ya əməliyyat
+                səlahiyyəti üçün sistem administratoruna müraciət edin.</p>
+            <a class="btn btn-primary" th:href="@{/dashboard}"><i class="ti ti-home me-1"></i><span
+                    th:text="#{common.dashboard_a_qayit}">Dashboard-a qayıt</span></a>
+        </div>
+    </section>
+</main>
+</body>
+</html>
