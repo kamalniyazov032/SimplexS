@@ -1,6 +1,9 @@
 @charset "UTF-8";
 
 
+:root { --app-font-size: 15px; --app-font-family: "Inter", sans-serif; }
+html { font-size: var(--app-font-size); }
+body { font-size: 1rem; font-family: var(--app-font-family); }
 
 /* Cədvəl üçün xüsusi skrol zonası */
 .table-scroll-container_ka {

@@ -128,25 +128,40 @@
                   ></option>
                 </select>
               </div>
-              <div class="col-md-6 ambulatory-field" data-icon="calendar-event">
-                <label class="form-label" th:text="#{visits.date}"></label
-                ><i class="ti ti-calendar-event ambulatory-field-icon"></i><input
-                  class="form-control"
-                  type="date"
-                  name="gelisTarixi"
-                  required
-                  th:value="${gelis!=null?gelis.gelisTarixi:today}"
-                />
+              <div class="col-md-6">
+                <div class="row g-3">
+                  <div class="col-6 ambulatory-field" data-icon="calendar-event">
+                    <label class="form-label" th:text="#{visits.date}"></label>
+                    <i class="ti ti-calendar-event ambulatory-field-icon"></i>
+                    <input
+                            class="form-control"
+                            type="date"
+                            name="gelisTarixi"
+                            required
+                            th:value="${gelis!=null?gelis.gelisTarixi:today}"
+                    />
+                  </div>
+
+                  <div class="col-6 ambulatory-field" data-icon="clock">
+                    <label class="form-label" th:text="#{visits.time}"></label>
+                    <i class="ti ti-clock ambulatory-field-icon"></i>
+                    <input
+                            class="form-control"
+                            type="time"
+                            name="gelisSaati"
+                            required
+                            th:value="${gelis!=null?gelis.gelisSaati:now}"
+                    />
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 ambulatory-field" data-icon="clock">
-                <label class="form-label" th:text="#{visits.time}"></label
-                ><i class="ti ti-clock ambulatory-field-icon"></i><input
-                  class="form-control"
-                  type="time"
-                  name="gelisSaati"
-                  required
-                  th:value="${gelis!=null?gelis.gelisSaati:now}"
-                />
+
+              <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="coin">
+                <label class="form-label">Qiymət qrupu</label>
+                <i class="ti ti-coin ambulatory-field-icon"></i>
+                <select id="qiymetQrupu" class="form-select select2">
+                  <option value="">Qiymət qrupu seçin</option>
+                </select>
               </div>
               <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="user-search">
                 <label
