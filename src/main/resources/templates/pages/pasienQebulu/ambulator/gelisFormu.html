@@ -115,7 +115,7 @@
                   class="form-label"
                   th:text="#{patients.organization}"
                 ></label
-                ><i class="ti ti-building-bank ambulatory-field-icon"></i><select class="form-select select2" name="teskilatId">
+                ><i class="ti ti-building-bank ambulatory-field-icon"></i><select id="ambulatorTeskilat" class="form-select select2" name="teskilatId" required>
                   <option
                     value=""
                     th:text="#{patients.default_organization}"
@@ -124,7 +124,7 @@
                     th:each="o:${teskilatlar}"
                     th:value="${o.id}"
                     th:text="${o.ad}"
-                    th:selected="${(gelis!=null and gelis.teskilatId==o.id) or (gelis==null and selectedXeste!=null and selectedXeste.teskilatId==o.id)}"
+                    th:selected="${gelis!=null and gelis.teskilatId==o.id}"
                   ></option>
                 </select>
               </div>
@@ -157,10 +157,10 @@
               </div>
 
               <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="coin">
-                <label class="form-label">Qiymət qrupu</label>
+                <label class="form-label" th:text="#{prices.qiymet_qrupu}"></label>
                 <i class="ti ti-coin ambulatory-field-icon"></i>
-                <select id="qiymetQrupu" class="form-select select2">
-                  <option value="">Qiymət qrupu seçin</option>
+                <select id="qiymetQrupu" class="form-select select2" name="qiymetQrupuId" required th:data-selected-id="${gelis?.qiymetQrupuId}">
+                  <option value="" th:text="#{common.select}"></option>
                 </select>
               </div>
               <div class="col-md-6 ambulatory-field ambulatory-field-select" data-icon="user-search">

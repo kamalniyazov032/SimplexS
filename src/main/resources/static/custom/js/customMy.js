@@ -109,7 +109,6 @@ $(document).ready(function () {
                     $button.on('click', () => {
                         $('#ambulatorPatientId').val(patient.id);
                         $('#ambulatorSelectedPatient').val(patient.ad + ' · ' + patient.kod + (patient.meta ? ' · ' + patient.meta : ''));
-                        if (patient.teskilatId) $('[name="teskilatId"]').val(String(patient.teskilatId)).trigger('change');
                         const value = key => patient[key] || '-';
                         $('#ambulatoryPatientName').text(patient.ad);
                         $('#ambulatoryPatientDocument').text(value('vesiqeNomresi'));
@@ -150,6 +149,28 @@ $(document).ready(function () {
         $('#patientModalSearch').on('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); loadPatients('search'); } });
         $('#patientModalPrevious').on('click', () => loadPatients('previous'));
         $('#patientModalNext').on('click', () => loadPatients('next'));
+    }
+
+    const $ambulatorTeskilat = $('#ambulatorTeskilat');
+    const $qiymetQrupu = $('#qiymetQrupu');
+    if ($ambulatorTeskilat.length && $qiymetQrupu.length) {
+        const emptyText = $qiymetQrupu.find('option:first').text();
+        let selectedPriceGroupId = String($qiymetQrupu.data('selected-id') || '');
+        const loadPriceGroups = () => {
+            const teskilatId = $ambulatorTeskilat.val();
+            $qiymetQrupu.empty().append($('<option>').val('').text(emptyText)).trigger('change');
+            if (!teskilatId) return;
+            $.get('/ambulatorQebul/qiymet-qruplari', { teskilatId }).done(groups => {
+                groups.forEach(group => $qiymetQrupu.append($('<option>').val(group.id).text(group.ad)));
+                if (selectedPriceGroupId) {
+                    $qiymetQrupu.val(selectedPriceGroupId);
+                    selectedPriceGroupId = '';
+                }
+                $qiymetQrupu.trigger('change');
+            });
+        };
+        $ambulatorTeskilat.on('change', loadPriceGroups);
+        loadPriceGroups();
     }
 });
 

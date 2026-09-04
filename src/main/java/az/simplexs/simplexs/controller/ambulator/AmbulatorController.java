@@ -97,6 +97,12 @@ public class AmbulatorController {
         return Map.of("results", page, "more", more, "nextCursor", more ? page.getLast().id() : 0, "total", repo.xesteAxtarSayi(kid(s), aktiv, term));
     }
 
+    @GetMapping("/ambulatorQebul/qiymet-qruplari")
+    @ResponseBody
+    public List<GelisOption> qiymetQruplari(@RequestParam Long teskilatId, HttpSession s) {
+        return repo.teskilatQiymetQruplari(kid(s), teskilatId);
+    }
+
     @PostMapping("/ambulatorQebul/yarat")
     public String yarat(@ModelAttribute GelisForm f, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes a) {
         flash(repo.gelisYarat(kid(s), f, p.personalId()), a);
