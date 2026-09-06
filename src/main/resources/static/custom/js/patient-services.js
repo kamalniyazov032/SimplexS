@@ -83,8 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
         qiymet: Number(row.qiymet || 0),
         miqdar: Number(row.miqdar || 1),
         tarix: today(),
-        rutinId: row.rutin_id ?? null,
+
+        rutinId: type.value === 'RUTIN'
+            ? (row.rutin_id ?? null)
+            : null,
+
         gonderenHekimId: Number(referringDoctor.options[1]?.value) || null,
+
         sobeId: null,
         sobeAdi: '',
         hekimSecimQaydasiKodu: 'SECIMLI',
@@ -92,7 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
         icraEdenHekimId: null,
         icraEdenHekimAdi: '',
         tecili: false,
-        aciqlama: null
+        aciqlama: null,
+
+        nov: type.value
     });
     const containsService = id => [...selected.values()].some(x => String(x.id) === String(id));
     const currentService = () => selected.get(editingId) || (draft && String(draft.id) === editingId ? draft : null);
@@ -253,23 +260,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function addService(row, button) {
         const id = String(row.id);
+
         if (containsService(id)) return;
+
         if (editingId !== id || !draft) {
             openCandidate(row);
             return;
         }
+
         syncDetails();
+
         const department = document.getElementById('serviceDepartment');
         const performing = document.getElementById('performingDoctor');
-        const doctorRequired = department.selectedOptions[0]?.dataset.doctorRule === 'MECBURI';
-        const invalid = [document.getElementById('serviceDate'), department, ...(doctorRequired ? [performing] : [])].find(field => !field.value);
-        [department, performing].forEach(field => field.classList.toggle('is-invalid', field === invalid));
+
+        const isPackage = type.value === 'PAKET';
+
+        const doctorRequired =
+            !isPackage &&
+            department.selectedOptions[0]?.dataset.doctorRule === 'MECBURI';
+
+        const requiredFields = [
+            document.getElementById('serviceDate')
+        ];
+
+        if (!isPackage) {
+            requiredFields.push(department);
+
+            if (doctorRequired) {
+                requiredFields.push(performing);
+            }
+        }
+
+        const invalid = requiredFields.find(field => !field.value);
+
+        [department, performing].forEach(field =>
+            field.classList.toggle('is-invalid', field === invalid)
+        );
+
         if (invalid) {
             invalid.focus();
             showError(tr.selectionRequired);
             return;
         }
+
         const candidate = {...draft};
+
         try {
             button.disabled = true;
             await validate(candidate);
@@ -278,28 +313,70 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = false;
             return;
         }
+
         selected.set(id, candidate);
         draft = null;
+
         clearError();
+
         button.disabled = true;
         button.innerHTML = '<i class="ti ti-check"></i>';
+
         button.closest('tr')?.classList.add('psw-service-added');
+
         closeDetails();
         renderSelected();
     }
 
     function openCandidate(row) {
         const id = String(row.id);
+
         if (containsService(id)) {
             const entry = [...selected].find(([, x]) => String(x.id) === id);
             if (!entry[1].locked) openDetails(entry[0]);
             return;
         }
+
         draft = newService(row);
         editingId = id;
+
         markActiveCatalogRow();
         renderSelected();
-        populateDetails(draft);
+
+        if (type.value === 'PAKET') {
+            populatePackageDetails(draft);
+        } else {
+            populateDetails(draft);
+        }
+    }
+
+    function populatePackageDetails(row) {
+        document.getElementById('detailsEmpty').classList.add('d-none');
+        document.getElementById('detailsForm').classList.remove('d-none');
+
+        document.getElementById('detailsName').textContent = row.kod;
+        document.getElementById('serviceDate').value = row.tarix;
+
+        referringDoctor.value = row.gonderenHekimId ?? '';
+
+        document.getElementById('requestingDoctor').value =
+            row.isteyenHekimId ?? '';
+
+        document.getElementById('serviceQuantity').value = row.miqdar;
+        document.getElementById('serviceUrgent').checked = row.tecili;
+        document.getElementById('serviceNote').value = row.aciqlama ?? '';
+
+        const department = document.getElementById('serviceDepartment');
+        const performing = document.getElementById('performingDoctor');
+
+        department.replaceChildren(option('', tr.select));
+        performing.replaceChildren(option('', tr.select));
+
+        department.value = '';
+        performing.value = '';
+
+        department.disabled = true;
+        performing.disabled = true;
     }
 
     function renderSelected() {
@@ -472,17 +549,18 @@ document.addEventListener('DOMContentLoaded', () => {
         clearError();
 
         const isService = type.value === 'XIDMET';
+        const isRoutine = type.value === 'RUTIN';
 
         groups.classList.toggle('d-none', !isService);
-        collections.classList.toggle('d-none', isService);
+        collections.classList.toggle('d-none', !isRoutine);
         title.textContent = type.options[type.selectedIndex].text;
 
         body.replaceChildren();
 
-        if (isService) {
-            loadCatalog();
-        } else {
+        if (isRoutine) {
             loadCollections();
+        } else {
+            loadCatalog();
         }
     });
 
@@ -540,10 +618,10 @@ document.addEventListener('DOMContentLoaded', () => {
             page = 0;
             activeCollection = '';
 
-            if (type.value === 'XIDMET') {
-                loadCatalog();
-            } else {
+            if (type.value === 'RUTIN') {
                 loadCollections();
+            } else {
+                loadCatalog();
             }
         }, 300);
     });
