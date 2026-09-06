@@ -81,9 +81,11 @@
                     <div class="psw-catalog-tools">
                         <input id="serviceDate"
                                type="date"
-                               required
+                               required min="0001-01-01" max="9999-12-31"
+                               th:aria-label="#{patient_services.date}"
+                               th:title="#{patient_services.date}"
                                class="form-control form-control-sm"
-                               th:value="${bugun}" style="max-width: 100px">
+                               th:value="${bugun}" style="width: 155px">
                         <div class="input-group input-group-sm"><span class="input-group-text bg-white"><i
                                 class="ti ti-search"></i></span><input id="catalogSearch" class="form-control"
                                                                        th:placeholder="#{patient_services.search_placeholder}"
@@ -197,6 +199,8 @@
                         <th>#</th>
                         <th th:text="#{patient_services.code}"></th>
                         <th th:text="#{patient_services.service_name}"></th>
+                        <th th:text="#{patient_services.date}"></th>
+                        <th th:text="#{patient_services.routine_id}"></th>
                         <th th:text="#{patient_services.quantity}"></th>
                         <th th:text="#{patient_services.price}"></th>
                         <th th:text="#{patient_services.total}"></th>
@@ -206,17 +210,14 @@
                     </tr>
                     </thead>
                     <tbody id="selectedBody"></tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="5"></td>
-                        <td colspan="4"><strong th:text="#{patient_services.grand_total}"></strong> <strong
-                                id="grandTotal" class="text-primary ms-2">0.00 AZN</strong></td>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
             <div class="psw-submit"><a class="btn btn-light" th:href="@{/ambulatorQebul/siyahi}"
                                        th:text="#{common.legv_et}"></a>
+                <div class="psw-grand-total" role="status" aria-live="polite">
+                    <strong th:text="#{patient_services.grand_total}"></strong>
+                    <strong id="grandTotal" class="text-primary" th:text="|0.00 #{patient_services.currency}|"></strong>
+                </div>
                 <button id="saveServices" class="btn btn-success" disabled><i class="ti ti-device-floppy me-1"></i><span
                         th:text="#{patient_services.save}"></span></button>
             </div>
@@ -226,6 +227,8 @@
          th:data-remove="#{patient_services.remove}" th:data-edit="#{patients.edit}"
          th:data-page="#{patient_services.page}" th:data-load-error="#{patient_services.load_error}"
          th:data-select="#{common.secin}" th:data-selection-required="#{patient_services.selection_required}"
+         th:data-not-found="#{patient_services.not_found}"
+         th:data-invalid-date="#{patient_services.invalid_date}"
          th:data-no-department="#{patient_services.no_department}"
          th:data-currency="#{patient_services.currency}"></div>
     <script th:src="@{/custom/js/patient-services.js}"></script>

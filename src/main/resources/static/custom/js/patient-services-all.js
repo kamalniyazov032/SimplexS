@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('allServices'); if (!root) return;
   const tr = document.getElementById('allI18n').dataset, base = `/xeste-xidmetleri/${root.dataset.gelisId}`;
   const body = document.getElementById('allBody'), error = document.getElementById('allError');
+  const success = document.getElementById('allSuccess');
+  const clearMessages = () => {
+    [success, error].forEach(element => {element.textContent = ''; element.classList.add('d-none');});
+  };
   let rows = [], visible = [], tab = 'services', grouped = false;
   const str = x => x == null ? '' : String(x), money = x => `${Number(x || 0).toFixed(2)} ${tr.currency}`;
   const doctor = (x, prefix) => ['ad','soyad','ata_adi'].map(k => x[`${prefix}_${k}`]).filter(Boolean).join(' ');
@@ -40,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
       button(tr.edit,'edit',()=>{window.location.href=`${base}?istekId=${encodeURIComponent(x.istek_id)}`;}).disabled=!!x.kilidlidir || x.aktiv===false;
       button(tr.remove,'trash',async()=>{
         if(!window.confirm(tr.cancelConfirm))return;
-        try {const token=document.querySelector('#allCsrf input[name="_csrf"]');const response=await fetch(`${base}/legv/${x.xeste_xidmet_id}`,{method:'POST',headers:token?{'X-CSRF-TOKEN':token.value}:{}});const result=await response.json();if(!response.ok || !/UGUR|SUCCESS|OK/i.test(str(result.status_kodu)))throw new Error(result.mesaj || tr.loadError);await load();}catch(e){fail(e);}
+        clearMessages();
+        try {const token=document.querySelector('#allCsrf input[name="_csrf"]');const response=await fetch(`${base}/legv/${x.xeste_xidmet_id}`,{method:'POST',headers:token?{'X-CSRF-TOKEN':token.value}:{}});const result=await response.json();if(!response.ok || !/UGUR|SUCCESS|OK/i.test(str(result.status_kodu)))throw new Error(result.mesaj || tr.loadError);success.textContent=result.mesaj || tr.cancelSuccess;success.classList.remove('d-none');await load();}catch(e){fail(e);}
       }).disabled=!!x.kilidlidir || x.aktiv===false;
       row.append(actions);body.append(row);
     });

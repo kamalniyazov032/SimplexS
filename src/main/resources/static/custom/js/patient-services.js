@@ -5,19 +5,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const gelisId = root.dataset.gelisId;
     const istekId = root.dataset.istekId || '';
 
-    const today = () => {
-        const parts = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'Asia/Baku',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        }).formatToParts(new Date());
-
-        const date = Object.fromEntries(parts.map(p => [p.type, p.value]));
-        return `${date.year}-${date.month}-${date.day}`;
+    const serviceDate = document.getElementById('serviceDate');
+    const validDate = value => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '0001-01-01') return false;
+        const parsed = new Date(`${value}T00:00:00Z`);
+        return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
     };
-
-
+    const checkServiceDate = () => {
+        const valid = validDate(serviceDate.value) && serviceDate.checkValidity();
+        serviceDate.classList.toggle('is-invalid', !valid);
+        if (!valid) {
+            serviceDate.reportValidity();
+            serviceDate.focus();
+            showError(tr.invalidDate);
+        }
+        return valid;
+    };
 
     const payload = x => ({
         xeste_xidmet_id: x.xesteXidmetId ?? null,
@@ -82,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
         standartQiymet: Number(row.qiymet || 0),
         qiymet: Number(row.qiymet || 0),
         miqdar: Number(row.miqdar || 1),
-        tarix: today(),
+        tarix: serviceDate.value,
 
         rutinId: type.value === 'RUTIN'
-            ? (row.rutin_id ?? null)
+            ? (Number(row.rutin_id ?? activeCollection) || null)
             : null,
 
         gonderenHekimId: Number(referringDoctor.options[1]?.value) || null,
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!items.length) {
             const d = document.createElement('div');
             d.className = 'psw-empty psw-empty-small';
-            d.textContent = tr.loadError;
+            d.textContent = tr.notFound;
             collections.append(d);
             return;
         }
@@ -194,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.querySelector('span').textContent = row.ad;
             button.querySelector('small').textContent = [row.kod, row.xidmet_sayi].filter(v => v != null).join(' · ');
             button.addEventListener('click', () => {
+                closeDetails();
                 activeCollection = String(row.id);
                 collections.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === button));
                 loadContents();
@@ -234,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadContents() {
-        if (!activeCollection) return;
+        if (!activeCollection || !checkServiceDate()) return;
         request?.abort();
         request = new AbortController();
         clearError();
@@ -243,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams({
             nov: type.value,
             secimId: activeCollection,
-            tarix: document.getElementById('serviceDate').value || today()
+            tarix: serviceDate.value
         });
         try {
             const data = await json(`/xeste-xidmetleri/${gelisId}/kataloq?${params}`);
@@ -261,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function addService(row, button) {
         const id = String(row.id);
 
-        if (containsService(id)) return;
+        if (containsService(id) || !checkServiceDate()) return;
 
         if (editingId !== id || !draft) {
             openCandidate(row);
@@ -273,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const department = document.getElementById('serviceDepartment');
         const performing = document.getElementById('performingDoctor');
 
-        const isPackage = type.value === 'PAKET';
+        const isPackage = draft.nov === 'PAKET';
 
         const doctorRequired =
             !isPackage &&
@@ -291,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const invalid = requiredFields.find(field => !field.value);
+        const invalid = requiredFields.find(field => !field.value || !field.checkValidity());
 
         [department, performing].forEach(field =>
             field.classList.toggle('is-invalid', field === invalid)
@@ -329,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openCandidate(row) {
+        if (!checkServiceDate()) return;
         const id = String(row.id);
 
         if (containsService(id)) {
@@ -394,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
             total += row.qiymet * row.miqdar;
             const line = document.createElement('tr');
             if (id === editingId) line.classList.add('table-primary');
-            [index, row.kod, row.ad, row.miqdar, money(row.qiymet), money(row.qiymet * row.miqdar), row.sobeAdi || '—', row.icraEdenHekimAdi || '—'].forEach((value, i) => {
+            [index, row.kod, row.ad, row.tarix, row.rutinId ?? '—', row.miqdar, money(row.qiymet), money(row.qiymet * row.miqdar), row.sobeAdi || '—', row.icraEdenHekimAdi || '—'].forEach((value, i) => {
                 const td = document.createElement('td');
                 td.textContent = value;
                 if (i === 2) td.className = 'fw-semibold';
@@ -464,7 +469,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!row || row.locked) return;
         markActiveCatalogRow();
         renderSelected();
-        populateDetails(row);
+        if (row.nov === 'PAKET') populatePackageDetails(row);
+        else populateDetails(row);
     }
 
     async function loadDoctors() {
@@ -502,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!row || row.locked) return;
         const department = document.getElementById('serviceDepartment'),
             doctors = document.getElementById('performingDoctor');
-        row.tarix = document.getElementById('serviceDate').value;
+        if (validDate(serviceDate.value) && serviceDate.checkValidity()) row.tarix = serviceDate.value;
         row.gonderenHekimId = Number(referringDoctor.value) || null;
         row.sobeId = Number(department.value) || null;
         row.sobeAdi = department.value ? department.options[department.selectedIndex].text : '';
@@ -546,8 +552,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     type.addEventListener('change', () => {
+        clearTimeout(timer);
+        search.value = '';
         page = 0;
         activeCollection = '';
+        closeDetails();
         clearError();
 
         const isService = type.value === 'XIDMET';
@@ -559,44 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         body.replaceChildren();
 
-        if (isRoutine) {
-            loadCollections();
-        } else {
-            loadCatalog();
-        }
+        loadCatalog();
     });
-
-    async function loadCollections() {
-        request?.abort();
-        request = new AbortController();
-
-        clearError();
-        collections.replaceChildren();
-        loading.classList.remove('d-none');
-
-        const params = new URLSearchParams({
-            nov: type.value,
-            page: '0',
-            istekId
-        });
-
-        const query = search.value.trim();
-        if (query) params.set('q', query);
-
-        try {
-            const data = await json(
-                `/xeste-xidmetleri/${gelisId}/kataloq?${params}`
-            );
-
-            renderCollections(data.items);
-        } catch (e) {
-            if (e.name !== 'AbortError') {
-                collections.replaceChildren();
-            }
-        } finally {
-            loading.classList.add('d-none');
-        }
-    }
 
     groups.addEventListener('click', e => {
         const button = e.target.closest('[data-group]');
@@ -620,11 +593,8 @@ document.addEventListener('DOMContentLoaded', () => {
             page = 0;
             activeCollection = '';
 
-            if (type.value === 'RUTIN') {
-                loadCollections();
-            } else {
-                loadCatalog();
-            }
+            closeDetails();
+            loadCatalog();
         }, 300);
     });
     previous.addEventListener('click', () => {
@@ -651,7 +621,9 @@ document.addEventListener('DOMContentLoaded', () => {
         syncDetails();
     });
     ['referringDoctor', 'requestingDoctor', 'performingDoctor', 'serviceUrgent'].forEach(id => document.getElementById(id).addEventListener('change', syncDetails));
-    document.getElementById('serviceDate').addEventListener('change', async () => {
+    serviceDate.addEventListener('change', async () => {
+        if (!checkServiceDate()) return;
+        clearError();
         syncDetails();
         await loadDoctors();
         syncDetails();
@@ -659,13 +631,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ['serviceQuantity', 'serviceNote'].forEach(id => document.getElementById(id).addEventListener('input', syncDetails));
     document.getElementById('selectedForm').addEventListener('submit', async e => {
         e.preventDefault();
+        if (!checkServiceDate()) return;
         syncDetails();
         const button = document.getElementById('saveServices');
         button.disabled = true;
         try {
             for (const row of selected.values()) {
                 if (row.locked) continue;
-                if (!row.tarix || !row.sobeId) throw new Error(tr.selectionRequired);
+                if (!validDate(row.tarix)) throw new Error(tr.invalidDate);
+                if (row.nov !== 'PAKET' && !row.sobeId) throw new Error(tr.selectionRequired);
                 await validate(row);
             }
             document.getElementById('servicesJson').value = JSON.stringify([...selected.values()].map(payload));

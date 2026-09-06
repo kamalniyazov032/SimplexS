@@ -424,6 +424,7 @@ body {
     flex: 0 0 auto;
     align-items: center;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 6px
 }
@@ -433,10 +434,17 @@ body {
     font-size: .76rem
 }
 
-.psw-selected tfoot td {
-    padding: 8px;
-    background: #f8fbff;
-    text-align: center
+.psw-grand-total {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 5px 8px;
+    font-size: .85rem
+}
+
+.psw-grand-total strong {
+    white-space: nowrap
 }
 
 @media (max-width: 1199.98px) {
