@@ -46,6 +46,11 @@ public class AmbulatorController {
 
     @GetMapping("/ambulatorQebul/siyahi")
     public String list(@RequestParam(required = false) Long xesteId, @RequestParam(required = false) Long gelisNovuId, @RequestParam(required = false) Long teskilatId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tarixBaslama, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tarixBitme, @RequestParam(required = false) String randevu, @RequestParam(defaultValue = "aktiv") String status, @RequestParam(required = false) String q, @RequestParam(required = false) Long cursor, @RequestParam(required = false) String cursorTrail, Model m, HttpSession s) {
+        if (tarixBaslama == null && tarixBitme == null) {
+            LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Baku"));
+            tarixBaslama = today;
+            tarixBitme = today;
+        }
         Boolean aktiv = status.isBlank() ? null : !"passiv".equals(status);
         Boolean r = randevu == null || randevu.isBlank() ? null : "beli".equals(randevu);
         var rows = repo.gelisler(kid(s), xesteId, gelisNovuId, teskilatId, tarixBaslama, tarixBitme, r, aktiv, q, cursor, 101);

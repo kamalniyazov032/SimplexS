@@ -6,13 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearMessages = () => {
     [success, error].forEach(element => {element.textContent = ''; element.classList.add('d-none');});
   };
+  const packagePending = new Set();
   let rows = [], visible = [], tab = 'services', grouped = false;
   const str = x => x == null ? '' : String(x), money = x => `${Number(x || 0).toFixed(2)} ${tr.currency}`;
   const doctor = (x, prefix) => ['ad','soyad','ata_adi'].map(k => x[`${prefix}_${k}`]).filter(Boolean).join(' ');
   const value = (x, key) => key === 'doctor' ? doctor(x,'icra_eden_hekim') : str(x[{status:'status_adi',type:'xidmet_tipi_adi',department:'sobe_adi'}[key]]);
   const fail = e => {error.textContent = e.message || tr.loadError; error.classList.remove('d-none');};
-  const cells = x => [x.istek_id, x.xidmet_adi, str(x.xidmet_tarixi).slice(0,10), x.sobe_adi, x.miqdar, money(x.vahid_qiymet), money(x.yekun_mebleg), doctor(x,'gonderen_hekim'),doctor(x,'isteyen_hekim'),doctor(x,'icra_eden_hekim'),x.status_adi];
-  const keys = ['request','serviceName','date','department','quantity','price','total','referringDoctor','requestingDoctor','performingDoctor','status'];
+  const cells = x => [x.istek_id, x.xidmet_adi, str(x.xidmet_tarixi).slice(0,10), x.sobe_adi, x.miqdar, money(x.vahid_qiymet), money(x.yekun_mebleg), doctor(x,'gonderen_hekim'),doctor(x,'isteyen_hekim'),doctor(x,'icra_eden_hekim'),x.status_adi, x.paket_daxildir ? tr.yes : tr.no];
+  const keys = ['request','serviceName','date','department','quantity','price','total','referringDoctor','requestingDoctor','performingDoctor','status','packageIncluded'];
   async function load() {
     try {
       const response = await fetch(`${base}/siyahi`, {headers:{Accept:'application/json'}}); if (!response.ok) throw new Error(tr.loadError);
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function details(row) {
     const dl = document.getElementById('serviceInfo'); dl.replaceChildren();
-    [...keys.map((key,i)=>[tr[key],cells(row)[i]]),[tr.note,row.aciqlama],[tr.patientAmount,money(row.xeste_meblegi)],[tr.organizationAmount,money(row.qurum_meblegi)],[tr.locked,row.blok_sebebi || row.maliyye_blok_sebebi || '—']].forEach(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=str(v)||'—';dl.append(dt,dd);});
+    [[tr.patientServiceId,row.xeste_xidmet_id],...keys.map((key,i)=>[tr[key],cells(row)[i]]),[tr.note,row.aciqlama],[tr.patientAmount,money(row.xeste_meblegi)],[tr.organizationAmount,money(row.qurum_meblegi)],[tr.locked,row.blok_sebebi || row.maliyye_blok_sebebi || '—']].forEach(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=str(v)||'—';dl.append(dt,dd);});
     document.getElementById('serviceDialog').showModal();
   }
   function render() {
@@ -35,9 +36,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if(tab==='history') visible.sort((a,b)=>str(b.yenilenme_tarixi || b.yaranma_tarixi).localeCompare(str(a.yenilenme_tarixi || a.yaranma_tarixi)));
     body.replaceChildren(); let previous=null;
     visible.forEach((x,i)=>{
-      if(grouped && x.istek_id!==previous){const row=document.createElement('tr'),td=document.createElement('td');row.className='request-group';td.colSpan=13;td.textContent=`${tr.request} #${x.istek_id}`;row.append(td);body.append(row);previous=x.istek_id;}
+      if(grouped && x.istek_id!==previous){const row=document.createElement('tr'),td=document.createElement('td');row.className='request-group';td.colSpan=14;td.textContent=`${tr.request} #${x.istek_id}`;row.append(td);body.append(row);previous=x.istek_id;}
       const row=document.createElement('tr');
-      [i+1,...cells(x)].forEach((v,n)=>{const td=document.createElement('td');td.textContent=str(v)||'—';if(n===2){const code=document.createElement('small');code.textContent=x.xidmet_kodu;td.append(code);}if(n===11){const badge=document.createElement('span');badge.className=`badge ${x.aktiv===false?'bg-danger-subtle text-danger':'bg-success-subtle text-success'}`;badge.textContent=td.textContent;td.replaceChildren(badge);}row.append(td);});
+      [i+1,...cells(x).slice(0,-1)].forEach((v,n)=>{const td=document.createElement('td');td.textContent=str(v)||'—';if(n===2){const code=document.createElement('small');code.textContent=x.xidmet_kodu;td.append(code);}if(n===11){const badge=document.createElement('span');badge.className=`badge ${x.aktiv===false?'bg-danger-subtle text-danger':'bg-success-subtle text-success'}`;badge.textContent=td.textContent;td.replaceChildren(badge);}row.append(td);});
+      const packageCell=document.createElement('td');packageCell.className='text-center';
+      const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.className='form-check-input';
+      checkbox.checked=x.paket_daxildir === true;
+      checkbox.setAttribute('aria-label',`${tr.packageIncluded}: ${str(x.xidmet_adi)}`);
+      checkbox.disabled=packagePending.has(x.xeste_xidmet_id) || !!x.kilidlidir || x.aktiv===false;
+      checkbox.onchange=async()=>{
+        if(packagePending.has(x.xeste_xidmet_id)) return;
+        const checked=checkbox.checked;
+        packagePending.add(x.xeste_xidmet_id);checkbox.disabled=true;clearMessages();
+        try {
+          const token=document.querySelector('#allCsrf input[name="_csrf"]');
+          const response=await fetch(`${base}/paket-statusu/${x.xeste_xidmet_id}`,{
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded',...(token?{'X-CSRF-TOKEN':token.value}:{})},
+            body:new URLSearchParams({paketDaxildir:String(checked)}).toString()
+          });
+          const result=await response.json();
+          if(!response.ok || !/^(UGURLU|SUCCESS|OK)$/i.test(str(result.status_kodu))) throw new Error(result.mesaj || tr.loadError);
+          x.paket_daxildir=result.paket_daxildir;
+          x.vahid_qiymet=result.vahid_qiymet;x.yekun_mebleg=result.yekun_mebleg;
+          success.textContent=result.mesaj || tr.packageSuccess;success.classList.remove('d-none');
+          await load();
+        } catch(e) {fail(e);}
+        finally {packagePending.delete(x.xeste_xidmet_id);render();}
+      };
+      packageCell.append(checkbox);row.append(packageCell);
       const actions=document.createElement('td');actions.className='text-nowrap';
       const button=(title,icon,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn btn-sm btn-outline-primary me-1';b.title=title;b.setAttribute('aria-label',title);const i=document.createElement('i');i.className=`ti ti-${icon}`;b.append(i);b.onclick=fn;actions.append(b);return b;};
       button(tr.view,'eye',()=>details(x));

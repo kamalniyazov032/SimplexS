@@ -12,7 +12,20 @@
 
     <div id="ambulatoryListPage" class="ambulatory-list-page">
       <style>
-        .visit-summary-card{transition:transform .2s ease,box-shadow .2s ease}.visit-summary-card:hover{transform:translateY(-2px);box-shadow:0 .5rem 1.25rem rgba(15,23,42,.08)!important}.visit-summary-card .avatar{width:3.5rem;height:3.5rem}.visit-patient-avatar{width:2.75rem;height:2.75rem;flex:0 0 2.75rem;font-size:1rem;font-weight:700}.visit-cell-icon{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;flex:0 0 2rem;border-radius:.5rem}.visit-table tbody tr{height:4.5rem}.visit-table th{white-space:nowrap}.visit-table td{white-space:nowrap}
+        .visit-summary-card{transition:transform .2s ease,box-shadow .2s ease}.visit-summary-card:hover{transform:translateY(-2px);box-shadow:0 .5rem 1.25rem rgba(15,23,42,.08)!important}.visit-summary-card .avatar{width:3.5rem;height:3.5rem}.visit-patient-avatar{width:2.75rem;height:2.75rem;flex:0 0 2.75rem;font-size:1rem;font-weight:700}.visit-cell-icon{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;flex:0 0 2rem;border-radius:.5rem}.visit-table{width:100%;min-width:0;table-layout:fixed;font-size:.78rem}
+        .visit-table th,.visit-table td{white-space:normal!important;overflow-wrap:anywhere;padding:.5rem .375rem!important;line-height:1.35}
+        .visit-table td .d-flex{gap:.375rem!important;min-width:0}
+        .visit-table td .d-flex>div,.visit-table td .d-flex>span:not(.avatar):not(.visit-cell-icon){min-width:0}
+        .visit-table .visit-patient-avatar{width:1.55rem;height:1.75rem;flex-basis:1.75rem;font-size:.75rem}
+        .visit-table .visit-cell-icon{width:1.5rem;height:1.5rem;flex-basis:1.5rem;border-radius:.375rem}
+        .visit-table td i{flex-shrink:0}
+        .visit-table td .badge{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:48px;white-space:nowrap;word-break:normal;overflow-wrap:normal;padding:.35rem .45rem;font-size:.7rem}
+        .visit-table th:nth-child(6),.visit-table td:nth-child(6){white-space:nowrap!important;overflow-wrap:normal}
+        .visit-table th:nth-child(8),.visit-table td:nth-child(8){text-align:center;white-space:nowrap!important;overflow-wrap:normal}
+        .visit-table th:last-child,.visit-table td:last-child{padding-right:.75rem!important}
+        .visit-table .visit-actions{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:.25rem!important}
+        .visit-table .visit-actions .btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;padding:0;font-size:.85rem;line-height:1}
+        @media(max-width:900px){.visit-table .visit-patient-avatar,.visit-table .visit-cell-icon,.visit-table td>div>i{display:none}.visit-table{font-size:.7rem}.visit-table th,.visit-table td{padding:.375rem .2rem!important}}
       </style>
       <div
         class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
@@ -216,12 +229,18 @@
         <div class="card-body p-0 visit-list-card-body">
           <div class="table-responsive visit-list-scroll">
             <table class="table visit-table table-hover align-middle mb-0">
+              <colgroup>
+                <col style="width:128px"><col style="width:calc((88% - 586px) / 3 - 84px)"><col style="width:12%">
+                <col style="width:calc((88% - 586px) / 3 + 56px)"><col><col style="width:180px">
+                <col style="width:90px"><col style="width:72px"><col style="width:144px">
+              </colgroup>
               <thead class="bg-light">
                 <tr>
                   <th class="ps-3" th:text="#{visits.protocol}"></th>
                   <th th:text="#{visits.patient}"></th>
                   <th th:text="#{visits.type}"></th>
                   <th th:text="#{patients.organization}"></th>
+                  <th th:text="#{prices.qiymet_qrupu}"></th>
                   <th th:text="#{visits.date}"></th>
                   <th th:text="#{visits.appointment}"></th>
                   <th th:text="#{common.status}"></th>
@@ -239,6 +258,7 @@
                   </td>
                   <td><div class="d-flex align-items-center gap-2"><span class="visit-cell-icon" th:classappend="${g.gelisNovuKodu=='KONTROL_MUAYINE'}?'bg-warning-subtle text-warning':(${g.gelisNovuKodu=='DIAQNOSTIK_MUAYINE'}?'bg-info-subtle text-info':'bg-success-subtle text-success')"><i class="ti" th:classappend="${g.gelisNovuKodu=='KONTROL_MUAYINE'}?'ti-refresh':(${g.gelisNovuKodu=='DIAQNOSTIK_MUAYINE'}?'ti-microscope':'ti-user-heart')"></i></span><span class="fw-medium" th:text="${g.gelisNovuAdi}"></span></div></td>
                   <td><div class="d-flex align-items-center gap-2"><i class="ti ti-building-hospital fs-5 text-muted"></i><span th:text="${g.teskilatAdi?:'—'}"></span></div></td>
+                  <td><div class="d-flex align-items-center gap-2"><i class="ti ti-coin fs-5 text-muted" aria-hidden="true"></i><span th:text="${g.qiymetQrupuAdi?:'—'}"></span></div></td>
                   <td><div class="d-flex align-items-center gap-2"><i class="ti ti-calendar fs-5 text-muted"></i><span th:text="|${#temporals.format(g.gelisTarixi,'dd.MM.yyyy')} ${#temporals.format(g.gelisSaati,'HH:mm')}|"></span></div></td>
                   <td><div class="d-flex align-items-center gap-2"><i class="ti ti-calendar-check fs-5 text-muted"></i><span th:text="${g.randevudur}?#{common.beli}:#{common.xeyr}"></span></div></td>
                   <td>
@@ -249,7 +269,7 @@
                     ></span>
                   </td>
                   <td>
-                    <div class="d-flex gap-1">
+                    <div class="visit-actions">
                       <a
                               class="btn btn-sm btn-outline-dark"
                               th:href="@{/xeste-xidmetleri/{id}/hamisi(id=${g.id})}" th:title="#{patient_services.all}">
@@ -280,7 +300,7 @@
                   </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(gelisler)}">
-                  <td colspan="8" class="text-center text-muted py-5">
+                  <td colspan="9" class="text-center text-muted py-5">
                     <i class="ti ti-stethoscope-off fs-2 d-block mb-2"></i
                     ><span th:text="#{patients.empty}"></span>
                   </td>

@@ -65,7 +65,7 @@ public class XesteXidmetController {
             List<Map<String, Object>> rows;
             if ("PAKET".equals(nov)) rows = repo.paketler(gelisId, q, offset);
             else if ("RUTIN".equals(nov)) rows = secimId == null ? repo.rutinler(klinikaId(session), q, offset) : repo.rutinTerkibi(gelisId, secimId, tarix == null ? java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")) : tarix);
-            else rows = repo.xidmetler(gelisId, qrupId, q, offset, istekId);
+            else rows = repo.xidmetler(gelisId, qrupId, q, offset, istekId, klinikaId(session));
             boolean more = secimId == null && rows.size() > 100;
             return ResponseEntity.ok(Map.of("items", more ? rows.subList(0, 100) : rows, "hasMore", more));
         } catch (DataAccessException exception) {
@@ -123,6 +123,20 @@ public class XesteXidmetController {
         if (repo.secilmisXidmetler(gelisId).stream().noneMatch(row -> String.valueOf(id).equals(String.valueOf(row.get("xeste_xidmet_id")))))
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
         return repo.legv(id, personal.personalId());
+    }
+
+    @PostMapping("/{gelisId}/paket-statusu/{id}") @ResponseBody
+    public ResponseEntity<Map<String, Object>> paketStatusu(@PathVariable Long gelisId, @PathVariable Long id,
+            @RequestParam boolean paketDaxildir, HttpSession session,
+            @AuthenticationPrincipal AuthenticatedPersonal personal) {
+        ambulatorRepo.gelis(klinikaId(session), gelisId);
+        if (repo.secilmisXidmetler(gelisId).stream().noneMatch(row -> String.valueOf(id).equals(String.valueOf(row.get("xeste_xidmet_id")))))
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
+        try {
+            return ResponseEntity.ok(repo.paketStatusunuYenile(id, paketDaxildir, personal.personalId()));
+        } catch (DataAccessException exception) {
+            return ResponseEntity.unprocessableContent().body(Map.of("mesaj", databaseMessage(exception)));
+        }
     }
 
     private Long klinikaId(HttpSession session) {

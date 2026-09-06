@@ -19,6 +19,7 @@
           name="gelisId"
           th:value="${gelis.id}"
         />
+        <input th:if="${gelis}" type="hidden" id="priceGroupApplyExisting" name="qiymetQrupuCariXidmetlereTesirEtsin" value="false" />
         <div class="ambulatory-page-header">
           <div class="ambulatory-heading">
             <a class="ambulatory-back" th:href="@{/ambulatorQebul/siyahi}" th:title="#{common.back}">
@@ -235,6 +236,17 @@
           <i class="ti ti-medical-cross ambulatory-note-art" aria-hidden="true"></i>
         </div>
       </form>
+      <div th:if="${gelis}" id="priceGroupImpactModal" class="modal fade" tabindex="-1"
+           aria-labelledby="priceGroupImpactTitle" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content">
+          <div class="modal-header"><h5 id="priceGroupImpactTitle" class="modal-title" th:text="#{prices.qiymet_qrupu}"></h5></div>
+          <div class="modal-body"><p class="mb-0" th:text="#{visits.price_group_existing_services}"></p></div>
+          <div class="modal-footer">
+            <button type="button" id="priceGroupImpactNo" class="btn btn-outline-secondary" th:text="#{common.xeyr}"></button>
+            <button type="button" id="priceGroupImpactYes" class="btn btn-primary" th:text="#{common.beli}"></button>
+          </div>
+        </div></div>
+      </div>
       <div class="modal fade" id="patientSelectionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
           <div class="modal-content">

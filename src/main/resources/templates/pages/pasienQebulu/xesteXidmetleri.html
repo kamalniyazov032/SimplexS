@@ -79,13 +79,16 @@
                             id="catalogHint" class="text-muted" th:text="#{patient_services.catalog_hint}"></small>
                     </div>
                     <div class="psw-catalog-tools">
+                        <div class="psw-date-picker">
+                            <label for="serviceDate" class="psw-date-label"><i class="ti ti-calendar-event" aria-hidden="true"></i><span th:text="#{patient_services.date}"></span></label>
                         <input id="serviceDate"
                                type="date"
                                required min="0001-01-01" max="9999-12-31"
                                th:aria-label="#{patient_services.date}"
                                th:title="#{patient_services.date}"
                                class="form-control form-control-sm"
-                               th:value="${bugun}" style="width: 155px">
+                               th:value="${bugun}" autocomplete="off" inputmode="none">
+                        </div>
                         <div class="input-group input-group-sm"><span class="input-group-text bg-white"><i
                                 class="ti ti-search"></i></span><input id="catalogSearch" class="form-control"
                                                                        th:placeholder="#{patient_services.search_placeholder}"
@@ -206,6 +209,8 @@
                         <th th:text="#{patient_services.total}"></th>
                         <th th:text="#{patient_services.department}"></th>
                         <th th:text="#{patient_services.performing_doctor}"></th>
+                        <th th:text="#{visits.referring_doctor}"></th>
+                        <th th:text="#{patient_services.requesting_doctor}"></th>
                         <th></th>
                     </tr>
                     </thead>

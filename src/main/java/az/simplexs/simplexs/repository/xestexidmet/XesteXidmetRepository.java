@@ -35,14 +35,24 @@ public class XesteXidmetRepository {
                 """, p().addValue("klinika", klinikaId));
     }
 
-    public List<Map<String, Object>> xidmetler(Long gelisId, Long qrupId, String query, int offset, Long istekId) {
+    public List<Map<String, Object>> xidmetler(Long gelisId, Long qrupId, String query, int offset, Long istekId, Long klinikaId) {
         return jdbc.queryForList("""
+                WITH RECURSIVE qruplar AS MATERIALIZED (
+                    SELECT xidmet_qrupu_id, parent_id
+                      FROM public.fn_xidmet_qrupu_siyahisi(CAST(:klinika AS bigint), true)
+                     WHERE CAST(:qrup AS bigint) IS NOT NULL
+                ), secilmis_qruplar(id) AS (
+                    SELECT xidmet_qrupu_id FROM qruplar WHERE xidmet_qrupu_id = CAST(:qrup AS bigint)
+                    UNION
+                    SELECT q.xidmet_qrupu_id FROM qruplar q
+                      JOIN secilmis_qruplar s ON q.parent_id = s.id
+                )
                 SELECT xidmet_id id, xidmet_kodu kod, xidmet_adi ad,
                        xidmet_qrupu_id qrup_id, xidmet_qrupu_adi qrup_adi,
                        xidmet_tipi_adi tip_adi, standart_qiymet qiymet, istekde_var, istekde_say
                   FROM public.fn_gelis_ucun_xidmet_siyahisi(
                        p_gelis_id => CAST(:gelis AS bigint), p_istek_id => CAST(:istek AS bigint))
-                 WHERE (CAST(:qrup AS bigint) IS NULL OR xidmet_qrupu_id = CAST(:qrup AS bigint))
+                 WHERE (CAST(:qrup AS bigint) IS NULL OR xidmet_qrupu_id IN (SELECT id FROM secilmis_qruplar))
                    AND (CAST(:q AS text) IS NULL
                         OR regexp_replace(xidmet_adi, '[[:space:]]+', '', 'g')
                            ILIKE '%' || regexp_replace(btrim(CAST(:q AS text)), '[[:space:]]+', '', 'g') || '%'
@@ -50,7 +60,7 @@ public class XesteXidmetRepository {
                  ORDER BY xidmet_adi
                  LIMIT 101 OFFSET :offset
                 """, p().addValue("gelis", gelisId).addValue("qrup", qrupId).addValue("istek", istekId)
-                .addValue("q", blank(query)).addValue("offset", offset));
+                .addValue("klinika", klinikaId).addValue("q", blank(query)).addValue("offset", offset));
     }
 
     public List<Map<String, Object>> paketler(Long gelisId, String query, int offset) {
@@ -153,11 +163,31 @@ public class XesteXidmetRepository {
 
 
     public List<Map<String, Object>> redakte(Long gelisId, Long istekId) {
-        return jdbc.queryForList("SELECT * FROM public.fn_xeste_xidmet_isteyi_redakte_siyahisi(p_gelis_id => CAST(:gelis AS bigint), p_istek_id => CAST(:istek AS bigint))", p().addValue("gelis", gelisId).addValue("istek", istekId));
+        return jdbc.queryForList("""
+                SELECT x.*,
+                       concat_ws(' ', gh.ad, gh.soyad, gh.ata_adi) gonderen_hekim_adi,
+                       concat_ws(' ', ih.ad, ih.soyad, ih.ata_adi) isteyen_hekim_adi,
+                       concat_ws(' ', eh.ad, eh.soyad, eh.ata_adi) icra_eden_hekim_adi
+                  FROM public.fn_xeste_xidmet_isteyi_redakte_siyahisi(
+                       p_gelis_id => CAST(:gelis AS bigint), p_istek_id => CAST(:istek AS bigint)) x
+                  LEFT JOIN public.rn_personallar gh ON gh.id = x.gonderen_hekim_id
+                  LEFT JOIN public.rn_personallar ih ON ih.id = x.isteyen_hekim_id
+                  LEFT JOIN public.rn_personallar eh ON eh.id = x.icra_eden_hekim_id
+                """, p().addValue("gelis", gelisId).addValue("istek", istekId));
     }
 
     public Map<String, Object> yenile(Long gelisId, Long istekId, String xidmetler, Long personalId) {
         return jdbc.queryForMap("SELECT * FROM public.fn_xeste_xidmet_isteyini_yenile(p_gelis_id => CAST(:gelis AS bigint), p_istek_id => CAST(:istek AS bigint), p_xidmetler => CAST(:xidmetler AS jsonb), p_yenileyen_personal_id => CAST(:personal AS bigint))", p().addValue("gelis", gelisId).addValue("istek", istekId).addValue("xidmetler", xidmetler).addValue("personal", personalId));
+    }
+
+    public Map<String, Object> paketStatusunuYenile(Long xidmetId, boolean paketDaxildir, Long personalId) {
+        return jdbc.queryForMap("""
+                SELECT status_kodu, xeste_xidmet_id, paket_daxildir, vahid_qiymet, yekun_mebleg, mesaj
+                  FROM public.fn_xeste_xidmetini_paket_statusunu_yenile(
+                    p_xeste_xidmet_id => CAST(:id AS bigint),
+                    p_paket_daxildir => CAST(:paket AS boolean),
+                    p_yenileyen_personal_id => CAST(:personal AS bigint))
+                """, p().addValue("id", xidmetId).addValue("paket", paketDaxildir).addValue("personal", personalId));
     }
 
     public Map<String, Object> legv(Long xidmetId, Long personalId) {

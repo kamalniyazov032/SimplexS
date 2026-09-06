@@ -11,6 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const parsed = new Date(`${value}T00:00:00Z`);
         return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
     };
+    let lastServiceDate = serviceDate.value;
+    const openDatePicker = () => {
+        if (typeof serviceDate.showPicker === 'function') {
+            try { serviceDate.showPicker(); } catch (_) { /* Native picker remains available. */ }
+        }
+    };
+    serviceDate.addEventListener('click', openDatePicker);
+    serviceDate.addEventListener('keydown', event => {
+        if (event.key === 'Tab' || event.key === 'Escape') return;
+        event.preventDefault();
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') openDatePicker();
+    });
+    ['beforeinput', 'paste', 'drop'].forEach(eventName => {
+        serviceDate.addEventListener(eventName, event => event.preventDefault());
+    });
+    serviceDate.addEventListener('focus', () => {
+        if (validDate(serviceDate.value)) lastServiceDate = serviceDate.value;
+    });
+    serviceDate.addEventListener('input', () => {
+        if (validDate(serviceDate.value)) lastServiceDate = serviceDate.value;
+        else serviceDate.value = lastServiceDate;
+    });
     const checkServiceDate = () => {
         const valid = validDate(serviceDate.value) && serviceDate.checkValidity();
         serviceDate.classList.toggle('is-invalid', !valid);
@@ -65,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertMessage = document.getElementById('catalogAlertMessage');
     const alertClose = document.getElementById('catalogAlertClose');
     const referringDoctor = document.getElementById('referringDoctor');
+    const doctorDefaults = {
+        gonderenHekimId: Number(referringDoctor.options[1]?.value) || null,
+        gonderenHekimAdi: referringDoctor.options[1]?.textContent || '',
+        isteyenHekimId: Number(document.getElementById('requestingDoctor').value) || null,
+        isteyenHekimAdi: document.getElementById('requestingDoctor').selectedOptions[0]?.textContent || ''
+    };
     const selected = new Map();
     let activeGroup = '', activeCollection = '', page = 0, hasMore = false, request, timer, editingId = null,
         draft = null;
@@ -91,12 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ? (Number(row.rutin_id ?? activeCollection) || null)
             : null,
 
-        gonderenHekimId: Number(referringDoctor.options[1]?.value) || null,
+        ...doctorDefaults,
 
         sobeId: null,
         sobeAdi: '',
         hekimSecimQaydasiKodu: 'SECIMLI',
-        isteyenHekimId: null,
         icraEdenHekimId: null,
         icraEdenHekimAdi: '',
         tecili: false,
@@ -216,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams({nov: type.value, page: String(page), istekId});
         const query = search.value.trim();
         if (query) params.set('q', query);
-        if (type.value === 'XIDMET' && activeGroup && !query) params.set('qrupId', activeGroup);
+        if (type.value === 'XIDMET' && activeGroup) params.set('qrupId', activeGroup);
         try {
             const data = await json(`/xeste-xidmetleri/${gelisId}/kataloq?${params}`);
             hasMore = data.hasMore;
@@ -399,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             total += row.qiymet * row.miqdar;
             const line = document.createElement('tr');
             if (id === editingId) line.classList.add('table-primary');
-            [index, row.kod, row.ad, row.tarix, row.rutinId ?? '—', row.miqdar, money(row.qiymet), money(row.qiymet * row.miqdar), row.sobeAdi || '—', row.icraEdenHekimAdi || '—'].forEach((value, i) => {
+            [index, row.kod, row.ad, row.tarix, row.rutinId ?? '—', row.miqdar, money(row.qiymet), money(row.qiymet * row.miqdar), row.sobeAdi || '—', row.icraEdenHekimAdi || '—', row.gonderenHekimAdi || '—', row.isteyenHekimAdi || '—'].forEach((value, i) => {
                 const td = document.createElement('td');
                 td.textContent = value;
                 if (i === 2) td.className = 'fw-semibold';
@@ -454,6 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 departmentOption.dataset.doctorRule = text(x.hekim_secim_qaydasi_kodu) || 'SECIMLI';
                 department.append(departmentOption);
             });
+            if (row.sobeId == null && rows.length === 1) {
+                row.sobeId = Number(rows[0].sobe_id);
+                row.sobeAdi = text(rows[0].sobe_adi);
+                if (selected.has(editingId)) renderSelected();
+            }
             department.value = row.sobeId ?? '';
             if (!rows.length) department.append(option('', tr.noDepartment));
             await loadDoctors();
@@ -510,9 +542,14 @@ document.addEventListener('DOMContentLoaded', () => {
             doctors = document.getElementById('performingDoctor');
         if (validDate(serviceDate.value) && serviceDate.checkValidity()) row.tarix = serviceDate.value;
         row.gonderenHekimId = Number(referringDoctor.value) || null;
+        row.gonderenHekimAdi = referringDoctor.value ? referringDoctor.selectedOptions[0]?.textContent || '' : '';
         row.sobeId = Number(department.value) || null;
         row.sobeAdi = department.value ? department.options[department.selectedIndex].text : '';
-        if (!document.getElementById('requestingDoctor').disabled) row.isteyenHekimId = Number(document.getElementById('requestingDoctor').value) || null;
+        const requestingDoctor = document.getElementById('requestingDoctor');
+        if (!requestingDoctor.disabled) {
+            row.isteyenHekimId = Number(requestingDoctor.value) || null;
+            row.isteyenHekimAdi = requestingDoctor.value ? requestingDoctor.selectedOptions[0]?.textContent || '' : '';
+        }
         row.icraEdenHekimId = Number(doctors.value) || null;
         row.icraEdenHekimAdi = doctors.value ? doctors.options[doctors.selectedIndex].dataset.doctorName : '';
         row.qiymet = doctors.value ? Number(doctors.options[doctors.selectedIndex].dataset.finalPrice ?? row.standartQiymet) : row.standartQiymet;
@@ -620,9 +657,19 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadDoctors();
         syncDetails();
     });
-    ['referringDoctor', 'requestingDoctor', 'performingDoctor', 'serviceUrgent'].forEach(id => document.getElementById(id).addEventListener('change', syncDetails));
+    [['referringDoctor', 'gonderenHekim'], ['requestingDoctor', 'isteyenHekim']].forEach(([id, key]) => {
+        const control = document.getElementById(id);
+        control.addEventListener('change', () => {
+            doctorDefaults[`${key}Id`] = Number(control.value) || null;
+            doctorDefaults[`${key}Adi`] = control.value ? control.selectedOptions[0]?.textContent || '' : '';
+            syncDetails();
+        });
+    });
+    ['performingDoctor', 'serviceUrgent'].forEach(id => document.getElementById(id).addEventListener('change', syncDetails));
     serviceDate.addEventListener('change', async () => {
+        if (!validDate(serviceDate.value)) serviceDate.value = lastServiceDate;
         if (!checkServiceDate()) return;
+        lastServiceDate = serviceDate.value;
         clearError();
         syncDetails();
         await loadDoctors();
@@ -673,8 +720,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     sobeId: x.sobe_id,
                     sobeAdi: x.sobe_adi,
                     gonderenHekimId: x.gonderen_hekim_id,
+                    gonderenHekimAdi: x.gonderen_hekim_adi,
                     isteyenHekimId: x.isteyen_hekim_id,
+                    isteyenHekimAdi: x.isteyen_hekim_adi,
                     icraEdenHekimId: x.icra_eden_hekim_id,
+                    icraEdenHekimAdi: x.icra_eden_hekim_adi,
                     miqdar: x.miqdar,
                     tecili: x.tecili,
                     aciqlama: x.aciqlama,

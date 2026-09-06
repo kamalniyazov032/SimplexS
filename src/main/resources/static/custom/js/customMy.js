@@ -154,6 +154,33 @@ $(document).ready(function () {
     const $ambulatorTeskilat = $('#ambulatorTeskilat');
     const $qiymetQrupu = $('#qiymetQrupu');
     if ($ambulatorTeskilat.length && $qiymetQrupu.length) {
+        const impactField = document.getElementById('priceGroupApplyExisting');
+        const impactElement = document.getElementById('priceGroupImpactModal');
+        if (impactField && impactElement) {
+            const originalGroup = String($qiymetQrupu.data('selected-id') || '');
+            const impactModal = bootstrap.Modal.getOrCreateInstance(impactElement);
+            let answeredGroup = originalGroup;
+            let pendingChoice = false;
+            $qiymetQrupu.on('change', () => {
+                const group = String($qiymetQrupu.val() || '');
+                if (group === answeredGroup && group) return;
+                impactField.value = 'false';
+                pendingChoice = !!group && group !== originalGroup;
+                if (pendingChoice) impactModal.show();
+                else { answeredGroup = group; impactModal.hide(); }
+            });
+            const chooseImpact = apply => {
+                impactField.value = String(apply);
+                answeredGroup = String($qiymetQrupu.val() || '');
+                pendingChoice = false;
+                impactModal.hide();
+            };
+            document.getElementById('priceGroupImpactYes').addEventListener('click', () => chooseImpact(true));
+            document.getElementById('priceGroupImpactNo').addEventListener('click', () => chooseImpact(false));
+            impactField.form.addEventListener('submit', event => {
+                if (pendingChoice) { event.preventDefault(); impactModal.show(); }
+            });
+        }
         const emptyText = $qiymetQrupu.find('option:first').text();
         let selectedPriceGroupId = String($qiymetQrupu.data('selected-id') || '');
         const loadPriceGroups = () => {
