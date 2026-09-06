@@ -144,19 +144,23 @@ body {
     align-items: center
 }
 
-.psw-catalog-tools {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 300px
-}
-.psw-catalog-tools #serviceDate{
-  width:100px;
-  flex:0 0 100px;
+.psw-catalog-tools{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
 }
 
-.psw-catalog-tools .input-group {
-    width: 270px
+.psw-catalog-tools #serviceDate{
+    width:115px;
+    min-width:115px;
+    max-width:115px;
+    flex:none;
+}
+
+.psw-catalog-tools .input-group{
+    width:220px;
+    flex:0 0 220px;
 }
 
 .psw-catalog-tools .form-control, .psw-catalog-tools .input-group-text {
