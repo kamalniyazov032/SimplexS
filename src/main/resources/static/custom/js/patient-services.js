@@ -469,12 +469,55 @@ document.addEventListener('DOMContentLoaded', () => {
     type.addEventListener('change', () => {
         page = 0;
         activeCollection = '';
+        clearError();
+
         const isService = type.value === 'XIDMET';
+
         groups.classList.toggle('d-none', !isService);
         collections.classList.toggle('d-none', isService);
         title.textContent = type.options[type.selectedIndex].text;
-        loadCatalog();
+
+        body.replaceChildren();
+
+        if (isService) {
+            loadCatalog();
+        } else {
+            loadCollections();
+        }
     });
+
+    async function loadCollections() {
+        request?.abort();
+        request = new AbortController();
+
+        clearError();
+        collections.replaceChildren();
+        loading.classList.remove('d-none');
+
+        const params = new URLSearchParams({
+            nov: type.value,
+            page: '0',
+            istekId
+        });
+
+        const query = search.value.trim();
+        if (query) params.set('q', query);
+
+        try {
+            const data = await json(
+                `/xeste-xidmetleri/${gelisId}/kataloq?${params}`
+            );
+
+            renderCollections(data.items);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                collections.replaceChildren();
+            }
+        } finally {
+            loading.classList.add('d-none');
+        }
+    }
+
     groups.addEventListener('click', e => {
         const button = e.target.closest('[data-group]');
         if (!button) return;
@@ -492,10 +535,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     search.addEventListener('input', () => {
         clearTimeout(timer);
+
         timer = setTimeout(() => {
             page = 0;
             activeCollection = '';
-            loadCatalog();
+
+            if (type.value === 'XIDMET') {
+                loadCatalog();
+            } else {
+                loadCollections();
+            }
         }, 300);
     });
     previous.addEventListener('click', () => {
