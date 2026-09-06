@@ -151,8 +151,8 @@ body {
     min-width: 300px
 }
 .psw-catalog-tools #serviceDate{
-  width:140px;
-  flex:0 0 140px;
+  width:100px;
+  flex:0 0 100px;
 }
 
 .psw-catalog-tools .input-group {

@@ -46,6 +46,7 @@ public class XesteXidmetController {
         model.addAttribute("qruplar", repo.qruplar(klinikaId(session)));
         model.addAttribute("isteyenHekimler", repo.isteyenHekimler(gelisId));
         model.addAttribute("gonderenHekim", repo.gonderenHekim(gelisId));
+        model.addAttribute("bugun", java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")));
         return "pages/pasienQebulu/xesteXidmetleri";
     }
 

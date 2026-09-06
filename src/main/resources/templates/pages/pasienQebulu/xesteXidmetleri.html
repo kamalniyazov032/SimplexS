@@ -79,7 +79,11 @@
                             id="catalogHint" class="text-muted" th:text="#{patient_services.catalog_hint}"></small>
                     </div>
                     <div class="psw-catalog-tools">
-                        <input id="serviceDate" type="date" required class="form-control form-control-sm">
+                        <input id="serviceDate"
+                               type="date"
+                               required
+                               class="form-control form-control-sm"
+                               th:value="${bugun}">
                         <div class="input-group input-group-sm"><span class="input-group-text bg-white"><i
                                 class="ti ti-search"></i></span><input id="catalogSearch" class="form-control"
                                                                        th:placeholder="#{patient_services.search_placeholder}"

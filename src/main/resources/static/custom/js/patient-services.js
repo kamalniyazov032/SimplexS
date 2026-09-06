@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gelisId = root.dataset.gelisId;
     const istekId = root.dataset.istekId || '';
+
     const today = () => {
         const parts = new Intl.DateTimeFormat('en-US', {
             timeZone: 'Asia/Baku',
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = Object.fromEntries(parts.map(p => [p.type, p.value]));
         return `${date.year}-${date.month}-${date.day}`;
     };
+
+
+
     const payload = x => ({
         xeste_xidmet_id: x.xesteXidmetId ?? null,
         xidmet_id: x.id,
@@ -542,7 +546,6 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = false;
         }
     });
-    document.getElementById('serviceDate').value = today();
     document.body.classList.add('patient-services-open');
     const fitWorkspace = () => {
         const top = root.getBoundingClientRect().top;
