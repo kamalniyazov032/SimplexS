@@ -225,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.target.submit();
     } catch (error) { showError(error.message); button.disabled = false; }
   });
+  document.getElementById('serviceDate').value = today();
   document.body.classList.add('patient-services-open');
   const fitWorkspace = () => { const top = root.getBoundingClientRect().top; root.style.height = `${Math.max(320, window.innerHeight - top - 10)}px`; };
   fitWorkspace(); window.addEventListener('resize', fitWorkspace);

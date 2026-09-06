@@ -44,14 +44,7 @@ public class XesteXidmetController {
         model.addAttribute("gelis", gelis);
         model.addAttribute("istekId", istekId);
         model.addAttribute("qruplar", repo.qruplar(klinikaId(session)));
-        try {
-            model.addAttribute("isteyenHekimler", repo.isteyenHekimler(gelisId));
-        } catch (DataAccessException exception) {
-            org.slf4j.LoggerFactory.getLogger(XesteXidmetController.class)
-                    .warn("Unable to load requesting doctors for visit {}", gelisId, exception);
-            model.addAttribute("isteyenHekimler", List.of());
-            model.addAttribute("requestingDoctorsUnavailable", true);
-        }
+        model.addAttribute("isteyenHekimler", repo.isteyenHekimler(gelisId));
         model.addAttribute("gonderenHekim", repo.gonderenHekim(gelisId));
         return "pages/pasienQebulu/xesteXidmetleri";
     }

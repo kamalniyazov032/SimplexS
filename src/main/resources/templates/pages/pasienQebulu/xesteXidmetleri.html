@@ -15,13 +15,23 @@
                         th:text="|${gelis.xesteAd} ${gelis.xesteSoyad} · ${gelis.xesteKodu}|"></span></span>
             </div>
             <a class="btn btn-outline-secondary" th:href="@{/ambulatorQebul/siyahi}"><i class="ti ti-x me-1"></i><span
-                    th:text="#{common.bagla}"></span></a>
+                    th:text="#{common.bagla}"></span> </a>
         </div>
 
         <div th:if="${successMessage}" class="alert alert-success"><i class="ti ti-circle-check me-2"></i><span
-                th:text="${successMessage}"></span></div>
+                th:text="${successMessage}"></span>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Bağla"></button>
+        </div>
         <div th:if="${errorMessage}" class="alert alert-danger"><i class="ti ti-alert-circle me-2"></i><span
-                th:text="${errorMessage}"></span></div>
+                th:text="${errorMessage}"></span>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Bağla"></button>
+        </div>
         <div id="catalogAlert" class="alert alert-danger d-none psw-alert" role="alert"><i
                 class="ti ti-database-exclamation me-2"></i><strong
                 th:text="#{patient_services.catalog_error_title}"></strong><span id="catalogAlertMessage"
@@ -58,8 +68,7 @@
                             id="catalogHint" class="text-muted" th:text="#{patient_services.catalog_hint}"></small>
                     </div>
                     <div class="psw-catalog-tools">
-                        <input
-                                id="serviceDate" type="date" required class="form-control mb-3">
+                        <input id="serviceDate" type="date" required class="form-control form-control-sm">
                         <div class="input-group input-group-sm"><span class="input-group-text bg-white"><i
                                 class="ti ti-search"></i></span><input id="catalogSearch" class="form-control"
                                                                        th:placeholder="#{patient_services.search_placeholder}"
@@ -129,14 +138,14 @@
                     <label class="form-label" for="serviceDepartment"
                            th:text="#{patient_services.department}"></label><select id="serviceDepartment"
                                                                                     class="form-select mb-3">
-                        <option value="" th:text="#{common.secin}"></option>
-                    </select>
+                    <option value="" th:text="#{common.secin}"></option>
+                </select>
                     <label class="form-label" for="performingDoctor"
                            th:text="#{patient_services.performing_doctor}"></label><select id="performingDoctor"
                                                                                            class="form-select mb-3"
                                                                                            disabled>
-                        <option value="" th:text="#{common.secin}"></option>
-                    </select>
+                    <option value="" th:text="#{common.secin}"></option>
+                </select>
                     <div class="row g-2">
                         <div class="col-6"><label class="form-label" for="serviceQuantity"
                                                   th:text="#{patient_services.quantity}"></label><input
@@ -147,8 +156,8 @@
                                 th:text="#{patient_services.urgent_service}"></span></label></div>
                     </div>
                     <label class="form-label mt-3" for="serviceNote" th:text="#{common.note}"></label><textarea
-                            id="serviceNote" class="form-control" rows="2"
-                            th:placeholder="#{patient_services.note_placeholder}"></textarea>
+                        id="serviceNote" class="form-control" rows="2"
+                        th:placeholder="#{patient_services.note_placeholder}"></textarea>
                 </div>
             </aside>
         </div>
