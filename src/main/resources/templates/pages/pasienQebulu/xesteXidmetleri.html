@@ -18,24 +18,35 @@
                     th:text="#{common.bagla}"></span> </a>
         </div>
 
-        <div th:if="${successMessage}" class="alert alert-success"><i class="ti ti-circle-check me-2"></i><span
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"><i class="ti ti-circle-check me-2"></i><span
                 th:text="${successMessage}"></span>
             <button type="button"
                     class="btn-close"
                     data-bs-dismiss="alert"
                     aria-label="Bağla"></button>
         </div>
-        <div th:if="${errorMessage}" class="alert alert-danger"><i class="ti ti-alert-circle me-2"></i><span
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"><i class="ti ti-alert-circle me-2"></i><span
                 th:text="${errorMessage}"></span>
             <button type="button"
                     class="btn-close"
                     data-bs-dismiss="alert"
                     aria-label="Bağla"></button>
         </div>
-        <div id="catalogAlert" class="alert alert-danger d-none psw-alert" role="alert"><i
-                class="ti ti-database-exclamation me-2"></i><strong
-                th:text="#{patient_services.catalog_error_title}"></strong><span id="catalogAlertMessage"
-                                                                                 class="ms-1"></span></div>
+        <div id="catalogAlert"
+             class="alert alert-danger d-none psw-alert position-relative"
+             role="alert">
+
+            <i class="ti ti-database-exclamation me-2"></i>
+
+            <strong th:text="#{patient_services.catalog_error_title}"></strong>
+
+            <span id="catalogAlertMessage" class="ms-1"></span>
+
+            <button type="button"
+                    id="catalogAlertClose"
+                    class="btn-close position-absolute top-50 end-0 translate-middle-y me-2"
+                    aria-label="Bağla"></button>
+        </div>
 
         <div th:if="${requestingDoctorsUnavailable}" class="alert alert-warning" role="alert"
              th:text="#{patient_services.requesting_doctors_unavailable}"></div>

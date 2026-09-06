@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageLabel = document.getElementById('catalogPage');
   const alert = document.getElementById('catalogAlert');
   const alertMessage = document.getElementById('catalogAlertMessage');
+  const alertClose = document.getElementById('catalogAlertClose');
   const referringDoctor = document.getElementById('referringDoctor');
   const selected = new Map();
   let activeGroup = '', activeCollection = '', page = 0, hasMore = false, request, timer, editingId = null, draft = null;
