@@ -343,10 +343,43 @@ document.addEventListener('DOMContentLoaded', () => {
         markActiveCatalogRow();
         renderSelected();
 
-        populateDetails(draft);
+        if (type.value === 'PAKET') {
+            populatePackageDetails(draft);
+        } else {
+            populateDetails(draft);
+        }
     }
 
-    
+    function populatePackageDetails(row) {
+        document.getElementById('detailsEmpty').classList.add('d-none');
+        document.getElementById('detailsForm').classList.remove('d-none');
+
+        document.getElementById('detailsName').textContent = row.kod;
+        document.getElementById('serviceDate').value = row.tarix;
+
+        referringDoctor.value = row.gonderenHekimId ?? '';
+
+        document.getElementById('requestingDoctor').value =
+            row.isteyenHekimId ?? '';
+
+        document.getElementById('serviceQuantity').value = row.miqdar;
+        document.getElementById('serviceUrgent').checked = row.tecili;
+        document.getElementById('serviceNote').value = row.aciqlama ?? '';
+
+        const department = document.getElementById('serviceDepartment');
+        const performing = document.getElementById('performingDoctor');
+
+        department.replaceChildren(option('', tr.select));
+        performing.replaceChildren(option('', tr.select));
+
+        department.value = '';
+        performing.value = '';
+
+        row.sobeId = null;
+        row.sobeAdi = '';
+        row.icraEdenHekimId = null;
+        row.icraEdenHekimAdi = '';
+    }
 
     function renderSelected() {
         const selectedBody = document.getElementById('selectedBody');
