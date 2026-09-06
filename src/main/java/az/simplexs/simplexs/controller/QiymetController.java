@@ -104,7 +104,7 @@ public class QiymetController {
         page = Math.max(1, Math.min(page, totalPages));
         var hekimQiymetleri = repo.hekimQiymetleri(cedvelId, null, null);
         var hekimQiymetSaylari = hekimQiymetleri.stream().collect(java.util.stream.Collectors.groupingBy(
-                        az.simplexs.simplexs.dto.qiymet.HekimXidmetQiymeti::xidmetId,
+                        qiymet -> qiymet.xidmetId(),
                         java.util.stream.Collectors.counting()));
 
         model.addAttribute("pageTitle", cedvel.qrupAdi());
@@ -135,9 +135,9 @@ public class QiymetController {
     private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(
             List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups) {
         Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order = Comparator
-                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo,
-                        Comparator.nullsLast(Integer::compareTo))
-                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad,
+                .comparing((az.simplexs.simplexs.dto.xidmet.XidmetQrupu qrup) -> qrup.siraNo(),
+                        Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(qrup -> qrup.ad(),
                         String.CASE_INSENSITIVE_ORDER);
         var children = new HashMap<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
         var ids = new HashSet<Long>();

@@ -53,8 +53,8 @@ public class XidmetController {
 
     private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups) {
         Comparator<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> order = Comparator
-                .comparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::siraNo, Comparator.nullsLast(Integer::compareTo))
-                .thenComparing(az.simplexs.simplexs.dto.xidmet.XidmetQrupu::ad, String.CASE_INSENSITIVE_ORDER);
+                .comparing((az.simplexs.simplexs.dto.xidmet.XidmetQrupu qrup) -> qrup.siraNo(), Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(qrup -> qrup.ad(), String.CASE_INSENSITIVE_ORDER);
         var children = new HashMap<Long, List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu>>();
         var ids = new HashSet<Long>();
         groups.forEach(x -> ids.add(x.id()));

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -20,7 +19,7 @@ class XidmetRepositoryTests {
         repository.paketler(1L, true, null);
 
         var sql = ArgumentCaptor.forClass(String.class);
-        verify(jdbc).query(sql.capture(), any(MapSqlParameterSource.class), any(RowMapper.class));
+        verify(jdbc).query(sql.capture(), any(MapSqlParameterSource.class), org.mockito.ArgumentMatchers.<org.springframework.jdbc.core.RowMapper<Object>>any());
         assertThat(sql.getValue())
                 .contains("CAST(NULL AS bigint)")
                 .contains("CAST(:aktiv AS boolean)")
