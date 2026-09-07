@@ -76,7 +76,7 @@ test('selected date and routine ID survive preparation, display and final JSON',
     assert.equal(requests[0].xidmet_tarixi, '2026-09-05');
     assert.equal(requests[0].rutin_id, 2);
     const cells = get('selectedBody').children[0].children;
-    assert.equal(cells[3].textContent, '2026-09-05');
+    assert.equal(cells[3].children[0].value, '2026-09-05');
     assert.equal(cells[4].textContent, 2);
     assert.equal(cells[9].textContent, 'Performing Doctor');
     assert.equal(cells[10].textContent, 'Referring Doctor');
@@ -324,4 +324,28 @@ test('doctor changes after adding affect the next service; explicit edit updates
     assert.equal(api.selected.get('2').isteyenHekimId, 49);
     assert.equal(api.selected.get('1').gonderenHekimId, 18);
     assert.equal(api.selected.get('3').gonderenHekimId, 28);
+});
+
+
+test('selected row calendar changes only its date and saves it', async () => {
+    const {api, get} = workspace();
+    get('catalogType').value = 'PAKET';
+    api.selected.set('1', api.newService({id: 1}));
+    api.selected.set('2', api.newService({id: 2}));
+    api.renderSelected();
+    const date = get('selectedBody').children[0].children[3].children[0];
+    let opened = false;
+    date.showPicker = () => { opened = true; };
+    date.listeners.click();
+    assert.equal(opened, true);
+    date.value = '2026-09-12';
+    await date.listeners.change();
+    assert.equal(api.selected.get('1').tarix, '2026-09-12');
+    assert.equal(api.selected.get('2').tarix, '2026-09-05');
+    assert.equal(get('serviceDate').value, '2026-09-05');
+    await get('selectedForm').listeners.submit({preventDefault() {}, target: get('selectedForm')});
+    assert.equal(JSON.parse(get('servicesJson').value)[0].xidmet_tarixi, '2026-09-12');
+    date.value = '';
+    await date.listeners.change();
+    assert.equal(api.selected.get('1').tarix, '2026-09-12');
 });

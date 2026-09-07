@@ -80,14 +80,14 @@
                     </div>
                     <div class="psw-catalog-tools">
                         <div class="psw-date-picker">
-                            <label for="serviceDate" class="psw-date-label"><i class="ti ti-calendar-event" aria-hidden="true"></i><span th:text="#{patient_services.date}"></span></label>
+                            <label for="serviceDate" class="psw-date-label" th:text="#{patient_services.date}"></label>
                         <input id="serviceDate"
                                type="date"
                                required min="0001-01-01" max="9999-12-31"
                                th:aria-label="#{patient_services.date}"
                                th:title="#{patient_services.date}"
                                class="form-control form-control-sm"
-                               th:value="${bugun}" autocomplete="off" inputmode="none">
+                               th:value="${bugun}" autocomplete="off">
                         </div>
                         <div class="input-group input-group-sm"><span class="input-group-text bg-white"><i
                                 class="ti ti-search"></i></span><input id="catalogSearch" class="form-control"
@@ -232,6 +232,7 @@
          th:data-select="#{common.secin}" th:data-selection-required="#{patient_services.selection_required}"
          th:data-not-found="#{patient_services.not_found}"
          th:data-invalid-date="#{patient_services.invalid_date}"
+         th:data-date="#{patient_services.date}"
          th:data-no-department="#{patient_services.no_department}"
          th:data-currency="#{patient_services.currency}"></div>
     <script th:src="@{/custom/js/patient-services.js}"></script>

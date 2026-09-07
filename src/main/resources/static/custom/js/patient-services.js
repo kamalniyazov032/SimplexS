@@ -18,21 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     serviceDate.addEventListener('click', openDatePicker);
-    serviceDate.addEventListener('keydown', event => {
-        if (event.key === 'Tab' || event.key === 'Escape') return;
-        event.preventDefault();
-        if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') openDatePicker();
-    });
-    ['beforeinput', 'paste', 'drop'].forEach(eventName => {
-        serviceDate.addEventListener(eventName, event => event.preventDefault());
-    });
-    serviceDate.addEventListener('focus', () => {
-        if (validDate(serviceDate.value)) lastServiceDate = serviceDate.value;
-    });
-    serviceDate.addEventListener('input', () => {
-        if (validDate(serviceDate.value)) lastServiceDate = serviceDate.value;
-        else serviceDate.value = lastServiceDate;
-    });
     const checkServiceDate = () => {
         const valid = validDate(serviceDate.value) && serviceDate.checkValidity();
         serviceDate.classList.toggle('is-invalid', !valid);
@@ -96,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     referringDoctor.value = doctorDefaults.gonderenHekimId ?? '';
     const selected = new Map();
     const preparing = new Set();
+    const changingDates = new Set();
     let activeGroup = '', activeCollection = '', page = 0, hasMore = false, request, timer, editingId = null,
         draft = null;
 
@@ -426,13 +412,57 @@ document.addEventListener('DOMContentLoaded', () => {
         row.icraEdenHekimAdi = '';
     }
 
+    async function changeSelectedDate(id, input) {
+        const row = selected.get(id);
+        if (!row || row.locked || changingDates.has(id)) return;
+        if (!validDate(input.value) || !input.checkValidity()) {
+            input.value = row.tarix;
+            showError(tr.invalidDate);
+            return;
+        }
+        const previousDate = row.tarix;
+        const date = input.value;
+        if (date === previousDate) return;
+        input.disabled = true;
+        changingDates.add(id);
+        document.getElementById('saveServices').disabled = true;
+        try {
+            const candidate = {...row, tarix: date};
+            if (row.icraEdenHekimId && row.sobeId && row.nov !== 'PAKET') {
+                const doctors = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${row.sobeId}/hekimler?tarix=${encodeURIComponent(date)}`, null);
+                const doctor = doctors.find(x => Number(x.hekim_id) === Number(row.icraEdenHekimId));
+                if (!doctor) throw new Error(tr.selectionRequired);
+                candidate.qiymet = Number(doctor.yekun_qiymet ?? row.standartQiymet);
+            }
+            await validate(candidate);
+            if (selected.get(id) !== row || row.tarix !== previousDate) return;
+            row.tarix = date;
+            row.qiymet = candidate.qiymet;
+            if (editingId === id) {
+                serviceDate.value = date;
+                lastServiceDate = date;
+                const doctor = document.getElementById('performingDoctor').selectedOptions[0];
+                if (row.icraEdenHekimId && doctor) doctor.dataset.finalPrice = row.qiymet;
+            }
+            clearError();
+            renderSelected();
+        } catch (error) {
+            input.value = row.tarix;
+            showError(error.message);
+        } finally {
+            changingDates.delete(id);
+            input.disabled = row.locked === true;
+            renderSelected();
+        }
+    }
+
     function renderSelected() {
         const selectedBody = document.getElementById('selectedBody');
         selectedBody.replaceChildren();
         document.getElementById('selectedCount').textContent = selected.size;
         document.getElementById('selectedEmpty').classList.toggle('d-none', selected.size > 0);
         document.getElementById('selectedTable').classList.toggle('d-none', selected.size === 0);
-        document.getElementById('saveServices').disabled = selected.size === 0;
+        document.getElementById('saveServices').disabled = selected.size === 0 || changingDates.size > 0;
         let total = 0, index = 0;
         selected.forEach((row, id) => {
             index++;
@@ -441,7 +471,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (id === editingId) line.classList.add('table-primary');
             [index, row.kod, row.ad, row.tarix, row.rutinId ?? '—', row.miqdar, money(row.qiymet), money(row.qiymet * row.miqdar), row.sobeAdi || '—', row.icraEdenHekimAdi || '—', row.gonderenHekimAdi || '—', row.isteyenHekimAdi || '—'].forEach((value, i) => {
                 const td = document.createElement('td');
-                td.textContent = value;
+                if (i === 3) {
+                    const date = document.createElement('input');
+                    date.type = 'date';
+                    date.className = 'form-control form-control-sm';
+                    date.style.minWidth = '140px';
+                    date.value = row.tarix;
+                    date.min = '0001-01-01';
+                    date.max = '9999-12-31';
+                    date.required = true;
+                    date.disabled = row.locked === true || changingDates.has(id);
+                    date.setAttribute('aria-label', tr.date);
+                    date.addEventListener('click', () => {
+                        if (date.disabled) return;
+                        try { date.showPicker?.(); } catch (_) { /* Native picker remains available. */ }
+                    });
+                    date.addEventListener('change', () => changeSelectedDate(id, date));
+                    td.append(date);
+                } else td.textContent = value;
                 if (i === 2) td.className = 'fw-semibold';
                 line.append(td);
             });
@@ -710,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['serviceQuantity', 'serviceNote'].forEach(id => document.getElementById(id).addEventListener('input', syncDetails));
     document.getElementById('selectedForm').addEventListener('submit', async e => {
         e.preventDefault();
-        if (!checkServiceDate()) return;
+        if (changingDates.size > 0 || !checkServiceDate()) return;
         syncDetails();
         const button = document.getElementById('saveServices');
         button.disabled = true;
