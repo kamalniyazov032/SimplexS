@@ -162,6 +162,12 @@
 
         <form method="post" th:action="@{/rollar/icazeler}">
             <input type="hidden" name="rolId" th:value="${selectedRolId}">
+            <div class="p-3 border-bottom bg-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <small class="text-muted"><i class="ti ti-info-circle me-1" aria-hidden="true"></i><span th:text="#{roles.deyisiklikler_yalniz_yadda_saxla_d}"></span></small>
+                <button class="btn btn-primary px-4" type="submit">
+                    <i class="ti ti-device-floppy me-1" aria-hidden="true"></i><span th:text="#{roles.icazeleri_yadda_saxla}"></span>
+                </button>
+            </div>
             <div class="card-body p-0">
                 <ul class="nav nav-tabs nav-tabs-bottom px-4 pt-3" id="permissionTabs" role="tablist">
                     <li class="nav-item" role="presentation">
