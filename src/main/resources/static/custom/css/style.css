@@ -232,6 +232,29 @@ body {
     opacity: .72
 }
 
+.personal-access-modal .modal-content {
+    height: min(640px, calc(100vh - var(--bs-modal-margin) * 2));
+    height: min(640px, calc(100dvh - var(--bs-modal-margin) * 2));
+}
+
+.personal-access-modal .js-access-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.personal-access-modal .modal-header,
+.personal-access-modal .modal-footer {
+    flex-shrink: 0;
+}
+
+.personal-access-modal .modal-body {
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .psw-table {
     font-size: .78rem;
     table-layout: fixed

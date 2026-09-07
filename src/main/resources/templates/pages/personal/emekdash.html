@@ -370,7 +370,7 @@
         </div></div>
     </div>
 
-    <div th:each="p : ${personallar}" class="modal fade" th:id="|cashP${p.personalId}|" tabindex="-1">
+    <div th:each="p : ${personallar}" class="modal fade personal-access-modal" th:id="|cashP${p.personalId}|" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/kassalar}" class="js-access-form" data-kind="cash">
                 <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="kassalarJson" class="js-json">
@@ -383,7 +383,7 @@
         </div></div>
     </div>
 
-    <div th:each="p : ${personallar}" class="modal fade" th:id="|departmentP${p.personalId}|" tabindex="-1">
+    <div th:each="p : ${personallar}" class="modal fade personal-access-modal" th:id="|departmentP${p.personalId}|" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/sobeler}" class="js-access-form" data-kind="department">
                 <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="sobelerJson" class="js-json">
@@ -395,7 +395,7 @@
             </form>
         </div></div>
     </div>
-    <div th:each="p : ${personallar}" class="modal fade" th:id="|warehouseP${p.personalId}|" tabindex="-1">
+    <div th:each="p : ${personallar}" class="modal fade personal-access-modal" th:id="|warehouseP${p.personalId}|" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
             <form method="post" th:action="@{/emekdash/anbarlar}" class="js-access-form" data-kind="warehouse">
                 <input type="hidden" name="returnUrl" th:value="${returnUrl}"><input type="hidden" name="personalId" th:value="${p.personalId}"><input type="hidden" name="anbarlarJson" class="js-json">
