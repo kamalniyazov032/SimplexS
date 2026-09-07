@@ -1,5 +1,6 @@
 package az.simplexs.simplexs.controller;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ArrayList;
@@ -127,13 +128,13 @@ public class XidmetController {
     }
 
     @PostMapping("/parXidmet/yeni")
-    public String xidmetYarat(@RequestParam String kod, @RequestParam String ad, @RequestParam Long qrupId,
+    public String xidmetYarat(@RequestParam String kod, @RequestParam String ad, @RequestParam BigDecimal qiymet, @RequestParam Long qrupId,
                               @RequestParam Long muhasibatKoduId, @RequestParam Long xidmetTipiId,
                               @RequestParam(required = false) String beynelxalqKod, @RequestParam(required = false) String beynelxalqAd,
                               @RequestParam(required = false) Long hesabatNovuId, @RequestParam(required = false) Long hesabatMecburiyyetiId,
                               @RequestParam(defaultValue = "false") boolean paketXidmet,
                               @RequestParam(defaultValue = "true") boolean aktiv, HttpSession s, RedirectAttributes a) {
-        flash(repo.xidmetYarat(klinikaId(s), kod, ad, qrupId, muhasibatKoduId, xidmetTipiId, beynelxalqKod, beynelxalqAd,
+        flash(repo.xidmetYarat(klinikaId(s), kod, ad, qiymet, qrupId, muhasibatKoduId, xidmetTipiId, beynelxalqKod, beynelxalqAd,
                 hesabatNovuId, hesabatMecburiyyetiId, paketXidmet, aktiv), a, "Xidmət yaradıldı.");
         return "redirect:/parXidmet";
     }

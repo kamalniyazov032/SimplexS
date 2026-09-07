@@ -358,7 +358,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         selected.set(id, candidate);
-        if (draft === pending) draft = null;
+        if (draft === pending) {
+            draft = null;
+            editingId = null;
+        }
 
         clearError();
 

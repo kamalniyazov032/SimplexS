@@ -1,5 +1,6 @@
 package az.simplexs.simplexs.repository.xidmet;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -100,10 +101,10 @@ public class XidmetRepository {
     public List<XidmetOption> hesabatNovleri(){return options("SELECT hesabat_novu_id id,hesabat_novu_kodu kod,hesabat_novu_adi ad FROM public.fn_hesabat_novu_siyahisi()");}
     public List<XidmetOption> hesabatMecburiyyetleri(){return options("SELECT hesabat_mecburiyyeti_id id,hesabat_mecburiyyeti_kodu kod,hesabat_mecburiyyeti_adi ad FROM public.fn_hesabat_mecburiyyeti_siyahisi()");}
     @Transactional
-    public Map<String,Object> xidmetYarat(Long klinikaId,String kod,String ad,Long qrupId,Long muhasibatId,Long tipId,
+    public Map<String,Object> xidmetYarat(Long klinikaId,String kod,String ad,BigDecimal qiymet,Long qrupId,Long muhasibatId,Long tipId,
             String beynelxalqKod,String beynelxalqAd,Long hesabatNovuId,Long mecburiyyetId,
             boolean paketXidmet,boolean aktiv){
-        Map<String,Object> created=one("SELECT * FROM public.fn_xidmet_yarat(p_klinika_id=>:klinika,p_kod=>:kod,p_ad=>:ad,p_xidmet_qrupu_id=>:qrup,p_muhasibat_kodu_id=>:muh,p_xidmet_tipi_id=>:tip,p_paket_xidmet=>:paket,p_yaradan_personal_id=>NULL)",new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("kod",kod.trim().toUpperCase()).addValue("ad",ad.trim()).addValue("qrup",qrupId).addValue("muh",muhasibatId).addValue("tip",tipId).addValue("paket",paketXidmet));
+        Map<String,Object> created=one("SELECT * FROM public.fn_xidmet_yarat(p_klinika_id=>:klinika,p_kod=>:kod,p_ad=>:ad,p_qiymet=>:qiymet,p_xidmet_qrupu_id=>:qrup,p_muhasibat_kodu_id=>:muh,p_xidmet_tipi_id=>:tip,p_paket_xidmet=>:paket,p_yaradan_personal_id=>NULL)",new MapSqlParameterSource().addValue("klinika",klinikaId).addValue("kod",kod.trim().toUpperCase()).addValue("ad",ad.trim()).addValue("qiymet",qiymet).addValue("qrup",qrupId).addValue("muh",muhasibatId).addValue("tip",tipId).addValue("paket",paketXidmet));
         if(!successful(created))return created;
         Object idValue=created.get("xidmet_id");
         if(!(idValue instanceof Number number)){TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();return Map.of("status_kodu","SISTEM_XETASI","mesaj","Yaradılmış xidmətin ID-si alınmadı");}

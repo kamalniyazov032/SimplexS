@@ -282,3 +282,46 @@ for (const scenario of [
         }
     });
 }
+
+
+test('doctor changes after adding affect the next service; explicit edit updates the saved row', async () => {
+    const {api, get, element} = workspace();
+    get('catalogType').value = 'PAKET';
+    const chooseDoctors = (referringId, requestingId) => {
+        for (const [id, value] of [['referringDoctor', referringId], ['requestingDoctor', requestingId]]) {
+            const control = get(id);
+            control.value = String(value);
+            control.selectedOptions = [{textContent: `Doctor ${value}`}];
+            control.listeners.change();
+        }
+    };
+    const add = async id => {
+        api.setDraft(api.newService({id}));
+        const button = element();
+        button.closest = () => null;
+        await api.addService({id}, button);
+    };
+    chooseDoctors(18, 19);
+    await add(1);
+    await add(2);
+    chooseDoctors(28, 29);
+    for (const id of ['1', '2']) {
+        assert.equal(api.selected.get(id).gonderenHekimId, 18);
+        assert.equal(api.selected.get(id).isteyenHekimId, 19);
+    }
+    await add(3);
+    assert.equal(api.selected.get('3').gonderenHekimId, 28);
+    assert.equal(api.selected.get('3').isteyenHekimId, 29);
+    chooseDoctors(38, 39);
+    await get('selectedForm').listeners.submit({preventDefault() {}, target: get('selectedForm')});
+    const saved = JSON.parse(get('servicesJson').value);
+    assert.equal(saved[2].gonderen_hekim_id, 28);
+    assert.equal(saved[2].isteyen_hekim_id, 29);
+    const actions = get('selectedBody').children[1].children.at(-1);
+    actions.children[0].listeners.click();
+    chooseDoctors(48, 49);
+    assert.equal(api.selected.get('2').gonderenHekimId, 48);
+    assert.equal(api.selected.get('2').isteyenHekimId, 49);
+    assert.equal(api.selected.get('1').gonderenHekimId, 18);
+    assert.equal(api.selected.get('3').gonderenHekimId, 28);
+});
