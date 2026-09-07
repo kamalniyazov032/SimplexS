@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-function workspace(catalogItems = [], existingRows = [], departments = []) {
+function workspace(catalogItems = [], existingRows = [], departments = [], doctors = []) {
     const nodes = new Map();
     const element = () => ({
         value: '', dataset: {}, options: [], selectedOptions: [], children: [], listeners: {},
@@ -41,7 +41,7 @@ function workspace(catalogItems = [], existingRows = [], departments = []) {
         fetch: async (url, options) => {
             urls.push(url);
             if (url.endsWith('/sobeler')) return {ok: true, json: async () => departments};
-            if (url.includes('/hekimler?')) return {ok: true, json: async () => []};
+            if (url.includes('/hekimler?')) return {ok: true, json: async () => doctors};
             if (!options.body) return {ok: true, json: async () => url.includes('/siyahi?') ? existingRows : ({items: catalogItems, hasMore: false})};
             requests.push(JSON.parse(options.body));
             return {ok: true, json: async () => ({ugurlu: true})};
@@ -247,3 +247,38 @@ test('selecting a parent group loads services immediately without a search or ch
     assert.equal(get('catalogBody').children.length, 1);
     assert.equal(get('catalogBody').children[0].dataset.serviceId, 7);
 });
+
+for (const scenario of [
+    {name: 'single department without doctors adds on first plus', departments: [{sobe_id: 12}], doctors: [], added: true},
+    {name: 'available doctors keep the candidate for selection', departments: [{sobe_id: 12}], doctors: [{hekim_id: 17}], added: false},
+    {name: 'multiple departments keep the candidate for selection', departments: [{sobe_id: 12}, {sobe_id: 13}], doctors: [], added: false},
+    {name: 'single required doctor is selected with its price on first plus', departments: [{sobe_id: 12, hekim_secim_qaydasi_kodu: 'MECBURI'}], doctors: [{hekim_id: 17, hekim_ad: 'Doctor', yekun_qiymet: 25}], added: true, doctorId: 17},
+    {name: 'multiple required doctors need selection', departments: [{sobe_id: 12, hekim_secim_qaydasi_kodu: 'MECBURI'}], doctors: [{hekim_id: 17}, {hekim_id: 18}], added: false},
+    {name: 'required doctor without options cannot auto-add', departments: [{sobe_id: 12, hekim_secim_qaydasi_kodu: 'MECBURI'}], doctors: [], added: false}
+]) {
+    test(scenario.name, async () => {
+        const {api, get, element, requests} = workspace([], [], scenario.departments, scenario.doctors);
+        // Model the selected option properties used by the browser's select element.
+        for (const department of [get('serviceDepartment'), get('performingDoctor')]) {
+        Object.defineProperty(department, 'options', {get() { return this.children; }});
+        Object.defineProperty(department, 'selectedOptions', {get() {
+            return this.children.filter(x => String(x.value) === String(this.value));
+        }});
+        Object.defineProperty(department, 'selectedIndex', {get() {
+            return this.children.findIndex(x => String(x.value) === String(this.value));
+        }});
+        }
+        const button = element();
+        button.closest = () => null;
+        await api.addService({id: 7831}, button);
+        assert.equal(api.selected.has('7831'), scenario.added);
+        assert.equal(requests.length, scenario.added ? 1 : 0);
+        if (scenario.added) assert.equal(requests[0].sobe_id, 12);
+        else assert.equal(get('catalogAlertMessage').textContent, 'Required');
+        if (scenario.doctorId) {
+            assert.equal(requests[0].icra_eden_hekim_id, scenario.doctorId);
+            assert.equal(api.selected.get('7831').icraEdenHekimAdi, 'Doctor');
+            assert.equal(api.selected.get('7831').qiymet, 25);
+        }
+    });
+}

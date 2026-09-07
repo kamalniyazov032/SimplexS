@@ -292,7 +292,7 @@ body {
 }
 
 .psw-service-table tbody tr {
-    cursor: pointer
+    cursor: default
 }
 
 .psw-service-table tbody tr.psw-service-active {
@@ -1364,6 +1364,12 @@ body {
 
 .psw-service-table {
     table-layout: fixed
+}
+
+.psw-service-table tbody tr:hover > td {
+    background-color: #eaf4ff;
+    --bs-table-bg-state: #eaf4ff;
+    --bs-table-accent-bg: #eaf4ff
 }
 
 .psw-service-table tbody tr.psw-service-added {

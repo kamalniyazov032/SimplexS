@@ -93,7 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isteyenHekimId: Number(document.getElementById('requestingDoctor').value) || null,
         isteyenHekimAdi: document.getElementById('requestingDoctor').selectedOptions[0]?.textContent || ''
     };
+    referringDoctor.value = doctorDefaults.gonderenHekimId ?? '';
     const selected = new Map();
+    const preparing = new Set();
     let activeGroup = '', activeCollection = '', page = 0, hasMore = false, request, timer, editingId = null,
         draft = null;
 
@@ -146,8 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     alertClose.addEventListener('click', clearError);
 
-    async function json(url) {
-        const response = await fetch(url, {headers: {Accept: 'application/json'}, signal: request?.signal});
+    async function json(url, signal = request?.signal) {
+        const response = await fetch(url, {headers: {Accept: 'application/json'}, signal});
         let payload = {};
         try {
             payload = await response.json();
@@ -200,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 addService(row, add);
             });
             actionCell.append(add);
-            line.addEventListener('click', () => openCandidate(row));
             line.append(code, infoCell(row), group, price, actionCell);
             body.append(line);
         });
@@ -292,12 +293,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function addService(row, button) {
         const id = String(row.id);
 
-        if (containsService(id) || !checkServiceDate()) return;
+        if (containsService(id) || preparing.has(id) || !checkServiceDate()) return;
 
-        if (editingId !== id || !draft) {
-            openCandidate(row);
-            return;
-        }
+        const newlyOpened = editingId !== id || !draft;
+        if (newlyOpened) openCandidate(row);
+        const pending = draft;
+        button.disabled = true;
+        if (pending?.detailsReady) await pending.detailsReady;
+        button.disabled = containsService(id);
+        if (!pending || draft !== pending || editingId !== id || pending.detailsLoaded === false) return;
 
         syncDetails();
 
@@ -334,19 +338,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (newlyOpened && !pending.canAddDirectly) {
+            showError(tr.selectionRequired);
+            return;
+        }
+
         const candidate = {...draft};
 
         try {
             button.disabled = true;
+            preparing.add(id);
             await validate(candidate);
         } catch (e) {
             showError(e.message);
             button.disabled = false;
             return;
+        } finally {
+            preparing.delete(id);
         }
 
         selected.set(id, candidate);
-        draft = null;
+        if (draft === pending) draft = null;
 
         clearError();
 
@@ -355,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         button.closest('tr')?.classList.add('psw-service-added');
 
-        closeDetails();
+        markActiveCatalogRow();
         renderSelected();
     }
 
@@ -378,13 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type.value === 'PAKET') {
             populatePackageDetails(draft);
         } else {
-            populateDetails(draft);
+            draft.detailsReady = populateDetails(draft);
         }
     }
 
     function populatePackageDetails(row) {
-        document.getElementById('detailsEmpty').classList.add('d-none');
-        document.getElementById('detailsForm').classList.remove('d-none');
 
         document.getElementById('detailsName').textContent = row.kod;
         document.getElementById('serviceDate').value = row.tarix;
@@ -461,8 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function populateDetails(row) {
-        document.getElementById('detailsEmpty').classList.add('d-none');
-        document.getElementById('detailsForm').classList.remove('d-none');
         document.getElementById('detailsName').textContent = row.kod;
         document.getElementById('serviceDate').value = row.tarix;
         referringDoctor.value = row.gonderenHekimId ?? '';
@@ -472,10 +480,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('serviceNote').value = row.aciqlama ?? '';
         const department = document.getElementById('serviceDepartment');
         department.replaceChildren(option('', tr.select));
+        document.getElementById('performingDoctor').replaceChildren(option('', tr.select));
+        document.getElementById('performingDoctor').disabled = true;
+        row.detailsLoaded = false;
+        row.canAddDirectly = false;
         try {
-            request?.abort();
-            request = new AbortController();
-            const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobeler`);
+            const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobeler`, null);
+            if (currentService() !== row) return;
+
             rows.forEach(x => {
                 const departmentOption = option(x.sobe_id, x.sobe_adi);
                 departmentOption.dataset.doctorRule = text(x.hekim_secim_qaydasi_kodu) || 'SECIMLI';
@@ -488,9 +500,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             department.value = row.sobeId ?? '';
             if (!rows.length) department.append(option('', tr.noDepartment));
-            await loadDoctors();
+            const doctorCount = await loadDoctors();
+            if (currentService() !== row) return;
+            row.detailsLoaded = doctorCount !== null;
+            row.canAddDirectly = rows.length === 1 && (
+                (doctorCount === 0 && row.hekimSecimQaydasiKodu !== 'MECBURI') ||
+                (doctorCount === 1 && row.hekimSecimQaydasiKodu === 'MECBURI')
+            );
         } catch (e) {
-            if (e.name !== 'AbortError') department.append(option('', tr.loadError));
+            if (currentService() === row && e.name !== 'AbortError') department.append(option('', tr.loadError));
         }
     }
 
@@ -519,9 +537,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.qiymet = row.standartQiymet;
             }
         }
-        if (!department.value || !row || doctorRule === 'SECILMIR') return;
+        if (!department.value || !row || doctorRule === 'SECILMIR') return 0;
+        const departmentId = department.value;
         try {
-            const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${department.value}/hekimler?tarix=${encodeURIComponent(row.tarix)}`);
+            const rows = await json(`/xeste-xidmetleri/${gelisId}/xidmet/${row.id}/sobe/${department.value}/hekimler?tarix=${encodeURIComponent(row.tarix)}`, null);
+            if (currentService() !== row || department.value !== departmentId) return null;
             rows.forEach(x => {
                 const name = doctorName(x);
                 const doctorOption = option(x.hekim_id, `${name} (${money(x.yekun_qiymet)})`);
@@ -529,9 +549,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 doctorOption.dataset.finalPrice = Number(x.yekun_qiymet ?? row.standartQiymet);
                 doctors.append(doctorOption);
             });
+            if (doctorRule === 'MECBURI' && rows.length === 1 && row.icraEdenHekimId == null) {
+                row.icraEdenHekimId = Number(rows[0].hekim_id);
+                row.icraEdenHekimAdi = doctorName(rows[0]);
+                row.qiymet = Number(rows[0].yekun_qiymet ?? row.standartQiymet);
+                if (selected.has(editingId)) renderSelected();
+            }
             doctors.value = row.icraEdenHekimId ?? '';
+            return rows.length;
         } catch (e) {
-            if (e.name !== 'AbortError') doctors.append(option('', tr.loadError));
+            if (currentService() === row && e.name !== 'AbortError') doctors.append(option('', tr.loadError));
+            return null;
         }
     }
 
@@ -583,8 +611,9 @@ document.addEventListener('DOMContentLoaded', () => {
         editingId = null;
         draft = null;
         markActiveCatalogRow();
-        document.getElementById('detailsForm').classList.add('d-none');
-        document.getElementById('detailsEmpty').classList.remove('d-none');
+        document.getElementById('serviceDepartment').replaceChildren(option('', tr.select));
+        document.getElementById('performingDoctor').replaceChildren(option('', tr.select));
+        document.getElementById('performingDoctor').disabled = true;
         document.getElementById('detailsName').textContent = '';
     }
 
