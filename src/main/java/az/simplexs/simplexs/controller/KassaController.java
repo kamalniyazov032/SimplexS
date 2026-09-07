@@ -34,7 +34,7 @@ public class KassaController {
         model.addAttribute("status", status);
         model.addAttribute("aktivKassaSayi", kassalar.stream().filter(k -> Boolean.TRUE.equals(k.aktiv())).count());
         model.addAttribute("passivKassaSayi", kassalar.stream().filter(k -> !Boolean.TRUE.equals(k.aktiv())).count());
-        return "pages/kassalar";
+        return "pages/maliyye/kassalar";
     }
 
     @PostMapping("/kassalar/yenile")

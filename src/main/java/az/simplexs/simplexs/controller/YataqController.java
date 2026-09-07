@@ -66,7 +66,7 @@ public class YataqController {
         model.addAttribute("selectedPalata", palatalar.stream().filter(x -> x.id().equals(selectedPalataId)).findFirst().orElse(null));
         model.addAttribute("status", status);
         model.addAttribute("filterApplied", sobeId != null || !"aktiv".equals(status));
-        return "pages/yataqlar";
+        return "pages/infrastruktur/yataqlar";
     }
 
     @PostMapping("/yataqlar/mertebe/yeni")

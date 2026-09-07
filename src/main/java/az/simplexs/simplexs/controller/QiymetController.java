@@ -74,7 +74,7 @@ public class QiymetController {
         model.addAttribute("qrupTeskilatIds", repo.qruplarinTeskilatIdleri(qruplar.stream().map(x -> x.id()).toList()));
         model.addAttribute("teskilatlar", teskilatRepo.siyahi(klinikaId).stream()
                 .filter(t -> Boolean.TRUE.equals(t.aktiv())).toList());
-        return "pages/xidmetQiymetleri";
+        return "pages/xidmetler/xidmetQiymetleri";
     }
 
     @GetMapping("/xidmetQiymetleri/cedvel/{cedvelId}")
@@ -129,7 +129,7 @@ public class QiymetController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", size);
-        return "pages/xidmetQiymetTarifleri";
+        return "pages/xidmetler/xidmetQiymetTarifleri";
     }
 
     private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(

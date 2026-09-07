@@ -58,7 +58,7 @@ public class SobeController {
         model.addAttribute("selectedStatus", selectedStatus);
         model.addAttribute("filterApplied", !query.isEmpty() || sobeTipiId != null
             || hekimSecimQaydasiId != null || cinsId != null || !selectedStatus.isBlank());
-        return "pages/shobe";
+        return "pages/infrastruktur/shobe";
     }
 
     @PostMapping("/shobe/yeni")

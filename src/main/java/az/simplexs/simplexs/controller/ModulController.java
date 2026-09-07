@@ -25,7 +25,7 @@ public class ModulController {
         model.addAttribute("sistemler",repository.findSystems());
         model.addAttribute("aktivModulSayi",modules.stream().filter(m->Boolean.TRUE.equals(m.aktiv())).count());
         model.addAttribute("sistemSayi",modules.stream().map(m->m.sistemId()).distinct().count());
-        return "pages/modullar";
+        return "pages/idareetme/modullar";
     }
 
     @PostMapping(value="/modullar/yenile",params="action=update")

@@ -31,7 +31,7 @@ public class PaketController {
         model.addAttribute("paketler",paketler);model.addAttribute("selectedPaket",selected);
         model.addAttribute("terkib",selected==null?java.util.List.of():repo.paketXidmetleri(selected.id()));
         model.addAttribute("qruplar",repo.qruplar(klinikaId(session)).stream().filter(x->Boolean.TRUE.equals(x.aktiv())).toList());
-        model.addAttribute("q",q);model.addAttribute("selectedStatus",status);return "pages/paket";
+        model.addAttribute("q",q);model.addAttribute("selectedStatus",status);return "pages/xidmetler/paket";
     }
 
     @GetMapping("/terkib") @ResponseBody

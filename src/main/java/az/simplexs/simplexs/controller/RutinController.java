@@ -34,7 +34,7 @@ public class RutinController {
         model.addAttribute("pageTitle",msg("routines.title"));model.addAttribute("activeMenuGroup","adminPanel");model.addAttribute("activeMenu","rutinler");
         model.addAttribute("rutinler",rutinler);model.addAttribute("selectedRutin",selected);model.addAttribute("terkib",selected==null?java.util.List.of():repo.terkib(selected.id()));
         model.addAttribute("qruplar",xidmetRepo.qruplar(klinikaId(session)).stream().filter(x->Boolean.TRUE.equals(x.aktiv())).toList());
-        model.addAttribute("q",q);model.addAttribute("selectedStatus",status);return "pages/rutinler";
+        model.addAttribute("q",q);model.addAttribute("selectedStatus",status);return "pages/xidmetler/rutinler";
     }
     @PostMapping("/yeni")
     public String yarat(@RequestParam String kod,@RequestParam String ad,@RequestParam(required=false)String aciqlama,

@@ -18,7 +18,7 @@ Dir[File.join(ROOT,"src/main/resources/templates/**/*.html")].each do |path|
     {"placeholder"=>"th:placeholder","title"=>"th:title","aria-label"=>"th:aria-label","data-placeholder"=>"th:attr"}.each do |plain,dynamic|
       value=node[plain];next if value.nil?||!value.match?(/[[:alpha:]]/)||node.key?(dynamic)
       next if plain=="placeholder" && value.match?(/\Ati(?: ti-[a-z0-9-]+)+\z/i)
-      next if relative=="pages/tercumeler.html" && plain=="placeholder" && %w[en English İngilis\ dili].include?(value)
+      next if relative=="pages/idareetme/tercumeler.html" && plain=="placeholder" && %w[en English İngilis\ dili].include?(value)
       issues << "#{path.sub(ROOT+'/','')}: atribut #{plain}: #{value}"
     end
   end

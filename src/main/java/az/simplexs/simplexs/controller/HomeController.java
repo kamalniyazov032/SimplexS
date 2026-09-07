@@ -23,7 +23,7 @@ public class HomeController {
 
     @GetMapping("/login")
     public String login() {
-        return "pages/login";
+        return "pages/auth/login";
     }
 
     @GetMapping("/")
@@ -35,7 +35,7 @@ public class HomeController {
     public String dashboard(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/dashboard";
+        return "pages/umumi/dashboard";
     }
 
     @GetMapping("/xesteKarti")
@@ -50,21 +50,21 @@ public class HomeController {
     public String kassa(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/kassa";
+        return "pages/maliyye/kassa";
     }
 
     @GetMapping("/patientService")
     public String patientService(Model model) {
         model.addAttribute("pageTitle", "Xəstə Xidmət Ödənişi");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/patientService";
+        return "pages/pasienQebulu/patientService";
     }
 
     @GetMapping("/qebz")
     public String qebz(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/kassaQebz";
+        return "pages/maliyye/kassaQebz";
     }
 
     @GetMapping("/binalar")
@@ -75,7 +75,7 @@ public class HomeController {
         model.addAttribute("activeMenu", "binalar");
         model.addAttribute("binalar", binaRepository.findByKlinikaId(klinikaId));
         model.addAttribute("binaNovleri", binaRepository.findBinaNovleri());
-        return "pages/binalar";
+        return "pages/infrastruktur/binalar";
     }
 
     @PostMapping("/binalar/yenile")
@@ -114,7 +114,7 @@ public class HomeController {
         model.addAttribute("activeMenuGroup", "adminPanel");
         model.addAttribute("activeMenu", "binaParametrleri");
         model.addAttribute("parametrler", parametrRepository.findByKlinikaId(klinikaId));
-        return "pages/binaParametrleri";
+        return "pages/infrastruktur/binaParametrleri";
     }
 
     @PostMapping("/bina-parametrleri/yadda-saxla")
@@ -149,81 +149,81 @@ public class HomeController {
     public String stasionar(Model model) {
         model.addAttribute("pageTitle", "Stasionar");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/stasionar";
+        return "pages/stasionar/stasionar";
     }
 
     @GetMapping("/stasionar/teyinat")
     public String stasionarTeyinat(Model model) {
         model.addAttribute("pageTitle", "Həkim təyinatı");
-        return "pages/stasionarTeyinat";
+        return "pages/stasionar/stasionarTeyinat";
     }
 
     @GetMapping("/stasionar/teyinat-yaz")
     public String stasionarTeyinatYaz(Model model) {
         model.addAttribute("pageTitle", "Həkim təyinat yaz");
-        return "pages/stasionarTeyinatYaz";
+        return "pages/stasionar/stasionarTeyinatYaz";
     }
 
     @GetMapping("/pasientAvans")
     public String pasientAvans(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/pasientAvans";
+        return "pages/maliyye/pasientAvans";
     }
 
     @GetMapping("/poliklinikHekim")
     public String poliklinikHekim(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/poliklinikHekim";
+        return "pages/klinika/poliklinikHekim";
     }
 
     @GetMapping("/qaimeOdenishiFirma")
     public String qaimeOdenishiFirma(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/qaimeOdenishiFirma";
+        return "pages/maliyye/qaimeOdenishiFirma";
     }
 
     @GetMapping("/qaimeHereketiFirma")
     public String qaimeHereketiFirma(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/qaimeHereketiFirma";
+        return "pages/maliyye/qaimeHereketiFirma";
     }
 
     @GetMapping("/xesteTarixcesi")
     public String xesteTarixcesi(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/xesteTarixcesi";
+        return "pages/klinika/xesteTarixcesi";
     }
 
     @GetMapping("/anamnez")
     public String anamnez(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/anamnez";
+        return "pages/klinika/anamnez";
     }
       @GetMapping("/esasDiaqnoz")
     public String esasDiaqnoz(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/esasDiaqnoz";
+        return "pages/klinika/esasDiaqnoz";
     }
 
           @GetMapping("/randevu")
     public String randevu(Model model) {
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/randevu";
+        return "pages/pasienQebulu/randevu";
     }
 
     @GetMapping("/radiologiya")
     public String radiologiya(Model model) {
         model.addAttribute("pageTitle", "Radiologiya");
         model.addAttribute("activeMenu", "dashboard");
-        return "pages/radiologiya";
+        return "pages/klinika/radiologiya";
     }
 
 }

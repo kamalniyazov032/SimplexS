@@ -30,6 +30,6 @@ public class XetaJurnaliController {
         model.addAttribute("xetalar",items);model.addAttribute("q",q);model.addAttribute("nov",nov);
         model.addAttribute("baslama",baslama);model.addAttribute("bitme",bitme);
         model.addAttribute("currentPage",page);model.addAttribute("totalPages",pages);model.addAttribute("totalCount",total);
-        return "pages/xetaJurnali";
+        return "pages/idareetme/xetaJurnali";
     }
 }

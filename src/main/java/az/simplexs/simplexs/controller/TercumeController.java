@@ -20,7 +20,7 @@ public class TercumeController {
             .filter(x->query.isBlank()||x.kod().toLowerCase(Locale.ROOT).contains(query)||x.azerbaycanca().toLowerCase(Locale.forLanguageTag("az")).contains(query))
             .filter(x->!yalnizBos||tercumeDilleri.stream().anyMatch(d->x.deyer(d.kod()).isBlank())).toList();
         m.addAttribute("pageTitle","Məlumat tərcümələri");m.addAttribute("activeMenuGroup","adminPanel");m.addAttribute("activeMenu","tercumeler");m.addAttribute("bolme","melumat");
-        m.addAttribute("diller",diller);m.addAttribute("tercumeDilleri",tercumeDilleri);m.addAttribute("melumatNovleri",novler);m.addAttribute("selectedMelumatNovu",selected);m.addAttribute("melumatSetirleri",rows);m.addAttribute("q",q);m.addAttribute("yalnizBos",yalnizBos);return "pages/tercumeler";
+        m.addAttribute("diller",diller);m.addAttribute("tercumeDilleri",tercumeDilleri);m.addAttribute("melumatNovleri",novler);m.addAttribute("selectedMelumatNovu",selected);m.addAttribute("melumatSetirleri",rows);m.addAttribute("q",q);m.addAttribute("yalnizBos",yalnizBos);return "pages/idareetme/tercumeler";
     }
     @GetMapping("/tercumeler") public String list(@RequestParam(required=false)String modul,@RequestParam(required=false)String q,
             @RequestParam(defaultValue="false")boolean yalnizBos,@RequestParam(defaultValue="1")int page,Model m){
@@ -48,7 +48,7 @@ public class TercumeController {
         m.addAttribute("diller",diller);m.addAttribute("tercumeDilleri",tercumeDilleri);m.addAttribute("modullar",modullar);m.addAttribute("selectedModul",selected);
         m.addAttribute("selectedModulInfo",selectedModulInfo);m.addAttribute("umumiModul",modullar.stream().filter(x->x.kod().equals("GLOBAL")).findFirst().orElse(null));m.addAttribute("modulQruplari",modulQruplari);
         m.addAttribute("tercumeler",allRows.subList(from,to));m.addAttribute("completion",completion);m.addAttribute("q",q);m.addAttribute("yalnizBos",yalnizBos);
-        m.addAttribute("currentPage",page);m.addAttribute("totalPages",totalPages);m.addAttribute("totalCount",allRows.size());return "pages/tercumeler";
+        m.addAttribute("currentPage",page);m.addAttribute("totalPages",totalPages);m.addAttribute("totalCount",allRows.size());return "pages/idareetme/tercumeler";
     }
     @PostMapping("/tercumeler/dil") public String dil(@RequestParam String kod,@RequestParam String ad,@RequestParam String yerliAd,RedirectAttributes a){repo.dilYarat(kod,ad,yerliAd);a.addFlashAttribute("successMessage","Dil əlavə edildi.");return "redirect:/tercumeler";}
     @PostMapping("/tercumeler/yadda-saxla") public String save(@RequestParam String dil,@RequestParam String acar,@RequestParam String deyer,

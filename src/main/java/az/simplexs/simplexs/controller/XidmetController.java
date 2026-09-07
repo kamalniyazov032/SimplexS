@@ -49,7 +49,7 @@ public class XidmetController {
         m.addAttribute("q", q);
         m.addAttribute("selectedStatus", selectedStatus);
         m.addAttribute("selectedQrupTipi", qrupTipi);
-        return "pages/xidmetQruplari";
+        return "pages/xidmetler/xidmetQruplari";
     }
 
     private List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> hierarchyOrder(List<az.simplexs.simplexs.dto.xidmet.XidmetQrupu> groups) {
@@ -124,7 +124,7 @@ public class XidmetController {
         m.addAttribute("xidmetTipleri", repo.xidmetTipleri());
         m.addAttribute("hesabatNovleri", repo.hesabatNovleri());
         m.addAttribute("hesabatMecburiyyetleri", repo.hesabatMecburiyyetleri());
-        return "pages/xidmet";
+        return "pages/xidmetler/xidmet";
     }
 
     @PostMapping("/parXidmet/yeni")

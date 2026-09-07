@@ -49,7 +49,7 @@ public class AnbarController {
             case "emeliyyatlar" -> {model.addAttribute("kateqoriyalar",repository.kateqoriyalar(istiqamet));model.addAttribute("emeliyyatlar",repository.emeliyyatlar(k,istiqamet,aktiv).stream().filter(x->matches(axtaris,x.kod(),x.ad(),x.kateqoriyaAdi(),x.aciqlama())).toList());}
             default -> {model.addAttribute("anbarNovleri",repository.anbarNovleri());model.addAttribute("anbarlar",repository.anbarlar(k,null,aktiv,axtaris));}
         }
-        return "pages/anbarParametrleri";
+        return "pages/anbar/anbarParametrleri";
     }
 
     @PostMapping("/parametrler/anbar/firma")

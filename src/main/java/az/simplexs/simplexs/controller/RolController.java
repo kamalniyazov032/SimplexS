@@ -57,7 +57,7 @@ public class RolController {
                 model.addAttribute("selahiyyetQruplari", selahiyyetQruplari);
                 model.addAttribute("rolaBagliPersonallar", personalRepository.findByRole(selectedRolId, false));
             }
-        return "pages/rollar";
+        return "pages/idareetme/rollar";
     }
 
     @PostMapping("/rollar/yeni")

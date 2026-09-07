@@ -55,7 +55,7 @@ public class DiaqnozController {
         model.addAttribute("totalCount", total);
         model.addAttribute("filterApplied", hasText(q) || parentId != null || !"hamisi".equals(secim)
                 || !"aktiv".equals(status) || !"hamisi".equals(tip) || !"hamisi".equals(cins));
-        return "pages/diaqnozlar";
+        return "pages/klinika/diaqnozlar";
     }
 
     private Boolean triState(String value, String trueValue, String falseValue) {

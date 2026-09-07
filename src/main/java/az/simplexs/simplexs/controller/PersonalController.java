@@ -125,7 +125,7 @@ public class PersonalController {
                 id -> id, id -> repo.sobeler(klinikaId, id))));
         model.addAttribute("personalAnbarlar", personalIds.stream().collect(Collectors.toMap(
                 id -> id, id -> repo.anbarlar(klinikaId, id))));
-        return "pages/emekdash";
+        return "pages/personal/emekdash";
     }
 
     @PostMapping("/emekdash/yeni")
