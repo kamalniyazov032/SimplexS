@@ -227,24 +227,12 @@ public class QiymetController {
         return redirect(basliqId, qrupId);
     }
 
-    @PostMapping("/xidmetQiymetleri/qiymetler")
+    @PostMapping({"/xidmetQiymetleri/qiymetler", "/xidmetQiymetleri/qiymetler/toplu"})
     public String qiymetler(@RequestParam Long cedvelId, @RequestParam String qiymetlerJson,
             @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
         if (!validJsonArray(qiymetlerJson)) a.addFlashAttribute("errorMessage", "Göndərilən qiymət məlumatları düzgün deyil.");
         else flash(repo.qiymetleriSaxla(cedvelId, qiymetlerJson, personal.personalId()), a,
                 "Dəyişdirilmiş xidmət qiymətləri yadda saxlanıldı.");
-        return tarifRedirect(cedvelId);
-    }
-
-    @PostMapping("/xidmetQiymetleri/qiymetler/toplu")
-    public String topluYenile(@RequestParam Long cedvelId, @RequestParam List<Long> xidmetIds,
-            @RequestParam(required = false) BigDecimal xestePayi,
-            @RequestParam(required = false) BigDecimal sigortaPayi,
-            @RequestParam(required = false) BigDecimal xesteEndirimi,
-            @RequestParam(required = false) BigDecimal sigortaEndirimi,
-            @AuthenticationPrincipal AuthenticatedPersonal personal, RedirectAttributes a) {
-        flash(repo.qiymetleriTopluYenile(cedvelId, xidmetIds, xestePayi, sigortaPayi,
-                xesteEndirimi, sigortaEndirimi, personal.personalId()), a, "Xidmətlər toplu yeniləndi.");
         return tarifRedirect(cedvelId);
     }
 

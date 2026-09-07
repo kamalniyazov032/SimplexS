@@ -234,18 +234,12 @@ public class QiymetRepository {
                         .addValue("se", sigortaEndirim).addValue("aktiv", aktiv).addValue("personal", personalId));
     }
 
+    @Transactional
     public Map<String, Object> qiymetleriSaxla(Long cedvelId, String json, Long personalId) {
-        return one("SELECT * FROM public.fn_xidmet_qiymetlerini_yadda_saxla(p_qiymet_cedveli_id=>:cedvel,p_qiymetler=>CAST(:json AS jsonb),p_emel_eden_personal_id=>:personal)",
+        Map<String, Object> result = one("SELECT * FROM public.fn_xidmet_qiymetlerini_toplu_yenile(p_qiymet_cedveli_id=>:cedvel,p_xidmetler=>CAST(:json AS jsonb),p_yenileyen_personal_id=>:personal)",
                 new MapSqlParameterSource("cedvel", cedvelId).addValue("json", json).addValue("personal", personalId));
-    }
-
-    public Map<String, Object> qiymetleriTopluYenile(Long cedvelId, List<Long> xidmetIds,
-            BigDecimal xestePayi, BigDecimal sigortaPayi, BigDecimal xesteEndirim,
-            BigDecimal sigortaEndirim, Long personalId) {
-        return one("SELECT * FROM public.fn_xidmet_qiymetlerini_toplu_yenile(p_qiymet_cedveli_id=>:cedvel,p_xidmet_idleri=>CAST(:xidmetler AS bigint[]),p_xeste_payi=>:xp,p_sigorta_payi=>:sp,p_xeste_endirim=>:xe,p_sigorta_endirim=>:se,p_yenileyen_personal_id=>:personal)",
-                new MapSqlParameterSource("cedvel", cedvelId).addValue("xidmetler", arrayLiteral(xidmetIds))
-                        .addValue("xp", xestePayi).addValue("sp", sigortaPayi).addValue("xe", xesteEndirim)
-                        .addValue("se", sigortaEndirim).addValue("personal", personalId));
+        if (!successful(result)) TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return result;
     }
 
     public Map<String, Object> hekimQiymetiSaxla(Long klinikaId, Long cedvelId, Long xidmetId,
