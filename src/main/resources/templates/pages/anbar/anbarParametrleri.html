@@ -19,7 +19,7 @@
 <span th:text="#{common.filter}">Filter</span>
 <span th:if="${filterApplied}" class="badge bg-white text-primary ms-2" th:text="#{common.aktiv}">Aktiv</span>
 </button>
-<button class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="|#${tab}Modal|" th:if="${@access.hasPermission(#authentication,selectedKlinikaId,'ANBAR_IDARE_ET')}">
+<button class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="|#${tab}Modal|">
 <i class="ti ti-plus me-1">
 </i>
 <span th:text="#{common.elave_et}">Əlavə et</span>
@@ -667,7 +667,7 @@
 </th:block>
 <th:block th:fragment="edit(kind,id)">
 <td class="text-end pe-3">
-<button type="button" th:if="${@access.hasPermission(#authentication,selectedKlinikaId,'ANBAR_IDARE_ET')}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#edit-${kind}-${id}|" th:title="#{common.redakte_et}" th:aria-label="#{common.redakte_et}">
+<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#edit-${kind}-${id}|" th:title="#{common.redakte_et}" th:aria-label="#{common.redakte_et}">
 <i class="ti ti-edit">
 </i>
 </button>

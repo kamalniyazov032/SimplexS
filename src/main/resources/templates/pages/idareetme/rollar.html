@@ -42,7 +42,7 @@
                 <i class="ti ti-filter me-1"></i><span th:text="#{common.filter}">Filter
                 </span><span id="roleFilterBadge" class="badge bg-white text-primary ms-2 d-none" th:text="#{common.aktiv}">Aktiv</span>
             </button>
-            <button th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'ROL_IDARE_ET')}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRoleModal">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRoleModal">
                 <i class="ti ti-plus me-1"></i><span th:text="#{roles.yeni_rol}">Yeni rol
             </span></button>
         </div>
@@ -160,7 +160,7 @@
             </div>
         </div>
 
-        <form th:if="${@access.hasPermission(#authentication, selectedKlinikaId, 'ROL_IDARE_ET')}" method="post" th:action="@{/rollar/icazeler}">
+        <form method="post" th:action="@{/rollar/icazeler}">
             <input type="hidden" name="rolId" th:value="${selectedRolId}">
             <div class="card-body p-0">
                 <ul class="nav nav-tabs nav-tabs-bottom px-4 pt-3" id="permissionTabs" role="tablist">
