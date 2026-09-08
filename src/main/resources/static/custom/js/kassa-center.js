@@ -14,6 +14,9 @@
     const form = document.getElementById('cash-payment-form');
     if (!form) return;
     const i18n = window.KassaI18n;
+    const refund = form.dataset.refund === 'true';
+    const refundAccount = refund ? document.getElementById('refund-account') : null;
+    const refundType = refund ? document.getElementById('refund-payment-type') : null;
     const choices = [...form.querySelectorAll('.service-choice:not(:disabled)')];
     const amounts = [...form.querySelectorAll('.payment-amount')];
     const all = document.getElementById('select-all-services');
@@ -49,7 +52,7 @@
     function totals() {
         const selected = choices.filter(input => input.checked);
         const due = selected.reduce((sum, input) => sum + cents(input.dataset.amount), 0);
-        const paid = amounts.reduce((sum, input) => sum + cents(input.value || '0'), 0);
+        const paid = refund ? due : amounts.reduce((sum, input) => sum + cents(input.value || '0'), 0);
         document.getElementById('selected-count').textContent = selected.length;
         document.getElementById('selected-total').textContent = display(due);
         document.getElementById('payment-total').textContent = Number.isFinite(paid) ? display(paid) : '—';
@@ -59,6 +62,8 @@
         all.disabled = choices.length === 0;
         let error = '';
         if (!selected.length) error = i18n.selectServices;
+        else if (refund && !refundAccount.value) error = i18n.invalidAccount;
+        else if (refund && !refundType.value) error = i18n.invalidPayment;
         else if (!Number.isFinite(paid) || paid <= 0) error = i18n.invalidPayment;
         else if (paid > due) error = i18n.overpayment;
         else if (form.dataset.debt !== 'true' && paid < due && !borrow?.checked) error = i18n.borrowRequired;
@@ -93,11 +98,16 @@
         if (state.error) { event.preventDefault(); feedback.textContent = state.error; return; }
         if (!confirmed) {
             event.preventDefault();
+            if (refund) {
+                document.getElementById('refund-confirm-account').textContent = refundAccount.selectedOptions[0]?.textContent || '';
+                document.getElementById('refund-confirm-type').textContent = refundType.selectedOptions[0]?.textContent || '';
+            }
             document.getElementById('confirm-payment-total').textContent = display(state.paid);
             document.getElementById('confirm-payment-remaining').textContent = display(state.due - state.paid);
             if (!confirmation.open) confirmation.showModal();
             return;
         }
+        if (refund) document.getElementById('refund-expected-total').value = (state.due / 100).toFixed(2);
         submitting = true;
         dirty = false;
         submit.disabled = true;

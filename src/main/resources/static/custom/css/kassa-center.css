@@ -96,3 +96,25 @@
 .kassa-confirmation-totals > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; }
 .kassa-confirmation-totals > div + div { margin-top: 12px; padding-top: 12px; border-top: 1px solid #dfe8f5; }
 .kassa-confirmation-totals strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.kassa-income-modal .modal-content { border: 0; border-radius: 16px; }
+.kassa-income-modal .modal-header, .kassa-income-modal .modal-footer { padding: 16px 20px; }
+.kassa-income-modal .modal-body { padding: 20px; }
+.kassa-income-modal .income-amount, .kassa-income-modal #income-total { font-variant-numeric: tabular-nums; }
+@media (max-width: 575.98px) { .kassa-income-modal .modal-content { border-radius: 0; } }
+
+.kassa-advance-modal .modal-dialog { max-width: 1180px; width: calc(100% - 32px); }
+.advance-results-scroll { height: 260px; overflow: auto; }
+.advance-results-scroll .table { white-space: nowrap; font-size: 13px; }
+.advance-results-scroll th { position: sticky; top: 0; z-index: 1; background: #f3f7fd; }
+#advance-confirm-patient { line-height: 1.7; }
+@media (max-width: 575.98px) { .kassa-advance-modal .modal-dialog { width: 100%; } }
+
+/* Keep the advance popup stable when a result page contains more rows. */
+.kassa-advance-modal .modal-content { height: min(900px, calc(100dvh - 56px)); }
+.kassa-advance-modal .modal-body { min-height: 0; }
+@media (max-width: 575.98px) { .kassa-advance-modal .modal-content { height: 100dvh; } }
+
+.kassa-refund-modal .modal-content { max-height: calc(100dvh - 56px); }
+.kassa-refund-modal .kassa-table-scroll { max-height: 380px; overflow: auto; }
+@media (max-width: 991.98px) { .kassa-refund-modal .modal-content { max-height: 100dvh; } }

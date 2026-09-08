@@ -72,6 +72,7 @@
 </form>
 <div class="alert alert-warning" th:if="${#lists.isEmpty(registers)}" th:text="#{kassa.noCashHint}">
 </div>
+<div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
 <div class="kassa-operation-grid">
 <section class="kassa-group kassa-income">
 <div class="kassa-group-heading">
@@ -131,7 +132,7 @@
 </small>
 </span>
 </button>
-<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<a id="advance-open" class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/avans(kassaId=${cashId})}">
 <i class="ti ti-user-plus kassa-action-icon" aria-hidden="true">
 </i>
 <span class="kassa-action-copy">
@@ -140,10 +141,17 @@
 <small th:text="#{kassa.advanceHint}">
 </small>
 </span>
-<span class="kassa-soon" th:text="#{kassa.soon}">
+<i class="ti ti-chevron-right" aria-hidden="true"></i></a>
+<button type="button" class="kassa-action" disabled th:if="${cashId == null}"><i class="ti ti-user-plus kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.advance}">
+</strong>
+<small th:text="#{kassa.advanceHint}">
+</small>
 </span>
 </button>
-<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<a id="other-income-open" class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/diger-giris(kassaId=${cashId})}">
 <i class="ti ti-dots kassa-action-icon" aria-hidden="true">
 </i>
 <span class="kassa-action-copy">
@@ -152,7 +160,15 @@
 <small th:text="#{kassa.otherIncomeHint}">
 </small>
 </span>
-<span class="kassa-soon" th:text="#{kassa.soon}">
+<i class="ti ti-chevron-right" aria-hidden="true"></i></a>
+<button type="button" class="kassa-action" disabled th:if="${cashId == null}">
+<i class="ti ti-dots kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.otherIncome}">
+</strong>
+<small th:text="#{kassa.otherIncomeHint}">
+</small>
 </span>
 </button>
 </div>
@@ -235,8 +251,7 @@
 </div>
 </div>
 <div class="kassa-actions">
-<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
-<i class="ti ti-rotate-2 kassa-action-icon" aria-hidden="true">
+<a class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/qaytarma(kassaId=${cashId})}"><i class="ti ti-rotate-2 kassa-action-icon" aria-hidden="true">
 </i>
 <span class="kassa-action-copy">
 <strong th:text="#{kassa.refund}">
@@ -244,7 +259,14 @@
 <small th:text="#{kassa.refundHint}">
 </small>
 </span>
-<span class="kassa-soon" th:text="#{kassa.soon}">
+<i class="ti ti-chevron-right" aria-hidden="true"></i></a>
+<button type="button" class="kassa-action" disabled th:if="${cashId == null}"><i class="ti ti-rotate-2 kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.refund}">
+</strong>
+<small th:text="#{kassa.refundHint}">
+</small>
 </span>
 </button>
 <button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
@@ -280,6 +302,7 @@
 </div>
 </section>
 </div>
+<th:block th:if="${showOtherIncome == true}"><div th:replace="~{fragments/kassa-other-income :: popup}"></div></th:block>
 </div>
 </body>
 </html>

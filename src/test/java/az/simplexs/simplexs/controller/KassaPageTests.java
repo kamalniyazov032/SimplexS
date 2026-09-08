@@ -108,8 +108,130 @@ class KassaPageTests {
                 .andExpect(status().isForbidden());
         verify(service,never()).pay(any(),any(),any(),any(),anyBoolean(),any(),any(),any(),anyBoolean(),any());
     }
+    @Test void otherIncomePopupRendersAccountingCodesAndPaymentTypes() throws Exception {
+        when(repo.accountingCodes(1L,"DIGER_GIRIS")).thenReturn(List.of(row("muhasibat_kodu_id",5L,"ad","Digər gəlirlər","aciqlama","Test açıqlama")));
+        var page=mvc.perform(get("/kassa/diger-giris").param("kassaId","7").session(session))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("id=\"other-income-modal\"")))
+                .andExpect(content().string(containsString("Digər gəlirlər"))).andExpect(content().string(containsString("name=\"_csrf\""))).andReturn();
+        preview("other-income",page.getResponse().getContentAsString());
+        verify(repo).accountingCodes(1L,"DIGER_GIRIS");
+        verifyNoInteractions(dataSource);
+    }
+    @Test void otherIncomeSubmissionIsScopedAndCannotBeReplayed() throws Exception {
+        var page=mvc.perform(get("/kassa/diger-giris").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        var token=(String)page.getModelAndView().getModel().get("incomeToken");
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.otherIncome(any(),eq(1L),eq(7L),eq(5L),anyList(),anyList(),any()))
+                .thenReturn(Map.of("ugurlu",true,"status_kodu","UGURLU"));
+        for(int i=0;i<2;i++) {
+            mvc.perform(post("/kassa/diger-giris").session(session).param(csrf.getParameterName(),csrf.getToken())
+                    .param("kassaId","7").param("paymentToken",token).param("accountId","5").param("paymentTypeIds","1").param("amounts","250.00"))
+                    .andExpect(status().is3xxRedirection());
+        }
+        verify(service,times(1)).otherIncome(any(),eq(1L),eq(7L),eq(5L),eq(List.of(1L)),eq(List.of(new BigDecimal("250.00"))),isNull());
+        verifyNoInteractions(dataSource);
+    }
+    @Test void otherIncomeNeedsCsrfAndWriteAccess() throws Exception {
+        mvc.perform(post("/kassa/diger-giris").session(session).param("kassaId","7").param("paymentToken","invalid"))
+                .andExpect(status().isForbidden());
+        when(service.requireCash(any(),eq(1L),eq(7L),eq(true))).thenThrow(new org.springframework.security.access.AccessDeniedException("denied"));
+        mvc.perform(get("/kassa/diger-giris").param("kassaId","7").session(session)).andExpect(status().isForbidden());
+        verify(service,never()).otherIncome(any(),any(),any(),any(),any(),any(),any());
+    }
+    @Test void failedOtherIncomeRetainsDraftAndReopensPopup() throws Exception {
+        var page=mvc.perform(get("/kassa/diger-giris").param("kassaId","7").session(session)).andReturn();
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.otherIncome(any(),any(),any(),any(),any(),any(),any()))
+                .thenReturn(Map.of("ugurlu",false,"status_kodu","UNKNOWN_CODE","mesaj","Internal DB details"));
+        var result=mvc.perform(post("/kassa/diger-giris").session(session).param(csrf.getParameterName(),csrf.getToken())
+                .param("kassaId","7").param("paymentToken",(String)page.getModelAndView().getModel().get("incomeToken"))
+                .param("accountId","5").param("paymentTypeIds","1").param("amounts","250.00").param("note","Test note"))
+                .andExpect(redirectedUrl("/kassa/diger-giris?kassaId=7")).andExpect(flash().attribute("incomeNote","Test note")).andReturn();
+        assertThat(result.getFlashMap().get("errorMessage").toString()).doesNotContain("Internal DB details");
+        when(repo.accountingCodes(1L,"DIGER_GIRIS")).thenReturn(List.of(row("muhasibat_kodu_id",5L,"ad","Digər gəlirlər","aciqlama","Test")));
+        mvc.perform(get("/kassa/diger-giris").session(session).param("kassaId","7").flashAttrs(result.getFlashMap()))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("value=\"250.00\"")));
+    }
+    private Map<String,Object> advancePatient() {
+        return row("gelis_id",17L,"xeste_id",4L,"l_kart","X0004","gelis_karti","AMB0017","kart_novu_adi","Ambulator",
+                "ad","Kamal","soyad","Niyazov","ata_adi","Əli","dogum_tarixi","1985-03-12","gelis_tarixi","2026-09-09");
+    }
+    @Test void advancePopupRendersSearchWithoutAutomaticallyLoadingPatients() throws Exception {
+        when(repo.cardTypes()).thenReturn(List.of(Map.of("kod","AMBULATOR","ad","Ambulator")));
+        var page=mvc.perform(get("/kassa/avans").param("kassaId","7").session(session)).andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"advance-query\"")))
+                .andExpect(content().string(containsString("data-advance=\"true\""))).andReturn();
+        preview("advance",page.getResponse().getContentAsString());
+        verify(repo).accountingCodes(1L,"AVANS_QEBUL");
+        verify(repo,never()).advancePatients(any(),any(),any(),any(),any(),anyInt());
+        verifyNoInteractions(dataSource);
+    }
+    @Test void advanceSearchShowsIdentityAndDatesAndEscapesPatientData() throws Exception {
+        var patient=advancePatient();patient.put("ata_adi","<script>bad</script>");
+        when(repo.advancePatients(1L,null,"Kamal Niyazov",null,null,1)).thenReturn(List.of(patient));
+        mvc.perform(get("/kassa/avans/xesteler").param("kassaId","7").param("q","Kamal Niyazov").session(session))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("AMB0017")))
+                .andExpect(content().string(containsString("1985-03-12"))).andExpect(content().string(containsString("2026-09-09")))
+                .andExpect(content().string(containsString("&lt;script&gt;bad&lt;/script&gt;")));
+        verifyNoInteractions(dataSource);
+    }
+    @Test void advanceSearchValidatesDatesAndScopesCardFilters() throws Exception {
+        when(repo.cardTypes()).thenReturn(List.of(Map.of("kod","AMBULATOR")));
+        mvc.perform(get("/kassa/avans/xesteler").param("kassaId","7").param("q","AMB0017").param("cardType","AMBULATOR")
+                .param("from","2026-09-01").param("to","2026-09-09").session(session)).andExpect(status().isOk());
+        verify(repo).advancePatients(1L,"AMBULATOR","AMB0017",java.time.LocalDate.of(2026,9,1),java.time.LocalDate.of(2026,9,9),1);
+        clearInvocations(repo);
+        mvc.perform(get("/kassa/avans/xesteler").param("kassaId","7").param("from","2026-09-10").param("to","2026-09-01").session(session))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("tarix aralığını yoxlayın")));
+        verify(repo,never()).advancePatients(any(),any(),any(),any(),any(),anyInt());
+    }
+    @Test void advanceUsesItsOwnTokenAndIgnoresClientPatientId() throws Exception {
+        var page=mvc.perform(get("/kassa/avans").param("kassaId","7").session(session)).andReturn();
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.advance(any(),eq(1L),eq(7L),eq(17L),eq(3L),anyList(),anyList(),any()))
+                .thenReturn(Map.of("ugurlu",true,"status_kodu","UGURLU"));
+        var token=(String)page.getModelAndView().getModel().get("incomeToken");
+        for(int i=0;i<2;i++) mvc.perform(post("/kassa/avans").session(session).param(csrf.getParameterName(),csrf.getToken())
+                .param("kassaId","7").param("paymentToken",token).param("visitId","17").param("patientId","999")
+                .param("accountId","3").param("paymentTypeIds","1").param("amounts","100.00"))
+                .andExpect(status().is3xxRedirection());
+        verify(service,times(1)).advance(any(),eq(1L),eq(7L),eq(17L),eq(3L),eq(List.of(1L)),eq(List.of(new BigDecimal("100.00"))),isNull());
+    }
+    @Test void advanceFailureRestoresSelectedPatientAndAmount() throws Exception {
+        when(repo.advanceVisit(1L,17L)).thenReturn(advancePatient());
+        mvc.perform(get("/kassa/avans").param("kassaId","7").session(session)
+                .flashAttr("advanceVisitId",17L).flashAttr("incomeAmounts",Map.of(1L,new BigDecimal("100.00"))))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("Kamal Niyazov Əli")))
+                .andExpect(content().string(containsString("value=\"100.00\"")));
+    }
+    @Test void sixHundredAdvanceResultsAreDisplayedInSixPagesOfOneHundred() throws Exception {
+        for(int page=1;page<=6;page++) {
+            List<Map<String,Object>> rows=new ArrayList<>();
+            int fetched=page<6?101:100;
+            for(int i=0;i<fetched;i++) {
+                var patient=new LinkedHashMap<>(advancePatient());
+                patient.put("gelis_id",(long)(page-1)*100+i+1);
+                rows.add(patient);
+            }
+            when(repo.advancePatients(1L,null,"Kamal",null,null,page)).thenReturn(rows);
+            var result=mvc.perform(get("/kassa/avans/xesteler").session(session).param("kassaId","7")
+                    .param("q","Kamal").param("page",String.valueOf(page))).andExpect(status().isOk()).andReturn();
+            String html=result.getResponse().getContentAsString();
+            assertThat(html.split("data-select-advance",-1).length-1).isEqualTo(100);
+            assertThat(html).contains("Səhifə "+page+" · 100 nəticə");
+            assertThat(result.getModelAndView().getModel().get("advanceHasMore")).isEqualTo(page<6);
+            if(page==6) assertThat(html).contains("data-advance-page=\"7\" disabled=\"disabled\"");
+        }
+    }
     private void preview(String name,String html) throws Exception {
         assertThat(html).doesNotContain("??kassa.");
         Path directory=Path.of("target/kassa-preview");Files.createDirectories(directory);Files.writeString(directory.resolve(name+".html"),html);
+    }
+    @Test void refundOpensLocalizedServicePopup() throws Exception {
+        when(repo.refundServices(1L,7L,17L)).thenReturn(List.of(row("gelis_id",17L,"xeste_id",4L,"xeste_kodu","X004","xeste_adi_soyadi","Test Pasiyent","protokol_kodu","A26000017","xeste_xidmet_id",101L,"xidmet_kodu","LAB01","xidmet_adi","Analiz","xidmet_tarixi","2026-09-09","status_kodu","YENI","status_adi","Yeni","secilib",true,"odenilen_mebleg",new BigDecimal("100.00"),"qaytarilan_mebleg",new BigDecimal("20.00"),"qaytarila_bilen_mebleg",new BigDecimal("80.00"))));
+        when(repo.accountingCodes(1L,"XESTE_QAYTARMA")).thenReturn(List.of(row("muhasibat_kodu_id",7L,"ad","Qaytarma")));
+        var result=mvc.perform(get("/kassa/qaytarma").servletPath("/kassa/qaytarma").param("kassaId","7").param("targetId","17").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(result.getResponse().getContentAsString()).contains("id=\"cash-payment-modal\"","data-refund=\"true\"","A26000017","Qaytarılacaq məbləğ","name=\"_csrf\"").doesNotContain("??kassa.");
+        preview("refund",result.getResponse().getContentAsString());
     }
 }

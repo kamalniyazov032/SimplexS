@@ -54,6 +54,65 @@ public class KassaEmeliyyatService {
         Map<Long,BigDecimal> available=new HashMap<>();
         rows.stream().filter(r->selectable(r,debt)).forEach(r->available.put(id(r,key),money(r,debt?"qalan_borc":"qalan_mebleg")));
         if (!available.keySet().containsAll(selected)) fail("staleServices");
+        var payments = validatePayments(types,amounts);
+        BigDecimal total = payments.total();
+        BigDecimal due=selected.stream().map(available::get).reduce(BigDecimal.ZERO,BigDecimal::add);
+        if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) fail("invalidPayment");
+        if(total.compareTo(due)>0) fail("overpayment");
+        if(!debt && total.compareTo(due)<0 && !borrow) fail("borrowRequired");
+        String serviceJson=selected.stream().map(x->"{\""+key+"\":"+x+"}").collect(Collectors.joining(",","[","]"));
+        return repo.pay(clinic,cash,personalId(auth),target,debt,serviceJson,
+                payments.json(),borrow,note==null?null:note.trim());
+    }
+    @Transactional
+    public Map<String,Object> otherIncome(Authentication auth, Long clinic, Long cash, Long account,
+            List<Long> types, List<BigDecimal> amounts, String note) {
+        requireCash(auth,clinic,cash,true);
+        if (note!=null && note.length()>1000) fail("noteLong");
+        if (account==null || repo.accountingCodes(clinic,"DIGER_GIRIS").stream()
+                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        var payments=validatePayments(types,amounts);
+        return repo.otherIncome(clinic,cash,personalId(auth),account,payments.json(),note==null?null:note.trim());
+    }
+    @Transactional
+    public Map<String,Object> advance(Authentication auth,Long clinic,Long cash,Long visit,Long account,
+            List<Long> types,List<BigDecimal> amounts,String note) {
+        requireCash(auth,clinic,cash,true);
+        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) fail("selectAdvancePatient");
+        var patient=repo.advanceVisit(clinic,visit);
+        if(id(patient,"xeste_id")==null) fail("selectAdvancePatient");
+        if(account==null || repo.accountingCodes(clinic,"AVANS_QEBUL").stream()
+                .noneMatch(row->Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        if(note!=null && note.length()>1000) fail("noteLong");
+        var payments=validatePayments(types,amounts);
+        return repo.advance(clinic,cash,personalId(auth),id(patient,"xeste_id"),visit,account,payments.json(),note==null?null:note.trim());
+    }
+    @Transactional
+    public Map<String,Object> refund(Authentication auth,Long clinic,Long cash,Long visit,List<Long> selected,
+            Long account,Long paymentType,BigDecimal expectedTotal,String note) {
+        requireCash(auth,clinic,cash,true);
+        if(visit==null || visit<=0 || selected==null || selected.isEmpty() || selected.size()>1000
+                || selected.stream().anyMatch(id->id==null || id<=0) || new HashSet<>(selected).size()!=selected.size()) fail("selectRefundServices");
+        if(note!=null && note.length()>1000) fail("noteLong");
+        if(!repo.lockPatient(clinic,visit,false)) fail("refundStale");
+        var rows=repo.refundServices(clinic,cash,visit);
+        var eligible=rows.stream().filter(r->Objects.equals(id(r,"gelis_id"),visit)
+                && "YENI".equals(r.get("status_kodu")) && money(r,"qaytarila_bilen_mebleg").signum()>0).toList();
+        Map<Long,Map<String,Object>> byId=new HashMap<>();
+        eligible.forEach(r->byId.put(id(r,"xeste_xidmet_id"),r));
+        if(!byId.keySet().containsAll(selected)) fail("refundStale");
+        String protocol=(String)byId.get(selected.getFirst()).get("protokol_kodu");
+        if(protocol==null || protocol.isBlank() || selected.stream().anyMatch(id->!protocol.equals(byId.get(id).get("protokol_kodu")))) fail("refundStale");
+        BigDecimal total=selected.stream().map(id->money(byId.get(id),"qaytarila_bilen_mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add);
+        if(expectedTotal==null || total.compareTo(expectedTotal)!=0 || total.compareTo(MAX_MONEY)>0) fail("refundAmountChanged");
+        if(account==null || repo.accountingCodes(clinic,"XESTE_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        if(paymentType==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),paymentType))) fail("invalidPayment");
+        String json=selected.stream().map(id->"{\"xeste_xidmet_id\":"+id+"}").collect(Collectors.joining(",","[","]"));
+        return repo.refund(clinic,cash,personalId(auth),protocol,account,json,paymentType,note==null?null:note.trim());
+    }
+    private record PaymentAmounts(BigDecimal total, String json) {}
+    private PaymentAmounts validatePayments(List<Long> types,List<BigDecimal> amounts) {
+        if (types==null || amounts==null || types.size()!=amounts.size() || types.isEmpty() || types.size()>20) fail("invalidPayment");
         Set<Long> allowed=repo.paymentTypes().stream().map(r->id(r,"odenis_novu_id")).collect(Collectors.toSet());
         BigDecimal total=BigDecimal.ZERO;
         List<String> paymentJson=new ArrayList<>();
@@ -67,13 +126,8 @@ public class KassaEmeliyyatService {
             total=total.add(amount);
             paymentJson.add("{\"odenis_novu_id\":"+types.get(i)+",\"mebleg\":"+amount.toPlainString()+"}");
         }
-        BigDecimal due=selected.stream().map(available::get).reduce(BigDecimal.ZERO,BigDecimal::add);
         if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) fail("invalidPayment");
-        if(total.compareTo(due)>0) fail("overpayment");
-        if(!debt && total.compareTo(due)<0 && !borrow) fail("borrowRequired");
-        String serviceJson=selected.stream().map(x->"{\""+key+"\":"+x+"}").collect(Collectors.joining(",","[","]"));
-        return repo.pay(clinic,cash,personalId(auth),target,debt,serviceJson,
-                String.join(",",paymentJson).transform(s->"["+s+"]"),borrow,note==null?null:note.trim());
+        return new PaymentAmounts(total,"["+String.join(",",paymentJson)+"]");
     }
     private static void fail(String key) { throw new PaymentValidationException(key); }
     public static class PaymentValidationException extends RuntimeException {

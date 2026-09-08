@@ -76,4 +76,54 @@ class KassaEmeliyyatServiceTests {
         assertThatThrownBy(()->pay(false,List.of(101L),List.of(BigDecimal.ONE,BigDecimal.ZERO),false)).hasMessage("kassa.invalidPayment");
         assertThatThrownBy(()->pay(false,List.of(101L),List.of(new BigDecimal("-1"),BigDecimal.ZERO),false)).hasMessage("kassa.invalidPayment");
     }
+    @Test void otherIncomeUsesOperationScopedAccountingCodeAndSplitPayments() {
+        when(repo.accountingCodes(1L,"DIGER_GIRIS")).thenReturn(List.of(Map.of("muhasibat_kodu_id",5L)));
+        service.otherIncome(auth,1L,7L,5L,List.of(1L,2L),List.of(new BigDecimal("200.00"),new BigDecimal("50.00"))," Income ");
+        verify(repo).otherIncome(1L,7L,24L,5L,"[{\"odenis_novu_id\":1,\"mebleg\":200.00},{\"odenis_novu_id\":2,\"mebleg\":50.00}]","Income");
+    }
+    @Test void otherIncomeRejectsForeignAccountingCodeBeforeWrite() {
+        when(repo.accountingCodes(1L,"DIGER_GIRIS")).thenReturn(List.of(Map.of("muhasibat_kodu_id",5L)));
+        assertThatThrownBy(()->service.otherIncome(auth,1L,7L,99L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.invalidAccount");
+        verify(repo,never()).otherIncome(any(),any(),any(),any(),any(),any());
+    }
+    @Test void otherIncomeRejectsReadOnlyCashAndInvalidAmounts() {
+        when(repo.accountingCodes(1L,"DIGER_GIRIS")).thenReturn(List.of(Map.of("muhasibat_kodu_id",5L)));
+        for(BigDecimal amount:List.of(BigDecimal.ZERO,new BigDecimal("-1"),new BigDecimal("1.001"))) {
+            assertThatThrownBy(()->service.otherIncome(auth,1L,7L,5L,List.of(1L),List.of(amount),null)).hasMessage("kassa.invalidPayment");
+        }
+        when(repo.cashRegisters(1L,24L)).thenReturn(List.of(Map.of("kassa_id",7L,"izlesin",true,"islesin",false)));
+        assertThatThrownBy(()->service.otherIncome(auth,1L,7L,5L,List.of(1L),List.of(BigDecimal.TEN),null)).isInstanceOf(AccessDeniedException.class);
+        verify(repo,never()).otherIncome(any(),any(),any(),any(),any(),any());
+    }
+    @Test void advanceDerivesPatientFromTheActiveClinicVisit() {
+        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of("xeste_id",4L,"gelis_id",17L));
+        when(repo.accountingCodes(1L,"AVANS_QEBUL")).thenReturn(List.of(Map.of("muhasibat_kodu_id",3L)));
+        service.advance(auth,1L,7L,17L,3L,List.of(1L),List.of(new BigDecimal("100.00"))," Advance ");
+        verify(repo).advance(1L,7L,24L,4L,17L,3L,"[{\"odenis_novu_id\":1,\"mebleg\":100.00}]","Advance");
+    }
+    @Test void advanceRejectsMissingOrForeignVisitAndWrongOperationAccount() {
+        assertThatThrownBy(()->service.advance(auth,1L,7L,null,3L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.selectAdvancePatient");
+        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of());
+        assertThatThrownBy(()->service.advance(auth,1L,7L,17L,3L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.selectAdvancePatient");
+        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of("xeste_id",4L));
+        when(repo.accountingCodes(1L,"AVANS_QEBUL")).thenReturn(List.of(Map.of("muhasibat_kodu_id",3L)));
+        assertThatThrownBy(()->service.advance(auth,1L,7L,17L,5L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.invalidAccount");
+        verify(repo,never()).advance(any(),any(),any(),any(),any(),any(),any(),any());
+    }
+    private void refundSetup() {
+        when(repo.refundServices(1L,7L,17L)).thenReturn(List.of(Map.of("gelis_id",17L,"xeste_xidmet_id",101L,"status_kodu","YENI","protokol_kodu","A26000017","qaytarila_bilen_mebleg",new BigDecimal("80.00"))));
+        when(repo.accountingCodes(1L,"XESTE_QAYTARMA")).thenReturn(List.of(Map.of("muhasibat_kodu_id",7L)));
+    }
+    @Test void refundDerivesProtocolAndPersonalAndUsesFullRefundableAmount() {
+        refundSetup();
+        service.refund(auth,1L,7L,17L,List.of(101L),7L,1L,new BigDecimal("80.00")," Refund ");
+        verify(repo).refund(1L,7L,24L,"A26000017",7L,"[{\"xeste_xidmet_id\":101}]",1L,"Refund");
+    }
+    @Test void refundRejectsStaleAmountAndForeignServicesBeforeWriting() {
+        refundSetup();
+        assertThatThrownBy(()->service.refund(auth,1L,7L,17L,List.of(101L),7L,1L,new BigDecimal("100.00"),null)).hasMessage("kassa.refundAmountChanged");
+        assertThatThrownBy(()->service.refund(auth,1L,7L,17L,List.of(999L),7L,1L,new BigDecimal("80.00"),null)).hasMessage("kassa.refundStale");
+        assertThatThrownBy(()->service.refund(auth,1L,7L,17L,List.of(101L),99L,1L,new BigDecimal("80.00"),null)).hasMessage("kassa.invalidAccount");
+        verify(repo,never()).refund(any(),any(),any(),any(),any(),any(),any(),any());
+    }
 }

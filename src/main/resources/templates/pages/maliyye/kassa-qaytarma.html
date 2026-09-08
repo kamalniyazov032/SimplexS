@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body><div layout:fragment="content" class="content kassa-page">
+<link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
+<div class="kassa-work-heading"><div><a th:href="@{/kassa(kassaId=${cashId})}"><i class="ti ti-arrow-left me-1" aria-hidden="true"></i><span th:text="#{kassa.back}"></span></a><h1 th:text="#{kassa.refund}"></h1><p th:text="|${cash.kassa_adi} (${cash.kassa_kodu})|"></p></div><span class="badge bg-danger-subtle text-danger p-3" th:text="#{kassa.refundHint}"></span></div>
+<div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
+<div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+<section class="kassa-panel">
+<div class="kassa-panel-head"><h2 th:text="#{kassa.refundPatients}"></h2></div>
+<form method="get" th:action="@{/kassa/qaytarma}" class="row g-2 p-3 align-items-end">
+<input type="hidden" name="kassaId" th:value="${cashId}">
+<div class="col-md-6"><label for="refund-query" class="form-label small" th:text="#{kassa.advanceQuery}"></label><input id="refund-query" name="q" type="search" class="form-control" maxlength="200" th:value="${query}" th:placeholder="#{kassa.advanceQueryHint}"></div>
+<div class="col-md-4"><label for="refund-card-type" class="form-label small" th:text="#{kassa.cardType}"></label><select id="refund-card-type" name="cardType" class="form-select select2"><option value="" th:text="#{kassa.allCardTypes}"></option><option th:each="c:${cardTypes}" th:value="${c.kod}" th:text="${c.ad}" th:selected="${c.kod == cardType}"></option></select></div>
+<div class="col-md-2"><button class="btn btn-primary w-100" type="submit" th:text="#{kassa.search}"></button></div>
+</form>
+<div class="kassa-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.refundPatients}"><table class="table"><thead><tr>
+<th th:text="#{kassa.patientCard}"></th><th th:text="#{kassa.visitCard}"></th><th th:text="#{kassa.cardType}"></th><th th:text="#{kassa.firstName}"></th><th th:text="#{kassa.lastName}"></th><th th:text="#{kassa.fatherName}"></th><th th:text="#{kassa.birthDate}"></th><th th:text="#{kassa.visitDate}"></th><th th:text="#{kassa.action}"></th>
+</tr></thead><tbody><tr th:each="r:${patients}" data-patient-row th:classappend="${r.gelis_id == targetId} ? 'is-selected'">
+<td th:text="${r.l_kart}"></td><td th:text="${r.gelis_karti}"></td><td th:text="${r.kart_novu_adi}"></td><td th:text="${r.ad}"></td><td th:text="${r.soyad}"></td><td th:text="${r.ata_adi}"></td><td th:text="${r.dogum_tarixi}"></td><td th:text="${r.gelis_tarixi}"></td>
+<td><a class="btn btn-sm btn-outline-danger" th:href="@{/kassa/qaytarma(kassaId=${cashId},targetId=${r.gelis_id},q=${query},cardType=${cardType},page=${page})}" th:text="#{kassa.open}"></a></td>
+</tr></tbody></table></div>
+<div class="kassa-empty" th:if="${#lists.isEmpty(patients)}" th:text="#{kassa.noRefundPatients}"></div>
+<nav class="p-3 d-flex align-items-center justify-content-between gap-2" th:aria-label="#{kassa.patientPages}"><span class="text-muted small" th:text="#{kassa.advancePageSummary(${page},${#lists.size(patients)})}"></span><div class="d-flex gap-2">
+<a class="btn btn-sm btn-outline-primary" th:if="${page > 1}" th:href="@{/kassa/qaytarma(kassaId=${cashId},q=${query},cardType=${cardType},page=${page - 1})}" th:text="#{kassa.previousPage}"></a>
+<a class="btn btn-sm btn-outline-primary" th:if="${hasMore}" th:href="@{/kassa/qaytarma(kassaId=${cashId},q=${query},cardType=${cardType},page=${page + 1})}" th:text="#{kassa.nextPage}"></a>
+</div></nav></section>
+<div th:if="${selected != null}" id="cash-payment-modal" class="modal fade kassa-payment-modal kassa-refund-modal" tabindex="-1" aria-labelledby="cash-payment-title" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-lg-down"><div class="modal-content">
+<div class="modal-header"><h2 class="modal-title fs-5" id="cash-payment-title" th:text="#{kassa.refund}"></h2><button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button></div>
+<div class="modal-body kassa-page"><div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+<form id="cash-payment-form" method="post" th:action="@{/kassa/qaytarma}" data-refund="true">
+<input type="hidden" name="kassaId" th:value="${cashId}"><input type="hidden" name="targetId" th:value="${targetId}"><input type="hidden" name="paymentToken" th:value="${paymentToken}"><input id="refund-expected-total" type="hidden" name="expectedTotal" value="0.00">
+<div class="kassa-payment-layout"><section class="kassa-panel">
+<div class="kassa-patient-context"><i class="ti ti-user-circle" aria-hidden="true"></i><div><strong th:text="${selected.xeste_adi_soyadi}"></strong><small th:text="|${selected.xeste_kodu} · ${selected.protokol_kodu}|"></small></div></div>
+<div class="kassa-panel-head"><h2 th:text="#{kassa.refundServices}"></h2><label class="d-flex align-items-center gap-2 small"><input id="select-all-services" type="checkbox" class="form-check-input m-0" th:disabled="${!canWrite}"><span th:text="#{kassa.selectAll}"></span></label></div>
+<div class="kassa-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.refundServices}"><table class="table"><thead><tr><th th:text="#{kassa.select}"></th><th th:text="#{kassa.service}"></th><th th:text="#{kassa.date}"></th><th th:text="#{kassa.status}"></th><th th:text="#{kassa.paid}"></th><th th:text="#{kassa.refunded}"></th><th th:text="#{kassa.refundable}"></th></tr></thead>
+<tbody><tr th:each="r:${services}" th:with="eligible=${r.qaytarila_bilen_mebleg > 0 and r.status_kodu == 'YENI'}">
+<td><input type="checkbox" class="form-check-input service-choice" name="serviceIds" th:value="${r.xeste_xidmet_id}" th:data-amount="${r.qaytarila_bilen_mebleg}" th:disabled="${!canWrite or !eligible}" th:checked="${eligible and (refundSelection != null ? #lists.contains(refundSelection,r.xeste_xidmet_id) : r.secilib == true)}" th:aria-label="${r.xidmet_adi}"></td>
+<td class="kassa-service-name"><strong th:text="${r.xidmet_adi}"></strong><small class="text-muted d-block" th:text="${r.xidmet_kodu}"></small></td><td th:text="${r.xidmet_tarixi}"></td><td th:text="${r.status_adi}"></td><td th:text="${#numbers.formatDecimal(r.odenilen_mebleg,1,2)}"></td><td th:text="${#numbers.formatDecimal(r.qaytarilan_mebleg,1,2)}"></td><td class="fw-bold text-danger" th:text="${#numbers.formatDecimal(r.qaytarila_bilen_mebleg,1,2)}"></td>
+</tr></tbody></table></div></section>
+<aside class="kassa-checkout"><h2 th:text="#{kassa.refundSummary}"></h2><div class="kassa-total-row"><span th:text="#{kassa.selectedCount}"></span><strong id="selected-count">0</strong></div><div class="kassa-total-row primary"><span th:text="#{kassa.refundTotal}"></span><strong><span id="selected-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong></div>
+<span id="payment-total" hidden></span><span id="remaining-total" hidden></span>
+<fieldset th:disabled="${!canWrite}">
+<label class="form-label small" for="refund-account" th:text="#{kassa.account}"></label><select id="refund-account" name="accountId" class="form-select select2" required th:data-placeholder="#{kassa.selectAccount}"><option value="" th:text="#{kassa.selectAccount}"></option><option th:each="a:${refundAccounts}" th:value="${a.muhasibat_kodu_id}" th:text="${a.ad}" th:selected="${refundAccountId == a.muhasibat_kodu_id}"></option></select>
+<div class="text-danger small mt-2" th:if="${#lists.isEmpty(refundAccounts)}" th:text="#{kassa.noRefundAccounts}"></div>
+<label class="form-label small mt-3" for="refund-payment-type" th:text="#{kassa.paymentTypes}"></label><select id="refund-payment-type" name="paymentTypeId" class="form-select select2" required><option value="" th:text="#{kassa.selectPaymentType}"></option><option th:each="t:${paymentTypes}" th:value="${t.odenis_novu_id}" th:text="${t.ad}" th:selected="${refundPaymentTypeId == t.odenis_novu_id}"></option></select>
+<label class="form-label small mt-3" for="payment-note" th:text="#{kassa.note}"></label><textarea id="payment-note" name="note" class="form-control mb-3" rows="2" maxlength="1000" th:placeholder="#{kassa.refundNoteHint}" th:text="${refundNote}"></textarea>
+<div id="payment-feedback" class="text-danger small mb-3" role="status" aria-live="polite"></div><button id="submit-payment" class="btn btn-danger w-100" type="submit" th:disabled="${#lists.isEmpty(refundAccounts) or #lists.isEmpty(paymentTypes)}"><i class="ti ti-rotate-2 me-1" aria-hidden="true"></i><span th:text="#{kassa.acceptRefund}"></span></button></fieldset><p th:unless="${canWrite}" class="small text-muted" th:text="#{kassa.readOnly}"></p>
+</aside></div>
+<dialog id="payment-confirmation" class="kassa-confirmation" aria-labelledby="payment-confirmation-title" aria-describedby="payment-confirmation-hint">
+<div class="kassa-confirmation-icon text-danger"><i class="ti ti-rotate-2" aria-hidden="true"></i></div><h2 id="payment-confirmation-title" th:text="#{kassa.refundConfirmTitle}"></h2><p id="payment-confirmation-hint" th:text="#{kassa.refundConfirmHint}"></p>
+<p class="fw-semibold" th:text="|${selected.xeste_adi_soyadi} · ${selected.protokol_kodu}|"></p>
+<div class="kassa-confirmation-totals"><div><span th:text="#{kassa.cash}"></span><span th:text="${cash.kassa_adi}"></span></div><div><span th:text="#{kassa.account}"></span><span id="refund-confirm-account"></span></div><div><span th:text="#{kassa.paymentTypes}"></span><span id="refund-confirm-type"></span></div><div><span th:text="#{kassa.refundTotal}"></span><strong><span id="confirm-payment-total"></span> <span th:text="#{kassa.currency}"></span></strong></div></div><span id="confirm-payment-remaining" hidden></span>
+<div class="d-flex gap-2 mt-4"><button id="cancel-payment" type="button" class="btn btn-light flex-fill" autofocus th:text="#{common.imtina}"></button><button id="confirm-payment" type="button" class="btn btn-danger flex-fill" th:text="#{kassa.confirmAction}"></button></div>
+</dialog></form></div></div></div></div>
+<script th:inline="javascript">window.KassaI18n = {selectServices: /*[[#{kassa.selectRefundServices}]]*/ '', invalidPayment: /*[[#{kassa.invalidPayment}]]*/ '', invalidAccount: /*[[#{kassa.invalidAccount}]]*/ '', processing: /*[[#{kassa.processing}]]*/ ''};</script>
+<script th:src="@{/custom/js/kassa-center.js}" defer></script>
+</div></body></html>
