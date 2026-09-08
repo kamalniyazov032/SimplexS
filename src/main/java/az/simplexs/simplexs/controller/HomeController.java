@@ -46,13 +46,6 @@ public class HomeController {
         return "pages/pasienQebulu/xesteKarti";
     }
 
-    @GetMapping("/kassa")
-    public String kassa(Model model) {
-        model.addAttribute("pageTitle", "Home");
-        model.addAttribute("activeMenu", "dashboard");
-        return "pages/maliyye/kassa";
-    }
-
     @GetMapping("/patientService")
     public String patientService(Model model) {
         model.addAttribute("pageTitle", "Xəstə Xidmət Ödənişi");

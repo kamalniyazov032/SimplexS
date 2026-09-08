@@ -1,736 +1,285 @@
 <!DOCTYPE html>
-<html lang="az" th:lang="${#locale.language}"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main}">
-
-<head>
-
-
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
 <body>
-
-<div layout:fragment="content">
-
-    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
-        <div class="breadcrumb-arrow">
-            <h4 class="mb-1 fw-bold text-dark text-uppercase">Kassa Əməliyyat Mərkəzi</h4>
-            <p class="mb-0 text-muted small">Bütün kassa növləri üzrə maliyyə hərəkətlərinin mərkəzləşdirilmiş idarəolunması</p>        </div>
-    </div>
-
-    <div class="row mb-5 justify-content-center">
-        <div class="col-md-5 text-center">
-            <select class="form-select select2 border-0 shadow-none text-center fw-bold fs-4 bg-transparent">
-                <option value="1" selected>ÜMUMİ KASSA</option>
-                <option value="2">FİLİAL 1 KASSASI</option>
-                <option value="3">TƏCİLİ YARDIM KASSASI</option>
-                <option value="4">STOMATOLOGİYA KASSASI</option>
-            </select>
-            <div class="mx-auto" style="width: 60px; height: 3px; background-color: #3d5ee1; border-radius: 10px; margin-top: -5px;"></div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #f0fdf4 !important; border: 1px solid #dcfce7 !important;">
-                <h6 class="fw-bold text-success mb-3 text-uppercase">
-                    <i class="ti ti-arrow-down-left me-1"></i><span> Kassa Giriş
-                </span></h6>
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a th:href="@{/patientService}" class="d-flex align-items-center justify-content-between text-dark hov-link">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
-                                    <i class="ti ti-credit-card text-success fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Xəstə xidmət ödənişi</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a href="javascript:void(0);" class="d-flex align-items-center justify-content-between text-dark"
-                           data-bs-toggle="modal" data-bs-target="#patientAdvanceModal">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
-                                    <i class="ti ti-moneybag text-success fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Xəstədən avans al</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="patientAdvanceModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg">
-
-                            <div class="modal-header bg-primary-light">
-                                <h5 class="modal-title d-flex align-items-center fw-bold text-primary">
-                                    <i class="fa-solid fa-hand-holding-dollar me-2"></i><span>
-                                    Xəstədən Avans Al
-                                </span></h5>
-                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
-                            </div>
-
-                            <div class="modal-body p-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3 px-1">
-                                    <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
-                                    <span class="fw-bold text-success h6 mb-0">15,200.00 AZN</span>
-                                </div>
-
-                                <form id="advancePaymentForm">
-                                    <div class="card bg-light border-0 mb-4 shadow-none">
-                                        <div class="card-body p-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold text-muted">Xəstə Protokol No</label>
-                                                    <div class="input-group input-group-sm shadow-xs">
-                                                        <span class="input-group-text bg-white"><i class="fa-solid fa-fingerprint text-muted"></i></span>
-                                                        <input type="text" class="form-control" placeholder="AID26000001">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold text-muted">Fayl No</label>
-                                                    <div class="input-group input-group-sm shadow-xs">
-                                                        <span class="input-group-text bg-white"><i class="fa-solid fa-folder-open text-muted"></i></span>
-                                                        <input type="text" class="form-control" placeholder="SID26000029">
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 mt-3">
-                                                    <button type="button" class="btn btn-primary w-100 btn-sm d-flex align-items-center justify-content-center">
-                                                        <i class="fa-solid fa-magnifying-glass me-2"></i><span>
-                                                        Axtar və Xəstəni Tap
-                                                    </span></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium text-dark">Hesab Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <input type="text" class="form-control" placeholder="600.01">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium text-dark">Alınacaq Məbləğ</label>
-                                            <div class="input-group shadow-xs">
-                                <span class="input-group-text bg-white border-end-0 text-success">
-                                    <i class="fa-solid fa-money-bill-1-wave"></i>
-                                </span>
-                                                <input type="number" class="form-control border-start-0 fw-bold fs-16"
-                                                       placeholder="0.00" step="0.01" min="0">
-                                                <span class="input-group-text bg-light-gray fw-bold text-muted small">AZN</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium text-dark">Ödəniş Növü</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-credit-card text-muted"></i></span>
-                                                <select class="form-select select2" id="odenisNovu">
-                                                    <option value="" selected>-- Seçin --</option>
-                                                    <option value="nağd">Nağd</option>
-                                                    <option value="kart">Kart</option>
-                                                    <option value="bank_tranfer">Bank köçürməsi</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium text-dark">Tarix</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-days text-muted"></i></span>
-                                                <input type="text" class="form-control datetimepicker" value="17.04.2026">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium text-dark">Saat</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
-                                                <input type="text" class="form-control timepicker" value="15:50">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium text-dark">Qeyd</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
-                                                <textarea class="form-control" rows="2" placeholder="Əməliyyat qeydi..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
-                                <button type="button" class="btn btn-primary px-4 shadow-sm fw-bold">
-                                    <i class="fa-solid fa-check-double me-2"></i><span>
-                                    Avansı Təsdiqlə
-                                </span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a href="javascript:void(0);"
-                           class="d-flex align-items-center justify-content-between text-dark"
-                           data-bs-toggle="modal"
-                           data-bs-target="#otherEntryModal">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-success-light rounded-circle me-3">
-                                    <i class="ti ti-plus text-success fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Digər xərc giriş</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="otherEntryModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg">
-
-                            <div class="modal-header bg-primary-light">
-                                <h5 class="modal-title d-flex align-items-center fw-bold text-primary">
-                                    <i class="fa-solid fa-circle-plus me-2"></i><span>
-                                    DİGƏR GİRİŞ
-                                </span></h5>
-                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
-                            </div>
-
-                            <div class="modal-body p-4">
-                                <div class="bg-light rounded-3 p-3 mb-4 border border-dashed border-primary border-opacity-25">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
-                                        <span class="fw-bold text-success h5 mb-0">15,200.00 AZN</span>
-                                    </div>
-                                </div>
-
-                                <form id="otherEntryForm">
-                                    <div class="row g-3">
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Ödəniş Növü</label>
-                                            <div class="input-group">
-                                                <select class="form-select select2">
-                                                    <option value="" selected disabled>-- Ödəniş növü seçin --</option>
-                                                    <option value="nağd">Nağd</option>
-                                                    <option value="kart">Kart</option>
-                                                    <option value="köçürmə">Bank Köçürməsi</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Alınan Məbləğ</label>
-                                            <div class="input-group shadow-xs">
-                                                <span class="input-group-text bg-white text-success"><i class="fa-solid fa-money-bill-transfer"></i></span>
-                                                <input type="number" class="form-control fw-bold fs-16" placeholder="0.00" step="0.01" min="0">
-                                                <span class="input-group-text bg-light fw-bold text-muted small">AZN</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Tarix</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-day text-muted"></i></span>
-                                                <input type="text" class="form-control datetimepicker" value="25.04.2024">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Saat</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
-                                                <input type="text" class="form-control timepicker" value="14:30">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Qrup Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-layer-group text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Hesab qrup kodu seçin --</option>
-                                                    <option value="1">Qrup 1</option>
-                                                    <option value="2">Qrup 2</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Hesab kodu seçin --</option>
-                                                    <option value="101">101 - Kassa</option>
-                                                    <option value="102">102 - Bank</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Kimdən Alındı</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Şəxs seçin --</option>
-                                                    <option value="1">Şəxs 1</option>
-                                                    <option value="2">Şəxs 2</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Qeyd</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
-                                                <textarea class="form-control" rows="3" placeholder="Giriş barədə qeyd əlavə edin..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
-                                <button type="button" class="btn btn-primary px-4 shadow-sm fw-bold">
-                                    <i class="fa-solid fa-save me-2"></i><span>
-                                    Girişi Yadda Saxla
-                                </span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #eff6ff !important; border: 1px solid #dbeafe !important;">
-                <h6 class="fw-bold text-primary mb-3 text-uppercase">
-                    <i class="ti ti-arrows-left-right me-1"></i><span> Kassa Əməliyyatlar
-                </span></h6>
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a href="javascript:void(0);"
-                           class="d-flex align-items-center justify-content-between text-dark"
-                           data-bs-toggle="modal"
-                           data-bs-target="#cashTransferModal">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-primary-light rounded-circle me-3">
-                                    <i class="ti ti-refresh text-primary fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Kassadan kassaya köçürmə</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="cashTransferModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg">
-
-                            <div class="modal-header bg-primary-light">
-                                <h5 class="modal-title d-flex align-items-center fw-bold text-primary">
-                                    <i class="fa-solid fa-money-bill-transfer me-2"></i><span>
-                                    KASSADAN KASSAYA GÖNDƏRİŞ
-                                </span></h5>
-                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
-                            </div>
-
-                            <div class="modal-body p-4">
-                                <div class="bg-light rounded-3 p-3 mb-4 border border-dashed border-primary border-opacity-25">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
-                                        <span class="fw-bold text-dark h5 mb-0">15,200.00 AZN</span>
-                                    </div>
-                                </div>
-
-                                <form id="cashTransferForm">
-                                    <div class="row g-3">
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Ödəniş Növü</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-credit-card text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="" selected disabled>-- Ödəniş növü seçin --</option>
-                                                    <option value="nağd">Nağd</option>
-                                                    <option value="kart">Kart</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Tarix</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-day text-muted"></i></span>
-                                                <input type="text" class="form-control datetimepicker" value="25.04.2024">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Saat</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
-                                                <input type="text" class="form-control timepicker" value="14:30">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Göndəriləcək kassa</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-vault text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Kassa seçin --</option>
-                                                    <option value="1">Əsas Kassa</option>
-                                                    <option value="2">Filial Kassası</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Göndərilən Məbləğ</label>
-                                            <div class="input-group shadow-xs">
-                                                <span class="input-group-text bg-white text-primary"><i class="fa-solid fa-coins"></i></span>
-                                                <input type="number" class="form-control fw-bold fs-16" placeholder="0.00" step="0.01">
-                                                <span class="input-group-text bg-light fw-bold text-muted small">AZN</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <input type="text" class="form-control" value="65.44" readonly>
-                                            </div>
-                                        </div>
-
-
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Qeyd</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
-                                                <textarea class="form-control" rows="3" placeholder="Göndəriş barədə qeyd əlavə edin..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
-                                <button type="button" class="btn btn-primary px-4 shadow-sm fw-bold">
-                                    <i class="fa-solid fa-paper-plane me-2"></i><span>
-                                    Göndərişi Yadda Saxla
-                                </span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-none border-0 p-3 h-100" style="background-color: #fef2f2 !important; border: 1px solid #fee2e2 !important;">
-                <h6 class="fw-bold text-danger mb-3 text-uppercase">
-                    <i class="ti ti-arrow-up-right me-1"></i><span> Kassa Çıxış
-                </span></h6>
-
-
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a href="javascript:void(0);"
-                           class="d-flex align-items-center justify-content-between text-dark"
-                           data-bs-toggle="modal"
-                           data-bs-target="#employeeAdvanceModal">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-primary-light rounded-circle me-3">
-                                    <i class="ti ti-wallet text-danger fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Əməkdaş avans</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="employeeAdvanceModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg">
-
-                            <div class="modal-header bg-danger-light">
-                                <h5 class="modal-title d-flex align-items-center fw-bold text-danger">
-                                    <i class="fa-solid fa-hand-holding-dollar me-2"></i><span>
-                                    İŞÇİ AVANS
-                                </span></h5>
-                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
-                            </div>
-
-                            <div class="modal-body p-4">
-                                <div class="bg-light rounded-3 p-3 mb-4 border border-dashed border-danger border-opacity-25">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
-                                        <span class="fw-bold text-dark h5 mb-0">15,200.00 AZN</span>
-                                    </div>
-                                </div>
-
-                                <form id="employeeAdvanceForm">
-                                    <div class="row g-3">
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Ödəniş Növü</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-credit-card text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="" selected disabled>-- Ödəniş növü seçin --</option>
-                                                    <option value="nağd">Nağd</option>
-                                                    <option value="kart">Kart</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Tarix</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-day text-muted"></i></span>
-                                                <input type="text" class="form-control datetimepicker" value="25.04.2024">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Saat</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
-                                                <input type="text" class="form-control timepicker" value="14:30">
-                                            </div>
-                                        </div>
-
-
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Məbləğ</label>
-                                            <div class="input-group shadow-xs">
-                                                <span class="input-group-text bg-white text-danger"><i class="fa-solid fa-money-bill-wave"></i></span>
-                                                <input type="number" class="form-control fw-bold fs-16" placeholder="0.00" step="0.01">
-                                                <span class="input-group-text bg-light fw-bold text-muted small">AZN</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <input type="text" class="form-control" value="65.22" readonly>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Məbləği Kimə Verildi</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user-tie text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- İşçi seçin --</option>
-                                                    <option value="1">Əməkdaş 1</option>
-                                                    <option value="2">Əməkdaş 2</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Qeyd</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
-                                                <textarea class="form-control" rows="3" placeholder="Avans barədə qeyd əlavə edin..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
-                                <button type="button" class="btn btn-danger px-4 shadow-sm fw-bold">
-                                    <i class="fa-solid fa-save me-2"></i><span>
-                                    Avansı Yadda Saxla
-                                </span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-2 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                          <a th:href="@{/qaimeOdenishiFirma}" class="d-flex align-items-center justify-content-between text-dark">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-primary-light rounded-circle me-3">
-                                   <i class="ti ti-building-bank text-danger fs-20"></i>
-                                </div>
-                                <div>
-                                       <span class="fw-semibold">Firma ödənişləri</span><br>
-                                    <small class="text-muted">Firmalara olan borcların idarə edilməsi</small>
-                                </div>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card mb-0 border-0 shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <a href="javascript:void(0);"
-                           class="d-flex align-items-center justify-content-between text-dark"
-                           data-bs-toggle="modal"
-                           data-bs-target="#otherExitModal">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-md bg-danger-light rounded-circle me-3">
-                                    <i class="ti ti-minus text-danger fs-20"></i>
-                                </div>
-                                <span class="fw-semibold">Digər xərc çıxış</span>
-                            </div>
-                            <i class="ti ti-chevron-right text-muted"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="modal fade" id="otherExitModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg">
-
-                            <div class="modal-header bg-danger-light">
-                                <h5 class="modal-title d-flex align-items-center fw-bold text-danger">
-                                    <i class="fa-solid fa-circle-minus me-2"></i><span>
-                                    DİGƏR ÇIXIŞ
-                                </span></h5>
-                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Bağla"></button>
-                            </div>
-
-                            <div class="modal-body p-4">
-                                <div class="bg-light rounded-3 p-3 mb-4 border border-dashed border-danger border-opacity-25">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted small fw-medium">Kassadakı Ümumi Məbləğ:</span>
-                                        <span class="fw-bold text-dark h5 mb-0">15,200.00 AZN</span>
-                                    </div>
-                                </div>
-
-                                <form id="otherExitForm">
-                                    <div class="row g-3">
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Ödəniş Növü</label>
-                                            <div class="input-group">
-                                                <select class="form-select select2">
-                                                    <option value="" selected disabled>-- Seçin --</option>
-                                                    <option value="nağd">Nağd</option>
-                                                    <option value="kart">Kart</option>
-                                                    <option value="köçürmə">Bank Köçürməsi</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Ödənilən Məbləğ</label>
-                                            <div class="input-group shadow-xs">
-                                                <span class="input-group-text bg-white text-danger"><i class="fa-solid fa-money-bill-trend-up"></i></span>
-                                                <input type="number" class="form-control fw-bold fs-16" placeholder="0.00" step="0.01" min="0">
-                                                <span class="input-group-text bg-light fw-bold text-muted small">AZN</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Tarix</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-xmark text-muted"></i></span>
-                                                <input type="text" class="form-control datetimepicker" value="25.04.2024">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium">Saat</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-clock text-muted"></i></span>
-                                                <input type="text" class="form-control timepicker" value="14:30">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Qrup Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-layer-group text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Qrup seçin --</option>
-                                                    <option value="1">Xərc Qrupu 1</option>
-                                                    <option value="2">Xərc Qrupu 2</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label class="form-label fw-medium">Hesab Kodu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Kod seçin --</option>
-                                                    <option value="701">701 - İnzibati Xərclər</option>
-                                                    <option value="702">702 - Təsərrüfat</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Kimə Ödənildi</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user-tag text-muted"></i></span>
-                                                <select class="form-select select2">
-                                                    <option value="">-- Şəxs və ya Firma seçin --</option>
-                                                    <option value="1">Tədarükçü A</option>
-                                                    <option value="2">Əməkdaş B</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium">Qeyd</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white align-items-start pt-2"><i class="fa-solid fa-comment-dots text-muted"></i></span>
-                                                <textarea class="form-control" rows="3" placeholder="Çıxışın səbəbi barədə qeyd..."></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Ləğv et</button>
-                                <button type="button" class="btn btn-danger px-4 shadow-sm fw-bold">
-                                    <i class="fa-solid fa-check-double me-2"></i><span>
-                                    Çıxışı Təsdiqlə
-                                </span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
+<div layout:fragment="content" class="content kassa-page kassa-home">
+<link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
+<header class="kassa-hero">
+<div class="kassa-hero-copy">
+<nav class="kassa-breadcrumb">
+<a th:href="@{/dashboard}" th:text="#{kassa.home}">
+</a>
+<i class="ti ti-chevron-right" aria-hidden="true">
+</i>
+<span th:text="#{kassa.cash}">
+</span>
+</nav>
+<h1 th:text="#{kassa.title}">
+</h1>
+<p th:text="#{kassa.subtitle}">
+</p>
+</div>
+<div class="kassa-hero-art" aria-hidden="true">
+<svg viewBox="0 0 260 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="cash-body" x2="0.8" y2="1">
+<stop stop-color="#fff"/>
+<stop offset="1" stop-color="#b8d7f8"/>
+</linearGradient>
+<linearGradient id="cash-blue" x2="1" y2="1">
+<stop stop-color="#40a8ff"/>
+<stop offset="1" stop-color="#075ce0"/>
+</linearGradient>
+</defs>
+<ellipse cx="133" cy="174" rx="113" ry="12" fill="#b9d7f5" opacity=".4"/>
+<path d="M76 47 Q76 33 90 33 H187 Q203 33 199 50 L182 122 H62Z" fill="url(#cash-blue)"/>
+<path d="M100 8H166L156 86H88Z" fill="white"/>
+<path d="M109 25h39m-42 12h37m-40 12h36m-39 12h33" stroke="#c4d9ee" stroke-width="4"/>
+<path d="M58 86Q61 76 73 76H164Q177 76 183 90L216 152H30Z" fill="url(#cash-body)"/>
+<rect x="29" y="144" width="188" height="30" rx="8" fill="url(#cash-body)"/>
+<path d="M81 87H147L140 109H72Z" fill="#65b9ef" stroke="white" stroke-width="4"/>
+<path d="M68 119h18m8 0h18m8 0h18" stroke="#91b8d9" stroke-width="9"/>
+<rect x="61" y="150" width="114" height="9" rx="3" fill="#1062d8"/>
+</svg>
+</div>
+</header>
+<form method="get" th:action="@{/kassa}" class="kassa-selector">
+<div class="kassa-selector-label">
+<span class="kassa-wallet">
+<i class="ti ti-wallet" aria-hidden="true">
+</i>
+</span>
+<div>
+<label for="cash-register" th:text="#{kassa.selectCash}">
+</label>
+<p th:text="#{kassa.selectCashHint}">
+</p>
+</div>
+</div>
+<div class="w-100" style="min-width:0">
+<select id="cash-register" name="kassaId" class="form-select select2" th:data-placeholder="#{kassa.selectCash}" th:disabled="${#lists.isEmpty(registers)}" onchange="this.form.requestSubmit()">
+<option th:if="${#lists.isEmpty(registers)}" value="" th:text="#{kassa.noCash}">
+</option>
+<option th:each="c:${registers}" th:value="${c.kassa_id}" th:selected="${c.kassa_id == cashId}" th:text="|${c.kassa_adi} (${c.kassa_kodu})|">
+</option>
+</select>
+</div>
+<div class="kassa-selector-note">
+<i class="ti ti-info-circle" aria-hidden="true">
+</i>
+<span th:text="#{kassa.scopeHint}">
+</span>
+</div>
+</form>
+<div class="alert alert-warning" th:if="${#lists.isEmpty(registers)}" th:text="#{kassa.noCashHint}">
+</div>
+<div class="kassa-operation-grid">
+<section class="kassa-group kassa-income">
+<div class="kassa-group-heading">
+<span class="kassa-group-icon">
+<i class="ti ti-arrow-down" aria-hidden="true">
+</i>
+</span>
+<div>
+<h2 th:text="#{kassa.income}">
+</h2>
+<p th:text="#{kassa.incomeSubtitle}">
+</p>
+</div>
+</div>
+<div class="kassa-actions">
+<a class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/odenis(kassaId=${cashId})}">
+<i class="ti ti-users kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.patientPayment}">
+</strong>
+<small th:text="#{kassa.patientPaymentHint}">
+</small>
+</span>
+<i class="ti ti-chevron-right" aria-hidden="true">
+</i>
+</a>
+<button type="button" class="kassa-action" disabled th:if="${cashId == null}">
+<i class="ti ti-users kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.patientPayment}">
+</strong>
+<small th:text="#{kassa.patientPaymentHint}">
+</small>
+</span>
+</button>
+<a class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/borc(kassaId=${cashId})}">
+<i class="ti ti-coins kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.debtPayment}">
+</strong>
+<small th:text="#{kassa.debtPaymentHint}">
+</small>
+</span>
+<i class="ti ti-chevron-right" aria-hidden="true">
+</i>
+</a>
+<button type="button" class="kassa-action" disabled th:if="${cashId == null}">
+<i class="ti ti-coins kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.debtPayment}">
+</strong>
+<small th:text="#{kassa.debtPaymentHint}">
+</small>
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-user-plus kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.advance}">
+</strong>
+<small th:text="#{kassa.advanceHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-dots kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.otherIncome}">
+</strong>
+<small th:text="#{kassa.otherIncomeHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+</div>
+<div class="kassa-group-footer">
+<i class="ti ti-info-circle" aria-hidden="true">
+</i>
+<span th:text="#{kassa.incomeFooter}">
+</span>
+</div>
+</section>
+<section class="kassa-group kassa-internal">
+<div class="kassa-group-heading">
+<span class="kassa-group-icon">
+<i class="ti ti-arrows-exchange" aria-hidden="true">
+</i>
+</span>
+<div>
+<h2 th:text="#{kassa.internal}">
+</h2>
+<p th:text="#{kassa.internalSubtitle}">
+</p>
+</div>
+</div>
+<div class="kassa-actions">
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-arrows-exchange kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.transfer}">
+</strong>
+<small th:text="#{kassa.transferHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-file-invoice kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.receipts}">
+</strong>
+<small th:text="#{kassa.receiptsHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-chart-bar kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.reports}">
+</strong>
+<small th:text="#{kassa.reportsHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+</div>
+<div class="kassa-group-footer">
+<i class="ti ti-info-circle" aria-hidden="true">
+</i>
+<span th:text="#{kassa.internalFooter}">
+</span>
+</div>
+</section>
+<section class="kassa-group kassa-expense">
+<div class="kassa-group-heading">
+<span class="kassa-group-icon">
+<i class="ti ti-arrow-up" aria-hidden="true">
+</i>
+</span>
+<div>
+<h2 th:text="#{kassa.expense}">
+</h2>
+<p th:text="#{kassa.expenseSubtitle}">
+</p>
+</div>
+</div>
+<div class="kassa-actions">
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-rotate-2 kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.refund}">
+</strong>
+<small th:text="#{kassa.refundHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-user-minus kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.advanceRefund}">
+</strong>
+<small th:text="#{kassa.advanceRefundHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-circle-minus kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.otherExpense}">
+</strong>
+<small th:text="#{kassa.otherExpenseHint}">
+</small>
+</span>
+<span class="kassa-soon" th:text="#{kassa.soon}">
+</span>
+</button>
+</div>
+<div class="kassa-group-footer">
+<i class="ti ti-info-circle" aria-hidden="true">
+</i>
+<span th:text="#{kassa.expenseFooter}">
+</span>
+</div>
+</section>
+</div>
 </div>
 </body>
-
 </html>

@@ -1,0 +1,98 @@
+.kassa-page{--cash-ink:#112456;--cash-muted:#61759a;color:var(--cash-ink);background:linear-gradient(135deg,#f5faff 0%,#fff 65%);min-height:calc(100vh - 65px)}
+.kassa-hero{display:flex;position:relative;align-items:center;justify-content:space-between;min-height:200px;padding:12px 8px 22px;overflow:hidden;background:radial-gradient(ellipse at 82% 60%,#d6eaff 0%,transparent 55%)}
+.kassa-hero-copy{position:relative;z-index:1}.kassa-breadcrumb{display:flex;gap:12px;align-items:center;font-size:14px;margin-bottom:20px;color:var(--cash-muted)}.kassa-breadcrumb a{color:inherit}
+.kassa-hero h1{font-size:clamp(26px,2.7vw,42px);font-weight:750;letter-spacing:-1.2px;color:#0c1949;margin:0 0 12px}.kassa-hero p{color:var(--cash-muted);font-size:16px;margin:0;max-width:680px;line-height:1.6}.kassa-hero-art{width:245px;flex:0 0 245px;margin:0 35px -15px 16px;filter:drop-shadow(0 14px 16px #d2e3f0)}
+.kassa-selector{display:grid;grid-template-columns:1.1fr 1.2fr 1fr;gap:26px;align-items:center;background:#ffffffed;border:1px solid #e3edfc;border-radius:15px;padding:22px;margin-bottom:24px;box-shadow:0 5px 20px #225aaa05}
+.kassa-selector-label{display:flex;align-items:center;gap:20px}.kassa-wallet{display:grid;place-items:center;width:62px;height:62px;flex-shrink:0;border-radius:17px;background:linear-gradient(135deg,#dcecff,#edf5ff);color:#0766f6;font-size:34px}.kassa-selector label{font-size:17px;font-weight:700;color:var(--cash-ink)}.kassa-selector p{font-size:13px;line-height:1.5;margin:5px 0 0;color:var(--cash-muted)}.kassa-selector-note{display:flex;gap:16px;align-items:center;border-left:2px solid #d0e2ff;padding-left:26px;font-size:13px;line-height:1.6;color:var(--cash-muted)}.kassa-selector-note i{font-size:26px;color:#0670ff}
+.kassa-operation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.kassa-group{--tone:#0cbb59;--tint:#edfcf4;--edge:#d9f8e8;display:flex;flex-direction:column;padding:22px 18px 16px;border:1px solid var(--edge);border-radius:14px;background:linear-gradient(140deg,var(--tint),#fff 180%)}.kassa-internal{--tone:#0768ff;--tint:#eef6ff;--edge:#dceafe}.kassa-expense{--tone:#fa353d;--tint:#fff2f3;--edge:#ffe1e5}.kassa-group-heading{display:flex;gap:18px;align-items:center;margin-bottom:23px;min-height:75px}.kassa-group-icon{display:grid;place-items:center;flex-shrink:0;width:66px;height:66px;border-radius:50%;color:#fff;font-size:37px;background:linear-gradient(145deg,#ffffff80,var(--tone) 75%),var(--tone);box-shadow:inset 0 2px 2px #ffffff99,0 4px 8px #1c456015}.kassa-group h2{color:var(--tone);font-size:clamp(18px,1.65vw,25px);font-weight:700;line-height:1.3;margin:0 0 5px}.kassa-group-heading p{color:var(--cash-muted);font-size:14px;line-height:1.5;margin:0}.kassa-actions{display:flex;flex-direction:column;gap:10px;flex:1}.kassa-action{display:flex;align-items:center;gap:16px;width:100%;background:#fff;border:1px solid #ffffff;border-radius:13px;padding:21px 18px;min-height:99px;text-align:left;color:var(--cash-ink);box-shadow:0 4px 13px #263e6205;transition:transform .15s,box-shadow .15s}.kassa-action[href]:hover{transform:translateY(-2px);box-shadow:0 5px 15px #1d65bc15;color:var(--cash-ink);border-color:var(--edge)}.kassa-action:focus-visible{outline:3px solid var(--tone);outline-offset:3px}.kassa-action-icon{color:var(--tone);font-size:33px;flex:0 0 37px}.kassa-action-copy{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}.kassa-action strong{font-size:16px;font-weight:700}.kassa-action small{font-size:13px;color:var(--cash-muted);line-height:1.5}.kassa-action:disabled{cursor:not-allowed}.kassa-soon{font-size:10px;align-self:flex-start;white-space:nowrap;color:#8a96ad;background:#f5f7fb;padding:3px 5px;border-radius:4px}.kassa-group-footer{display:flex;gap:13px;align-items:center;margin-top:20px;padding:12px;background:var(--tint);border-left:3px solid var(--tone);border-radius:6px;color:var(--cash-muted);font-size:13px;font-style:italic}.kassa-group-footer i{color:var(--tone);font-size:23px}
+.kassa-work-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.kassa-work-heading h1{font-size:27px;font-weight:700;margin:8px 0}.kassa-work-heading p{margin:0;color:var(--cash-muted)}.kassa-panel{background:#fff;border:1px solid #e1eafa;border-radius:14px;margin-bottom:20px;overflow:hidden}.kassa-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid #eaf0f7}.kassa-panel-head h2{font-size:17px;margin:0;font-weight:700}.kassa-panel-head input{max-width:320px}.kassa-table-scroll{overflow:auto;max-height:380px;scrollbar-gutter:stable}.kassa-table-scroll:focus-visible{outline:2px solid #066aff;outline-offset:-2px}.kassa-page .table{margin:0;white-space:nowrap}.kassa-page .table thead th{position:sticky;top:0;background:#f4f8fe;z-index:1;color:#5b6f93;font-size:12px;padding:13px 16px;border-bottom:1px solid #e1eafa}.kassa-page .table td{padding:13px 16px;font-size:13px;vertical-align:middle}.kassa-page .table tr.is-selected td{background:#edf5ff}.kassa-page .table .patient-name{font-weight:650;color:var(--cash-ink)}.kassa-empty{padding:40px 20px;text-align:center;color:var(--cash-muted)}.kassa-payment-layout{display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:20px;align-items:start}.kassa-checkout{background:#fff;border:1px solid #dce8fa;border-radius:14px;padding:20px;position:sticky;top:82px}.kassa-checkout h2{font-size:18px;font-weight:700;margin:0 0 20px}.kassa-total-row{display:flex;justify-content:space-between;gap:12px;margin:12px 0;color:var(--cash-muted);font-size:13px}.kassa-total-row strong{color:var(--cash-ink);font-variant-numeric:tabular-nums}.kassa-total-row.primary{background:#f0f6ff;padding:14px;border-radius:9px;margin:16px -2px;font-size:14px}.kassa-payment-method{margin-bottom:12px}.kassa-payment-method label{font-size:13px;font-weight:600;margin-bottom:5px}.kassa-payment-method input{font-variant-numeric:tabular-nums}.kassa-checkout textarea{resize:vertical}.kassa-checkout .form-check-label{font-size:13px;line-height:1.5}.kassa-service-name{white-space:normal;min-width:180px;max-width:330px}.kassa-mono{font-variant-numeric:tabular-nums}.kassa-patient-context{padding:15px 20px;background:#f1f7ff;display:flex;gap:15px;align-items:center}.kassa-patient-context i{font-size:28px;color:#086bff}.kassa-patient-context strong{font-size:16px}.kassa-patient-context small{display:block;color:var(--cash-muted);margin-top:4px}.kassa-payment-feedback:empty{display:none}
+@media(min-width:1600px){.kassa-action{min-height:112px}.kassa-group{padding:26px 22px 18px}.kassa-group-heading{margin-bottom:28px}.kassa-action strong{font-size:18px}.kassa-action small{font-size:15px}}
+@media(max-width:1199.98px){.kassa-selector{grid-template-columns:1fr 1fr}.kassa-selector-note{grid-column:1/-1;border:0;padding:0}.kassa-operation-grid{gap:12px}.kassa-group{padding:16px 12px}.kassa-group-heading{gap:10px}.kassa-group-icon{width:48px;height:48px;font-size:29px}.kassa-action{padding:16px 12px;gap:10px;flex-wrap:wrap}.kassa-soon{margin-left:auto}.kassa-payment-layout{grid-template-columns:minmax(0,1fr) 280px}.kassa-hero-art{margin-right:0;width:185px;flex-basis:185px}}
+@media(max-width:767.98px){.kassa-hero{min-height:170px}.kassa-hero-art{display:none}.kassa-selector{grid-template-columns:1fr;padding:18px;gap:16px}.kassa-operation-grid{grid-template-columns:1fr}.kassa-group{padding:20px}.kassa-group-heading{gap:18px}.kassa-group-icon{width:60px;height:60px}.kassa-action{flex-wrap:nowrap}.kassa-payment-layout{grid-template-columns:1fr}.kassa-checkout{position:static}.kassa-panel-head input{max-width:none;width:100%}.kassa-table-scroll{max-height:340px}.kassa-hero h1{letter-spacing:-.6px}}
+
+/* Compact operation center; payment workspaces retain their own layout. */
+.page-wrapper .content.kassa-home {
+    box-sizing: border-box;
+    height: calc(100dvh - var(--topbar-height, 56px) - 1px);
+    min-height: 0;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+}
+.kassa-home > .kassa-hero,
+.kassa-home > .kassa-selector,
+.kassa-home > .alert { flex-shrink: 0; }
+.kassa-home .kassa-hero { min-height: 88px; padding: 4px 4px 12px; }
+.kassa-home .kassa-breadcrumb { font-size: 12px; margin-bottom: 8px; gap: 8px; }
+.kassa-home .kassa-hero h1 { font-size: clamp(22px, 2vw, 28px); letter-spacing: -.6px; margin-bottom: 6px; }
+.kassa-home .kassa-hero p { font-size: 13px; }
+.kassa-home .kassa-hero-art { width: 120px; flex-basis: 120px; margin: 0 20px 0 12px; }
+.kassa-home .kassa-hero-art svg { display: block; width: 100%; height: auto; }
+.kassa-home .kassa-selector { padding: 12px 16px; gap: 12px; margin-bottom: 12px; }
+.kassa-home .kassa-selector-label { gap: 12px; }
+.kassa-home .kassa-wallet { width: 42px; height: 42px; border-radius: 12px; font-size: 25px; }
+.kassa-home .kassa-selector label { font-size: 14px; }
+.kassa-home .kassa-selector p { font-size: 12px; line-height: 1.4; margin-top: 3px; }
+.kassa-home .kassa-selector-note { gap: 10px; padding-left: 16px; font-size: 12px; }
+.kassa-home .kassa-selector-note i { font-size: 21px; }
+.kassa-home .kassa-operation-grid { flex: 1; min-height: 0; gap: 12px; }
+.kassa-home .kassa-group { min-height: 0; padding: 12px; }
+.kassa-home .kassa-group-heading { flex-shrink: 0; gap: 12px; min-height: 44px; margin-bottom: 10px; }
+.kassa-home .kassa-group-icon { width: 42px; height: 42px; font-size: 26px; }
+.kassa-home .kassa-group h2 { font-size: clamp(15px, 1.35vw, 19px); }
+.kassa-home .kassa-group-heading p { font-size: 12px; }
+.kassa-home .kassa-actions { min-height: 0; overflow-y: auto; gap: 8px; padding: 3px; }
+.kassa-home .kassa-action { flex-shrink: 0; flex-wrap: nowrap; gap: 12px; padding: 10px 12px; min-height: 62px; }
+.kassa-home .kassa-action-icon { font-size: 25px; flex-basis: 28px; }
+.kassa-home .kassa-action-copy { gap: 4px; }
+.kassa-home .kassa-action strong { font-size: 14px; }
+.kassa-home .kassa-action small { font-size: 12px; }
+.kassa-home .kassa-group-footer { flex-shrink: 0; gap: 8px; margin-top: 10px; padding: 8px; font-size: 11px; }
+.kassa-home .kassa-group-footer i { font-size: 18px; }
+@media (min-width: 768px) and (max-height: 720px) {
+    .kassa-home .kassa-hero { min-height: 68px; padding-bottom: 8px; }
+    .kassa-home .kassa-hero-art { width: 90px; flex-basis: 90px; }
+    .kassa-home .kassa-breadcrumb { margin-bottom: 4px; }
+    .kassa-home .kassa-action { min-height: 54px; padding: 6px 10px; }
+    .kassa-home .kassa-actions { gap: 6px; }
+    .kassa-home .kassa-group-footer { margin-top: 6px; padding: 6px; }
+}
+@media (max-width: 767.98px) {
+    .page-wrapper .content.kassa-home { padding: 10px 12px; }
+    .kassa-home .kassa-selector { padding: 10px 12px; gap: 8px; }
+    .kassa-home .kassa-selector-note { display: none; }
+    .kassa-home .kassa-operation-grid { overflow-y: auto; align-content: start; }
+    .kassa-home .kassa-actions { overflow-y: visible; }
+}
+
+.kassa-payment-modal .modal-dialog { width: calc(100% - 32px); max-width: 1400px; }
+.kassa-payment-modal .modal-content { border: 0; border-radius: 14px; }
+.kassa-payment-modal .modal-header { padding: 14px 20px; }
+.kassa-payment-modal .modal-body { min-height: 0; padding: 16px; }
+.kassa-payment-modal .kassa-checkout { position: static; }
+.kassa-payment-modal .kassa-panel:last-child { margin-bottom: 0; }
+@media (max-width: 991.98px) {
+    .kassa-payment-modal .modal-dialog { width: 100%; max-width: none; }
+    .kassa-payment-modal .modal-content { border-radius: 0; }
+}
+
+.kassa-confirmation {
+    width: min(440px, calc(100vw - 32px));
+    margin: auto;
+    padding: 28px;
+    border: 1px solid #e2eaf6;
+    border-radius: 18px;
+    color: var(--cash-ink, #112456);
+    background: #fff;
+    box-shadow: 0 24px 80px #13264b40;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+}
+.kassa-confirmation::backdrop { background: #14244480; backdrop-filter: blur(3px); }
+.kassa-confirmation-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 16px; border-radius: 14px; background: #edf5ff; color: #086bff; font-size: 30px; }
+.kassa-confirmation h2 { font-size: 21px; font-weight: 700; margin-bottom: 8px; }
+.kassa-confirmation p { color: #61759a; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.kassa-confirmation-totals { padding: 16px; border-radius: 12px; background: #f4f8fe; }
+.kassa-confirmation-totals > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; }
+.kassa-confirmation-totals > div + div { margin-top: 12px; padding-top: 12px; border-top: 1px solid #dfe8f5; }
+.kassa-confirmation-totals strong { font-variant-numeric: tabular-nums; white-space: nowrap; }

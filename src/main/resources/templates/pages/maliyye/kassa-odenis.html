@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content" class="content kassa-page">
+<link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
+<div class="kassa-work-heading">
+<div>
+<a th:href="@{/kassa(kassaId=${cashId})}" class="text-primary">
+<i class="ti ti-arrow-left me-1" aria-hidden="true">
+</i>
+<span th:text="#{kassa.back}">
+</span>
+</a>
+<h1 th:text="${pageTitle}">
+</h1>
+<p th:text="|${cash.kassa_adi} (${cash.kassa_kodu})|">
+</p>
+</div>
+<span class="badge bg-primary-subtle text-primary p-3" th:text="${debt} ? #{kassa.debtPaymentHint} : #{kassa.patientPaymentHint}">
+</span>
+</div>
+<div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}">
+</div>
+<div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">
+</div>
+<section class="kassa-panel">
+<div class="kassa-panel-head">
+<h2 th:text="${debt} ? #{kassa.debtors} : #{kassa.waitingPatients}">
+</h2>
+<input id="patient-search" type="search" class="form-control" th:placeholder="#{kassa.searchPatient}" th:aria-label="#{kassa.searchPatient}">
+</div>
+<div class="kassa-table-scroll" tabindex="0" role="region" th:aria-label="${debt} ? #{kassa.debtors} : #{kassa.waitingPatients}">
+<table class="table">
+<thead>
+<tr>
+<th th:text="#{kassa.patient}">
+</th>
+<th th:text="#{kassa.patientCode}">
+</th>
+<th th:unless="${debt}" th:text="#{kassa.protocol}">
+</th>
+<th th:unless="${debt}" th:text="#{kassa.date}">
+</th>
+<th th:text="#{kassa.count}">
+</th>
+<th th:text="#{kassa.total}">
+</th>
+<th th:text="#{kassa.paid}">
+</th>
+<th th:text="#{kassa.borrowed}">
+</th>
+<th th:text="#{kassa.due}">
+</th>
+<th th:text="#{kassa.action}">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="r:${patients}" data-patient-row th:classappend="${(debt ? r.xeste_id : r.gelis_id) == targetId} ? 'is-selected'">
+<td class="patient-name" th:text="${r.xeste_adi_soyadi}">
+</td>
+<td th:text="${r.xeste_kodu}">
+</td>
+<td th:unless="${debt}" th:text="${r.protokol_kodu}">
+</td>
+<td th:unless="${debt}" th:text="${r.gelis_tarixi}">
+</td>
+<td th:text="${debt ? r.aktiv_borclandirma_sayi : r.aciq_xidmet_sayi}">
+</td>
+<td th:text="${#numbers.formatDecimal(debt ? r.borclandirilan_umumi_mebleg : r.xeste_umumi_meblegi,1,2)}">
+</td>
+<td th:text="${#numbers.formatDecimal(r.odenilen_mebleg,1,2)}">
+</td>
+<td th:text="${#numbers.formatDecimal(debt ? r.borclandirilan_umumi_mebleg : r.borclandirilan_mebleg,1,2)}">
+</td>
+<td class="fw-bold text-danger" th:text="${#numbers.formatDecimal(debt ? r.qalan_borc : r.odenis_gozleyen_mebleg,1,2)}">
+</td>
+<td>
+<a class="btn btn-sm btn-outline-primary" th:href="@{${listPath}(kassaId=${cashId},targetId=${debt ? r.xeste_id : r.gelis_id})}" th:text="#{kassa.open}">
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div th:if="${#lists.isEmpty(patients)}" class="kassa-empty" th:text="#{kassa.noPatients}">
+</div>
+<div id="patient-search-empty" class="kassa-empty d-none" th:text="#{kassa.noSearchResults}">
+</div>
+</section>
+<div th:if="${selected == null and !#lists.isEmpty(patients)}" class="kassa-panel kassa-empty">
+<i class="ti ti-user-search fs-1 d-block mb-3" aria-hidden="true">
+</i>
+<span th:text="#{kassa.selectPatient}">
+</span>
+</div>
+<div th:if="${selected != null}"
+     id="cash-payment-modal" class="modal fade kassa-payment-modal" tabindex="-1" aria-labelledby="cash-payment-title" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-lg-down">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title fs-5" id="cash-payment-title" th:text="${debt} ? #{kassa.debtPayment} : #{kassa.patientPayment}"></h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button>
+</div>
+<div class="modal-body kassa-page">
+<div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+<form th:if="${selected != null}" id="cash-payment-form" method="post" th:action="@{${listPath}}" th:data-debt="${debt}">
+<input type="hidden" name="kassaId" th:value="${cashId}">
+<input type="hidden" name="targetId" th:value="${targetId}">
+<input type="hidden" name="paymentToken" th:value="${paymentToken}">
+<div class="kassa-payment-layout">
+<div>
+<section class="kassa-panel">
+<div class="kassa-patient-context">
+<i class="ti ti-user-circle" aria-hidden="true">
+</i>
+<div>
+<strong th:text="${selected.xeste_adi_soyadi}">
+</strong>
+<small th:text="${debt ? selected.xeste_kodu : selected.protokol_kodu}">
+</small>
+</div>
+</div>
+<div class="kassa-panel-head">
+<h2 th:text="${debt} ? #{kassa.debtServices} : #{kassa.services}">
+</h2>
+<label class="d-flex align-items-center gap-2 small">
+<input id="select-all-services" type="checkbox" class="form-check-input m-0" th:disabled="${!canWrite}">
+<span th:text="#{kassa.selectAll}">
+</span>
+</label>
+</div>
+<div class="kassa-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.services}">
+<table class="table">
+<thead>
+<tr>
+<th th:text="#{kassa.select}">
+</th>
+<th th:text="#{kassa.service}">
+</th>
+<th th:text="#{kassa.date}">
+</th>
+<th th:text="${debt} ? #{kassa.protocol} : #{kassa.status}">
+</th>
+<th th:text="#{kassa.total}">
+</th>
+<th th:text="#{kassa.paid}">
+</th>
+<th th:text="#{kassa.due}">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="r:${services}" th:with="eligible=${T(az.simplexs.simplexs.service.kassa.KassaEmeliyyatService).selectable(r,debt)}">
+<td>
+<input class="form-check-input service-choice" type="checkbox" name="serviceIds" th:value="${debt ? r.borclandirma_xidmet_id : r.xeste_xidmet_id}" th:data-amount="${debt ? r.qalan_borc : r.qalan_mebleg}" th:checked="${eligible and (debt or r.secilib == true)}" th:disabled="${!canWrite or !eligible}" th:aria-label="${r.xidmet_adi}">
+</td>
+<td class="kassa-service-name">
+<strong th:text="${r.xidmet_adi}">
+</strong>
+<small class="d-block text-muted" th:text="${r.xidmet_kodu}">
+</small>
+<span th:if="${!debt and r.paket_daxildir == true}" class="badge bg-info-subtle text-info" th:text="#{kassa.inPackage}">
+</span>
+<span th:if="${!debt and r.borclandirilib == true}" class="badge bg-warning-subtle text-warning" th:text="#{kassa.inDebt}">
+</span>
+</td>
+<td th:text="${debt ? r.borclandirma_tarixi : r.xidmet_tarixi}">
+</td>
+<td th:text="${debt ? r.protokol_kodu : r.status_adi}">
+</td>
+<td th:text="${#numbers.formatDecimal(debt ? r.borclandirilan_mebleg : r.xeste_meblegi,1,2)}">
+</td>
+<td th:text="${#numbers.formatDecimal(r.odenilen_mebleg,1,2)}">
+</td>
+<td class="fw-bold" th:text="${#numbers.formatDecimal(debt ? r.qalan_borc : r.qalan_mebleg,1,2)}">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div th:if="${#lists.isEmpty(services)}" class="kassa-empty" th:text="#{kassa.noServices}">
+</div>
+</section>
+<section class="kassa-panel" th:unless="${debt}">
+<div class="kassa-panel-head">
+<h2 th:text="#{kassa.previousReceipts}">
+</h2>
+</div>
+<div class="kassa-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.previousReceipts}">
+<table class="table">
+<thead>
+<tr>
+<th th:text="#{kassa.receiptNo}">
+</th>
+<th th:text="#{kassa.date}">
+</th>
+<th th:text="#{kassa.direction}">
+</th>
+<th th:text="#{kassa.amount}">
+</th>
+<th th:text="#{kassa.account}">
+</th>
+<th th:text="#{kassa.paymentTypes}">
+</th>
+<th th:text="#{kassa.note}">
+</th>
+<th th:text="#{kassa.status}">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="r:${receipts}">
+<td th:text="${r.emeliyyat_no}">
+</td>
+<td th:text="${r.emeliyyat_tarixi}">
+</td>
+<td th:text="${r.istiqamet}">
+</td>
+<td th:text="${r.mebleg}">
+</td>
+<td th:text="${r.muhasibat_kodu_adi}">
+</td>
+<td th:text="${r.odenis_novleri}">
+</td>
+<td th:text="${r.aciqlama}">
+</td>
+<td>
+<span class="badge" th:classappend="${r.aktiv} ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'" th:text="${r.aktiv} ? #{common.aktiv} : #{common.passiv}">
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div th:if="${#lists.isEmpty(receipts)}" class="kassa-empty" th:text="#{kassa.noReceipts}">
+</div>
+</section>
+</div>
+<aside class="kassa-checkout">
+<h2 th:text="#{kassa.paymentSummary}">
+</h2>
+<div class="kassa-total-row">
+<span th:text="#{kassa.selectedCount}">
+</span>
+<strong id="selected-count">0</strong>
+</div>
+<div class="kassa-total-row primary">
+<span th:text="#{kassa.selectedTotal}">
+</span>
+<strong>
+<span id="selected-total">0.00</span> <span th:text="#{kassa.currency}">
+</span>
+</strong>
+</div>
+<fieldset th:disabled="${!canWrite}">
+<legend class="fs-6 mb-3" th:text="#{kassa.paymentTypes}">
+</legend>
+<div class="kassa-payment-method" th:each="t:${paymentTypes}">
+<label th:for="|payment-${t.odenis_novu_id}|" th:text="${t.ad}">
+</label>
+<input type="hidden" name="paymentTypeIds" th:value="${t.odenis_novu_id}">
+<div class="input-group">
+<input class="form-control payment-amount" type="number" name="amounts" min="0" max="999999999999.99" step="0.01" value="0.00" th:id="|payment-${t.odenis_novu_id}|">
+<span class="input-group-text" th:text="#{kassa.currency}">
+</span>
+</div>
+</div>
+<div class="alert alert-warning small" th:if="${#lists.isEmpty(paymentTypes)}" th:text="#{kassa.noPaymentTypes}">
+</div>
+<div class="kassa-total-row">
+<span th:text="#{kassa.paymentTotal}">
+</span>
+<strong id="payment-total">0.00</strong>
+</div>
+<div class="kassa-total-row">
+<span th:text="#{kassa.remaining}">
+</span>
+<strong id="remaining-total">0.00</strong>
+</div>
+<div th:if="${canBorrow}" class="form-check my-3">
+<input type="checkbox" class="form-check-input" name="borrow" value="true" id="borrow-remainder">
+<label for="borrow-remainder" class="form-check-label" th:text="#{kassa.borrowRemainder}">
+</label>
+</div>
+<label for="payment-note" class="form-label small" th:text="#{kassa.note}">
+</label>
+<textarea id="payment-note" name="note" class="form-control mb-3" rows="2" maxlength="1000" th:placeholder="#{kassa.noteHint}">
+</textarea>
+<div id="payment-feedback" role="status" aria-live="polite" class="kassa-payment-feedback text-danger small mb-3">
+</div>
+<button id="submit-payment" class="btn btn-primary w-100 py-3" type="submit" th:disabled="${#lists.isEmpty(paymentTypes) or #lists.isEmpty(services)}">
+<i class="ti ti-check me-1" aria-hidden="true">
+</i>
+<span th:text="#{kassa.acceptPayment}">
+</span>
+</button>
+</fieldset>
+<p th:unless="${canWrite}" class="text-muted small mb-0" th:text="#{kassa.readOnly}">
+</p>
+</aside>
+</div>
+<dialog id="payment-confirmation" class="kassa-confirmation" aria-labelledby="payment-confirmation-title" aria-describedby="payment-confirmation-hint">
+<div class="kassa-confirmation-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+<h2 id="payment-confirmation-title" th:text="#{kassa.confirmTitle}"></h2>
+<p id="payment-confirmation-hint" th:text="#{kassa.confirmHint}"></p>
+<div class="kassa-confirmation-totals">
+<div><span th:text="#{kassa.paymentTotal}"></span><strong><span id="confirm-payment-total"></span> <span th:text="#{kassa.currency}"></span></strong></div>
+<div><span th:text="#{kassa.remaining}"></span><strong><span id="confirm-payment-remaining"></span> <span th:text="#{kassa.currency}"></span></strong></div>
+</div>
+<div class="d-flex gap-2 mt-4">
+<button id="cancel-payment" type="button" class="btn btn-light flex-fill" autofocus th:text="#{common.imtina}"></button>
+<button id="confirm-payment" type="button" class="btn btn-primary flex-fill"><i class="ti ti-check me-1" aria-hidden="true"></i><span th:text="#{kassa.confirmAction}"></span></button>
+</div>
+</dialog>
+</form>
+</div>
+</div>
+</div>
+</div>
+<script th:inline="javascript">window.KassaI18n = {
+selectServices: /*[[#{kassa.selectServices}]]*/ '', invalidPayment: /*[[#{kassa.invalidPayment}]]*/ '',
+overpayment: /*[[#{kassa.overpayment}]]*/ '', borrowRequired: /*[[#{kassa.borrowRequired}]]*/ '',
+processing: /*[[#{kassa.processing}]]*/ '',
+unsaved: /*[[#{kassa.unsaved}]]*/ ''};</script>
+<script th:src="@{/custom/js/kassa-center.js}" defer>
+</script>
+</div>
+</body>
+</html>
