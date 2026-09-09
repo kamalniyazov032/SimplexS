@@ -261,7 +261,7 @@
 </label>
 <input type="hidden" name="paymentTypeIds" th:value="${t.odenis_novu_id}">
 <div class="input-group">
-<input class="form-control payment-amount" type="number" name="amounts" min="0" max="999999999999.99" step="0.01" value="0.00" th:id="|payment-${t.odenis_novu_id}|">
+<input class="form-control payment-amount" th:data-payment-name="${t.ad}" type="number" name="amounts" min="0" max="999999999999.99" step="0.01" value="0.00" th:id="|payment-${t.odenis_novu_id}|">
 <span class="input-group-text" th:text="#{kassa.currency}">
 </span>
 </div>
@@ -277,6 +277,10 @@
 <span th:text="#{kassa.remaining}">
 </span>
 <strong id="remaining-total">0.00</strong>
+</div>
+<div id="cash-change-row" class="kassa-total-row text-success" hidden role="status" aria-live="polite">
+<span th:text="#{kassa.cashChange}"></span>
+<strong><span id="cash-change-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong>
 </div>
 <div th:if="${canBorrow}" class="form-check my-3">
 <input type="checkbox" class="form-check-input" name="borrow" value="true" id="borrow-remainder">
@@ -307,6 +311,7 @@
 <div class="kassa-confirmation-totals">
 <div><span th:text="#{kassa.paymentTotal}"></span><strong><span id="confirm-payment-total"></span> <span th:text="#{kassa.currency}"></span></strong></div>
 <div><span th:text="#{kassa.remaining}"></span><strong><span id="confirm-payment-remaining"></span> <span th:text="#{kassa.currency}"></span></strong></div>
+<div id="confirm-cash-change-row" hidden><span th:text="#{kassa.cashChange}"></span><strong><span id="confirm-cash-change-total"></span> <span th:text="#{kassa.currency}"></span></strong></div>
 </div>
 <div class="d-flex gap-2 mt-4">
 <button id="cancel-payment" type="button" class="btn btn-light flex-fill" autofocus th:text="#{common.imtina}"></button>

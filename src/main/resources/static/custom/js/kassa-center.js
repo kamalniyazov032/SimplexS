@@ -19,6 +19,8 @@
     const refundType = refund ? document.getElementById('refund-payment-type') : null;
     const choices = [...form.querySelectorAll('.service-choice:not(:disabled)')];
     const amounts = [...form.querySelectorAll('.payment-amount')];
+    // The payment list exposes the original business name, independent of UI locale.
+    const isCash = input => /^(nağd|nagd|nəğd|negd|cash|наличные)( ödəniş)?$/iu.test((input.dataset?.paymentName || '').trim());
     const all = document.getElementById('select-all-services');
     const borrow = document.getElementById('borrow-remainder');
     const feedback = document.getElementById('payment-feedback');
@@ -52,7 +54,16 @@
     function totals() {
         const selected = choices.filter(input => input.checked);
         const due = selected.reduce((sum, input) => sum + cents(input.dataset.amount), 0);
-        const paid = refund ? due : amounts.reduce((sum, input) => sum + cents(input.value || '0'), 0);
+        const tendered = refund ? due : amounts.reduce((sum, input) => sum + cents(input.value || '0'), 0);
+        const cash = refund ? 0 : amounts.filter(isCash).reduce((sum, input) => sum + cents(input.value || '0'), 0);
+        const change = selected.length > 0 && Number.isFinite(tendered) && tendered > due && cash >= tendered - due
+            ? tendered - due : 0;
+        const paid = tendered - change;
+        const changeRow = document.getElementById('cash-change-row');
+        if (changeRow) {
+            changeRow.hidden = change <= 0;
+            document.getElementById('cash-change-total').textContent = display(change);
+        }
         document.getElementById('selected-count').textContent = selected.length;
         document.getElementById('selected-total').textContent = display(due);
         document.getElementById('payment-total').textContent = Number.isFinite(paid) ? display(paid) : '—';
@@ -67,7 +78,7 @@
         else if (!Number.isFinite(paid) || paid <= 0) error = i18n.invalidPayment;
         else if (paid > due) error = i18n.overpayment;
         else if (form.dataset.debt !== 'true' && paid < due && !borrow?.checked) error = i18n.borrowRequired;
-        return { error, due, paid };
+        return { error, due, paid, change };
     }
     form.addEventListener('input', event => {
         dirty = true;
@@ -104,10 +115,24 @@
             }
             document.getElementById('confirm-payment-total').textContent = display(state.paid);
             document.getElementById('confirm-payment-remaining').textContent = display(state.due - state.paid);
+            const changeRow = document.getElementById('confirm-cash-change-row');
+            if (changeRow) {
+                changeRow.hidden = state.change <= 0;
+                document.getElementById('confirm-cash-change-total').textContent = display(state.change);
+            }
             if (!confirmation.open) confirmation.showModal();
             return;
         }
         if (refund) document.getElementById('refund-expected-total').value = (state.due / 100).toFixed(2);
+        // Return the excess cash to the patient; record only the retained payment.
+        let changeLeft = state.change;
+        for (const input of amounts.filter(isCash)) {
+            if (!changeLeft) break;
+            const value = cents(input.value || '0');
+            const returned = Math.min(value, changeLeft);
+            input.value = ((value - returned) / 100).toFixed(2);
+            changeLeft -= returned;
+        }
         submitting = true;
         dirty = false;
         submit.disabled = true;

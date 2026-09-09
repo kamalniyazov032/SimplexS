@@ -138,3 +138,8 @@
 }
 
 .receipt-list-scroll{max-height:calc(100dvh - 270px)}
+
+#cash-change-row[hidden],
+#confirm-cash-change-row[hidden] {
+    display: none;
+}
