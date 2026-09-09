@@ -88,6 +88,12 @@
 </div>
 </div>
 <div class="kassa-actions">
+<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<i class="ti ti-file-invoice kassa-action-icon" aria-hidden="true"></i>
+<span class="kassa-action-copy"><strong th:text="#{kassa.invoicePayment}"></strong><small th:text="#{kassa.invoicePaymentHint}"></small></span>
+<span class="kassa-soon" th:text="#{kassa.soon}"></span>
+</button>
+
 <a class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/odenis(kassaId=${cashId})}">
 <i class="ti ti-users kassa-action-icon" aria-hidden="true">
 </i>
@@ -268,7 +274,17 @@
 </small>
 </span>
 </button>
-<button type="button" class="kassa-action" disabled th:title="#{kassa.soon}">
+<a class="kassa-action" th:if="${cashId != null}" th:href="@{/kassa/avans-qaytarma(kassaId=${cashId})}">
+<i class="ti ti-user-minus kassa-action-icon" aria-hidden="true">
+</i>
+<span class="kassa-action-copy">
+<strong th:text="#{kassa.advanceRefund}">
+</strong>
+<small th:text="#{kassa.advanceRefundHint}">
+</small>
+</span>
+<i class="ti ti-chevron-right" aria-hidden="true"></i>
+</a><button type="button" class="kassa-action" th:if="${cashId == null}" disabled th:title="#{kassa.soon}">
 <i class="ti ti-user-minus kassa-action-icon" aria-hidden="true">
 </i>
 <span class="kassa-action-copy">

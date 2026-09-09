@@ -16,7 +16,12 @@ public class KassaEmeliyyatService {
     private static final BigDecimal MAX_MONEY = new BigDecimal("999999999999.99");
     private final KassaEmeliyyatRepository repo;
     private final AccessService access;
-    public KassaEmeliyyatService(KassaEmeliyyatRepository repo, AccessService access) { this.repo=repo; this.access=access; }
+    private final az.simplexs.simplexs.repository.sebeb.SebebRepository reasons;
+    public KassaEmeliyyatService(KassaEmeliyyatRepository repo, AccessService access,az.simplexs.simplexs.repository.sebeb.SebebRepository reasons) { this.repo=repo; this.access=access; this.reasons=reasons; }
+    public List<az.simplexs.simplexs.dto.sebeb.Sebeb> receiptCancelReasons() {
+        return reasons.sebebler(null,"QEBZ_LEGV",true).stream()
+            .filter(r->Boolean.TRUE.equals(r.aktiv()) && "QEBZ_LEGV".equals(r.novKodu())).toList();
+    }
     public List<Map<String,Object>> cashRegisters(Authentication auth, Long clinic) {
         if (!(auth != null && auth.getPrincipal() instanceof AuthenticatedPersonal)
                 || !access.hasClinic(auth,clinic) || !access.canAccessRoute(auth,clinic,"/kassa"))
@@ -43,15 +48,31 @@ public class KassaEmeliyyatService {
         return access.hasPermission(auth,clinic,"SLX000005");
     }
     @Transactional
-    public Map<String,Object> cancelReceipt(Authentication auth,Long clinic,Long cash,Long receipt,String reason) {
+    public Map<String,Object> refundAdvance(Authentication auth,Long clinic,Long cash,Long visit,Long advance,
+            Long account,Long type,BigDecimal amount,String note) {
+        requireCash(auth,clinic,cash,true);
+        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) fail("advanceRefundStale");
+        var row=repo.refundableAdvances(clinic,cash,visit).stream()
+            .filter(r->Objects.equals(id(r,"avans_id"),advance) && Objects.equals(id(r,"gelis_id"),visit)
+                && money(r,"qalan_mebleg").signum()>0).findFirst().orElseThrow(()->new PaymentValidationException("advanceRefundStale"));
+        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) fail("invalidPayment");
+        if(amount.compareTo(money(row,"qalan_mebleg"))>0) fail("advanceRefundOver");
+        if(account==null || repo.accountingCodes(clinic,"AVANS_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        if(type==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),type))) fail("invalidPayment");
+        if(note!=null && note.length()>1000) fail("noteLong");
+        return repo.refundAdvance(clinic,cash,personalId(auth),visit,advance,account,type,amount.setScale(2),note==null?null:note.trim());
+    }
+    @Transactional
+    public Map<String,Object> cancelReceipt(Authentication auth,Long clinic,Long cash,Long receipt,Long reasonId) {
         requireCash(auth,clinic,cash,true);
         if(!canCancelReceipt(auth,clinic)) throw new AccessDeniedException("kassa.denied");
-        if(reason==null || reason.isBlank() || reason.length()>1000) fail("receiptCancelReasonRequired");
+        var reason=receiptCancelReasons().stream().filter(r->Objects.equals(r.id(),reasonId)).findFirst()
+            .orElseThrow(()->new PaymentValidationException("receiptCancelReasonSelect"));
         var detail=repo.receiptDetail(clinic,cash,receipt);
         if(detail.isEmpty()) fail("receiptNotFound");
         var print=repo.receiptPrint(clinic,cash,receipt);
         if(!"TAMAMLANIB".equals(print.get("status"))) fail("receiptNotCancelable");
-        return repo.cancelReceipt(clinic,cash,receipt,personalId(auth),reason.trim());
+        return repo.cancelReceipt(clinic,cash,receipt,personalId(auth),reason.ad());
     }
     @Transactional
     public Map<String,Object> transfer(Authentication auth,Long clinic,Long cash,Long recipient,Long account,BigDecimal amount,String note) {
@@ -115,7 +136,7 @@ public class KassaEmeliyyatService {
             List<Long> types,List<BigDecimal> amounts,String note) {
         requireCash(auth,clinic,cash,true);
         if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) fail("selectAdvancePatient");
-        var patient=repo.advanceVisit(clinic,visit);
+        var patient=repo.advanceVisit(clinic,cash,visit);
         if(id(patient,"xeste_id")==null) fail("selectAdvancePatient");
         if(account==null || repo.accountingCodes(clinic,"AVANS_QEBUL").stream()
                 .noneMatch(row->Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");

@@ -109,12 +109,15 @@ public class KassaOdenishController {
     public String receiptsPage(@RequestParam Long kassaId,@RequestParam(defaultValue="") String q,
             @RequestParam(defaultValue="") String from,@RequestParam(defaultValue="") String to,
             @RequestParam(defaultValue="") String direction,@RequestParam(defaultValue="") String operation,
-            @RequestParam(defaultValue="") String active,@RequestParam(defaultValue="1") int page,
-            Authentication auth,HttpSession session,Model model) {
+            @RequestParam(required=false) String active,@RequestParam(defaultValue="1") int page,
+            @RequestParam(required=false) Long receiptId,@RequestParam(defaultValue="false") boolean cancel,
+            Authentication auth,HttpSession session,Model model,jakarta.servlet.http.HttpServletRequest request) {
+        if(active==null) active="true";
         String today=java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")).toString();
         if(from.isBlank()) from=today;
         if(to.isBlank()) to=today;
         model.addAttribute("cash",service.requireCash(auth,clinic(session),kassaId,false));
+        model.addAttribute("canCancelReceipts",service.canCancelReceipt(auth,clinic(session)) && Boolean.TRUE.equals(((Map<?,?>)model.getAttribute("cash")).get("islesin")));
         model.addAttribute("registers",service.cashRegisters(auth,clinic(session)));
         model.addAttribute("cashId",kassaId);model.addAttribute("q",q);model.addAttribute("from",from);model.addAttribute("to",to);
         model.addAttribute("direction",direction);model.addAttribute("operation",operation);model.addAttribute("active",active);
@@ -133,6 +136,10 @@ public class KassaOdenishController {
             log.error("Receipt list lookup failed",e);model.addAttribute("errorMessage",msg("kassa.receiptLoadFailed"));
         }
         model.addAttribute("receipts",rows.stream().limit(100).toList());model.addAttribute("hasMore",rows.size()>100);
+        if(receiptId!=null) {
+            receiptPage(receiptId,kassaId,auth,session,model,request);
+            model.addAttribute("showReceiptPopup",true);model.addAttribute("cancelMode",cancel);
+        }
         base(model,"kassa.receipts");return "pages/maliyye/kassa-qebzler";
     }
     @GetMapping({"/kassa/qebzler/{receiptId}","/kassa/qebzler/{receiptId}/cap"})
@@ -146,11 +153,15 @@ public class KassaOdenishController {
         model.addAttribute("cash",cash);model.addAttribute("cashId",kassaId);model.addAttribute("receiptId",receiptId);
         model.addAttribute("receipt",detail);model.addAttribute("paper",paper);
         var source=print?paper:detail;
-        model.addAttribute("receiptPayments",receiptJson(source.get("odenisler")));
-        model.addAttribute("receiptServices",receiptJson(source.get("xidmetler")));
-        boolean canCancel=Boolean.TRUE.equals(cash.get("islesin")) && service.canCancelReceipt(auth,clinic(session))
-                && "TAMAMLANIB".equals(paper.get("status"));
+        var payments=receiptJson(source.get("odenisler"));var services=receiptJson(source.get("xidmetler"));
+        model.addAttribute("receiptPayments",payments);model.addAttribute("receiptServices",services);
+        model.addAttribute("receiptPaymentTotal",payments.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add));
+        model.addAttribute("receiptServiceTotal",services.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add));
+        boolean cancelPermission=Boolean.TRUE.equals(cash.get("islesin")) && service.canCancelReceipt(auth,clinic(session));
+        model.addAttribute("cancelPermission",cancelPermission);
+        boolean canCancel=cancelPermission && "TAMAMLANIB".equals(paper.get("status"));
         model.addAttribute("canCancel",canCancel);
+        model.addAttribute("cancelReasons",!print?service.receiptCancelReasons():List.of());
         model.addAttribute("cancelToken",canCancel && !print?issueToken(session,kassaId,receiptId,"QEBZ_LEGV"):"");
         base(model,"kassa.receiptDetail");return print?"pages/maliyye/kassa-qebz-cap":"pages/maliyye/kassa-qebz-detail";
     }
@@ -161,19 +172,20 @@ public class KassaOdenishController {
     }
     @PostMapping("/kassa/qebzler/{receiptId}/legv")
     public String cancelReceipt(@PathVariable Long receiptId,@RequestParam Long kassaId,@RequestParam String paymentToken,
-            @RequestParam(required=false) String reason,Authentication auth,HttpSession session,RedirectAttributes flash) {
+            @RequestParam(required=false) Long reasonId,Authentication auth,HttpSession session,RedirectAttributes flash) {
         service.requireCash(auth,clinic(session),kassaId,true);
         if(!service.canCancelReceipt(auth,clinic(session))) throw new AccessDeniedException("kassa.denied");
         try {
             consumeToken(session,paymentToken,kassaId,receiptId,"QEBZ_LEGV");
-            var result=service.cancelReceipt(auth,clinic(session),kassaId,receiptId,reason);
+            var result=service.cancelReceipt(auth,clinic(session),kassaId,receiptId,reasonId);
             boolean success=Boolean.TRUE.equals(result.get("ugurlu"));
             flash.addFlashAttribute(success?"successMessage":"errorMessage",msg(success?"kassa.receiptCancelSuccess":"kassa.receiptCancelFailed"));
             if(!success) log.warn("Receipt cancellation rejected: status={}",result.get("status_kodu"));
         } catch(PaymentValidationException e) { flash.addFlashAttribute("errorMessage",msg(e.getMessage()));
         } catch(DataAccessException e) { log.error("Receipt cancellation outcome requires verification",e);flash.addFlashAttribute("errorMessage",msg("kassa.paymentUnknown")); }
         flash.addAttribute("kassaId",kassaId);
-        return "redirect:/kassa/qebzler/"+receiptId;
+        flash.addAttribute("receiptId",receiptId);
+        return "redirect:/kassa/qebzler";
     }
     @GetMapping({"/kassa/odenis","/kassa/borc"})
     public String workspace(@RequestParam Long kassaId,@RequestParam(required=false) Long targetId,
@@ -246,7 +258,7 @@ public class KassaOdenishController {
         if(advance) {
             model.addAttribute("advanceCardTypes",repo.cardTypes());
             Long selectedVisit=(Long)model.getAttribute("advanceVisitId");
-            var selected=selectedVisit==null?Map.<String,Object>of():repo.advanceVisit(clinic(session),selectedVisit);
+            var selected=selectedVisit==null?Map.<String,Object>of():repo.advanceVisit(clinic(session),kassaId,selectedVisit);
             model.addAttribute("advanceSelected",selected);
         }
         return "pages/maliyye/kassa";
@@ -306,12 +318,53 @@ public class KassaOdenishController {
             model.addAttribute("advanceResults",List.of());
         } else {
             var rows=query.isEmpty() && card==null && from==null && to==null?List.<Map<String,Object>>of()
-                    :repo.advancePatients(clinic(session),card,query,from,to,page);
+                    :repo.advancePatients(clinic(session),kassaId,card,query,from,to,page);
             model.addAttribute("advanceResults",rows.stream().limit(100).toList());
             model.addAttribute("advanceHasMore",rows.size()>100);
         }
         model.addAttribute("advancePage",Math.max(1,page));
         return "fragments/kassa-advance-search :: results";
+    }
+    @GetMapping("/kassa/avans-qaytarma")
+    public String advanceRefundPage(@RequestParam Long kassaId,@RequestParam(required=false) Long targetId,
+            @RequestParam(defaultValue="") String q,@RequestParam(required=false) String cardType,
+            @RequestParam(defaultValue="1") int page,Authentication auth,HttpSession session,Model model) {
+        var cash=service.requireCash(auth,clinic(session),kassaId,false);
+        var cards=repo.cardTypes();String card=cardType==null || cardType.isBlank()?null:cardType.trim();
+        boolean invalid=page<1 || q.length()>200 || (card!=null && cards.stream().noneMatch(r->card.equals(r.get("kod"))));
+        var patients=invalid?List.<Map<String,Object>>of():repo.advanceRefundPatients(clinic(session),kassaId,card,q.trim(),null,null,page);
+        var advances=targetId==null?List.<Map<String,Object>>of():repo.refundableAdvances(clinic(session),kassaId,targetId);
+        if(invalid) model.addAttribute("errorMessage",msg("kassa.invalidAdvanceSearch"));
+        if(targetId!=null && advances.isEmpty()) model.addAttribute("errorMessage",msg("kassa.advanceRefundStale"));
+        model.addAttribute("cash",cash);model.addAttribute("cashId",kassaId);model.addAttribute("targetId",targetId);
+        model.addAttribute("patients",patients.stream().limit(100).toList());model.addAttribute("hasMore",patients.size()>100);
+        model.addAttribute("cardTypes",cards);model.addAttribute("cardType",card);model.addAttribute("query",q);model.addAttribute("page",Math.max(1,page));
+        model.addAttribute("advances",advances);model.addAttribute("selected",advances.isEmpty()?null:advances.getFirst());
+        model.addAttribute("canWrite",Boolean.TRUE.equals(cash.get("islesin")));
+        model.addAttribute("refundAccounts",advances.isEmpty()?List.of():repo.accountingCodes(clinic(session),"AVANS_QAYTARMA"));
+        model.addAttribute("paymentTypes",advances.isEmpty()?List.of():repo.paymentTypes());
+        model.addAttribute("paymentToken",advances.isEmpty()?"":issueToken(session,kassaId,targetId,"AVANS_QAYTARMA"));
+        base(model,"kassa.advanceRefund");return "pages/maliyye/kassa-avans-qaytarma";
+    }
+    @PostMapping("/kassa/avans-qaytarma")
+    public String refundAdvance(@RequestParam Long kassaId,@RequestParam Long targetId,@RequestParam String paymentToken,
+            @RequestParam(required=false) Long advanceId,@RequestParam(required=false) Long accountId,@RequestParam(required=false) Long typeId,
+            @RequestParam(required=false) BigDecimal amount,@RequestParam(required=false) String note,Authentication auth,HttpSession session,RedirectAttributes flash) {
+        service.requireCash(auth,clinic(session),kassaId,true);boolean success=false;
+        try {
+            consumeToken(session,paymentToken,kassaId,targetId,"AVANS_QAYTARMA");
+            var result=service.refundAdvance(auth,clinic(session),kassaId,targetId,advanceId,accountId,typeId,amount,note);
+            success=Boolean.TRUE.equals(result.get("ugurlu"));
+            flash.addFlashAttribute(success?"successMessage":"errorMessage",msg(success?"kassa.advanceRefundSuccess":"kassa.advanceRefundFailed"));
+            if(!success) log.warn("Advance refund rejected: status={}",result.get("status_kodu"));
+        } catch(PaymentValidationException e) {flash.addFlashAttribute("errorMessage",msg(e.getMessage()));
+        } catch(DataAccessException e) {log.error("Advance refund outcome requires verification",e);flash.addFlashAttribute("errorMessage",msg("kassa.paymentUnknown"));}
+        flash.addAttribute("kassaId",kassaId);
+        if(!success) {
+            flash.addAttribute("targetId",targetId);flash.addFlashAttribute("refundAdvanceId",advanceId);flash.addFlashAttribute("refundAccountId",accountId);
+            flash.addFlashAttribute("refundTypeId",typeId);flash.addFlashAttribute("refundAmount",amount);flash.addFlashAttribute("refundNote",note);
+        }
+        return "redirect:/kassa/avans-qaytarma";
     }
     @GetMapping("/kassa/qaytarma")
     public String refunds(@RequestParam Long kassaId,@RequestParam(required=false) Long targetId,

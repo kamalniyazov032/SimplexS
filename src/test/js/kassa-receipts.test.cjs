@@ -12,7 +12,7 @@ test('receipt cancellation requires a reason and explicit confirmation and submi
  form.requestSubmit=()=>{let blocked=false;form.listeners.submit({preventDefault(){blocked=true;}});if(!blocked)submissions++;};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/custom/js/kassa-receipts.js'),'utf8'),{document:{getElementById:id=>ids[id]},window:{addEventListener(){}}});
  form.requestSubmit();assert.equal(dialog.open,false);assert.equal(submissions,0);
- ids['receipt-reason'].value='Incorrect receipt';form.requestSubmit();assert.equal(dialog.open,true);assert.equal(submissions,0);
+ ids['receipt-reason'].value='9';ids['receipt-reason'].selectedOptions=[{textContent:'Incorrect receipt'}];form.requestSubmit();assert.equal(dialog.open,true);assert.equal(submissions,0);
  ids['receipt-cancel-no'].listeners.click();assert.equal(submissions,0);
  form.requestSubmit();ids['receipt-cancel-yes'].listeners.click();ids['receipt-cancel-yes'].listeners.click();form.requestSubmit();assert.equal(submissions,1);
 });

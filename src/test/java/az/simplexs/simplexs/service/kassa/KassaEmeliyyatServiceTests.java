@@ -17,7 +17,8 @@ import static org.mockito.ArgumentMatchers.*;
 class KassaEmeliyyatServiceTests {
     final KassaEmeliyyatRepository repo=mock(KassaEmeliyyatRepository.class);
     final AccessService access=mock(AccessService.class);
-    final KassaEmeliyyatService service=new KassaEmeliyyatService(repo,access);
+    final az.simplexs.simplexs.repository.sebeb.SebebRepository reasons=mock(az.simplexs.simplexs.repository.sebeb.SebebRepository.class);
+    final KassaEmeliyyatService service=new KassaEmeliyyatService(repo,access,reasons);
     final UsernamePasswordAuthenticationToken auth=UsernamePasswordAuthenticationToken.authenticated(
             new AuthenticatedPersonal(24L,"cashier","","Cashier",true,List.of()),null,List.of());
     @BeforeEach void setup() {
@@ -96,16 +97,16 @@ class KassaEmeliyyatServiceTests {
         verify(repo,never()).otherIncome(any(),any(),any(),any(),any(),any());
     }
     @Test void advanceDerivesPatientFromTheActiveClinicVisit() {
-        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of("xeste_id",4L,"gelis_id",17L));
+        when(repo.advanceVisit(1L,7L,17L)).thenReturn(Map.of("xeste_id",4L,"gelis_id",17L));
         when(repo.accountingCodes(1L,"AVANS_QEBUL")).thenReturn(List.of(Map.of("muhasibat_kodu_id",3L)));
         service.advance(auth,1L,7L,17L,3L,List.of(1L),List.of(new BigDecimal("100.00"))," Advance ");
         verify(repo).advance(1L,7L,24L,4L,17L,3L,"[{\"odenis_novu_id\":1,\"mebleg\":100.00}]","Advance");
     }
     @Test void advanceRejectsMissingOrForeignVisitAndWrongOperationAccount() {
         assertThatThrownBy(()->service.advance(auth,1L,7L,null,3L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.selectAdvancePatient");
-        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of());
+        when(repo.advanceVisit(1L,7L,17L)).thenReturn(Map.of());
         assertThatThrownBy(()->service.advance(auth,1L,7L,17L,3L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.selectAdvancePatient");
-        when(repo.advanceVisit(1L,17L)).thenReturn(Map.of("xeste_id",4L));
+        when(repo.advanceVisit(1L,7L,17L)).thenReturn(Map.of("xeste_id",4L));
         when(repo.accountingCodes(1L,"AVANS_QEBUL")).thenReturn(List.of(Map.of("muhasibat_kodu_id",3L)));
         assertThatThrownBy(()->service.advance(auth,1L,7L,17L,5L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.invalidAccount");
         verify(repo,never()).advance(any(),any(),any(),any(),any(),any(),any(),any());
@@ -150,17 +151,32 @@ class KassaEmeliyyatServiceTests {
         assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,8L,BigDecimal.TEN,null)).isInstanceOf(AccessDeniedException.class);
     }
     @Test void cancelReceiptRequiresSpecialPermissionReasonAndCompletedReceipt() {
-        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,9L)).isInstanceOf(AccessDeniedException.class);
         when(access.hasPermission(auth,1L,"SLX000005")).thenReturn(true);
-        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L," ")).hasMessage("kassa.receiptCancelReasonRequired");
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,null)).hasMessage("kassa.receiptCancelReasonSelect");
+        when(reasons.sebebler(null,"QEBZ_LEGV",true)).thenReturn(List.of(new az.simplexs.simplexs.dto.sebeb.Sebeb(9L,5L,"QEBZ_LEGV","", "TEST","Reason",null,1,true)));
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,99L)).hasMessage("kassa.receiptCancelReasonSelect");
         when(repo.receiptDetail(1L,7L,10L)).thenReturn(Map.of());
-        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).hasMessage("kassa.receiptNotFound");
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,9L)).hasMessage("kassa.receiptNotFound");
         when(repo.receiptDetail(1L,7L,10L)).thenReturn(Map.of("kassa_emeliyyat_id",10L));
         when(repo.receiptPrint(1L,7L,10L)).thenReturn(Map.of("status","LEGV_EDILIB"));
-        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).hasMessage("kassa.receiptNotCancelable");
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,9L)).hasMessage("kassa.receiptNotCancelable");
         verify(repo,never()).cancelReceipt(any(),any(),any(),any(),any());
         when(repo.receiptPrint(1L,7L,10L)).thenReturn(Map.of("status","TAMAMLANIB"));
-        service.cancelReceipt(auth,1L,7L,10L," Reason ");
+        service.cancelReceipt(auth,1L,7L,10L,9L);
         verify(repo).cancelReceipt(1L,7L,10L,24L,"Reason");
+    }
+    @Test void advanceRefundChecksOwnershipRemainingAmountAndScopedAccount() {
+        when(repo.refundableAdvances(1L,7L,17L)).thenReturn(List.of(Map.of("avans_id",1L,"gelis_id",17L,"qalan_mebleg",new BigDecimal("25.00"))));
+        when(repo.accountingCodes(1L,"AVANS_QAYTARMA")).thenReturn(List.of(Map.of("muhasibat_kodu_id",17L)));
+        service.refundAdvance(auth,1L,7L,17L,1L,17L,1L,new BigDecimal("20.00")," Refund ");
+        verify(repo).refundAdvance(1L,7L,24L,17L,1L,17L,1L,new BigDecimal("20.00"),"Refund");
+        assertThatThrownBy(()->service.refundAdvance(auth,1L,7L,17L,99L,17L,1L,BigDecimal.ONE,null)).hasMessage("kassa.advanceRefundStale");
+        assertThatThrownBy(()->service.refundAdvance(auth,1L,7L,17L,1L,17L,1L,new BigDecimal("25.01"),null)).hasMessage("kassa.advanceRefundOver");
+        assertThatThrownBy(()->service.refundAdvance(auth,1L,7L,17L,1L,99L,1L,BigDecimal.ONE,null)).hasMessage("kassa.invalidAccount");
+        assertThatThrownBy(()->service.refundAdvance(auth,1L,7L,17L,1L,17L,99L,BigDecimal.ONE,null)).hasMessage("kassa.invalidPayment");
+        when(repo.refundableAdvances(1L,7L,17L)).thenReturn(List.of(Map.of("avans_id",1L,"gelis_id",18L,"qalan_mebleg",BigDecimal.TEN)));
+        assertThatThrownBy(()->service.refundAdvance(auth,1L,7L,17L,1L,17L,1L,BigDecimal.ONE,null)).hasMessage("kassa.advanceRefundStale");
+        verify(repo,times(1)).refundAdvance(any(),any(),any(),any(),any(),any(),any(),any(),any());
     }
 }

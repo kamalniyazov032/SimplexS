@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 
-/* KASSA QƏBZLƏR - BUNU ƏLAVƏ ET */
+/*!* KASSA QƏBZLƏR - BUNU ƏLAVƏ ET *!
 #receipt-filter.offcanvas.offcanvas-top {
   --bs-offcanvas-height: 260px !important;
   top: 0 !important;
@@ -14,7 +14,7 @@
 #receipt-filter .offcanvas-body {
   flex: 1 1 auto !important;
   overflow-y: auto !important;
-}
+}*/
 
   /* Bütün stilləri .custom-ka daxilinə salırıq */
 .custom-ka .widget-card {
