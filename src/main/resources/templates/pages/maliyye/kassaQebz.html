@@ -11,185 +11,287 @@
 <div layout:fragment="content">
 
 
-
     <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
         <div class="breadcrumb-arrow">
-            <h4 class="mb-1 fw-bold text-dark"><i class="ti ti-cash-banknote me-2"></i><span>Kassa hərəkətləri</span></h4>
+            <h4 class="mb-1 fw-bold text-dark"><i class="ti ti-cash-banknote me-2"></i><span>Kassa hərəkətləri</span>
+            </h4>
             <p class="mb-0 text-muted small">Maliyyə əməliyyatlarının monitorinqi və hesabatlığı</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-white border shadow-sm"><i class="ti ti-printer me-1"></i><span> Çap et</span></button>
+            <button class="btn btn-white border shadow-sm"><i class="ti ti-printer me-1"></i><span> Çap et</span>
+            </button>
             <button class="btn btn-primary shadow-sm">Ümumi Hesabat</button>
             <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><i class="fa-solid fa-filter me-1"></i><span>Filter
+                    data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><i
+                    class="fa-solid fa-filter me-1"></i><span>Filter
             </span></button>
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg"
-         tabindex="-1"
-         id="offcanvasTop"
+    <div id="receipt-filter"
+         class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg receipt-filter"
          style="
-        --bs-offcanvas-height: 260px !important;
-        height: 260px !important;
-        min-height: 260px !important;
-        max-height: 260px !important;
+        --bs-offcanvas-height: 210px !important;
+        height: 210px !important;
+        min-height: 210px !important;
+        max-height: 210px !important;
      ">
-        <div class="offcanvas-header border-bottom bg-light">
+
+        <div class="offcanvas-header border-bottom bg-light py-2">
             <h4 id="offcanvasTopLabel" class="mb-0 fw-bold text-primary">
-                <i class="ti ti-filter me-2"></i><span>Kassa Əməliyyatları üzrə Ətraflı Axtarış
-            </span></h4>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <i class="ti ti-filter me-2"></i>
+                <span>Kassa Əməliyyatları üzrə Ətraflı Axtarış</span>
+            </h4>
+
+            <button type="button"
+                    class="btn-close text-reset"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
         </div>
 
-        <div class="offcanvas-body">
-            <div class="row g-3 mb-3">
-                <div class="col-md-2">
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Kassa seçimi</label>
-                        <select class="form-select select2">
-                            <option selected>Kassa 1</option>
-                            <option>Kassa 2</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Tarix aralığı</label>
-                        <input type="text" class="form-control datetimepicker" placeholder="24.04.2025 - 25.04.2025">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Hesab qrupu</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                        </select>
-                    </div>
+        <div class="offcanvas-body py-2">
 
-                </div>
-                <div class="col-md-2">
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Kassir</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Ödəniş açıqlaması</label>
-                        <input type="text" class="form-control" placeholder="Açıqlama daxil edin...">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Avans statusu</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                            <option>Var</option>
-                            <option>Yoxdur</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Kart No</label>
-                        <input type="text" class="form-control" placeholder="**** **** ****">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Qaimə ID</label>
-                        <input type="text" class="form-control" placeholder="ID">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">EDV çek No</label>
-                        <input type="text" class="form-control">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Ödəniş növü</label>
-                        <select class="form-select select2">
-                            <option>Nağd / Kart</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Fiskal cihaz</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Pos cihazı</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                        </select>
-                    </div>
+            <div class="row g-2 align-items-end">
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Kassa seçimi</label>
+                    <select class="form-select select2">
+                        <option selected>Kassa 1</option>
+                        <option>Kassa 2</option>
+                    </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Tarix aralığı</label>
+                    <input type="text"
+                           class="form-control datetimepicker"
+                           placeholder="24.04.2025 - 25.04.2025">
+                </div>
 
-                    <div class="col-md-12 d-flex flex-wrap gap-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="c12">
-                            <label class="form-check-label small" for="c12">Sadəcə ləğvlər</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="c13">
-                            <label class="form-check-label small" for="c13">Lağvları göstərmə</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="c15" checked>
-                            <label class="form-check-label small" for="c15">Avans axtarış</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="c17f">
-                            <label class="form-check-label small" for="c17f">Fiskal göndərilən</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="c23">
-                            <label class="form-check-label small" for="c23">Digər kassadan gələnlər</label>
-                        </div>
-                    </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Hesab qrupu</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Firma</label>
-                        <select class="form-select select2">
-                            <option>- Seçin -</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">Xəstə statusu (A/Y)</label>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="status" id="stA" checked>
-                            <label class="btn btn-outline-success btn-sm" for="stA">A</label>
-                            <input type="radio" class="btn-check" name="status" id="stY">
-                            <label class="btn btn-outline-primary btn-sm" for="stY">Y</label>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <br>
-                        <button class="btn btn-primary btn-lg">
-                            <i class="ti ti-search me-1"></i><span> Filtirlə
-                        </span></button>
-                    </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Kassir</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                    </select>
                 </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Ödəniş açıqlaması</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Açıqlama daxil edin...">
+                </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Avans statusu</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                        <option>Var</option>
+                        <option>Yoxdur</option>
+                    </select>
+                </div>
+
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Kart No</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="**** **** ****">
+                </div>
+
+                <div class="col-xl-1 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Qaimə ID</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="ID">
+                </div>
+
+                <div class="col-xl-1 col-md-4">
+                    <label class="form-label small fw-bold mb-1">EDV çek No</label>
+                    <input type="text"
+                           class="form-control">
+                </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Ödəniş növü</label>
+                    <select class="form-select select2">
+                        <option>Nağd / Kart</option>
+                    </select>
+                </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Fiskal cihaz</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                    </select>
+                </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Pos cihazı</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                    </select>
+                </div>
+
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label small fw-bold mb-1">Firma</label>
+                    <select class="form-select select2">
+                        <option>- Seçin -</option>
+                    </select>
+                </div>
+
             </div>
-        </div>
-    </div>
 
+
+            <div class="row g-2 align-items-center mt-1">
+
+                <div class="col-xl-2 col-md-4">
+
+                    <div class="d-flex align-items-center gap-2">
+
+                    <span class="small fw-bold text-nowrap">
+                        Xəstə statusu
+                    </span>
+
+                        <div class="btn-group w-100" role="group">
+
+                            <input type="radio"
+                                   class="btn-check"
+                                   name="status"
+                                   id="stA"
+                                   checked>
+
+                            <label class="btn btn-outline-success btn-sm"
+                                   for="stA">
+                                A
+                            </label>
+
+                            <input type="radio"
+                                   class="btn-check"
+                                   name="status"
+                                   id="stY">
+
+                            <label class="btn btn-outline-primary btn-sm"
+                                   for="stY">
+                                Y
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-xl-8 col-md-8">
+
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="c12">
+
+                            <label class="form-check-label small"
+                                   for="c12">
+                                Sadəcə ləğvlər
+                            </label>
+                        </div>
+
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="c13">
+
+                            <label class="form-check-label small"
+                                   for="c13">
+                                Ləğvləri göstərmə
+                            </label>
+                        </div>
+
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="c15"
+                                   checked>
+
+                            <label class="form-check-label small"
+                                   for="c15">
+                                Avans axtarış
+                            </label>
+                        </div>
+
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="c17f">
+
+                            <label class="form-check-label small"
+                                   for="c17f">
+                                Fiskal göndərilən
+                            </label>
+                        </div>
+
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="c23">
+
+                            <label class="form-check-label small"
+                                   for="c23">
+                                Digər kassadan gələnlər
+                            </label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-xl-2 col-md-12 text-end">
+
+                    <button class="btn btn-primary w-100">
+                        <i class="ti ti-search me-1"></i>
+                        <span>Filtirlə</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
     <div class="row">
         <div class="col-lg-10">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-0">
-                    <table  class="table datatable_ka_tam table-bordered w-100" style="font-size: small">
-                            <thead style="font-size: small">
-                            <tr>
-                                <th>Ödəniş tarixi</th>
-                                <th>Kimdən</th>
-                                <th>Kart No</th>
-                                <th>Qəbz No</th>
-                                <th>EDV çek No</th>
-                                <th class="text-center">Hesab</th>
-                                <th class="text-end">Ödənilən</th>
-                                <th class="text-end">Qaytarılan</th>
-                                <th class="text-center">Növü</th>
-                                <th class="text-center">Avans</th>
-                            </tr>
-                            </thead>
+                    <table class="table datatable_ka_tam table-bordered w-100" style="font-size: small">
+                        <thead style="font-size: small">
+                        <tr>
+                            <th>Ödəniş tarixi</th>
+                            <th>Kimdən</th>
+                            <th>Kart No</th>
+                            <th>Qəbz No</th>
+                            <th>EDV çek No</th>
+                            <th class="text-center">Hesab</th>
+                            <th class="text-end">Ödənilən</th>
+                            <th class="text-end">Qaytarılan</th>
+                            <th class="text-center">Növü</th>
+                            <th class="text-center">Avans</th>
+                        </tr>
+                        </thead>
                         <tbody>
                         <tr>
                             <td>25.04.2025 14:25</td>
@@ -201,7 +303,8 @@
                             <td class="amount">150.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 14:30</td>
@@ -213,7 +316,8 @@
                             <td class="amount">100.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 15:10</td>
@@ -225,7 +329,8 @@
                             <td class="amount">250.00</td>
                             <td class="amount amount-refund">10.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 15:45</td>
@@ -237,7 +342,8 @@
                             <td class="amount">45.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 16:20</td>
@@ -249,7 +355,8 @@
                             <td class="amount">120.00</td>
                             <td class="amount amount-refund">5.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 09:15</td>
@@ -261,7 +368,8 @@
                             <td class="amount">500.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 10:05</td>
@@ -273,7 +381,8 @@
                             <td class="amount">85.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 11:30</td>
@@ -285,7 +394,8 @@
                             <td class="amount">210.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 12:45</td>
@@ -297,7 +407,8 @@
                             <td class="amount">320.00</td>
                             <td class="amount amount-refund">20.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 14:10</td>
@@ -309,7 +420,8 @@
                             <td class="amount">15.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 08:30</td>
@@ -321,7 +433,8 @@
                             <td class="amount">600.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 10:20</td>
@@ -333,7 +446,8 @@
                             <td class="amount">180.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 11:55</td>
@@ -345,7 +459,8 @@
                             <td class="amount">95.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 13:40</td>
@@ -357,7 +472,8 @@
                             <td class="amount">220.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 09:15</td>
@@ -369,7 +485,8 @@
                             <td class="amount">140.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 10:50</td>
@@ -381,7 +498,8 @@
                             <td class="amount">75.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 12:30</td>
@@ -393,7 +511,8 @@
                             <td class="amount">1000.00</td>
                             <td class="amount amount-refund">50.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 09:00</td>
@@ -405,7 +524,8 @@
                             <td class="amount">30.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 10:45</td>
@@ -417,7 +537,8 @@
                             <td class="amount">450.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 12:15</td>
@@ -429,7 +550,8 @@
                             <td class="amount">115.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 14:25</td>
@@ -441,7 +563,8 @@
                             <td class="amount">150.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 14:30</td>
@@ -453,7 +576,8 @@
                             <td class="amount">100.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 15:10</td>
@@ -465,7 +589,8 @@
                             <td class="amount">250.00</td>
                             <td class="amount amount-refund">10.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 15:45</td>
@@ -477,7 +602,8 @@
                             <td class="amount">45.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>25.04.2025 16:20</td>
@@ -489,7 +615,8 @@
                             <td class="amount">120.00</td>
                             <td class="amount amount-refund">5.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 09:15</td>
@@ -501,7 +628,8 @@
                             <td class="amount">500.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 10:05</td>
@@ -513,7 +641,8 @@
                             <td class="amount">85.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 11:30</td>
@@ -525,7 +654,8 @@
                             <td class="amount">210.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 12:45</td>
@@ -537,7 +667,8 @@
                             <td class="amount">320.00</td>
                             <td class="amount amount-refund">20.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>26.04.2025 14:10</td>
@@ -549,7 +680,8 @@
                             <td class="amount">15.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 08:30</td>
@@ -561,7 +693,8 @@
                             <td class="amount">600.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 10:20</td>
@@ -573,7 +706,8 @@
                             <td class="amount">180.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 11:55</td>
@@ -585,7 +719,8 @@
                             <td class="amount">95.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>27.04.2025 13:40</td>
@@ -597,7 +732,8 @@
                             <td class="amount">220.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 09:15</td>
@@ -609,7 +745,8 @@
                             <td class="amount">140.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 10:50</td>
@@ -621,7 +758,8 @@
                             <td class="amount">75.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>28.04.2025 12:30</td>
@@ -633,7 +771,8 @@
                             <td class="amount">1000.00</td>
                             <td class="amount amount-refund">50.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 09:00</td>
@@ -645,7 +784,8 @@
                             <td class="amount">30.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 10:45</td>
@@ -657,7 +797,8 @@
                             <td class="amount">450.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Kart</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-warning text-warning">Var</span></td>
                         </tr>
                         <tr>
                             <td>29.04.2025 12:15</td>
@@ -669,14 +810,14 @@
                             <td class="amount">115.00</td>
                             <td class="amount amount-refund">0.00</td>
                             <td class="text-center">Nağd</td>
-                            <td class="text-center"><span class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
+                            <td class="text-center"><span
+                                    class="badge rounded-pill bg-soft-success text-success">Yoxdur</span></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
 
 
         <div class="col-lg-2 custom-ka">
@@ -691,17 +832,17 @@
                 </div>
             </div>
 
-    <!--        <div class="widget-card">
-                <div class="widget-icon bg-soft-success">
-                    <i class="ti ti-cash fs-4"></i>
-                </div>
-                <div>
-                    <div class="widget-label">Nağd ödəniş</div>
-                    <h4 class="widget-amount text-dark">
-                        450.00<span class="unit">AZN</span>
-                    </h4>
-                </div>
-            </div>-->
+            <!--        <div class="widget-card">
+                        <div class="widget-icon bg-soft-success">
+                            <i class="ti ti-cash fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="widget-label">Nağd ödəniş</div>
+                            <h4 class="widget-amount text-dark">
+                                450.00<span class="unit">AZN</span>
+                            </h4>
+                        </div>
+                    </div>-->
 
             <div class="widget-card">
                 <div class="widget-icon bg-soft-info">

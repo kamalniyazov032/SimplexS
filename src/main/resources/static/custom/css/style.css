@@ -1061,17 +1061,22 @@ body {
     border-bottom: 2px solid #dee2e6;
 }
 
-/* CSS hissəsində bu kodu tap və dəyiş */
 .offcanvas-top_ka {
-    /* Ekran boyu olmasını ləğv edirik */
     height: auto !important;
-    /* İçindəki elementlərin hündürlüyünə uyğunlaşdırırıq */
-    min-height: fit-content !important;
-    /* Maksimum ekranın 80%-i qədər ola bilsin (ehtiyat üçün) */
+    min-height: 0 !important;
     max-height: 85vh !important;
     border-bottom: 3px solid #3d5ee1;
-    visibility: hidden; /* İlkin vəziyyətdə gizli qalsın */
+    visibility: hidden;
     transition: transform .3s ease-in-out;
+}
+
+.offcanvas-top_ka.show {
+    height: auto !important;
+}
+
+.offcanvas-top_ka .offcanvas-body {
+    flex: 0 1 auto !important;
+    overflow-y: auto;
 }
 
 /* Offcanvas açılanda hündürlüyün düzgün hesablanması üçün */
