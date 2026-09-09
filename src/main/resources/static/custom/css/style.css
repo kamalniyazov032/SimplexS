@@ -1062,20 +1062,30 @@ body {
 }
 
 .offcanvas-top_ka {
+    --bs-offcanvas-height: auto !important;
     height: auto !important;
-    min-height: 0 !important;
+    min-height: unset !important;
     max-height: 85vh !important;
+
+    display: block !important;
+
     border-bottom: 3px solid #3d5ee1;
     visibility: hidden;
     transition: transform .3s ease-in-out;
 }
 
-.offcanvas-top_ka.show {
+.offcanvas-top_ka.show,
+.offcanvas-top_ka.showing {
     height: auto !important;
 }
 
+.offcanvas-top_ka .offcanvas-header {
+    flex: none !important;
+}
+
 .offcanvas-top_ka .offcanvas-body {
-    flex: 0 1 auto !important;
+    flex: none !important;
+    height: auto !important;
     overflow-y: auto;
 }
 
