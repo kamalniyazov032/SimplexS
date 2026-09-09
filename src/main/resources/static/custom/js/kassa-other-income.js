@@ -14,6 +14,7 @@
     let confirmed = false;
     let submitting = false;
     let dirty = false;
+    let popupOpen = true;
     const cents = value => {
         if (!/^\d+(\.\d{1,2})?$/.test(value || '0')) return NaN;
         const [whole, fraction = ''] = (value || '0').split('.');
@@ -65,8 +66,12 @@
     modal.addEventListener('hide.bs.modal', event => {
         if (submitting || dialog.open) event.preventDefault();
     });
-    modal.addEventListener('hidden.bs.modal', () => document.getElementById(advance ? 'advance-open' : 'other-income-open')?.focus());
-    const open = document.getElementById(advance ? 'advance-open' : 'other-income-open');
+    modal.addEventListener('show.bs.modal', () => { popupOpen = true; });
+    modal.addEventListener('hidden.bs.modal', () => {
+        popupOpen = false;
+        document.getElementById(advance ? 'advance-open' : form.dataset.expense === 'true' ? 'other-expense-open' : 'other-income-open')?.focus();
+    });
+    const open = document.getElementById(advance ? 'advance-open' : form.dataset.expense === 'true' ? 'other-expense-open' : 'other-income-open');
     if (window.bootstrap?.Modal) {
         document.body.appendChild(modal);
         const popup = window.bootstrap.Modal.getOrCreateInstance(modal);
@@ -163,7 +168,7 @@
         });
     }
     window.addEventListener('beforeunload', event => {
-        if (dirty && !submitting) { event.preventDefault(); event.returnValue = ''; }
+        if (popupOpen && dirty && !submitting) { event.preventDefault(); event.returnValue = ''; }
     });
     window.addEventListener('pageshow', event => { if (event.persisted) window.location.reload(); });
     accountChanged();

@@ -39,6 +39,142 @@ public class KassaOdenishController {
         base(model,"kassa.title");
         return "pages/maliyye/kassa";
     }
+    @GetMapping({"/kassa/balans","/kassa/balans-tarix"})
+    public String balance(@RequestParam Long kassaId,@RequestParam(required=false) String from,
+            @RequestParam(required=false) String to,Authentication auth,HttpSession session,Model model,
+            jakarta.servlet.http.HttpServletRequest request) {
+        var cash=service.requireCash(auth,clinic(session),kassaId,false);
+        home(kassaId,auth,session,model);
+        boolean dated=request.getRequestURI().endsWith("/balans-tarix");
+        var today=java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"));
+        model.addAttribute("balanceCash",cash);model.addAttribute("showBalance",true);
+        model.addAttribute("datedBalance",dated);
+        model.addAttribute("balanceFrom",from==null?today.toString():from);
+        model.addAttribute("balanceTo",to==null?today.toString():to);
+        try {
+            if(dated) {
+                var start=from==null?today:java.time.LocalDate.parse(from);
+                var end=to==null?today:java.time.LocalDate.parse(to);
+                if(start.isAfter(end)) throw new java.time.DateTimeException("Invalid date range");
+                model.addAttribute("balance",repo.balanceByDate(clinic(session),kassaId,start,end));
+            } else model.addAttribute("balance",repo.balance(clinic(session),kassaId));
+        } catch(java.time.DateTimeException e) {
+            model.addAttribute("balanceError",msg("kassa.balanceInvalidDates"));
+        } catch(DataAccessException e) {
+            log.error("Cash balance lookup failed",e);
+            model.addAttribute("balanceError",msg("kassa.balanceFailed"));
+        }
+        return "pages/maliyye/kassa";
+    }
+    @GetMapping("/kassa/transfer")
+    public String transferPage(@RequestParam Long kassaId,Authentication auth,HttpSession session,Model model) {
+        var cash=service.requireCash(auth,clinic(session),kassaId,true);
+        home(kassaId,auth,session,model);
+        model.addAttribute("showTransfer",true);model.addAttribute("transferCash",cash);
+        var balance=KassaEmeliyyatService.money(repo.balance(clinic(session),kassaId),"cari_balans");
+        model.addAttribute("transferBalance",balance);
+        model.addAttribute("transferMax",balance.max(BigDecimal.ZERO).min(new BigDecimal("999999999999.99")));
+        model.addAttribute("transferRecipients",repo.transferRecipients(clinic(session),kassaId));
+        model.addAttribute("transferAccounts",repo.accountingCodes(clinic(session),"KASSA_TRANSFER"));
+        model.addAttribute("transferToken",issueToken(session,kassaId,null,"KASSA_TRANSFER"));
+        return "pages/maliyye/kassa";
+    }
+    @PostMapping("/kassa/transfer")
+    public String transfer(@RequestParam Long kassaId,@RequestParam String paymentToken,
+            @RequestParam(required=false) Long recipientId,@RequestParam(required=false) Long accountId,
+            @RequestParam(required=false) BigDecimal amount,@RequestParam(required=false) String note,
+            Authentication auth,HttpSession session,RedirectAttributes flash) {
+        service.requireCash(auth,clinic(session),kassaId,true);
+        boolean success=false;
+        try {
+            consumeToken(session,paymentToken,kassaId,null,"KASSA_TRANSFER");
+            var result=service.transfer(auth,clinic(session),kassaId,recipientId,accountId,amount,note);
+            success=Boolean.TRUE.equals(result.get("ugurlu"));
+            flash.addFlashAttribute(success?"successMessage":"errorMessage",msg(success?"kassa.transferSuccess":"kassa.transferFailed"));
+            if(!success) log.warn("Cash transfer rejected: status={}",result.get("status_kodu"));
+        } catch(PaymentValidationException e) {
+            flash.addFlashAttribute("errorMessage",msg(e.getMessage()));
+        } catch(DataAccessException e) {
+            log.error("Cash transfer outcome requires verification",e);
+            flash.addFlashAttribute("errorMessage",msg("kassa.paymentUnknown"));
+        }
+        flash.addAttribute("kassaId",kassaId);
+        if(!success) {
+            flash.addFlashAttribute("transferRecipientId",recipientId);flash.addFlashAttribute("transferAccountId",accountId);
+            flash.addFlashAttribute("transferAmount",amount);flash.addFlashAttribute("transferNote",note);
+        }
+        return success?"redirect:/kassa":"redirect:/kassa/transfer";
+    }
+    @GetMapping("/kassa/qebzler")
+    public String receiptsPage(@RequestParam Long kassaId,@RequestParam(defaultValue="") String q,
+            @RequestParam(defaultValue="") String from,@RequestParam(defaultValue="") String to,
+            @RequestParam(defaultValue="") String direction,@RequestParam(defaultValue="") String operation,
+            @RequestParam(defaultValue="") String active,@RequestParam(defaultValue="1") int page,
+            Authentication auth,HttpSession session,Model model) {
+        String today=java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")).toString();
+        if(from.isBlank()) from=today;
+        if(to.isBlank()) to=today;
+        model.addAttribute("cash",service.requireCash(auth,clinic(session),kassaId,false));
+        model.addAttribute("registers",service.cashRegisters(auth,clinic(session)));
+        model.addAttribute("cashId",kassaId);model.addAttribute("q",q);model.addAttribute("from",from);model.addAttribute("to",to);
+        model.addAttribute("direction",direction);model.addAttribute("operation",operation);model.addAttribute("active",active);
+        model.addAttribute("page",Math.max(1,page));
+        List<Map<String,Object>> rows=List.of();
+        try {
+            var start=from.isBlank()?null:java.time.LocalDate.parse(from);
+            var end=to.isBlank()?null:java.time.LocalDate.parse(to);
+            if(page<1 || q.length()>200 || (!direction.isEmpty() && !List.of("GIRIS","CIXIS").contains(direction))
+                    || operation.length()>64 || !List.of("","true","false").contains(active)
+                    || (start!=null && end!=null && start.isAfter(end))) throw new IllegalArgumentException();
+            rows=repo.allReceipts(clinic(session),kassaId,q.trim(),start,end,direction,operation,active.isEmpty()?null:Boolean.valueOf(active),page);
+        } catch(java.time.DateTimeException | IllegalArgumentException e) {
+            model.addAttribute("errorMessage",msg("kassa.receiptInvalidFilter"));
+        } catch(DataAccessException e) {
+            log.error("Receipt list lookup failed",e);model.addAttribute("errorMessage",msg("kassa.receiptLoadFailed"));
+        }
+        model.addAttribute("receipts",rows.stream().limit(100).toList());model.addAttribute("hasMore",rows.size()>100);
+        base(model,"kassa.receipts");return "pages/maliyye/kassa-qebzler";
+    }
+    @GetMapping({"/kassa/qebzler/{receiptId}","/kassa/qebzler/{receiptId}/cap"})
+    public String receiptPage(@PathVariable Long receiptId,@RequestParam Long kassaId,Authentication auth,
+            HttpSession session,Model model,jakarta.servlet.http.HttpServletRequest request) {
+        var cash=service.requireCash(auth,clinic(session),kassaId,false);
+        boolean print=request.getRequestURI().endsWith("/cap");
+        var detail=repo.receiptDetail(clinic(session),kassaId,receiptId);
+        var paper=repo.receiptPrint(clinic(session),kassaId,receiptId);
+        if(detail.isEmpty() || paper.isEmpty()) throw new org.springframework.web.server.ResponseStatusException(HttpStatus.NOT_FOUND,msg("kassa.receiptNotFound"));
+        model.addAttribute("cash",cash);model.addAttribute("cashId",kassaId);model.addAttribute("receiptId",receiptId);
+        model.addAttribute("receipt",detail);model.addAttribute("paper",paper);
+        var source=print?paper:detail;
+        model.addAttribute("receiptPayments",receiptJson(source.get("odenisler")));
+        model.addAttribute("receiptServices",receiptJson(source.get("xidmetler")));
+        boolean canCancel=Boolean.TRUE.equals(cash.get("islesin")) && service.canCancelReceipt(auth,clinic(session))
+                && "TAMAMLANIB".equals(paper.get("status"));
+        model.addAttribute("canCancel",canCancel);
+        model.addAttribute("cancelToken",canCancel && !print?issueToken(session,kassaId,receiptId,"QEBZ_LEGV"):"");
+        base(model,"kassa.receiptDetail");return print?"pages/maliyye/kassa-qebz-cap":"pages/maliyye/kassa-qebz-detail";
+    }
+    @SuppressWarnings("unchecked")
+    private List<Map<String,Object>> receiptJson(Object value) {
+        if(value==null) return List.of();
+        return tools.jackson.databind.json.JsonMapper.builder().enable(tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).build().readValue(value.toString(),List.class);
+    }
+    @PostMapping("/kassa/qebzler/{receiptId}/legv")
+    public String cancelReceipt(@PathVariable Long receiptId,@RequestParam Long kassaId,@RequestParam String paymentToken,
+            @RequestParam(required=false) String reason,Authentication auth,HttpSession session,RedirectAttributes flash) {
+        service.requireCash(auth,clinic(session),kassaId,true);
+        if(!service.canCancelReceipt(auth,clinic(session))) throw new AccessDeniedException("kassa.denied");
+        try {
+            consumeToken(session,paymentToken,kassaId,receiptId,"QEBZ_LEGV");
+            var result=service.cancelReceipt(auth,clinic(session),kassaId,receiptId,reason);
+            boolean success=Boolean.TRUE.equals(result.get("ugurlu"));
+            flash.addFlashAttribute(success?"successMessage":"errorMessage",msg(success?"kassa.receiptCancelSuccess":"kassa.receiptCancelFailed"));
+            if(!success) log.warn("Receipt cancellation rejected: status={}",result.get("status_kodu"));
+        } catch(PaymentValidationException e) { flash.addFlashAttribute("errorMessage",msg(e.getMessage()));
+        } catch(DataAccessException e) { log.error("Receipt cancellation outcome requires verification",e);flash.addFlashAttribute("errorMessage",msg("kassa.paymentUnknown")); }
+        flash.addAttribute("kassaId",kassaId);
+        return "redirect:/kassa/qebzler/"+receiptId;
+    }
     @GetMapping({"/kassa/odenis","/kassa/borc"})
     public String workspace(@RequestParam Long kassaId,@RequestParam(required=false) Long targetId,
             Authentication auth,HttpSession session,Model model,jakarta.servlet.http.HttpServletRequest request) {
@@ -93,18 +229,20 @@ public class KassaOdenishController {
         if(!success) flash.addAttribute("targetId",targetId);
         return "redirect:"+path;
     }
-    @GetMapping({"/kassa/diger-giris","/kassa/avans"})
+    @GetMapping({"/kassa/diger-giris","/kassa/avans","/kassa/diger-cixis"})
     public String otherIncome(@RequestParam Long kassaId, Authentication auth, HttpSession session, Model model,
             jakarta.servlet.http.HttpServletRequest request) {
         boolean advance=request.getRequestURI().endsWith("/avans");
+        boolean expense=request.getRequestURI().endsWith("/diger-cixis");
         var cash=service.requireCash(auth,clinic(session),kassaId,true);
         home(kassaId,auth,session,model);
         model.addAttribute("incomeCash",cash);
-        model.addAttribute("incomeAccounts",repo.accountingCodes(clinic(session),advance?"AVANS_QEBUL":"DIGER_GIRIS"));
+        model.addAttribute("incomeAccounts",repo.accountingCodes(clinic(session),advance?"AVANS_QEBUL":expense?"DIGER_CIXIS":"DIGER_GIRIS"));
         model.addAttribute("incomePaymentTypes",repo.paymentTypes());
-        model.addAttribute("incomeToken",issueToken(session,kassaId,null,advance?"AVANS_QEBUL":"DIGER_GIRIS"));
+        model.addAttribute("incomeToken",issueToken(session,kassaId,null,advance?"AVANS_QEBUL":expense?"DIGER_CIXIS":"DIGER_GIRIS"));
         model.addAttribute("showOtherIncome",true);
         model.addAttribute("advanceMode",advance);
+        model.addAttribute("expenseMode",expense);
         if(advance) {
             model.addAttribute("advanceCardTypes",repo.cardTypes());
             Long selectedVisit=(Long)model.getAttribute("advanceVisitId");
@@ -113,23 +251,25 @@ public class KassaOdenishController {
         }
         return "pages/maliyye/kassa";
     }
-    @PostMapping({"/kassa/diger-giris","/kassa/avans"})
+    @PostMapping({"/kassa/diger-giris","/kassa/avans","/kassa/diger-cixis"})
     public String saveOtherIncome(@RequestParam Long kassaId, @RequestParam String paymentToken,
             @RequestParam(required=false) Long accountId, @RequestParam(required=false) List<Long> paymentTypeIds,
             @RequestParam(required=false) List<BigDecimal> amounts, @RequestParam(required=false) String note,
             @RequestParam(required=false) Long visitId, jakarta.servlet.http.HttpServletRequest request,
             Authentication auth, HttpSession session, RedirectAttributes flash) {
         boolean advance=request.getRequestURI().endsWith("/avans");
+        boolean expense=request.getRequestURI().endsWith("/diger-cixis");
         service.requireCash(auth,clinic(session),kassaId,true);
         boolean success=false;
         try {
-            consumeToken(session,paymentToken,kassaId,null,advance?"AVANS_QEBUL":"DIGER_GIRIS");
+            consumeToken(session,paymentToken,kassaId,null,advance?"AVANS_QEBUL":expense?"DIGER_CIXIS":"DIGER_GIRIS");
             var result=advance?service.advance(auth,clinic(session),kassaId,visitId,accountId,paymentTypeIds,amounts,note)
+                    :expense?service.otherExpense(auth,clinic(session),kassaId,accountId,paymentTypeIds,amounts,note)
                     :service.otherIncome(auth,clinic(session),kassaId,accountId,paymentTypeIds,amounts,note);
             success=Boolean.TRUE.equals(result.get("ugurlu"));
             String code=String.valueOf(result.get("status_kodu"));
             flash.addFlashAttribute(success?"successMessage":"errorMessage",messages.getMessage(
-                    success?(advance?"kassa.advanceSuccess":"kassa.incomeSuccess"):"kassa.result."+code,null,msg("kassa.incomeFailed"),LocaleContextHolder.getLocale()));
+                    success?(advance?"kassa.advanceSuccess":expense?"kassa.expenseSuccess":"kassa.incomeSuccess"):"kassa.result."+code,null,msg(expense?"kassa.expenseFailed":"kassa.incomeFailed"),LocaleContextHolder.getLocale()));
             if(!success) log.warn("Other cash income rejected: status={}",code);
         } catch(PaymentValidationException e) {
             flash.addFlashAttribute("errorMessage",msg(e.getMessage()));
@@ -148,7 +288,7 @@ public class KassaOdenishController {
             }
             flash.addFlashAttribute("incomeAmounts",entered);
         }
-        return success?"redirect:/kassa":advance?"redirect:/kassa/avans":"redirect:/kassa/diger-giris";
+        return success?"redirect:/kassa":advance?"redirect:/kassa/avans":expense?"redirect:/kassa/diger-cixis":"redirect:/kassa/diger-giris";
     }
     @GetMapping("/kassa/avans/xesteler")
     public String advancePatients(@RequestParam Long kassaId,@RequestParam(defaultValue="") String q,
@@ -222,6 +362,10 @@ public class KassaOdenishController {
             flash.addFlashAttribute("refundNote",note);flash.addFlashAttribute("refundSelection",serviceIds==null?List.of():serviceIds);
         }
         return "redirect:/kassa/qaytarma";
+    }
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ModelAndView receiptMissing(org.springframework.web.server.ResponseStatusException e) {
+        return new ModelAndView("pages/maliyye/kassa-receipt-error",Map.of("errorMessage",msg("kassa.receiptNotFound")),e.getStatusCode());
     }
     @ExceptionHandler(AccessDeniedException.class)
     public ModelAndView denied() { return new ModelAndView("error/403",Map.of(),HttpStatus.FORBIDDEN); }

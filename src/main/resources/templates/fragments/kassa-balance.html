@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="popup">
+<div id="kassa-balance-modal" class="modal fade" tabindex="-1" aria-labelledby="kassa-balance-title" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"><div class="modal-content">
+<div class="modal-header"><div><h2 id="kassa-balance-title" class="modal-title fs-5" th:text="${datedBalance} ? #{kassa.balanceByDate} : #{kassa.balance}"></h2><small class="text-muted" th:text="|${balanceCash.kassa_adi} (${balanceCash.kassa_kodu})|"></small></div><button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button></div>
+<div class="modal-body">
+<form th:if="${datedBalance}" method="get" th:action="@{/kassa/balans-tarix}" class="row g-3 align-items-end mb-4">
+<input type="hidden" name="kassaId" th:value="${cashId}">
+<div class="col-sm-4"><label for="balance-from" class="form-label" th:text="#{kassa.balanceFrom}"></label><input id="balance-from" class="form-control" type="date" name="from" th:value="${balanceFrom}" required></div>
+<div class="col-sm-4"><label for="balance-to" class="form-label" th:text="#{kassa.balanceTo}"></label><input id="balance-to" class="form-control" type="date" name="to" th:value="${balanceTo}" required></div>
+<div class="col-sm-4"><button class="btn btn-primary w-100" type="submit" th:text="#{kassa.balanceShow}"></button></div></form>
+<div th:if="${balanceError}" class="alert alert-danger" role="alert" th:text="${balanceError}"></div>
+<div th:if="${balance != null}" class="row g-2">
+<div class="col-sm-4" th:if="${datedBalance == false}"><div class="border rounded-3 p-2 h-100 text-success"><div class="small mb-2" th:text="#{kassa.balanceIncome}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.umumi_giris,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-sm-4" th:if="${datedBalance == false}"><div class="border rounded-3 p-2 h-100 text-danger"><div class="small mb-2" th:text="#{kassa.balanceExpense}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.umumi_cixis,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-sm-4" th:if="${datedBalance == false}"><div class="border rounded-3 p-2 h-100 bg-primary-subtle"><div class="small mb-2" th:text="#{kassa.balanceCurrent}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.cari_balans,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-6 col-sm-3" th:if="${datedBalance == true}"><div class="border rounded-3 p-2 h-100 "><div class="small mb-2" th:text="#{kassa.balanceOpening}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.acilis_balansi,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-6 col-sm-3" th:if="${datedBalance == true}"><div class="border rounded-3 p-2 h-100 text-success"><div class="small mb-2" th:text="#{kassa.balancePeriodIncome}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.dovr_giris,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-6 col-sm-3" th:if="${datedBalance == true}"><div class="border rounded-3 p-2 h-100 text-danger"><div class="small mb-2" th:text="#{kassa.balancePeriodExpense}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.dovr_cixis,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+<div class="col-6 col-sm-3" th:if="${datedBalance == true}"><div class="border rounded-3 p-2 h-100 bg-primary-subtle"><div class="small mb-2" th:text="#{kassa.balanceClosing}"></div><strong class="fs-6 text-break"><span th:text="${#numbers.formatDecimal(balance.baglanis_balansi,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div></div>
+</div></div>
+<div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.bagla}"></button></div>
+</div></div></div><script th:src="@{/custom/js/kassa-balance.js}" defer></script>
+</th:block></body></html>

@@ -4,11 +4,11 @@
 <th:block th:fragment="popup">
 <div id="other-income-modal" class="modal fade kassa-income-modal" th:classappend="${advanceMode} ? 'kassa-advance-modal'" tabindex="-1" aria-labelledby="other-income-title" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
-<form id="other-income-form" class="modal-content" method="post" th:action="${advanceMode} ? @{/kassa/avans} : @{/kassa/diger-giris}" th:data-advance="${advanceMode}">
+<form id="other-income-form" class="modal-content" method="post" th:action="${advanceMode} ? @{/kassa/avans} : (${expenseMode} ? @{/kassa/diger-cixis} : @{/kassa/diger-giris})" th:data-advance="${advanceMode}" th:data-expense="${expenseMode}">
 <input type="hidden" name="kassaId" th:value="${cashId}">
 <input type="hidden" name="paymentToken" th:value="${incomeToken}">
 <div class="modal-header">
-<div><h2 id="other-income-title" class="modal-title fs-5" th:text="${advanceMode} ? #{kassa.advance} : #{kassa.otherIncome}"></h2>
+<div><h2 id="other-income-title" class="modal-title fs-5" th:text="${advanceMode} ? #{kassa.advance} : (${expenseMode} ? #{kassa.otherExpense} : #{kassa.otherIncome})"></h2>
 <small class="text-muted" th:text="|${incomeCash.kassa_adi} (${incomeCash.kassa_kodu})|"></small></div>
 <button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button>
 </div>
@@ -23,9 +23,9 @@
 <option th:each="a:${incomeAccounts}" th:value="${a.muhasibat_kodu_id}" th:text="${a.ad}" th:data-description="${a.aciqlama}" th:selected="${incomeAccountId != null and incomeAccountId == a.muhasibat_kodu_id}"></option>
 </select>
 <p id="income-account-description" class="small text-muted mt-2"></p>
-<div th:if="${#lists.isEmpty(incomeAccounts)}" class="alert alert-warning small" th:text="${advanceMode} ? #{kassa.noAdvanceAccounts} : #{kassa.noIncomeAccounts}"></div>
+<div th:if="${#lists.isEmpty(incomeAccounts)}" class="alert alert-warning small" th:text="${advanceMode} ? #{kassa.noAdvanceAccounts} : (${expenseMode} ? #{kassa.noExpenseAccounts} : #{kassa.noIncomeAccounts})"></div>
 <label for="income-note" class="form-label mt-3" th:text="#{kassa.note}"></label>
-<textarea id="income-note" name="note" class="form-control" rows="4" maxlength="1000" th:placeholder="${advanceMode} ? #{kassa.advanceNoteHint} : #{kassa.incomeNoteHint}" th:text="${incomeNote}"></textarea>
+<textarea id="income-note" name="note" class="form-control" rows="4" maxlength="1000" th:placeholder="${advanceMode} ? #{kassa.advanceNoteHint} : (${expenseMode} ? #{kassa.expenseNoteHint} : #{kassa.incomeNoteHint})" th:text="${incomeNote}"></textarea>
 </div>
 <div class="col-md-6">
 <fieldset><legend class="fs-6" th:text="#{kassa.paymentTypes}"></legend>
@@ -42,21 +42,21 @@
 <div id="income-feedback" class="text-danger small mt-3" role="status" aria-live="polite"></div>
 </div>
 <div class="modal-footer justify-content-between gap-3">
-<div><small class="text-muted d-block" th:text="${advanceMode} ? #{kassa.advanceTotal} : #{kassa.incomeTotal}"></small><strong class="text-success fs-5"><span id="income-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong></div>
+<div><small class="text-muted d-block" th:text="${advanceMode} ? #{kassa.advanceTotal} : (${expenseMode} ? #{kassa.expenseTotal} : #{kassa.incomeTotal})"></small><strong class="fs-5" th:classappend="${expenseMode} ? 'text-danger' : 'text-success'"><span id="income-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong></div>
 <div class="d-flex gap-2"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}"></button>
-<button id="income-submit" type="submit" class="btn btn-success" th:disabled="${#lists.isEmpty(incomeAccounts) or #lists.isEmpty(incomePaymentTypes)}"><i class="ti ti-check me-1" aria-hidden="true"></i><span th:text="${advanceMode} ? #{kassa.acceptAdvance} : #{kassa.acceptIncome}"></span></button></div>
+<button id="income-submit" type="submit" class="btn" th:classappend="${expenseMode} ? 'btn-danger' : 'btn-success'" th:disabled="${#lists.isEmpty(incomeAccounts) or #lists.isEmpty(incomePaymentTypes)}"><i class="ti ti-check me-1" aria-hidden="true"></i><span th:text="${advanceMode} ? #{kassa.acceptAdvance} : (${expenseMode} ? #{kassa.acceptExpense} : #{kassa.acceptIncome})"></span></button></div>
 </div>
 <dialog id="income-confirmation" class="kassa-confirmation" aria-labelledby="income-confirm-title" aria-describedby="income-confirm-hint">
 <div class="kassa-confirmation-icon"><i class="ti ti-cash" aria-hidden="true"></i></div>
-<h2 id="income-confirm-title" th:text="${advanceMode} ? #{kassa.advanceConfirmTitle} : #{kassa.incomeConfirmTitle}"></h2>
+<h2 id="income-confirm-title" th:text="${advanceMode} ? #{kassa.advanceConfirmTitle} : (${expenseMode} ? #{kassa.expenseConfirmTitle} : #{kassa.incomeConfirmTitle})"></h2>
 <p id="income-confirm-hint" th:text="#{kassa.confirmHint}"></p>
 <div th:if="${advanceMode}" class="alert alert-primary small" id="advance-confirm-patient"></div>
 <div class="kassa-confirmation-totals">
 <div><span th:text="#{kassa.cash}"></span><span class="fw-semibold text-end" th:text="${incomeCash.kassa_adi}"></span></div>
 <div><span th:text="#{kassa.account}"></span><span id="income-confirm-account" class="fw-semibold text-end"></span></div>
-<div><span th:text="${advanceMode} ? #{kassa.advanceTotal} : #{kassa.incomeTotal}"></span><strong><span id="income-confirm-total"></span> <span th:text="#{kassa.currency}"></span></strong></div>
+<div><span th:text="${advanceMode} ? #{kassa.advanceTotal} : (${expenseMode} ? #{kassa.expenseTotal} : #{kassa.incomeTotal})"></span><strong><span id="income-confirm-total"></span> <span th:text="#{kassa.currency}"></span></strong></div>
 </div>
-<div class="d-flex gap-2 mt-4"><button id="income-cancel" type="button" class="btn btn-light flex-fill" autofocus th:text="#{common.imtina}"></button><button id="income-confirm" type="button" class="btn btn-success flex-fill" th:text="#{kassa.confirmAction}"></button></div>
+<div class="d-flex gap-2 mt-4"><button id="income-cancel" type="button" class="btn btn-light flex-fill" autofocus th:text="#{common.imtina}"></button><button id="income-confirm" type="button" class="btn flex-fill" th:classappend="${expenseMode} ? 'btn-danger' : 'btn-success'" th:text="#{kassa.confirmAction}"></button></div>
 </dialog>
 </form>
 </div>

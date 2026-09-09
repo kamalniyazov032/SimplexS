@@ -118,3 +118,23 @@
 .kassa-refund-modal .modal-content { max-height: calc(100dvh - 56px); }
 .kassa-refund-modal .kassa-table-scroll { max-height: 380px; overflow: auto; }
 @media (max-width: 991.98px) { .kassa-refund-modal .modal-content { max-height: 100dvh; } }
+
+/* Compact shortcuts leave room for future operations beside them. */
+.kassa-home .kassa-bottom-actions { --tone: #0768ff; --edge: #dceafe; display: flex; flex-wrap: wrap; flex-shrink: 0; gap: 12px; margin-top: 12px; }
+.kassa-home .kassa-bottom-actions .kassa-action { width: 300px; max-width: calc(50% - 6px); border-color: var(--edge); min-height: 62px; }
+.kassa-home .kassa-expense .kassa-action { min-height: 54px; padding: 7px 10px; gap: 10px; }
+.kassa-home .kassa-expense .kassa-action-copy { gap: 2px; }
+.kassa-home .kassa-expense .kassa-actions { gap: 6px; }
+@media (max-width: 575.98px) {
+    .kassa-home .kassa-bottom-actions { gap: 8px; margin-top: 8px; }
+    .kassa-home .kassa-bottom-actions .kassa-action { width: calc(50% - 4px); max-width: none; padding: 8px; gap: 6px; flex-wrap: wrap; }
+    .kassa-home .kassa-bottom-actions .kassa-action small { display: none; }
+}
+
+.kassa-home .kassa-bottom-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 300px)); }
+.kassa-home .kassa-bottom-actions .kassa-action { width: 100%; max-width: none; }
+@media (max-width: 991.98px) {
+    .kassa-home .kassa-bottom-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.receipt-list-scroll{max-height:calc(100dvh - 270px)}

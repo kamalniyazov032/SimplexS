@@ -39,6 +39,32 @@ public class KassaEmeliyyatService {
                 && (debt || (!Boolean.TRUE.equals(row.get("borclandirilib")) && !Boolean.TRUE.equals(row.get("paket_daxildir"))));
     }
     public boolean canBorrow(Authentication auth, Long clinic) { return access.hasPermission(auth,clinic,"SLX000004"); }
+    public boolean canCancelReceipt(Authentication auth,Long clinic) {
+        return access.hasPermission(auth,clinic,"SLX000005");
+    }
+    @Transactional
+    public Map<String,Object> cancelReceipt(Authentication auth,Long clinic,Long cash,Long receipt,String reason) {
+        requireCash(auth,clinic,cash,true);
+        if(!canCancelReceipt(auth,clinic)) throw new AccessDeniedException("kassa.denied");
+        if(reason==null || reason.isBlank() || reason.length()>1000) fail("receiptCancelReasonRequired");
+        var detail=repo.receiptDetail(clinic,cash,receipt);
+        if(detail.isEmpty()) fail("receiptNotFound");
+        var print=repo.receiptPrint(clinic,cash,receipt);
+        if(!"TAMAMLANIB".equals(print.get("status"))) fail("receiptNotCancelable");
+        return repo.cancelReceipt(clinic,cash,receipt,personalId(auth),reason.trim());
+    }
+    @Transactional
+    public Map<String,Object> transfer(Authentication auth,Long clinic,Long cash,Long recipient,Long account,BigDecimal amount,String note) {
+        requireCash(auth,clinic,cash,true);
+        if(recipient==null || recipient.equals(cash) || repo.transferRecipients(clinic,cash).stream()
+                .noneMatch(r->Objects.equals(id(r,"kassa_id"),recipient))) fail("invalidTransferRecipient");
+        if(account==null || repo.accountingCodes(clinic,"KASSA_TRANSFER").stream()
+                .noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) fail("invalidPayment");
+        if(note!=null && note.length()>1000) fail("noteLong");
+        if(amount.compareTo(money(repo.balance(clinic,cash),"cari_balans"))>0) fail("transferInsufficientBalance");
+        return repo.transfer(clinic,cash,recipient,personalId(auth),account,amount.setScale(2),note==null?null:note.trim());
+    }
     @Transactional
     public Map<String,Object> pay(Authentication auth, Long clinic, Long cash, Long target, boolean debt,
             List<Long> selected, List<Long> types, List<BigDecimal> amounts, boolean borrow, String note) {
@@ -73,6 +99,16 @@ public class KassaEmeliyyatService {
                 .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
         var payments=validatePayments(types,amounts);
         return repo.otherIncome(clinic,cash,personalId(auth),account,payments.json(),note==null?null:note.trim());
+    }
+    @Transactional
+    public Map<String,Object> otherExpense(Authentication auth, Long clinic, Long cash, Long account,
+            List<Long> types, List<BigDecimal> amounts, String note) {
+        requireCash(auth,clinic,cash,true);
+        if (note!=null && note.length()>1000) fail("noteLong");
+        if (account==null || repo.accountingCodes(clinic,"DIGER_CIXIS").stream()
+                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+        var payments=validatePayments(types,amounts);
+        return repo.otherExpense(clinic,cash,personalId(auth),account,payments.json(),note==null?null:note.trim());
     }
     @Transactional
     public Map<String,Object> advance(Authentication auth,Long clinic,Long cash,Long visit,Long account,

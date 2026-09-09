@@ -1,0 +1,28 @@
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const vm = require('node:vm');
+const fs = require('node:fs');
+const path = require('node:path');
+test('transfer requires confirmation, submits once and allows navigation after popup closes', () => {
+    const node = extra => ({listeners:{},value:'',textContent:'',addEventListener(n,f){this.listeners[n]=f;},focus(){},...extra});
+    const ids = Object.fromEntries(['form','modal','confirmation','submit','recipient','account','amount','note','cancel','confirm','feedback','confirm-recipient','confirm-account','confirm-amount'].map(x=>['transfer-'+x,node()]));
+    const form=ids['transfer-form'], dialog=ids['transfer-confirmation'], modal=ids['transfer-modal'];
+    dialog.open=false; dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;dialog.listeners.close();};
+    ids['transfer-submit'].querySelector=()=>node();
+    ids['transfer-recipient'].value='2';ids['transfer-recipient'].selectedOptions=[{textContent:'Receiver'}];
+    ids['transfer-account'].value='8';ids['transfer-account'].selectedOptions=[{textContent:'Transfer'}];
+    ids['transfer-amount'].value='50.00';ids['transfer-amount'].max='50.00';
+    let submissions=0;
+    form.requestSubmit=()=>{let prevented=false;form.listeners.submit({preventDefault(){prevented=true;}});if(!prevented)submissions++;};
+    const win=node({KassaTransferI18n:{invalidRecipient:'recipient',invalidAccount:'account',invalidAmount:'amount',processing:'processing',insufficientBalance:'balance'}});
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../main/resources/static/custom/js/kassa-transfer.js'),'utf8'),{document:{getElementById:id=>ids[id],documentElement:{lang:'en'}},window:win});
+    form.listeners.input();
+    modal.listeners['hidden.bs.modal']();
+    win.listeners.beforeunload({preventDefault(){assert.fail('Closed popup must not warn');}});
+    ids['transfer-amount'].value='50.01';form.requestSubmit();assert.equal(dialog.open,false);assert.equal(ids['transfer-feedback'].textContent,'balance');
+    ids['transfer-amount'].value='50.00';
+    form.requestSubmit();assert.equal(submissions,0);assert.equal(dialog.open,true);
+    assert.equal(ids['transfer-confirm-recipient'].textContent,'Receiver');assert.equal(ids['transfer-confirm-amount'].textContent,'50.00');
+    ids['transfer-confirm'].listeners.click();ids['transfer-confirm'].listeners.click();form.requestSubmit();
+    assert.equal(submissions,1);
+});

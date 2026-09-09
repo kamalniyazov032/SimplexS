@@ -234,4 +234,90 @@ class KassaPageTests {
         assertThat(result.getResponse().getContentAsString()).contains("id=\"cash-payment-modal\"","data-refund=\"true\"","A26000017","Qaytarılacaq məbləğ","name=\"_csrf\"").doesNotContain("??kassa.");
         preview("refund",result.getResponse().getContentAsString());
     }
+    @Test void expensePopupUsesExpenseActionAndAccountingCodes() throws Exception {
+        when(repo.accountingCodes(1L,"DIGER_CIXIS")).thenReturn(List.of(row("muhasibat_kodu_id",18L,"ad","Təsərrüfat xərci","aciqlama","Test")));
+        var page=mvc.perform(get("/kassa/diger-cixis").servletPath("/kassa/diger-cixis").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(page.getResponse().getContentAsString()).contains("action=\"/kassa/diger-cixis\"","data-expense=\"true\"","Çıxışı təsdiqləyin","Təsərrüfat xərci").doesNotContain("??kassa.");
+        var token=(String)page.getModelAndView().getModel().get("incomeToken");
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.otherExpense(any(),eq(1L),eq(7L),eq(18L),anyList(),anyList(),any())).thenReturn(Map.of("ugurlu",true,"status_kodu","OK"));
+        for(int i=0;i<2;i++) mvc.perform(post("/kassa/diger-cixis").servletPath("/kassa/diger-cixis").session(session).param(csrf.getParameterName(),csrf.getToken()).param("kassaId","7").param("paymentToken",token).param("accountId","18").param("paymentTypeIds","1").param("amounts","40.00")).andExpect(status().is3xxRedirection());
+        verify(service,times(1)).otherExpense(any(),eq(1L),eq(7L),eq(18L),eq(List.of(1L)),eq(List.of(new BigDecimal("40.00"))),isNull());
+    }
+    @Test void balanceShowsCurrentTotalsWithReadAccess() throws Exception {
+        when(repo.balance(1L,7L)).thenReturn(row("umumi_giris",new BigDecimal("150.00"),"umumi_cixis",new BigDecimal("175.00"),"cari_balans",new BigDecimal("-25.00")));
+        var page=mvc.perform(get("/kassa/balans").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(page.getResponse().getContentAsString()).contains("Cari balans","-25","kassa-balance-modal").doesNotContain("??kassa.");
+        verify(service,atLeastOnce()).requireCash(any(),eq(1L),eq(7L),eq(false));
+    }
+    @Test void datedBalanceDefaultsToTodayAndAcceptsExplicitRange() throws Exception {
+        when(repo.balanceByDate(eq(1L),eq(7L),any(),any())).thenReturn(row("acilis_balansi",BigDecimal.TEN,"dovr_giris",BigDecimal.ZERO,"dovr_cixis",BigDecimal.ZERO,"baglanis_balansi",BigDecimal.TEN));
+        mvc.perform(get("/kassa/balans-tarix").param("kassaId","7").session(session)).andExpect(status().isOk()).andExpect(content().string(containsString("Açılış balansı")));
+        var today=java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"));
+        verify(repo).balanceByDate(1L,7L,today,today);
+        mvc.perform(get("/kassa/balans-tarix").param("kassaId","7").param("from","2026-09-01").param("to","2026-09-09").session(session)).andExpect(status().isOk());
+        verify(repo).balanceByDate(1L,7L,java.time.LocalDate.of(2026,9,1),java.time.LocalDate.of(2026,9,9));
+    }
+    @Test void invalidBalanceDatesDoNotQueryDatabase() throws Exception {
+        for(String start:List.of("2026-09-10","not-a-date"))
+            mvc.perform(get("/kassa/balans-tarix").param("kassaId","7").param("from",start).param("to","2026-09-09").session(session)).andExpect(status().isOk()).andExpect(content().string(containsString("Düzgün tarix aralığı seçin")));
+        verify(repo,never()).balanceByDate(any(),any(),any(),any());
+    }
+    @Test void balanceDeniesUnauthorizedCashBeforeQuery() throws Exception {
+        when(service.requireCash(any(),eq(1L),eq(7L),eq(false))).thenThrow(new org.springframework.security.access.AccessDeniedException("Denied"));
+        mvc.perform(get("/kassa/balans").param("kassaId","7").session(session)).andExpect(status().isForbidden());
+        verify(repo,never()).balance(any(),any());
+    }
+    @Test void transferPopupAndReplayProtection() throws Exception {
+        when(repo.balance(1L,7L)).thenReturn(row("cari_balans",new BigDecimal("75.00")));
+        when(repo.transferRecipients(1L,7L)).thenReturn(List.of(row("kassa_id",2L,"kassa_kodu","K02","kassa_adi","Əsas kassa")));
+        when(repo.accountingCodes(1L,"KASSA_TRANSFER")).thenReturn(List.of(row("muhasibat_kodu_id",8L,"ad","Transfer")));
+        var page=mvc.perform(get("/kassa/transfer").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(page.getResponse().getContentAsString()).contains("max=\"75.00\"","Cari balans","Əsas kassa","Transferi təsdiqləyin","name=\"_csrf\"").doesNotContain("??kassa.");
+        var token=(String)page.getModelAndView().getModel().get("transferToken");
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.transfer(any(),eq(1L),eq(7L),eq(2L),eq(8L),any(),any())).thenReturn(Map.of("ugurlu",true));
+        for(int i=0;i<2;i++) mvc.perform(post("/kassa/transfer").session(session).param(csrf.getParameterName(),csrf.getToken()).param("kassaId","7").param("paymentToken",token).param("recipientId","2").param("accountId","8").param("amount","50.00")).andExpect(status().is3xxRedirection());
+        verify(service,times(1)).transfer(any(),eq(1L),eq(7L),eq(2L),eq(8L),eq(new BigDecimal("50.00")),isNull());
+    }
+    private Map<String,Object> receiptRow() {
+        var r=row("kassa_emeliyyat_id",10L,"emeliyyat_no","K2600010","emeliyyat_tarixi","2026-09-09","istiqamet","GIRIS","mebleg",new BigDecimal("50.00"),"emeliyyat_kodu","DIGER_GIRIS","muhasibat_kodu_adi","Test hesab","xeste_adi_soyadi","Test Pasiyent","xeste_kodu","X004","protokol_kodu","A17","odenis_novleri","Nağd","yaradan_personal_adi","Kassir","aciqlama","<script>alert(1)</script>","aktiv",true,"transfer_id",null);
+        r.put("odenisler","[{\"odenis_novu_adi\":\"Nağd\",\"mebleg\":50.00}]");
+        r.put("xidmetler","[{\"xidmet_kodu\":\"LAB01\",\"xidmet_adi\":\"Analiz\",\"mebleg\":50.00}]");
+        return r;
+    }
+    private void receiptSetup() {
+        when(repo.receiptDetail(1L,7L,10L)).thenReturn(receiptRow());
+        var paper=new LinkedHashMap<>(receiptRow());paper.put("status","TAMAMLANIB");paper.put("legv_sebebi",null);
+        paper.put("klinika_adi","Test klinika");paper.put("kassa_adi","Mərkəzi Kassa");paper.put("kassir_adi","Kassir");
+        paper.put("odenisler","[{\"ad\":\"Nağd\",\"mebleg\":50.00}]");
+        when(repo.receiptPrint(1L,7L,10L)).thenReturn(paper);
+        when(service.canCancelReceipt(any(),eq(1L))).thenReturn(true);
+    }
+    @Test void receiptListRendersOffcanvasAndLimitsRows() throws Exception {
+        when(repo.allReceipts(eq(1L),eq(7L),eq(""),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(""),eq(""),isNull(),eq(1))).thenReturn(Collections.nCopies(101,receiptRow()));
+        var page=mvc.perform(get("/kassa/qebzler").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat((List<?>)page.getModelAndView().getModel().get("receipts")).hasSize(100);
+        assertThat(page.getModelAndView().getModel().get("from")).isEqualTo(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")).toString());
+        assertThat(page.getModelAndView().getModel().get("to")).isEqualTo(page.getModelAndView().getModel().get("from"));
+        assertThat(page.getModelAndView().getModel().get("hasMore")).isEqualTo(true);
+        assertThat(page.getResponse().getContentAsString()).contains("offcanvas-top_ka","K2600010","&lt;script&gt;").doesNotContain("<script>alert(1)</script>","??kassa.");
+    }
+    @Test void receiptDetailPrintAndCancellationAreScopedAndReplaySafe() throws Exception {
+        receiptSetup();
+        var page=mvc.perform(get("/kassa/qebzler/10").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(page.getResponse().getContentAsString()).contains("Analiz","Nağd","receipt-cancel-form").doesNotContain("??kassa.");
+        mvc.perform(get("/kassa/qebzler/10/cap").param("kassaId","7").session(session)).andExpect(status().isOk()).andExpect(content().string(containsString("Test klinika")));
+        var token=(String)page.getModelAndView().getModel().get("cancelToken");
+        var csrf=(CsrfToken)page.getRequest().getAttribute(CsrfToken.class.getName());
+        when(service.cancelReceipt(any(),eq(1L),eq(7L),eq(10L),eq("Səhv qəbz"))).thenReturn(Map.of("ugurlu",true));
+        for(int i=0;i<2;i++) mvc.perform(post("/kassa/qebzler/10/legv").session(session).param(csrf.getParameterName(),csrf.getToken()).param("kassaId","7").param("paymentToken",token).param("reason","Səhv qəbz")).andExpect(status().is3xxRedirection());
+        verify(service,times(1)).cancelReceipt(any(),eq(1L),eq(7L),eq(10L),eq("Səhv qəbz"));
+    }
+    @Test void receiptCancellationHiddenWithoutPermissionAndMissingReceiptIs404() throws Exception {
+        receiptSetup();when(service.canCancelReceipt(any(),eq(1L))).thenReturn(false);
+        var page=mvc.perform(get("/kassa/qebzler/10").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
+        assertThat(page.getResponse().getContentAsString()).doesNotContain("id=\"receipt-cancel-form\"");
+        mvc.perform(get("/kassa/qebzler/99").param("kassaId","7").session(session)).andExpect(status().isNotFound());
+    }
 }

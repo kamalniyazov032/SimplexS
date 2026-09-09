@@ -25,12 +25,13 @@ function income({ values = ['200.00', '50.00'], accountId = '5', advance = false
         return prevented;
     }
     form.requestSubmit = submit;
+    const windowEvents = {};
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../../main/resources/static/custom/js/kassa-other-income.js'), 'utf8'), {
         document: { getElementById: id => ids[id], documentElement: { lang: 'en' }, body: { appendChild() {} } },
         URL, AbortController, fetch: fetcher,
-        window: node({ location: { href: 'http://localhost/kassa/avans?kassaId=7' }, KassaIncomeI18n: { invalidAccount: 'account', invalidPayment: 'amount', processing: 'processing', selectPatient: 'patient', searchHint: 'search hint', searching: 'searching', searchFailed: 'failed', invalidSearch: 'invalid search' }, bootstrap: { Modal: { getOrCreateInstance: () => ({ show() { openings++; } }) } } })
+        window: node({ addEventListener(name, callback) { windowEvents[name] = callback; }, location: { href: 'http://localhost/kassa/avans?kassaId=7' }, KassaIncomeI18n: { invalidAccount: 'account', invalidPayment: 'amount', processing: 'processing', selectPatient: 'patient', searchHint: 'search hint', searching: 'searching', searchFailed: 'failed', invalidSearch: 'invalid search' }, bootstrap: { Modal: { getOrCreateInstance: () => ({ show() { openings++; } }) } } })
     });
-    return { ids, amounts, account, dialog, submit, get submissions() { return submissions; }, get openings() { return openings; }, confirm() { ids['income-confirm'].listeners.click(); } };
+    return { windowEvents, ids, amounts, account, dialog, submit, get submissions() { return submissions; }, get openings() { return openings; }, confirm() { ids['income-confirm'].listeners.click(); } };
 }
 test('popup totals split income and requires custom confirmation before one submission', () => {
     const page = income();
@@ -137,4 +138,24 @@ test('advance pagination keeps filters and a new search resets to page one', asy
     assert.equal(urls.length, 2);
     await page.ids['advance-search-button'].listeners.click();
     assert.equal(urls[2].searchParams.get('page'), '1');
+});
+
+test('closing a changed popup allows navigation without the browser unsaved warning', () => {
+    const page = income();
+    const leaving = () => {
+        let blocked = false;
+        page.windowEvents.beforeunload({ preventDefault() { blocked = true; } });
+        return blocked;
+    };
+    assert.equal(leaving(), false);
+    page.ids['other-income-form'].listeners.input();
+    assert.equal(leaving(), true);
+    page.ids['other-income-modal'].listeners['hidden.bs.modal']();
+    assert.equal(leaving(), false);
+    // Select2 events from a hidden form must not reactivate the warning.
+    page.account.listeners.change();
+    assert.equal(leaving(), false);
+    page.ids['other-income-modal'].listeners['show.bs.modal']();
+    assert.equal(leaving(), true);
+    assert.equal(page.submissions, 0);
 });

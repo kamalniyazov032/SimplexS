@@ -1,0 +1,4 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="lines">
+<h3 class="fs-6 mt-4" th:text="#{kassa.paymentTypes}"></h3><table class="table table-sm"><thead><tr><th th:text="#{kassa.paymentTypes}"></th><th th:text="#{kassa.receiptAmount}"></th></tr></thead><tbody><tr th:each="r:${receiptPayments}"><td th:text="${r['odenis_novu_adi'] != null ? r['odenis_novu_adi'] : r['ad']}"></td><td th:text="${#numbers.formatDecimal(r['mebleg'],1,2)}"></td></tr></tbody></table>
+<h3 class="fs-6 mt-4" th:text="#{kassa.receiptServices}"></h3><table class="table table-sm"><thead><tr><th th:text="#{kassa.service}"></th><th th:text="#{kassa.receiptAmount}"></th></tr></thead><tbody><tr th:each="r:${receiptServices}"><td><span th:text="${r['xidmet_kodu']}"></span> <span th:text="${r['xidmet_adi']}"></span></td><td th:text="${#numbers.formatDecimal(r['mebleg'],1,2)}"></td></tr></tbody></table>
+</th:block></body></html>

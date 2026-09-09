@@ -126,4 +126,41 @@ class KassaEmeliyyatServiceTests {
         assertThatThrownBy(()->service.refund(auth,1L,7L,17L,List.of(101L),99L,1L,new BigDecimal("80.00"),null)).hasMessage("kassa.invalidAccount");
         verify(repo,never()).refund(any(),any(),any(),any(),any(),any(),any(),any());
     }
+    @Test void expenseUsesScopedAccountAuthenticatedPersonalAndExactAmount() {
+        when(repo.accountingCodes(1L,"DIGER_CIXIS")).thenReturn(List.of(Map.of("muhasibat_kodu_id",18L)));
+        service.otherExpense(auth,1L,7L,18L,List.of(1L),List.of(new BigDecimal("40.00"))," Expense ");
+        verify(repo).otherExpense(1L,7L,24L,18L,"[{\"odenis_novu_id\":1,\"mebleg\":40.00}]","Expense");
+        assertThatThrownBy(()->service.otherExpense(auth,1L,7L,5L,List.of(1L),List.of(BigDecimal.TEN),null)).hasMessage("kassa.invalidAccount");
+        assertThatThrownBy(()->service.otherExpense(auth,1L,7L,18L,List.of(1L),List.of(BigDecimal.ZERO),null)).hasMessage("kassa.invalidPayment");
+    }
+    @Test void transferValidatesDestinationAccountAndAmountAndDerivesPersonal() {
+        when(repo.balance(1L,7L)).thenReturn(Map.of("cari_balans",new BigDecimal("50.00")));
+        when(repo.transferRecipients(1L,7L)).thenReturn(List.of(Map.of("kassa_id",2L)));
+        when(repo.accountingCodes(1L,"KASSA_TRANSFER")).thenReturn(List.of(Map.of("muhasibat_kodu_id",8L)));
+        service.transfer(auth,1L,7L,2L,8L,new BigDecimal("50.00")," Transfer ");
+        verify(repo).transfer(1L,7L,2L,24L,8L,new BigDecimal("50.00"),"Transfer");
+        for(Long recipient:List.of(7L,99L)) assertThatThrownBy(()->service.transfer(auth,1L,7L,recipient,8L,BigDecimal.TEN,null)).hasMessage("kassa.invalidTransferRecipient");
+        assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,99L,BigDecimal.TEN,null)).hasMessage("kassa.invalidAccount");
+        for(BigDecimal amount:List.of(BigDecimal.ZERO,new BigDecimal("-1"),new BigDecimal("0.001"))) assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,8L,amount,null)).hasMessage("kassa.invalidPayment");
+        assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,8L,new BigDecimal("50.01"),null)).hasMessage("kassa.transferInsufficientBalance");
+        when(repo.balance(1L,7L)).thenReturn(Map.of("cari_balans",BigDecimal.ZERO));
+        assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,8L,BigDecimal.ONE,null)).hasMessage("kassa.transferInsufficientBalance");
+        verify(repo,times(1)).transfer(any(),any(),any(),any(),any(),any(),any());
+        when(repo.cashRegisters(1L,24L)).thenReturn(List.of(Map.of("kassa_id",7L,"izlesin",true,"islesin",false)));
+        assertThatThrownBy(()->service.transfer(auth,1L,7L,2L,8L,BigDecimal.TEN,null)).isInstanceOf(AccessDeniedException.class);
+    }
+    @Test void cancelReceiptRequiresSpecialPermissionReasonAndCompletedReceipt() {
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).isInstanceOf(AccessDeniedException.class);
+        when(access.hasPermission(auth,1L,"SLX000005")).thenReturn(true);
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L," ")).hasMessage("kassa.receiptCancelReasonRequired");
+        when(repo.receiptDetail(1L,7L,10L)).thenReturn(Map.of());
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).hasMessage("kassa.receiptNotFound");
+        when(repo.receiptDetail(1L,7L,10L)).thenReturn(Map.of("kassa_emeliyyat_id",10L));
+        when(repo.receiptPrint(1L,7L,10L)).thenReturn(Map.of("status","LEGV_EDILIB"));
+        assertThatThrownBy(()->service.cancelReceipt(auth,1L,7L,10L,"Reason")).hasMessage("kassa.receiptNotCancelable");
+        verify(repo,never()).cancelReceipt(any(),any(),any(),any(),any());
+        when(repo.receiptPrint(1L,7L,10L)).thenReturn(Map.of("status","TAMAMLANIB"));
+        service.cancelReceipt(auth,1L,7L,10L," Reason ");
+        verify(repo).cancelReceipt(1L,7L,10L,24L,"Reason");
+    }
 }

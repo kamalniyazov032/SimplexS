@@ -19,6 +19,74 @@ public class KassaEmeliyyatRepository {
                 p_klinika_id=>CAST(:clinic AS bigint), p_personal_id=>CAST(:personal AS bigint))
             """, scope(clinic, null).addValue("personal", personal));
     }
+    public Map<String,Object> balance(Long clinic, Long cash) {
+        return jdbc.queryForMap("""
+            SELECT umumi_giris, umumi_cixis, cari_balans FROM public.fn_kassa_balansi(
+                p_klinika_id=>CAST(:clinic AS bigint), p_kassa_id=>CAST(:cash AS bigint))
+            """, scope(clinic,cash));
+    }
+    public Map<String,Object> balanceByDate(Long clinic, Long cash, java.time.LocalDate from, java.time.LocalDate to) {
+        return jdbc.queryForMap("""
+            SELECT acilis_balansi, dovr_giris, dovr_cixis, baglanis_balansi
+            FROM public.fn_kassa_balansi_tarix_uzre(
+                p_klinika_id=>CAST(:clinic AS bigint), p_kassa_id=>CAST(:cash AS bigint),
+                p_baslangic_tarix=>CAST(:from AS date), p_son_tarix=>CAST(:to AS date))
+            """, scope(clinic,cash).addValue("from",from).addValue("to",to));
+    }
+    public List<Map<String,Object>> transferRecipients(Long clinic,Long cash) {
+        return jdbc.queryForList("""
+            SELECT kassa_id, kassa_kodu, kassa_adi FROM public.fn_kassa_transfer_qebul_eden_kassalar_siyahisi(
+                p_klinika_id=>CAST(:clinic AS bigint), p_gonderen_kassa_id=>CAST(:cash AS bigint))
+            """,scope(clinic,cash));
+    }
+    public Map<String,Object> transfer(Long clinic,Long cash,Long recipient,Long personal,Long account,java.math.BigDecimal amount,String note) {
+        return jdbc.queryForMap("""
+            SELECT status_kodu, ugurlu, mesaj FROM public.fn_kassadan_kassaya_transfer(
+                p_klinika_id=>CAST(:clinic AS bigint), p_gonderen_kassa_id=>CAST(:cash AS bigint),
+                p_qebul_eden_kassa_id=>CAST(:recipient AS bigint), p_personal_id=>CAST(:personal AS bigint),
+                p_muhasibat_kodu_id=>CAST(:account AS bigint), p_mebleg=>CAST(:amount AS numeric),
+                p_aciqlama=>CAST(:note AS text))
+            """,scope(clinic,cash).addValue("recipient",recipient).addValue("personal",personal)
+                .addValue("account",account).addValue("amount",amount).addValue("note",note));
+    }
+    public List<Map<String,Object>> allReceipts(Long clinic,Long cash,String query,java.time.LocalDate from,
+            java.time.LocalDate to,String direction,String operation,Boolean active,int page) {
+        return jdbc.queryForList("""
+            SELECT * FROM public.fn_kassa_qebzler_siyahisi(
+                p_klinika_id=>CAST(:clinic AS bigint),p_kassa_id=>CAST(:cash AS bigint))
+            WHERE (:query='' OR position(lower(:query) in lower(concat_ws(' ',emeliyyat_no,xeste_kodu,xeste_adi_soyadi,
+                protokol_kodu,muhasibat_kodu_adi,yaradan_personal_adi,aciqlama)))>0)
+              AND (CAST(:from AS date) IS NULL OR emeliyyat_tarixi>=CAST(:from AS date))
+              AND (CAST(:to AS date) IS NULL OR emeliyyat_tarixi<CAST(:to AS date)+interval '1 day')
+              AND (:direction='' OR istiqamet=:direction)
+              AND (:operation='' OR emeliyyat_kodu=:operation)
+              AND (CAST(:active AS boolean) IS NULL OR aktiv=CAST(:active AS boolean))
+            ORDER BY emeliyyat_tarixi DESC,kassa_emeliyyat_id DESC LIMIT 101 OFFSET :offset
+            """,scope(clinic,cash).addValue("query",query).addValue("from",from).addValue("to",to)
+                .addValue("direction",direction).addValue("operation",operation).addValue("active",active).addValue("offset",(long)(page-1)*100));
+    }
+    public Map<String,Object> receiptDetail(Long clinic,Long cash,Long receipt) {
+        var rows=jdbc.queryForList("""
+            SELECT * FROM public.fn_kassa_qebz_detali(p_klinika_id=>CAST(:clinic AS bigint),
+                p_kassa_id=>CAST(:cash AS bigint),p_kassa_emeliyyat_id=>CAST(:receipt AS bigint))
+            """,scope(clinic,cash).addValue("receipt",receipt));
+        return rows.isEmpty()?Map.of():rows.getFirst();
+    }
+    public Map<String,Object> receiptPrint(Long clinic,Long cash,Long receipt) {
+        var rows=jdbc.queryForList("""
+            SELECT * FROM public.fn_kassa_qebz_cap_melumati(p_klinika_id=>CAST(:clinic AS bigint),
+                p_kassa_id=>CAST(:cash AS bigint),p_kassa_emeliyyat_id=>CAST(:receipt AS bigint))
+            """,scope(clinic,cash).addValue("receipt",receipt));
+        return rows.isEmpty()?Map.of():rows.getFirst();
+    }
+    public Map<String,Object> cancelReceipt(Long clinic,Long cash,Long receipt,Long personal,String reason) {
+        return jdbc.queryForMap("""
+            SELECT status_kodu,ugurlu,eks_emeliyyat_id,mesaj FROM public.fn_kassa_qebzi_legv_et(
+                p_klinika_id=>CAST(:clinic AS bigint),p_kassa_id=>CAST(:cash AS bigint),
+                p_kassa_emeliyyat_id=>CAST(:receipt AS bigint),p_legv_eden_personal_id=>CAST(:personal AS bigint),
+                p_legv_sebebi=>CAST(:reason AS text))
+            """,scope(clinic,cash).addValue("receipt",receipt).addValue("personal",personal).addValue("reason",reason));
+    }
     public List<Map<String,Object>> paymentTypes() {
         return jdbc.queryForList("SELECT * FROM public.fn_odenis_novleri_siyahisi() WHERE aktiv = true", new MapSqlParameterSource());
     }
@@ -33,6 +101,15 @@ public class KassaEmeliyyatRepository {
     public Map<String,Object> otherIncome(Long clinic, Long cash, Long personal, Long account, String payments, String note) {
         return jdbc.queryForMap("""
             SELECT status_kodu, ugurlu, mesaj FROM public.fn_kassa_diger_giris(
+                p_klinika_id=>CAST(:clinic AS bigint), p_kassa_id=>CAST(:cash AS bigint),
+                p_personal_id=>CAST(:personal AS bigint), p_muhasibat_kodu_id=>CAST(:account AS bigint),
+                p_odenisler=>CAST(:payments AS jsonb), p_aciqlama=>CAST(:note AS text))
+            """, scope(clinic,cash).addValue("personal",personal).addValue("account",account)
+                    .addValue("payments",payments).addValue("note",note));
+    }
+    public Map<String,Object> otherExpense(Long clinic, Long cash, Long personal, Long account, String payments, String note) {
+        return jdbc.queryForMap("""
+            SELECT status_kodu, ugurlu, mesaj FROM public.fn_kassa_diger_cixis(
                 p_klinika_id=>CAST(:clinic AS bigint), p_kassa_id=>CAST(:cash AS bigint),
                 p_personal_id=>CAST(:personal AS bigint), p_muhasibat_kodu_id=>CAST(:account AS bigint),
                 p_odenisler=>CAST(:payments AS jsonb), p_aciqlama=>CAST(:note AS text))
