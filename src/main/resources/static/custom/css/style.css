@@ -1079,10 +1079,6 @@ body {
     overflow-y: auto;
 }
 
-/* Offcanvas açılanda hündürlüyün düzgün hesablanması üçün */
-.offcanvas.show {
-    height: auto !important;
-}
 
 /* Mövcud stillərin davamı */
 .custom-tree-table .head-row td {
