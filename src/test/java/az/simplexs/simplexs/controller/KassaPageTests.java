@@ -301,6 +301,7 @@ class KassaPageTests {
     }
     private Map<String,Object> receiptRow() {
         var r=row("kassa_emeliyyat_id",10L,"emeliyyat_no","K2600010","emeliyyat_tarixi",java.sql.Timestamp.valueOf("2026-09-09 18:55:34.123456"),"istiqamet","GIRIS","mebleg",new BigDecimal("50.00"),"emeliyyat_kodu","DIGER_GIRIS","muhasibat_kodu_adi","Test hesab","xeste_adi_soyadi","Test Pasiyent","xeste_kodu","X004","protokol_kodu","A17","odenis_novleri","Nağd","yaradan_personal_adi","Kassir","aciqlama","<script>alert(1)</script>","aktiv",true,"transfer_id",null);
+        r.put("status","TAMAMLANIB");
         r.put("odenisler","[{\"odenis_novu_adi\":\"Nağd\",\"mebleg\":50.00}]");
         r.put("xidmetler","[{\"xidmet_kodu\":\"LAB01\",\"xidmet_adi\":\"Analiz\",\"mebleg\":50.00}]");
         return r;
@@ -315,13 +316,21 @@ class KassaPageTests {
         when(service.receiptCancelReasons()).thenReturn(List.of(new az.simplexs.simplexs.dto.sebeb.Sebeb(9L,5L,"QEBZ_LEGV","","TEST","Test səbəbi",null,1,true)));
     }
     @Test void receiptListRendersOffcanvasAndLimitsRows() throws Exception {
-        when(repo.allReceipts(eq(1L),eq(7L),eq(""),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(""),eq(""),eq(true),eq(1))).thenReturn(Collections.nCopies(101,receiptRow()));
+        when(repo.receiptTotals(eq(1L),eq(7L),eq(""),any(),any(),eq(""),eq(""),eq("")))
+                .thenReturn(row("income",new BigDecimal("6000.00"),"expense",new BigDecimal("750.00"),"net",new BigDecimal("5250.00")));
+
+        when(repo.receiptFilterOptions(1L,7L)).thenReturn(List.of(
+                row("kind","status","code","TAMAMLANIB"), row("kind","status","code","LEGV_EDILIB"),
+                row("kind","operation","code","DIGER_GIRIS")));
+
+        when(repo.allReceipts(eq(1L),eq(7L),eq(""),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku"))),eq(""),eq(""),eq(""),eq(1))).thenReturn(Collections.nCopies(101,receiptRow()));
         var page=mvc.perform(get("/kassa/qebzler").param("kassaId","7").session(session)).andExpect(status().isOk()).andReturn();
         assertThat((List<?>)page.getModelAndView().getModel().get("receipts")).hasSize(100);
         assertThat(page.getModelAndView().getModel().get("from")).isEqualTo(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")).toString());
         assertThat(page.getModelAndView().getModel().get("to")).isEqualTo(page.getModelAndView().getModel().get("from"));
         assertThat(page.getModelAndView().getModel().get("hasMore")).isEqualTo(true);
-        assertThat(page.getResponse().getContentAsString()).contains("receipt-cancel-action","cancel=true","offcanvas-top_ka","K2600010","09.09.2026 18:55","&lt;script&gt;").doesNotContain("<script>alert(1)</script>","??kassa.");
+        assertThat(page.getResponse().getContentAsString()).contains("<tfoot", "5250,00", "A17");
+        assertThat(page.getResponse().getContentAsString()).contains("receipt-cancel-action","cancel=true","offcanvas-top_ka","K2600010","09.09.2026 18:55","&lt;script&gt;").contains("receipt-status", "LEGV_EDILIB", "TAMAMLANIB", "name=\"status\"").doesNotContain("receipt-active", "<script>alert(1)</script>","??kassa.");
     }
     @Test void receiptDetailPrintAndCancellationAreScopedAndReplaySafe() throws Exception {
         receiptSetup();
@@ -352,12 +361,12 @@ class KassaPageTests {
         for(int i=0;i<2;i++) mvc.perform(post("/kassa/avans-qaytarma").session(session).param(csrf.getParameterName(),csrf.getToken()).param("kassaId","7").param("targetId","17").param("paymentToken",token).param("advanceId","1").param("accountId","17").param("typeId","1").param("amount","20.00")).andExpect(status().is3xxRedirection());
         verify(service,times(1)).refundAdvance(any(),eq(1L),eq(7L),eq(17L),eq(1L),eq(17L),eq(1L),eq(new BigDecimal("20.00")),isNull());
     }
-    @Test void receiptsOpenDetailsInModalAndDefaultToActive() throws Exception {
+    @Test void receiptsOpenDetailsInModalAndFilterByStatus() throws Exception {
         receiptSetup();
         var page=mvc.perform(get("/kassa/qebzler").param("kassaId","7").param("receiptId","10").param("cancel","true").session(session)).andExpect(status().isOk()).andReturn();
-        assertThat(page.getModelAndView().getModel().get("active")).isEqualTo("true");
+        assertThat(page.getModelAndView().getModel().get("receiptStatus")).isEqualTo("");
         assertThat(page.getResponse().getContentAsString()).contains("id=\"receipt-detail-modal\"","data-cancel=\"true\"","receipt-cancel-form").doesNotContain("??kassa.");
-        mvc.perform(get("/kassa/qebzler").param("kassaId","7").param("active","").session(session)).andExpect(status().isOk());
-        verify(repo).allReceipts(eq(1L),eq(7L),eq(""),any(),any(),eq(""),eq(""),isNull(),eq(1));
+        mvc.perform(get("/kassa/qebzler").param("kassaId","7").param("status","LEGV_EDILIB").session(session)).andExpect(status().isOk());
+        verify(repo).allReceipts(eq(1L),eq(7L),eq(""),any(),any(),eq(""),eq(""),eq("LEGV_EDILIB"),eq(1));
     }
 }

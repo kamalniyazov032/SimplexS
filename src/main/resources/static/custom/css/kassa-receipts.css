@@ -1,5 +1,11 @@
 .page-wrapper .content.receipt-workspace {
-    padding: 20px 22px;
+    box-sizing: border-box;
+    height: calc(100dvh - var(--topbar-height, 56px) - 1px);
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
     background: radial-gradient(ellipse at 25% 0, #eff7ff 0, transparent 55%), #f8fbff;
     color: #16264b
 }
@@ -127,7 +133,9 @@
 
 .receipt-table-scroll {
     overflow: auto;
-    max-height: calc(100dvh - 300px);
+    flex: 1;
+    min-height: 0;
+    max-height: none;
     scrollbar-width: thin;
     scrollbar-color: #cfddf0 transparent;
     border-radius: 8px
@@ -140,7 +148,9 @@
 
 .receipt-workspace .receipt-table {
     margin: 0;
-    white-space: nowrap;
+    table-layout: fixed;
+    white-space: normal;
+    overflow-wrap: anywhere;
     width: 100%
 }
 
@@ -196,7 +206,7 @@
 
 .receipt-workspace .receipt-table .receipt-text-cell {
     white-space: normal;
-    min-width: 105px;
+    min-width: 0;
     max-width: 175px;
     line-height: 1.4
 }
@@ -364,7 +374,7 @@
     }
 
     .receipt-table-scroll {
-        max-height: calc(100dvh - 320px)
+        max-height: none
     }
 }
 
@@ -405,6 +415,31 @@
     }
 
     .receipt-table-scroll {
-        max-height: 55dvh
+        max-height: none
     }
+}
+
+.receipt-table tfoot th,.receipt-table tfoot td{position:sticky;bottom:0;z-index:2;background:#eef2f6;border-top:2px solid #cdd8e6;padding:12px;vertical-align:middle}
+
+.receipt-heading,.receipt-pagination,.receipt-workspace > .alert { flex-shrink: 0; }
+.receipt-results { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.receipt-toolbar { flex-shrink: 0; }
+.receipt-back-icon { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #e5efff; color: #1479ed; font-size: 23px; }
+.receipt-back:hover .receipt-back-icon { background: #d4e6ff; }
+.receipt-back:focus-visible { outline: 2px solid #1484f4; outline-offset: 3px; border-radius: 8px; }
+.receipt-workspace .receipt-table .receipt-payment-types { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+.receipt-workspace .receipt-table .receipt-direction { white-space: normal; max-width: 100%; line-height: 1.3; }
+.receipt-workspace .receipt-table .receipt-status,
+.receipt-workspace .receipt-table .receipt-status-heading,
+.receipt-workspace .receipt-table .receipt-operation,
+.receipt-workspace .receipt-table .receipt-card { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+.receipt-direction i,.receipt-status i { flex-shrink: 0; }
+.receipt-row-actions { flex-wrap: nowrap; white-space: nowrap; gap: 4px; }
+.receipt-workspace .receipt-table .receipt-actions-cell { padding-left: 6px; padding-right: 6px; }
+.receipt-icon-button,.receipt-note-icon { flex-shrink: 0; }
+@media (max-height: 600px), (max-width: 575.98px) {
+    .receipt-heading { gap: 8px; margin-bottom: 10px; }
+    .receipt-heading p { display: none; }
+    .receipt-back { margin-bottom: 6px; }
+    .receipt-pagination { padding: 8px; }
 }

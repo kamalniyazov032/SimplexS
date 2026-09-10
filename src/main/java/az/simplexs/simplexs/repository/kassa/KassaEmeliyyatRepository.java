@@ -60,10 +60,20 @@ public class KassaEmeliyyatRepository {
                 .addValue("account", account).addValue("amount", amount).addValue("note", note));
     }
 
-    public List<Map<String, Object>> allReceipts(Long clinic, Long cash, String query, java.time.LocalDate from,
-                                                 java.time.LocalDate to, String direction, String operation, Boolean active, int page) {
+    public List<Map<String, Object>> receiptFilterOptions(Long clinic, Long cash) {
         return jdbc.queryForList("""
-                SELECT * FROM public.fn_kassa_qebzler_siyahisi(
+                SELECT 'status' AS kind, status AS code FROM public.rn_kassa_emeliyyatlari
+                WHERE klinika_id=:clinic AND kassa_id=:cash AND aktiv=true AND status IS NOT NULL
+                UNION SELECT 'status', 'TAMAMLANIB'
+                UNION SELECT 'status', 'LEGV_EDILIB'
+                UNION SELECT 'operation', emeliyyat_kodu FROM public.rn_muhasibat_kodlari
+                WHERE klinika_id=:clinic AND emeliyyat_kodu IS NOT NULL
+                ORDER BY kind,code
+                """, scope(clinic, cash));
+    }
+
+    private static final String RECEIPT_FILTER_SQL = """
+                FROM public.fn_kassa_qebzler_siyahisi(
                     p_klinika_id=>CAST(:clinic AS bigint),p_kassa_id=>CAST(:cash AS bigint))
                 WHERE (:query='' OR position(lower(:query) in lower(concat_ws(' ',emeliyyat_no,xeste_kodu,xeste_adi_soyadi,
                     protokol_kodu,muhasibat_kodu_adi,yaradan_personal_adi,aciqlama)))>0)
@@ -71,10 +81,31 @@ public class KassaEmeliyyatRepository {
                   AND (CAST(:to AS date) IS NULL OR emeliyyat_tarixi<CAST(:to AS date)+interval '1 day')
                   AND (:direction='' OR istiqamet=:direction)
                   AND (:operation='' OR emeliyyat_kodu=:operation)
-                  AND (CAST(:active AS boolean) IS NULL OR aktiv=CAST(:active AS boolean))
-                ORDER BY emeliyyat_tarixi DESC,kassa_emeliyyat_id DESC LIMIT 101 OFFSET :offset
-                """, scope(clinic, cash).addValue("query", query).addValue("from", from).addValue("to", to)
-                .addValue("direction", direction).addValue("operation", operation).addValue("active", active).addValue("offset", (long) (page - 1) * 100));
+                  AND (:status='' OR status=:status)
+                """;
+
+    private MapSqlParameterSource receiptParams(Long clinic, Long cash, String query, java.time.LocalDate from,
+                                                java.time.LocalDate to, String direction, String operation, String status) {
+        return scope(clinic,cash).addValue("query",query).addValue("from",from).addValue("to",to)
+                .addValue("direction",direction).addValue("operation",operation).addValue("status",status);
+    }
+
+    public List<Map<String, Object>> allReceipts(Long clinic, Long cash, String query, java.time.LocalDate from,
+                                                 java.time.LocalDate to, String direction, String operation, String status, int page) {
+        return jdbc.queryForList("SELECT * " + RECEIPT_FILTER_SQL
+                + " ORDER BY emeliyyat_tarixi DESC,kassa_emeliyyat_id DESC LIMIT 101 OFFSET :offset",
+                receiptParams(clinic,cash,query,from,to,direction,operation,status).addValue("offset",(long)(page-1)*100));
+    }
+
+    public Map<String,Object> receiptTotals(Long clinic, Long cash, String query, java.time.LocalDate from,
+                                           java.time.LocalDate to, String direction, String operation, String status) {
+        // Cancellation keeps the original entry and creates an opposite entry, as in fn_kassa_balansi.
+        return jdbc.queryForMap("""
+                SELECT COALESCE(SUM(CASE WHEN istiqamet='GIRIS' THEN mebleg ELSE 0 END),0) AS income,
+                       COALESCE(SUM(CASE WHEN istiqamet='CIXIS' THEN mebleg ELSE 0 END),0) AS expense,
+                       COALESCE(SUM(CASE WHEN istiqamet='GIRIS' THEN mebleg
+                                         WHEN istiqamet='CIXIS' THEN -mebleg ELSE 0 END),0) AS net
+                """ + RECEIPT_FILTER_SQL, receiptParams(clinic,cash,query,from,to,direction,operation,status));
     }
 
     public Map<String, Object> receiptDetail(Long clinic, Long cash, Long receipt) {

@@ -109,10 +109,9 @@ public class KassaOdenishController {
     public String receiptsPage(@RequestParam Long kassaId,@RequestParam(defaultValue="") String q,
             @RequestParam(defaultValue="") String from,@RequestParam(defaultValue="") String to,
             @RequestParam(defaultValue="") String direction,@RequestParam(defaultValue="") String operation,
-            @RequestParam(required=false) String active,@RequestParam(defaultValue="1") int page,
+            @RequestParam(defaultValue="") String status,@RequestParam(defaultValue="1") int page,
             @RequestParam(required=false) Long receiptId,@RequestParam(defaultValue="false") boolean cancel,
             Authentication auth,HttpSession session,Model model,jakarta.servlet.http.HttpServletRequest request) {
-        if(active==null) active="true";
         String today=java.time.LocalDate.now(java.time.ZoneId.of("Asia/Baku")).toString();
         if(from.isBlank()) from=today;
         if(to.isBlank()) to=today;
@@ -120,16 +119,18 @@ public class KassaOdenishController {
         model.addAttribute("canCancelReceipts",service.canCancelReceipt(auth,clinic(session)) && Boolean.TRUE.equals(((Map<?,?>)model.getAttribute("cash")).get("islesin")));
         model.addAttribute("registers",service.cashRegisters(auth,clinic(session)));
         model.addAttribute("cashId",kassaId);model.addAttribute("q",q);model.addAttribute("from",from);model.addAttribute("to",to);
-        model.addAttribute("direction",direction);model.addAttribute("operation",operation);model.addAttribute("active",active);
+        model.addAttribute("direction",direction);model.addAttribute("operation",operation);model.addAttribute("receiptStatus",status);
         model.addAttribute("page",Math.max(1,page));
         List<Map<String,Object>> rows=List.of();
         try {
             var start=from.isBlank()?null:java.time.LocalDate.parse(from);
             var end=to.isBlank()?null:java.time.LocalDate.parse(to);
             if(page<1 || q.length()>200 || (!direction.isEmpty() && !List.of("GIRIS","CIXIS").contains(direction))
-                    || operation.length()>64 || !List.of("","true","false").contains(active)
+                    || operation.length()>64 || status.length()>64
                     || (start!=null && end!=null && start.isAfter(end))) throw new IllegalArgumentException();
-            rows=repo.allReceipts(clinic(session),kassaId,q.trim(),start,end,direction,operation,active.isEmpty()?null:Boolean.valueOf(active),page);
+            model.addAttribute("receiptFilterOptions",repo.receiptFilterOptions(clinic(session),kassaId));
+            rows=repo.allReceipts(clinic(session),kassaId,q.trim(),start,end,direction,operation,status,page);
+            model.addAttribute("receiptTotals",repo.receiptTotals(clinic(session),kassaId,q.trim(),start,end,direction,operation,status));
         } catch(java.time.DateTimeException | IllegalArgumentException e) {
             model.addAttribute("errorMessage",msg("kassa.receiptInvalidFilter"));
         } catch(DataAccessException e) {

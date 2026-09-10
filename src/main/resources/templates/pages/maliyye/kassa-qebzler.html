@@ -1,43 +1,280 @@
 <!DOCTYPE html>
-<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
-<body><div layout:fragment="content" class="content kassa-page receipt-workspace">
-<link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
-<link rel="stylesheet" th:href="@{/custom/css/kassa-receipts.css}">
-<header class="receipt-heading">
-<div><a class="receipt-back" th:href="@{/kassa(kassaId=${cashId})}"><i class="ti ti-arrow-left" aria-hidden="true"></i><span th:text="#{kassa.back}"></span></a><h1 th:text="#{kassa.receipts}"></h1><p th:text="#{kassa.receiptListSubtitle}"></p></div>
-<form id="receipt-cash-form" method="get" th:action="@{/kassa/qebzler}" class="receipt-cash-picker"><span class="receipt-heading-icon"><i class="ti ti-building-bank" aria-hidden="true"></i></span><div><label for="receipt-cash" th:text="#{kassa.selectCash}"></label><select id="receipt-cash" name="kassaId" class="form-select select2"><option th:each="r:${registers}" th:value="${r.kassa_id}" th:text="|${r.kassa_adi} (${r.kassa_kodu})|" th:selected="${r.kassa_id == cashId}"></option></select></div>
-<input type="hidden" name="q" th:value="${q}">
-<input type="hidden" name="from" th:value="${from}">
-<input type="hidden" name="to" th:value="${to}">
-<input type="hidden" name="direction" th:value="${direction}">
-<input type="hidden" name="operation" th:value="${operation}">
-<input type="hidden" name="active" th:value="${active}">
-<noscript><button class="btn btn-primary" type="submit" th:text="#{kassa.balanceShow}"></button></noscript></form></header>
-<div th:if="${successMessage}" class="alert alert-success" role="status" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
-<div id="receipt-filter" class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg receipt-filter" tabindex="-1" aria-labelledby="receipt-filter-title"><div class="offcanvas-header border-bottom bg-light"><h4 id="receipt-filter-title" class="mb-0 fw-bold text-primary"><i class="ti ti-filter me-2" aria-hidden="true"></i><span th:text="#{kassa.receiptFilter}"></span></h4><button class="btn-close" type="button" data-bs-dismiss="offcanvas" th:aria-label="#{common.bagla}"></button></div><div class="offcanvas-body receipt-filter-body"><form method="get" th:action="@{/kassa/qebzler}" class="row g-3 align-items-end"><input type="hidden" name="kassaId" th:value="${cashId}">
-<div class="col-md-4"><label for="receipt-q" class="form-label"><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{kassa.search}"></span></label><input id="receipt-q" name="q" class="form-control" maxlength="200" th:value="${q}" th:placeholder="#{kassa.receiptSearchHint}"></div>
-<div class="col-md-2"><label for="receipt-from" class="form-label"><i class="ti ti-calendar me-1" aria-hidden="true"></i><span th:text="#{kassa.balanceFrom}"></span></label><input id="receipt-from" name="from" type="date" class="form-control" th:value="${from}"></div><div class="col-md-2"><label for="receipt-to" class="form-label"><i class="ti ti-calendar me-1" aria-hidden="true"></i><span th:text="#{kassa.balanceTo}"></span></label><input id="receipt-to" name="to" type="date" class="form-control" th:value="${to}"></div><div class="col-md-2"><label for="receipt-direction" class="form-label"><i class="ti ti-arrows-exchange me-1" aria-hidden="true"></i><span th:text="#{kassa.receiptDirection}"></span></label><select id="receipt-direction" name="direction" class="form-select select2"><option value="" th:text="#{kassa.receiptAll}"></option><option value="GIRIS" th:selected="${direction == 'GIRIS'}" th:text="#{kassa.income}"></option><option value="CIXIS" th:selected="${direction == 'CIXIS'}" th:text="#{kassa.expense}"></option></select></div>
-<div class="col-md-2"><label for="receipt-active" class="form-label"><i class="ti ti-circle-check me-1" aria-hidden="true"></i><span th:text="#{kassa.receiptActive}"></span></label><select id="receipt-active" name="active" class="form-select select2"><option value="" th:text="#{kassa.receiptAll}"></option><option value="true" th:selected="${active == 'true'}" th:text="#{kassa.receiptActive}"></option><option value="false" th:selected="${active == 'false'}" th:text="#{kassa.receiptInactive}"></option></select></div>
-<div class="col-md-4"><label for="receipt-operation" class="form-label"><i class="ti ti-receipt me-1" aria-hidden="true"></i><span th:text="#{kassa.receiptOperation}"></span></label><input id="receipt-operation" name="operation" class="form-control" maxlength="64" th:value="${operation}"></div>
-<div class="col-md-8 d-flex justify-content-end gap-2 receipt-filter-actions"><a class="btn btn-light" th:href="@{/kassa/qebzler(kassaId=${cashId})}" ><i class="ti ti-refresh me-1" aria-hidden="true"></i><span th:text="#{kassa.receiptReset}"></span></a><button type="submit" class="btn btn-primary"><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{kassa.search}"></span></button></div></form></div></div>
-<section class="receipt-results">
-<div class="receipt-toolbar"><div class="receipt-results-count"><span class="receipt-heading-icon"><i class="ti ti-files" aria-hidden="true"></i></span><strong th:text="#{kassa.receiptPageResults(${#lists.size(receipts)})}"></strong></div><div class="receipt-toolbar-actions"><span class="receipt-date-range"><i class="ti ti-calendar" aria-hidden="true"></i><span th:text="|${from} — ${to}|"></span></span><button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#receipt-filter" aria-controls="receipt-filter"><i class="ti ti-filter me-1" aria-hidden="true"></i><span th:text="#{common.filter}"></span></button></div></div>
-<div class="receipt-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.receipts}"><table class="table receipt-table"><thead><tr><th th:text="#{kassa.receiptRowNumber}"></th><th th:text="#{kassa.receiptNumber}"></th><th th:text="#{kassa.date}"></th><th th:text="#{kassa.receiptDirection}"></th><th th:text="#{kassa.receiptAmount}"></th><th th:text="#{kassa.receiptOperation}"></th><th th:text="#{kassa.account}"></th><th th:text="#{kassa.receiptPatient}"></th><th th:text="#{kassa.patientCard}"></th><th th:text="#{kassa.paymentTypes}"></th><th th:text="#{kassa.receiptActive}"></th><th th:text="#{kassa.action}"></th></tr></thead><tbody><tr th:each="r,iter:${receipts}">
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content" class="content kassa-page receipt-workspace">
+    <link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
+    <link rel="stylesheet" th:href="@{/custom/css/kassa-receipts.css}">
+    <header class="receipt-heading">
+        <div><a class="receipt-back" th:href="@{/kassa(kassaId=${cashId})}"><span class="receipt-back-icon"><i
+                class="ti ti-cash-register" aria-hidden="true"></i></span><span th:text="#{kassa.back}"></span></a>
+            <h1 th:text="#{kassa.receipts}"></h1>
+            <p th:text="#{kassa.receiptListSubtitle}"></p></div>
+        <form id="receipt-cash-form" method="get" th:action="@{/kassa/qebzler}" class="receipt-cash-picker"><span
+                class="receipt-heading-icon"><i class="ti ti-building-bank" aria-hidden="true"></i></span>
+            <div><label for="receipt-cash" th:text="#{kassa.selectCash}"></label><select id="receipt-cash"
+                                                                                         name="kassaId"
+                                                                                         class="form-select select2">
+                <option th:each="r:${registers}" th:value="${r.kassa_id}" th:text="|${r.kassa_adi} (${r.kassa_kodu})|"
+                        th:selected="${r.kassa_id == cashId}"></option>
+            </select></div>
+            <input type="hidden" name="q" th:value="${q}">
+            <input type="hidden" name="from" th:value="${from}">
+            <input type="hidden" name="to" th:value="${to}">
+            <input type="hidden" name="direction" th:value="${direction}">
+            <input type="hidden" name="operation" th:value="${operation}">
+            <input type="hidden" name="status" th:value="${receiptStatus}">
+            <noscript>
+                <button class="btn btn-primary" type="submit" th:text="#{kassa.balanceShow}"></button>
+            </noscript>
+        </form>
+    </header>
+    <div th:if="${successMessage}" class="alert alert-success" role="status" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+    <div id="receipt-filter" class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg receipt-filter" tabindex="-1"
+         aria-labelledby="receipt-filter-title">
+        <div class="offcanvas-header border-bottom bg-light"><h4 id="receipt-filter-title"
+                                                                 class="mb-0 fw-bold text-primary"><i
+                class="ti ti-filter me-2" aria-hidden="true"></i><span th:text="#{kassa.receiptFilter}"></span></h4>
+            <button class="btn-close" type="button" data-bs-dismiss="offcanvas"
+                    th:aria-label="#{common.bagla}"></button>
+        </div>
+        <div class="offcanvas-body receipt-filter-body">
+            <form method="get" th:action="@{/kassa/qebzler}" class="row g-3 align-items-end"><input type="hidden"
+                                                                                                    name="kassaId"
+                                                                                                    th:value="${cashId}">
+                <div class="col-md-4"><label for="receipt-q" class="form-label"><i class="ti ti-search me-1"
+                                                                                   aria-hidden="true"></i><span
+                        th:text="#{kassa.search}"></span></label><input id="receipt-q" name="q" class="form-control"
+                                                                        maxlength="200" th:value="${q}"
+                                                                        th:placeholder="#{kassa.receiptSearchHint}">
+                </div>
+                <div class="col-md-2"><label for="receipt-from" class="form-label"><i class="ti ti-calendar me-1"
+                                                                                      aria-hidden="true"></i><span
+                        th:text="#{kassa.balanceFrom}"></span></label><input id="receipt-from" name="from" type="date"
+                                                                             class="form-control" th:value="${from}">
+                </div>
+                <div class="col-md-2"><label for="receipt-to" class="form-label"><i class="ti ti-calendar me-1"
+                                                                                    aria-hidden="true"></i><span
+                        th:text="#{kassa.balanceTo}"></span></label><input id="receipt-to" name="to" type="date"
+                                                                           class="form-control" th:value="${to}"></div>
+                <div class="col-md-2"><label for="receipt-direction" class="form-label"><i
+                        class="ti ti-arrows-exchange me-1" aria-hidden="true"></i><span
+                        th:text="#{kassa.receiptDirection}"></span></label><select id="receipt-direction"
+                                                                                   name="direction"
+                                                                                   class="form-select select2">
+                    <option value="" th:text="#{kassa.receiptAll}"></option>
+                    <option value="GIRIS" th:selected="${direction == 'GIRIS'}" th:text="#{kassa.income}"></option>
+                    <option value="CIXIS" th:selected="${direction == 'CIXIS'}" th:text="#{kassa.expense}"></option>
+                </select></div>
+                <div class="col-md-2"><label for="receipt-status" class="form-label"><i class="ti ti-circle-check me-1"
+                                                                                        aria-hidden="true"></i><span
+                        th:text="#{kassa.status}"></span></label><select id="receipt-status" name="status"
+                                                                         class="form-select select2">
+                    <option value="" th:text="#{common.butun_statuslar}"></option>
+                    <option th:each="o:${receiptFilterOptions}" th:if="${o.kind == 'status'}" th:value="${o.code}"
+                            th:selected="${receiptStatus == o.code}"
+                            th:text="${o.code == 'TAMAMLANIB'} ? #{kassa.receiptStatusCompleted} : (${o.code == 'LEGV_EDILIB'} ? #{kassa.receiptStatusCancelled} : ${o.code})"></option>
+                </select></div>
+                <div class="col-md-4"><label for="receipt-operation" class="form-label"><i class="ti ti-receipt me-1"
+                                                                                           aria-hidden="true"></i><span
+                        th:text="#{kassa.receiptOperation}"></span></label><select id="receipt-operation"
+                                                                                   name="operation"
+                                                                                   class="form-select select2">
+                    <option value="" th:text="#{kassa.receiptAll}"></option>
+                    <option th:each="o:${receiptFilterOptions}" th:if="${o.kind == 'operation'}" th:value="${o.code}"
+                            th:selected="${operation == o.code}" th:text="${o.code}"></option>
+                </select></div>
+                <div class="col-md-8 d-flex justify-content-end gap-2 receipt-filter-actions"><a class="btn btn-light"
+                                                                                                 th:href="@{/kassa/qebzler(kassaId=${cashId})}"><i
+                        class="ti ti-refresh me-1" aria-hidden="true"></i><span th:text="#{kassa.receiptReset}"></span></a>
+                    <button type="submit" class="btn btn-primary"><i class="ti ti-search me-1"
+                                                                     aria-hidden="true"></i><span
+                            th:text="#{kassa.search}"></span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <section class="receipt-results">
+        <div class="receipt-toolbar">
+            <div class="receipt-results-count"><span class="receipt-heading-icon"><i class="ti ti-files"
+                                                                                     aria-hidden="true"></i></span><strong
+                    th:text="#{kassa.receiptPageResults(${#lists.size(receipts)})}"></strong></div>
+            <div class="receipt-toolbar-actions"><span class="receipt-date-range"><i class="ti ti-calendar"
+                                                                                     aria-hidden="true"></i><span
+                    th:text="|${from} — ${to}|"></span></span>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#receipt-filter" aria-controls="receipt-filter"><i class="ti ti-filter me-1"
+                                                                                           aria-hidden="true"></i><span
+                        th:text="#{common.filter}"></span></button>
+            </div>
+        </div>
+        <div class="receipt-table-scroll" tabindex="0" role="region" th:aria-label="#{kassa.receipts}">
+            <table class="table receipt-table">
+                <colgroup>
+                    <col style="width:3%">
+                    <col style="width:8%">
+                    <col style="width:10%">
+                    <col style="width:6%">
+                    <col style="width:7%">
+                    <col style="width:11%">
+                    <col style="width:13%">
+                    <col style="width:7%">
+                    <col style="width:5%">
+                    <col>
+                    <col style="width:7%">
+                    <col style="width:132px">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{kassa.receiptRowNumber}"></th>
+                    <th th:text="#{kassa.receiptNumber}"></th>
+                    <th th:text="#{kassa.date}"></th>
+                    <th th:text="#{kassa.receiptDirection}"></th>
+                    <th th:text="#{kassa.receiptAmount}"></th>
+                    <th class="receipt-operation" th:text="#{kassa.receiptOperation}"></th>
+                    <th th:text="#{kassa.account}"></th>
+                    <th th:text="#{kassa.receiptPatient}"></th>
+                    <th class="receipt-card" th:text="#{kassa.receiptProtocolCard}"></th>
+                    <th th:text="#{kassa.paymentTypes}"></th>
+                    <th class="receipt-status-heading" th:text="#{kassa.status}"></th>
+                    <th class="receipt-actions-cell" th:text="#{kassa.action}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r,iter:${receipts}">
 
-<td class="receipt-row-number" th:text="${(page - 1L) * 100 + iter.count}"></td>
-<td><a class="receipt-number" th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},active=${active},page=${page})}" th:text="${r.emeliyyat_no}"></a></td>
-<td class="receipt-date" th:text="${r.emeliyyat_tarixi != null ? #dates.format(r.emeliyyat_tarixi, 'dd.MM.yyyy HH:mm') : '—'}"></td>
-<td><span class="receipt-direction" th:classappend="${r.istiqamet == 'GIRIS'} ? 'is-income' : 'is-expense'"><i class="ti" th:classappend="${r.istiqamet == 'GIRIS'} ? 'ti-arrow-down' : 'ti-arrow-up'" aria-hidden="true"></i><span th:text="${r.istiqamet}"></span></span></td>
-<td class="receipt-money"><span th:text="${#numbers.formatDecimal(r.mebleg,1,2)}"></span> <small th:text="#{kassa.currency}"></small></td>
-<td class="receipt-operation" th:text="${r.emeliyyat_kodu ?: '—'}"></td>
-<td class="receipt-text-cell" th:text="${r.muhasibat_kodu_adi ?: '—'}"></td>
-<td class="receipt-text-cell" th:title="${r.protokol_kodu}" th:text="${#strings.isEmpty(r.xeste_adi_soyadi) ? '—' : r.xeste_adi_soyadi}"></td>
-<td th:text="${r['gelis_id'] ?: '—'}"></td><td th:text="${r.odenis_novleri ?: '—'}"></td>
-<td><span class="receipt-status" th:classappend="${r.aktiv} ? 'is-active' : 'is-inactive'"><i class="ti ti-point-filled" aria-hidden="true"></i><span th:text="${r.aktiv} ? #{kassa.receiptActive} : #{kassa.receiptInactive}"></span></span></td>
-<td><div class="receipt-row-actions"><a class="receipt-icon-button" th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},active=${active},page=${page})}" th:title="#{kassa.receiptDetail}" th:aria-label="#{kassa.receiptDetail}"><i class="ti ti-eye" aria-hidden="true"></i></a><a class="receipt-icon-button" target="_blank" rel="noopener" th:href="@{/kassa/qebzler/{id}/cap(id=${r.kassa_emeliyyat_id},kassaId=${cashId})}" th:title="#{kassa.receiptPrint}" th:aria-label="#{kassa.receiptPrint}"><i class="ti ti-printer" aria-hidden="true"></i></a><span th:if="${!#strings.isEmpty(r.aciqlama)}" class="receipt-note-icon" tabindex="0" th:title="${r.aciqlama}" th:aria-label="${r.aciqlama}"><i class="ti ti-message" aria-hidden="true"></i></span><a class="receipt-icon-button text-danger border-danger-subtle receipt-cancel-action" th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},cancel=true,q=${q},from=${from},to=${to},direction=${direction},operation=${operation},active=${active},page=${page})}" th:title="#{kassa.receiptCancel}" th:aria-label="#{kassa.receiptCancel}"><i class="ti ti-trash" aria-hidden="true"></i></a></div></td>
-</tr></tbody></table></div><div th:if="${#lists.isEmpty(receipts)}" class="kassa-empty"><i class="ti ti-file-search fs-1 d-block mb-2" aria-hidden="true"></i><span th:text="#{kassa.receiptEmpty}"></span></div></section>
-<nav class="receipt-pagination" th:aria-label="#{kassa.receiptPages}"><div class="d-flex align-items-center gap-3"><a class="receipt-page-button" th:if="${page > 1}" th:href="@{/kassa/qebzler(kassaId=${cashId},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},active=${active},page=${page - 1})}" th:title="#{kassa.previousPage}" th:aria-label="#{kassa.previousPage}"><i class="ti ti-chevron-left" aria-hidden="true"></i></a><strong th:text="#{kassa.receiptCurrentPage(${page})}"></strong><a class="receipt-page-button" th:if="${hasMore}" th:href="@{/kassa/qebzler(kassaId=${cashId},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},active=${active},page=${page + 1})}" th:title="#{kassa.nextPage}" th:aria-label="#{kassa.nextPage}"><i class="ti ti-chevron-right" aria-hidden="true"></i></a></div><span class="receipt-page-summary" th:text="#{kassa.advancePageSummary(${page},${#lists.size(receipts)})}"></span></nav>
-<div th:if="${showReceiptPopup == true}" id="receipt-detail-modal" class="modal fade kassa-payment-modal" th:classappend="${cancelMode} ? 'receipt-cancel-mode'" tabindex="-1" aria-labelledby="receipt-popup-title" aria-hidden="true" th:data-cancel="${cancelMode}"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header rd-modal-header"><div class="rd-header-identity"><span class="rd-header-icon"><i class="ti ti-receipt" aria-hidden="true"></i></span><div class="rd-header-copy"><h2 id="receipt-popup-title" class="modal-title" th:text="${cancelMode} ? #{kassa.receiptCancel} : #{kassa.receiptDetail}"></h2><div class="rd-header-meta"><strong th:text="${receipt.emeliyyat_no}"></strong><span th:text="${cash.kassa_adi}"></span></div></div></div><div class="rd-header-actions"><a th:if="${cancelMode != true}" class="rd-header-print" target="_blank" rel="noopener" th:href="@{/kassa/qebzler/{id}/cap(id=${receiptId},kassaId=${cashId})}" th:title="#{kassa.receiptPrint}"><i class="ti ti-printer" aria-hidden="true"></i><span th:text="#{kassa.receiptPrint}"></span></a><span th:if="${cancelMode != true}" class="rd-header-divider" aria-hidden="true"></span><button type="button" class="rd-header-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}" th:title="#{common.bagla}"><i class="ti ti-x" aria-hidden="true"></i></button></div></div><div class="modal-body"><div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div><div th:if="${successMessage}" class="alert alert-success" role="status" th:text="${successMessage}"></div><div th:if="${cancelMode and !canCancel}" class="alert alert-warning" th:text="${cancelPermission} ? #{kassa.receiptNotCancelable} : #{kassa.receiptCancelDenied}"></div><div th:replace="~{fragments/kassa-receipt-detail :: detail}"></div></div><div class="modal-footer rd-footer"><span><i class="ti ti-clock me-2" aria-hidden="true"></i><span th:text="${receipt.emeliyyat_tarixi}"></span></span><div class="d-flex align-items-center gap-2"><button th:if="${cancelMode == true}" id="receipt-cancel-submit" form="receipt-cancel-form" type="submit" class="btn btn-danger" th:disabled="${!canCancel or #lists.isEmpty(cancelReasons)}" th:text="#{kassa.confirmAction}"></button><button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{common.bagla}"></span></button></div></div></div></div></div>
-<script th:src="@{/custom/js/kassa-receipts.js}" defer></script>
-<script th:src="@{/custom/js/kassa-receipt-list.js}" defer></script>
-</div></body></html>
+                    <td class="receipt-row-number" th:text="${(page - 1L) * 100 + iter.count}"></td>
+                    <td><a class="receipt-number"
+                           th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},status=${receiptStatus},page=${page})}"
+                           th:text="${r.emeliyyat_no}"></a></td>
+                    <td class="receipt-date"
+                        th:text="${r.emeliyyat_tarixi != null ? #dates.format(r.emeliyyat_tarixi, 'dd.MM.yyyy HH:mm') : '—'}"></td>
+                    <td><span class="receipt-direction"
+                              th:classappend="${r.istiqamet == 'GIRIS'} ? 'is-income' : 'is-expense'"><i class="ti"
+                                                                                                         th:classappend="${r.istiqamet == 'GIRIS'} ? 'ti-arrow-down' : 'ti-arrow-up'"
+                                                                                                         aria-hidden="true"></i><span
+                            th:text="${r.istiqamet}"></span></span></td>
+                    <td class="receipt-money"><span th:text="${#numbers.formatDecimal(r.mebleg,1,2)}"></span> <small
+                            th:text="#{kassa.currency}"></small></td>
+                    <td class="receipt-operation" th:text="${r.emeliyyat_kodu ?: '—'}"></td>
+                    <td class="receipt-text-cell" th:text="${r.muhasibat_kodu_adi ?: '—'}"></td>
+                    <td class="receipt-text-cell" th:title="${r.protokol_kodu}"
+                        th:text="${#strings.isEmpty(r.xeste_adi_soyadi) ? '—' : r.xeste_adi_soyadi}"></td>
+                    <td class="receipt-card" th:text="${r.protokol_kodu ?: '—'}"></td>
+                    <td class="receipt-payment-types" th:text="${r.odenis_novleri ?: '—'}"></td>
+                    <td><span class="receipt-status"
+                              th:classappend="${r.status == 'TAMAMLANIB'} ? 'is-active' : 'is-inactive'"><i
+                            class="ti ti-point-filled" aria-hidden="true"></i><span
+                            th:text="${r.status == 'TAMAMLANIB'} ? #{kassa.receiptStatusCompleted} : (${r.status == 'LEGV_EDILIB'} ? #{kassa.receiptStatusCancelled} : ${r.status})"></span></span>
+                    </td>
+                    <td class="receipt-actions-cell">
+                        <div class="receipt-row-actions"><a class="receipt-icon-button"
+                                                            th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},status=${receiptStatus},page=${page})}"
+                                                            th:title="#{kassa.receiptDetail}"
+                                                            th:aria-label="#{kassa.receiptDetail}"><i class="ti ti-eye"
+                                                                                                      aria-hidden="true"></i></a><a
+                                class="receipt-icon-button" target="_blank" rel="noopener"
+                                th:href="@{/kassa/qebzler/{id}/cap(id=${r.kassa_emeliyyat_id},kassaId=${cashId})}"
+                                th:title="#{kassa.receiptPrint}" th:aria-label="#{kassa.receiptPrint}"><i
+                                class="ti ti-printer" aria-hidden="true"></i></a><span
+                                th:if="${!#strings.isEmpty(r.aciqlama)}" class="receipt-note-icon" tabindex="0"
+                                th:title="${r.aciqlama}" th:aria-label="${r.aciqlama}"><i class="ti ti-message"
+                                                                                          aria-hidden="true"></i></span><a
+                                class="receipt-icon-button text-danger border-danger-subtle receipt-cancel-action"
+                                th:href="@{/kassa/qebzler(kassaId=${cashId},receiptId=${r.kassa_emeliyyat_id},cancel=true,q=${q},from=${from},to=${to},direction=${direction},operation=${operation},status=${receiptStatus},page=${page})}"
+                                th:title="#{kassa.receiptCancel}" th:aria-label="#{kassa.receiptCancel}"><i
+                                class="ti ti-trash" aria-hidden="true"></i></a></div>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot th:if="${receiptTotals != null and receiptTotals['net'] != null}">
+                <tr>
+                    <th colspan="4" th:text="#{kassa.receiptFilteredNet}"></th>
+                    <td class="receipt-money"><strong
+                            th:text="${#numbers.formatDecimal(receiptTotals['net'],1,2)}"></strong> <small
+                            th:text="#{kassa.currency}"></small></td>
+                    <td colspan="7"><span th:text="#{kassa.income}"></span>: <strong
+                            th:text="${#numbers.formatDecimal(receiptTotals['income'],1,2)}"></strong>
+                        <span class="ms-3" th:text="#{kassa.expense}"></span>: <strong
+                                th:text="${#numbers.formatDecimal(receiptTotals['expense'],1,2)}"></strong>
+                        </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(receipts)}" class="kassa-empty"><i class="ti ti-file-search fs-1 d-block mb-2"
+                                                                        aria-hidden="true"></i><span
+                th:text="#{kassa.receiptEmpty}"></span></div>
+    </section>
+    <nav class="receipt-pagination" th:aria-label="#{kassa.receiptPages}">
+        <div class="d-flex align-items-center gap-3"><a class="receipt-page-button" th:if="${page > 1}"
+                                                        th:href="@{/kassa/qebzler(kassaId=${cashId},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},status=${receiptStatus},page=${page - 1})}"
+                                                        th:title="#{kassa.previousPage}"
+                                                        th:aria-label="#{kassa.previousPage}"><i
+                class="ti ti-chevron-left" aria-hidden="true"></i></a><strong
+                th:text="#{kassa.receiptCurrentPage(${page})}"></strong><a class="receipt-page-button"
+                                                                           th:if="${hasMore}"
+                                                                           th:href="@{/kassa/qebzler(kassaId=${cashId},q=${q},from=${from},to=${to},direction=${direction},operation=${operation},status=${receiptStatus},page=${page + 1})}"
+                                                                           th:title="#{kassa.nextPage}"
+                                                                           th:aria-label="#{kassa.nextPage}"><i
+                class="ti ti-chevron-right" aria-hidden="true"></i></a></div>
+        <span class="receipt-page-summary"
+              th:text="#{kassa.advancePageSummary(${page},${#lists.size(receipts)})}"></span></nav>
+    <div th:if="${showReceiptPopup == true}" id="receipt-detail-modal" class="modal fade kassa-payment-modal"
+         th:classappend="${cancelMode} ? 'receipt-cancel-mode'" tabindex="-1" aria-labelledby="receipt-popup-title"
+         aria-hidden="true" th:data-cancel="${cancelMode}">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header rd-modal-header">
+                    <div class="rd-header-identity"><span class="rd-header-icon"><i class="ti ti-receipt"
+                                                                                    aria-hidden="true"></i></span>
+                        <div class="rd-header-copy"><h2 id="receipt-popup-title" class="modal-title"
+                                                        th:text="${cancelMode} ? #{kassa.receiptCancel} : #{kassa.receiptDetail}"></h2>
+                            <div class="rd-header-meta"><strong th:text="${receipt.emeliyyat_no}"></strong><span
+                                    th:text="${cash.kassa_adi}"></span></div>
+                        </div>
+                    </div>
+                    <div class="rd-header-actions"><a th:if="${cancelMode != true}" class="rd-header-print"
+                                                      target="_blank" rel="noopener"
+                                                      th:href="@{/kassa/qebzler/{id}/cap(id=${receiptId},kassaId=${cashId})}"
+                                                      th:title="#{kassa.receiptPrint}"><i class="ti ti-printer"
+                                                                                          aria-hidden="true"></i><span
+                            th:text="#{kassa.receiptPrint}"></span></a><span th:if="${cancelMode != true}"
+                                                                             class="rd-header-divider"
+                                                                             aria-hidden="true"></span>
+                        <button type="button" class="rd-header-close" data-bs-dismiss="modal"
+                                th:aria-label="#{common.bagla}" th:title="#{common.bagla}"><i class="ti ti-x"
+                                                                                              aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert"
+                         th:text="${errorMessage}"></div>
+                    <div th:if="${successMessage}" class="alert alert-success" role="status"
+                         th:text="${successMessage}"></div>
+                    <div th:if="${cancelMode and !canCancel}" class="alert alert-warning"
+                         th:text="${cancelPermission} ? #{kassa.receiptNotCancelable} : #{kassa.receiptCancelDenied}"></div>
+                    <div th:replace="~{fragments/kassa-receipt-detail :: detail}"></div>
+                </div>
+                <div class="modal-footer rd-footer"><span><i class="ti ti-clock me-2" aria-hidden="true"></i><span
+                        th:text="${receipt.emeliyyat_tarixi}"></span></span>
+                    <div class="d-flex align-items-center gap-2">
+                        <button th:if="${cancelMode == true}" id="receipt-cancel-submit" form="receipt-cancel-form"
+                                type="submit" class="btn btn-danger"
+                                th:disabled="${!canCancel or #lists.isEmpty(cancelReasons)}"
+                                th:text="#{kassa.confirmAction}"></button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="ti ti-x me-1"
+                                                                                               aria-hidden="true"></i><span
+                                th:text="#{common.bagla}"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/custom/js/kassa-receipts.js}" defer></script>
+    <script th:src="@{/custom/js/kassa-receipt-list.js}" defer></script>
+</div>
+</body>
+</html>
