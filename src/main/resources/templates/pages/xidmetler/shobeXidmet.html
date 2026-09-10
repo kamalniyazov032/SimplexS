@@ -126,16 +126,21 @@
                 th:text="#{department_services.sobe_xidmetleri}">Şöbə xidmətləri</span></h4>
             <p class="text-muted mb-0" th:text="#{department_services.xidmet_kataloqundan}">Xidmət kataloqundan şöbəyə
                 lazım olan xidmətləri idarə edin</p></div>
-        <form method="get" th:action="@{/parShobeXidmet}" class="d-flex align-items-center gap-2"><i
-                class="ti ti-building-community text-primary fs-20"></i><select class="form-select select2"
+        <form method="get" th:action="@{/parShobeXidmet}" class="d-flex align-items-center gap-2 mw-100"><i
+                class="ti ti-building-community text-primary fs-20 flex-shrink-0"></i>
+            <div style="width:400px; min-width:0;">
+                <select class="form-select select2"
                                                                                 name="sobeId"
                                                                                 onchange="this.form.submit()"
-                                                                                style="min-width:480px"
+                                                                                style="width:100%;"
                                                                                 th:data-placeholder="#{department_services.sobe_secin}">
             <option th:each="s:${sobeler}" th:value="${s.sobeId}" th:text="${s.sobeAdi}"
                     th:selected="${s.sobeId==selectedSobeId}"></option>
-        </select></form>
+                </select>
+            </div>
+        </form>
     </div>
+
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
     <div th:if="${#lists.isEmpty(sobeler)}" class="card border-0 shadow-sm">
