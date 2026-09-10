@@ -4,6 +4,8 @@ import java.util.*;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.BindingResult;
+import org.springframework.dao.DataAccessException;
 import org.springframework.context.*;
 import org.springframework.context.i18n.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/xeste-qeydiyyati")
 public class XesteQeydiyyatiController {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(XesteQeydiyyatiController.class);
     private static final int PAGE_SIZE = 100;
     private final XesteRepository repo;
     private final TeskilatRepository teskilatRepo;
@@ -82,8 +85,12 @@ public class XesteQeydiyyatiController {
     }
 
     @PostMapping("/yeni")
-    public String yarat(@ModelAttribute XesteForm form, @RequestParam(required = false) String returnTo, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes f) {
-        Map<String, Object> r = repo.yarat(klinika(s), form, p.personalId());
+    public String yarat(@ModelAttribute XesteForm form, BindingResult binding, @RequestParam(required = false) String returnTo, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes f, Model m) {
+        if (invalid(form, binding)) return failedForm(form, false, returnTo, msg("patients.check_form"), m, s);
+        Map<String, Object> r;
+        try { r = repo.yarat(klinika(s), form, p.personalId()); }
+        catch (DataAccessException e) { log.error("Patient save failed", e); return failedForm(form, false, returnTo, msg("patients.save_error"), m, s); }
+        if (!success(r)) return failedForm(form, false, returnTo, String.valueOf(r.getOrDefault("mesaj", msg("patients.check_form"))), m, s);
         result(r, f, msg("patients.created"));
         if ("ambulator".equals(returnTo) && success(r) && r.get("xeste_id") instanceof Number id)
             return "redirect:/ambulatorQebul/yeni?xesteId=" + id.longValue();
@@ -91,8 +98,13 @@ public class XesteQeydiyyatiController {
     }
 
     @PostMapping("/yenile")
-    public String yenile(@ModelAttribute XesteForm form, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes f) {
-        result(repo.yenile(klinika(s), form, p.personalId()), f, msg("patients.updated"));
+    public String yenile(@ModelAttribute XesteForm form, BindingResult binding, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes f, Model m) {
+        if (invalid(form, binding) || form.xesteId == null) return failedForm(form, true, null, msg("patients.check_form"), m, s);
+        Map<String, Object> r;
+        try { r = repo.yenile(klinika(s), form, p.personalId()); }
+        catch (DataAccessException e) { log.error("Patient save failed", e); return failedForm(form, true, null, msg("patients.save_error"), m, s); }
+        if (!success(r)) return failedForm(form, true, null, String.valueOf(r.getOrDefault("mesaj", msg("patients.check_form"))), m, s);
+        result(r, f, msg("patients.updated"));
         return back();
     }
 
@@ -106,6 +118,23 @@ public class XesteQeydiyyatiController {
     @GetMapping("/{id}")
     public String redakte(@PathVariable Long id, Model m, HttpSession s) {
         formBase(m, s, repo.tap(klinika(s), id));
+        return "pages/pasienQebulu/xesteFormu";
+    }
+
+    private boolean invalid(XesteForm form, BindingResult binding) {
+        return binding.hasErrors() || form.ad == null || form.ad.isBlank() || form.soyad == null || form.soyad.isBlank()
+                || form.cinsId == null || form.dogumTarixi == null || form.vesiqeNovuId == null
+                || form.vesiqeNomresi == null || form.vesiqeNomresi.isBlank()
+                || form.finKodu == null || form.finKodu.isBlank() || form.defaultTeskilatId == null;
+    }
+
+    private String failedForm(XesteForm form, boolean editing, String returnTo, String error, Model m, HttpSession s) {
+        formBase(m, s, null);
+        m.addAttribute("submittedForm", form);
+        m.addAttribute("editing", editing);
+        m.addAttribute("returnTo", returnTo);
+        m.addAttribute("pageTitle", msg(editing ? "patients.edit" : "patients.new"));
+        m.addAttribute("registrationError", error);
         return "pages/pasienQebulu/xesteFormu";
     }
 

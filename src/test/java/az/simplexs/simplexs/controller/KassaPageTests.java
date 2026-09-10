@@ -35,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class KassaPageTests {
     @Autowired MockMvc mvc;
+    @MockitoBean az.simplexs.simplexs.repository.xeste.XesteRepository patients;
+    @MockitoBean az.simplexs.simplexs.repository.teskilat.TeskilatRepository patientOrganizations;
     @MockitoBean DataSource dataSource; // No live database connections, including error journaling.
     @MockitoBean KassaEmeliyyatRepository repo;
     @MockitoBean KassaEmeliyyatService service;
@@ -223,6 +225,23 @@ class KassaPageTests {
             if(page==6) assertThat(html).contains("data-advance-page=\"7\" disabled=\"disabled\"");
         }
     }
+    @Test void patientRegistrationErrorRendersEnteredValuesWithoutRedirect() throws Exception {
+        when(patients.yarat(eq(1L), any(), eq(24L))).thenReturn(Map.of("status_kodu", "DUPLICATE_FIN", "mesaj", "Duplicate FIN"));
+        var page = mvc.perform(get("/xeste-qeydiyyati/yeni").session(session)).andExpect(status().isOk()).andReturn();
+        var csrf = (CsrfToken) page.getRequest().getAttribute(CsrfToken.class.getName());
+        mvc.perform(post("/xeste-qeydiyyati/yeni").session(session).param(csrf.getParameterName(), csrf.getToken())
+                .param("ad", "Entered name").param("soyad", "Entered surname").param("finKodu", "ABC1234")
+                .param("vesiqeNomresi", "AA123").param("vesiqeNovuId", "2").param("cinsId", "1")
+                .param("defaultTeskilatId", "3").param("dogumTarixi", "1990-01-01")
+                .param("qeyd", "Keep my note").param("returnTo", "ambulator"))
+                .andExpect(status().isOk()).andExpect(view().name("pages/pasienQebulu/xesteFormu"))
+                .andExpect(content().string(containsString("Duplicate FIN")))
+                .andExpect(content().string(containsString("value=\"Entered name\"")))
+                .andExpect(content().string(containsString("value=\"ABC1234\"")))
+                .andExpect(content().string(containsString("Keep my note")))
+                .andExpect(content().string(containsString("value=\"ambulator\"")));
+    }
+
     private void preview(String name,String html) throws Exception {
         assertThat(html).doesNotContain("??kassa.");
         Path directory=Path.of("target/kassa-preview");Files.createDirectories(directory);Files.writeString(directory.resolve(name+".html"),html);

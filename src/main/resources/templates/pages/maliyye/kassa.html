@@ -3,6 +3,7 @@
 <body>
 <div layout:fragment="content" class="content kassa-page kassa-home">
 <link rel="stylesheet" th:href="@{/custom/css/kassa-center.css}">
+<script th:src="@{/custom/js/kassa-selector.js}" defer></script>
 <header class="kassa-hero">
 <div class="kassa-hero-copy">
 <nav class="kassa-breadcrumb">
@@ -56,7 +57,7 @@
 </div>
 </div>
 <div class="w-100" style="min-width:0">
-<select id="cash-register" name="kassaId" class="form-select select2" th:data-placeholder="#{kassa.selectCash}" th:disabled="${#lists.isEmpty(registers)}" onchange="this.form.requestSubmit()">
+<select id="cash-register" name="kassaId" class="form-select select2" th:data-placeholder="#{kassa.selectCash}" th:disabled="${#lists.isEmpty(registers)}">
 <option th:if="${#lists.isEmpty(registers)}" value="" th:text="#{kassa.noCash}">
 </option>
 <option th:each="c:${registers}" th:value="${c.kassa_id}" th:selected="${c.kassa_id == cashId}" th:text="|${c.kassa_adi} (${c.kassa_kodu})|">

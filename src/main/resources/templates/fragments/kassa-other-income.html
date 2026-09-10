@@ -2,21 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <th:block th:fragment="popup">
-<div id="other-income-modal" class="modal fade kassa-income-modal" th:classappend="${advanceMode} ? 'kassa-advance-modal'" tabindex="-1" aria-labelledby="other-income-title" aria-hidden="true">
+<div id="other-income-modal" class="modal fade kassa-income-modal" th:classappend="${advanceMode} ? 'kassa-advance-modal' : 'kassa-transaction-modal'" tabindex="-1" aria-labelledby="other-income-title" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
 <form id="other-income-form" class="modal-content" method="post" th:action="${advanceMode} ? @{/kassa/avans} : (${expenseMode} ? @{/kassa/diger-cixis} : @{/kassa/diger-giris})" th:data-advance="${advanceMode}" th:data-expense="${expenseMode}">
 <input type="hidden" name="kassaId" th:value="${cashId}">
 <input type="hidden" name="paymentToken" th:value="${incomeToken}">
 <div class="modal-header">
+<span th:if="${advanceMode}" class="advance-icon advance-title-icon"><i class="ti ti-user-dollar" aria-hidden="true"></i></span>
+<span th:unless="${advanceMode}" class="transaction-icon transaction-title-icon"><i class="ti" th:classappend="${expenseMode} ? 'ti-logout' : 'ti-login'" aria-hidden="true"></i></span>
 <div><h2 id="other-income-title" class="modal-title fs-5" th:text="${advanceMode} ? #{kassa.advance} : (${expenseMode} ? #{kassa.otherExpense} : #{kassa.otherIncome})"></h2>
 <small class="text-muted" th:text="|${incomeCash.kassa_adi} (${incomeCash.kassa_kodu})|"></small></div>
 <button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button>
 </div>
 <div class="modal-body">
+<div th:if="${expenseMode}" class="alert alert-primary d-flex justify-content-between align-items-center py-2 mb-3" id="expense-current-balance"><span><i class="ti ti-wallet me-2" aria-hidden="true"></i><span th:text="#{kassa.balanceCurrent}"></span></span><strong><span th:text="${#numbers.formatDecimal(expenseBalance,1,2)}"></span> <span th:text="#{kassa.currency}"></span></strong></div>
 <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
 <th:block th:if="${advanceMode}"><div th:replace="~{fragments/kassa-advance-search :: search}"></div></th:block>
-<div class="row g-4">
-<div class="col-md-6">
+<div class="row g-3 advance-bottom-panels">
+<div class="col-md-6"><div class="advance-detail-panel">
+<div th:if="${advanceMode}" class="advance-section-heading"><span class="advance-icon"><i class="ti ti-file-description" aria-hidden="true"></i></span><h3 th:text="#{kassa.advanceStepDetails}"></h3></div>
+<div class="transaction-account">
+<span th:unless="${advanceMode}" class="transaction-icon"><i class="ti ti-database" aria-hidden="true"></i></span>
+<div class="transaction-account-fields">
 <label for="income-account" class="form-label" th:text="#{kassa.account}"></label>
 <select id="income-account" name="accountId" class="form-select select2" required th:data-placeholder="#{kassa.selectAccount}">
 <option value="" th:text="#{kassa.selectAccount}"></option>
@@ -24,25 +31,31 @@
 </select>
 <p id="income-account-description" class="small text-muted mt-2"></p>
 <div th:if="${#lists.isEmpty(incomeAccounts)}" class="alert alert-warning small" th:text="${advanceMode} ? #{kassa.noAdvanceAccounts} : (${expenseMode} ? #{kassa.noExpenseAccounts} : #{kassa.noIncomeAccounts})"></div>
+</div></div>
+<div class="transaction-note">
+<span th:unless="${advanceMode}" class="transaction-icon"><i class="ti ti-file-description" aria-hidden="true"></i></span>
 <label for="income-note" class="form-label mt-3" th:text="#{kassa.note}"></label>
 <textarea id="income-note" name="note" class="form-control" rows="4" maxlength="1000" th:placeholder="${advanceMode} ? #{kassa.advanceNoteHint} : (${expenseMode} ? #{kassa.expenseNoteHint} : #{kassa.incomeNoteHint})" th:text="${incomeNote}"></textarea>
 </div>
-<div class="col-md-6">
-<fieldset><legend class="fs-6" th:text="#{kassa.paymentTypes}"></legend>
+</div></div>
+<div class="col-md-6"><div class="advance-detail-panel">
+<fieldset class="transaction-payments"><legend class="fs-6"><span th:if="${advanceMode}" class="advance-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></span><span th:unless="${advanceMode}" class="transaction-icon transaction-wallet"><i class="ti ti-wallet" aria-hidden="true"></i></span><span th:text="${advanceMode} ? #{kassa.advanceStepPayments} : #{kassa.paymentTypes}"></span></legend>
 <p class="text-muted small" th:text="#{kassa.incomePaymentHint}"></p>
-<div class="mb-3" th:each="t:${incomePaymentTypes}">
+<div class="mb-3 advance-payment-row" th:each="t, typeRow:${incomePaymentTypes}">
+<span th:if="${advanceMode}" class="advance-icon advance-method-icon" th:classappend="|advance-method-${typeRow.index % 3}|"><i class="ti ti-wallet" aria-hidden="true"></i></span>
+<span th:unless="${advanceMode}" class="transaction-icon transaction-method" th:classappend="|transaction-method-${typeRow.index % 3}|"><i class="ti" th:classappend="${typeRow.index % 3 == 0} ? 'ti-cash' : (${typeRow.index % 3 == 1} ? 'ti-credit-card' : 'ti-building-bank')" aria-hidden="true"></i></span>
 <label class="form-label small" th:for="|income-amount-${t.odenis_novu_id}|" th:text="${t.ad}"></label>
 <input type="hidden" name="paymentTypeIds" th:value="${t.odenis_novu_id}">
 <div class="input-group"><input type="number" class="form-control income-amount" name="amounts" min="0" max="999999999999.99" step="0.01" th:id="|income-amount-${t.odenis_novu_id}|" th:value="${incomeAmounts != null and incomeAmounts[t.odenis_novu_id] != null ? incomeAmounts[t.odenis_novu_id] : '0.00'}"><span class="input-group-text" th:text="#{kassa.currency}"></span></div>
 </div>
 <div th:if="${#lists.isEmpty(incomePaymentTypes)}" class="alert alert-warning small" th:text="#{kassa.noPaymentTypes}"></div>
 </fieldset>
-</div>
+</div></div>
 </div>
 <div id="income-feedback" class="text-danger small mt-3" role="status" aria-live="polite"></div>
 </div>
 <div class="modal-footer justify-content-between gap-3">
-<div><small class="text-muted d-block" th:text="${advanceMode} ? #{kassa.advanceTotal} : (${expenseMode} ? #{kassa.expenseTotal} : #{kassa.incomeTotal})"></small><strong class="fs-5" th:classappend="${expenseMode} ? 'text-danger' : 'text-success'"><span id="income-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong></div>
+<div class="advance-total"><span th:unless="${advanceMode}" class="transaction-icon"><i class="ti ti-calculator" aria-hidden="true"></i></span><span th:if="${advanceMode}" class="advance-icon"><i class="ti ti-calculator" aria-hidden="true"></i></span><div><small class="text-muted d-block" th:text="${advanceMode} ? #{kassa.advanceTotal} : (${expenseMode} ? #{kassa.expenseTotal} : #{kassa.incomeTotal})"></small><strong class="fs-5" th:classappend="${expenseMode} ? 'text-danger' : 'text-success'"><span id="income-total">0.00</span> <span th:text="#{kassa.currency}"></span></strong></div></div>
 <div class="d-flex gap-2"><button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{common.imtina}"></button>
 <button id="income-submit" type="submit" class="btn" th:classappend="${expenseMode} ? 'btn-danger' : 'btn-success'" th:disabled="${#lists.isEmpty(incomeAccounts) or #lists.isEmpty(incomePaymentTypes)}"><i class="ti ti-check me-1" aria-hidden="true"></i><span th:text="${advanceMode} ? #{kassa.acceptAdvance} : (${expenseMode} ? #{kassa.acceptExpense} : #{kassa.acceptIncome})"></span></button></div>
 </div>
@@ -64,6 +77,7 @@
 <script th:inline="javascript">window.KassaIncomeI18n = {
 invalidAccount: /*[[#{kassa.invalidAccount}]]*/ '', invalidPayment: /*[[#{kassa.invalidPayment}]]*/ '',
 processing: /*[[#{kassa.processing}]]*/ '',
+select: /*[[#{kassa.select}]]*/ '', selected: /*[[#{kassa.advanceSelected}]]*/ '',
 selectPatient: /*[[#{kassa.selectAdvancePatient}]]*/ '', searchHint: /*[[#{kassa.advanceSearchHint}]]*/ '',
 searching: /*[[#{kassa.searching}]]*/ '', searchFailed: /*[[#{kassa.advanceSearchFailed}]]*/ '',
 invalidSearch: /*[[#{kassa.invalidAdvanceSearch}]]*/ ''};</script>

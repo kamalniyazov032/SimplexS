@@ -82,20 +82,28 @@
         const search = document.getElementById('advance-search');
         const results = document.getElementById('advance-search-results');
         const status = document.getElementById('advance-search-feedback');
-        const selected = document.getElementById('advance-selected');
         const query = document.getElementById('advance-query');
         const card = document.getElementById('advance-card-type');
         const from = document.getElementById('advance-from');
         const to = document.getElementById('advance-to');
+        results.querySelectorAll('[data-select-advance]').forEach(button => {
+            const active = button.dataset.visitId === visit.value;
+            button.classList.toggle('btn-primary', active);
+            button.classList.toggle('btn-outline-primary', !active);
+            button.setAttribute('aria-pressed', String(active));
+            button.textContent = active ? '✓ ' + i18n.selected : i18n.select;
+            button.closest('tr')?.classList.toggle('is-selected', active);
+        });
         let request = null;
         let revision = 0;
         function clearSelection() {
             visit.value = '';
-            selected.classList.add('d-none');
             results.querySelectorAll('[data-select-advance]').forEach(button => {
                 button.classList.remove('btn-primary');
                 button.classList.add('btn-outline-primary');
                 button.setAttribute('aria-pressed', 'false');
+                button.textContent = i18n.select;
+                button.closest('tr')?.classList.remove('is-selected');
             });
         }
         function invalidateSearch() {
@@ -141,10 +149,6 @@
         search.addEventListener('input', invalidateSearch);
         card.addEventListener('change', invalidateSearch);
         if (window.jQuery) window.jQuery(card).on('change.kassaAdvance', invalidateSearch);
-        document.getElementById('advance-clear').addEventListener('click', () => {
-            clearSelection();
-            query.focus();
-        });
         results.addEventListener('click', event => {
             const pager = event.target.closest('[data-advance-page]');
             if (pager && results.contains(pager)) {
@@ -157,11 +161,12 @@
             for (const [id, field] of [['name', 'name'], ['card', 'card'], ['visit-card', 'visitCard'], ['dob', 'dob'], ['date', 'date']]) {
                 document.getElementById('advance-selected-' + id).textContent = button.dataset[field] || '—';
             }
-            selected.classList.remove('d-none');
             results.querySelectorAll('[data-select-advance]').forEach(item => {
                 item.classList.toggle('btn-primary', item === button);
                 item.classList.toggle('btn-outline-primary', item !== button);
                 item.setAttribute('aria-pressed', String(item === button));
+                item.textContent = item === button ? '✓ ' + i18n.selected : i18n.select;
+                item.closest('tr')?.classList.toggle('is-selected', item === button);
             });
             dirty = true;
             feedback.textContent = '';

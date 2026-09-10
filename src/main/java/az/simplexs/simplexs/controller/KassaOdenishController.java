@@ -249,6 +249,7 @@ public class KassaOdenishController {
         var cash=service.requireCash(auth,clinic(session),kassaId,true);
         home(kassaId,auth,session,model);
         model.addAttribute("incomeCash",cash);
+        if(expense) model.addAttribute("expenseBalance",KassaEmeliyyatService.money(repo.balance(clinic(session),kassaId),"cari_balans"));
         model.addAttribute("incomeAccounts",repo.accountingCodes(clinic(session),advance?"AVANS_QEBUL":expense?"DIGER_CIXIS":"DIGER_GIRIS"));
         model.addAttribute("incomePaymentTypes",repo.paymentTypes());
         model.addAttribute("incomeToken",issueToken(session,kassaId,null,advance?"AVANS_QEBUL":expense?"DIGER_CIXIS":"DIGER_GIRIS"));

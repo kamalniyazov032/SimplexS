@@ -1,0 +1,44 @@
+#service-groups-page { color: #17223d; }
+#service-groups-page h4 { font-size: 25px; font-weight: 700; }
+#service-groups-page h4 > i { font-size: 29px; vertical-align: middle; }
+#service-groups-page > .d-flex p { font-size: 14px; }
+#service-groups-page .groups-actions { align-items: center; flex-wrap: wrap; }
+#service-groups-page .groups-search { position: relative; width: 290px; }
+#service-groups-page .groups-search input { height: 40px; padding-right: 40px; border-color: #dce6f3; font-size: 13px; }
+#service-groups-page .groups-search button { position: absolute; right: 0; top: 0; }
+#service-groups-page .groups-actions > .btn { min-height: 40px; font-weight: 600; }
+#service-groups-page > .card { border: 1px solid #e1eaf6 !important; border-radius: 6px; box-shadow: none !important; overflow: hidden; }
+#service-groups-page .card-header { padding: 13px 16px; border-color: #e1eaf6; background: #fff; }
+#service-groups-page .card-header h5 { font-size: 17px; font-weight: 700; margin-bottom: 0 !important; }
+#service-groups-page .card-header .badge { border-radius: 20px; padding: 7px 13px; }
+#service-groups-page .service-groups-table-scroll { max-height: calc(100dvh - 285px); }
+#service-groups-page table { width: 100%; table-layout: fixed; font-size: 13px; min-width: 950px; }
+#service-groups-page th { padding: 12px 10px; background: #f4f7fb; font-weight: 600; font-size: 12px; }
+#service-groups-page th:first-child { width: 29%; }
+#service-groups-page th:nth-child(2) { width: 37%; }
+#service-groups-page th:nth-child(3) { width: 8%; }
+#service-groups-page th:nth-child(4), #service-groups-page th:nth-child(5) { width: 6%; }
+#service-groups-page th:nth-child(6) { width: 8%; }
+#service-groups-page th:nth-child(7) { width: 6%; }
+#service-groups-page .service-tree-row { --tree-indent: 23px; }
+#service-groups-page .service-tree-row[hidden] { display: none; }
+#service-groups-page .service-tree-row > td { height: 48px; padding: 7px 10px; border-color: #e5ecf5; white-space: normal; overflow-wrap: anywhere; }
+#service-groups-page .service-tree-row:nth-child(even) > td { background-color: #fafcff; }
+#service-groups-page .service-tree-cell { min-width: 0; gap: 8px; }
+#service-groups-page .service-tree-cell::before { top: -24px; bottom: -24px; border-color: #dbe5f3; }
+#service-groups-page .service-tree-folder { background: transparent !important; color: #0878ed !important; box-shadow: none; width: 26px; height: 26px; flex: 0 0 26px; font-size: 23px; }
+#service-groups-page .service-group-name { color: #17223d !important; letter-spacing: 0; font-size: 13px; white-space: normal; }
+#service-groups-page .service-tree-row:not([data-level="0"]):not([data-level="1"]) .service-group-name { font-weight: 400 !important; }
+#service-groups-page .service-tree-cell small { font-size: 10px; }
+#service-groups-page .service-tree-toggle, #service-groups-page .service-tree-toggle-placeholder { width: 20px; min-width: 20px; background: transparent; }
+#service-groups-page td:nth-child(n+3), #service-groups-page th:nth-child(n+3) { text-align: center; }
+#service-groups-page td .badge { font-size: 11px; font-weight: 500; padding: 7px 10px; border: 0 !important; white-space: nowrap; }
+#service-groups-page td .bg-success-subtle::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0aa55b; margin-right: 6px; }
+#service-groups-page .service-tree-row .btn-outline-primary { padding: 4px 7px; border-radius: 5px; }
+#service-groups-page .groups-pagination { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fff; border-color: #e1eaf6; font-size: 13px; gap: 12px; }
+#service-groups-page .groups-pagination .btn { min-width: 32px; border-radius: 5px; border-color: #dbe5f2; }
+@media (max-width: 767.98px) {
+    #service-groups-page .groups-actions, #service-groups-page .groups-search { width: 100%; }
+    #service-groups-page .groups-pagination { flex-wrap: wrap; }
+    #service-groups-page .service-groups-table-scroll { max-height: 65dvh; }
+}

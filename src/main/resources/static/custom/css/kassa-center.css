@@ -143,3 +143,167 @@
 #confirm-cash-change-row[hidden] {
     display: none;
 }
+
+/* Patient advance: keep selection in the results and the payment form in view. */
+.kassa-advance-modal .modal-dialog { max-width: 1400px; }
+.kassa-advance-modal .modal-content { height: auto; max-height: calc(100dvh - 32px); color: #14213a; border-radius: 18px; }
+.kassa-advance-modal .modal-header { gap: 20px; border-bottom: 0; padding: 24px 28px 16px; }
+.kassa-advance-modal .modal-title { font-size: 28px !important; font-weight: 700; margin-bottom: 5px; }
+.kassa-advance-modal .modal-body { padding: 0 28px 16px; }
+.kassa-advance-modal .advance-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 50px; width: 50px; height: 50px; border-radius: 12px; background: #eaf3ff; color: #0062cc; font-size: 26px; }
+.kassa-advance-modal .advance-title-icon { flex-basis: 76px; width: 76px; height: 76px; font-size: 34px; }
+.kassa-advance-modal .advance-header-hint { display: flex; align-items: center; gap: 18px; margin-left: auto; max-width: 510px; padding: 14px 20px; background: #f1f6ff; border-radius: 12px; color: #476080; font-size: 13px; line-height: 1.5; }
+.kassa-advance-modal .advance-header-hint i { font-size: 25px; color: #0062cc; }
+.kassa-advance-modal .btn-close { align-self: flex-start; margin: 0; }
+.kassa-advance-modal .advance-search-panel, .kassa-advance-modal .advance-detail-panel { border: 1px solid #e0e8f3; border-radius: 9px; padding: 16px; }
+.kassa-advance-modal .advance-search-panel { margin-bottom: 14px; }
+.kassa-advance-modal .advance-section-heading { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+.kassa-advance-modal .advance-section-heading h3 { font-size: 18px; font-weight: 700; margin: 0; }
+.kassa-advance-modal .advance-section-heading p { margin: 4px 0 0; font-size: 14px; color: #476080; }
+.kassa-advance-modal .form-label { font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+.kassa-advance-modal .form-control, .kassa-advance-modal .form-select, .kassa-advance-modal .input-group-text { min-height: 46px; border-color: #dfe7f1; border-radius: 7px; }
+.kassa-advance-modal .input-group .form-control { border-radius: 7px 0 0 7px; }
+.kassa-advance-modal .input-group-text { border-radius: 0 7px 7px 0; background: #f7f9fc; }
+.kassa-advance-modal #advance-search-button { min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; padding-inline: 10px; }
+.kassa-advance-modal .advance-results-scroll { height: auto; max-height: 300px; border: 1px solid #e0e8f3; border-radius: 7px; }
+.kassa-advance-modal .advance-results-heading { display: flex; align-items: center; gap: 18px; padding: 12px; background: #f3f6fb; }
+.kassa-advance-modal .advance-result-count { padding: 2px 12px; border-radius: 20px; background: #e5ebf4; font-size: 13px; color: #476080; }
+.kassa-advance-modal .advance-results-scroll .table { font-size: 14px; }
+.kassa-advance-modal .advance-results-scroll th { background: #f8faff; color: #14213a; }
+.kassa-advance-modal .advance-results-scroll th, .kassa-advance-modal .advance-results-scroll td { padding: 10px 12px; border-color: #e7edf5; }
+.kassa-advance-modal .advance-results-scroll tr.is-selected > td { background: #e5f2ff; --bs-table-bg: #e5f2ff; --bs-table-accent-bg: #e5f2ff; }
+.kassa-advance-modal [data-select-advance] { min-width: 108px; font-weight: 600; }
+.kassa-advance-modal .advance-pagination { padding: 12px 8px 0 !important; }
+.kassa-advance-modal .advance-detail-panel { height: 100%; }
+.kassa-advance-modal .advance-detail-panel legend { display: flex; align-items: center; gap: 16px; font-size: 18px !important; font-weight: 700; margin-bottom: 8px; }
+.kassa-advance-modal .advance-payment-row { display: grid; grid-template-columns: 50px minmax(100px, 1fr) minmax(140px, 1.8fr); gap: 20px; align-items: center; margin-top: 20px; }
+.kassa-advance-modal .advance-payment-row label { margin: 0; }
+.kassa-advance-modal .advance-method-0 { color: #008a17; background: #e0f4e4; }
+.kassa-advance-modal .advance-method-2 { color: #8239bc; background: #f0e7fb; }
+.kassa-advance-modal .modal-footer { border-top: 0; padding: 0 28px 20px; flex-wrap: nowrap; }
+.kassa-advance-modal .advance-total { display: flex; align-items: center; gap: 20px; flex: 1; padding: 14px 16px; border-radius: 9px; background: #edf5ff; }
+.kassa-advance-modal .advance-total strong { color: #0062cc !important; font-size: 28px !important; }
+.kassa-advance-modal .modal-footer .btn { min-height: 50px; padding-inline: 24px; font-weight: 600; }
+@media (max-width: 991.98px) {
+    .kassa-advance-modal .advance-header-hint { display: none; }
+    .kassa-advance-modal .advance-payment-row { gap: 10px; grid-template-columns: 36px minmax(70px, 1fr) minmax(110px, 1.5fr); }
+    .kassa-advance-modal .advance-method-icon { width: 36px; height: 40px; font-size: 22px; }
+}
+@media (max-width: 575.98px) {
+    .kassa-advance-modal .modal-content { height: 100dvh; max-height: 100dvh; border-radius: 0; }
+    .kassa-advance-modal .modal-header { padding: 16px; gap: 12px; }
+    .kassa-advance-modal .modal-title { font-size: 22px !important; }
+    .kassa-advance-modal .advance-title-icon { width: 50px; height: 50px; flex-basis: 50px; }
+    .kassa-advance-modal .modal-body { padding: 0 12px 12px; }
+    .kassa-advance-modal .modal-footer { padding: 0 12px 12px; flex-wrap: wrap; }
+    .kassa-advance-modal .advance-total { flex-basis: 100%; }
+    .kassa-advance-modal .modal-footer > .d-flex { width: 100%; }
+    .kassa-advance-modal .modal-footer .btn { flex: 1; padding-inline: 12px; }
+}
+
+/* Compact advance dialog: only the results table scrolls. */
+.kassa-advance-modal .modal-dialog { max-width: 1120px; margin: 12px auto; }
+.kassa-advance-modal .modal-content { height: auto; max-height: calc(100dvh - 24px); overflow: hidden; }
+.kassa-advance-modal .modal-body { overflow: hidden; padding: 0 16px 8px; flex-shrink: 1; }
+.kassa-advance-modal .modal-header { padding: 12px 16px; gap: 12px; }
+.kassa-advance-modal .modal-title { font-size: 22px !important; margin-bottom: 2px; }
+.kassa-advance-modal .advance-title-icon { width: 48px; height: 48px; flex-basis: 48px; font-size: 26px; }
+.kassa-advance-modal .advance-header-hint { padding: 8px 12px; max-width: 450px; font-size: 12px; }
+.kassa-advance-modal .advance-search-panel, .kassa-advance-modal .advance-detail-panel { padding: 10px 12px; }
+.kassa-advance-modal .advance-search-panel { margin-bottom: 10px; }
+.kassa-advance-modal .advance-section-heading { gap: 10px; margin-bottom: 8px; }
+.kassa-advance-modal .advance-section-heading h3, .kassa-advance-modal .advance-detail-panel legend { font-size: 15px !important; }
+.kassa-advance-modal .advance-section-heading p { font-size: 12px; margin-top: 2px; }
+.kassa-advance-modal .advance-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 21px; border-radius: 8px; }
+.kassa-advance-modal .form-label { font-size: 12px; margin-bottom: 4px; }
+.kassa-advance-modal .form-control, .kassa-advance-modal .form-select, .kassa-advance-modal .input-group-text { min-height: 36px; font-size: 13px; padding-top: 6px; padding-bottom: 6px; }
+.kassa-advance-modal #advance-search-button { min-height: 36px; font-size: 13px; }
+.kassa-advance-modal #advance-search-results { margin-top: 8px !important; }
+.kassa-advance-modal .advance-results-scroll { height: clamp(80px, calc(100dvh - 535px), 220px); max-height: 220px; overflow: auto; }
+.kassa-advance-modal .advance-results-heading { padding: 7px 10px; font-size: 13px; }
+.kassa-advance-modal .advance-results-scroll .table { font-size: 12px; }
+.kassa-advance-modal .advance-results-scroll th, .kassa-advance-modal .advance-results-scroll td { padding: 6px 9px; }
+.kassa-advance-modal [data-select-advance] { min-width: 76px; padding: 4px 10px; font-size: 12px; }
+.kassa-advance-modal .advance-pagination { padding: 6px 0 0 !important; }
+.kassa-advance-modal .advance-payment-row { grid-template-columns: 34px minmax(90px, 1fr) minmax(130px, 1.6fr); gap: 10px; margin-top: 8px; margin-bottom: 8px !important; }
+.kassa-advance-modal .advance-detail-panel legend { gap: 10px; margin-bottom: 4px; }
+.kassa-advance-modal .advance-detail-panel p { margin-bottom: 6px; font-size: 12px; }
+.kassa-advance-modal #income-account-description:empty, .kassa-advance-modal #income-feedback:empty, .kassa-advance-modal #advance-search-feedback:empty { display: none; }
+.kassa-advance-modal label[for="income-note"] { margin-top: 8px !important; }
+.kassa-advance-modal #income-note { height: 58px; min-height: 58px; resize: none; }
+.kassa-advance-modal .modal-footer { padding: 0 16px 12px; gap: 10px !important; }
+.kassa-advance-modal .advance-total { padding: 8px 12px; gap: 12px; }
+.kassa-advance-modal .advance-total strong { font-size: 22px !important; }
+.kassa-advance-modal .modal-footer .btn { min-height: 40px; padding-inline: 18px; font-size: 13px; }
+@media (max-width: 767.98px) {
+    .kassa-advance-modal .modal-dialog { width: calc(100% - 16px); margin: 8px auto; }
+    .kassa-advance-modal .modal-content { height: auto; max-height: calc(100dvh - 16px); }
+    .kassa-advance-modal .advance-search-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0; }
+    .kassa-advance-modal .advance-search-filters > div { width: auto; padding: 0; margin: 0; }
+    .kassa-advance-modal .advance-search-filters > div:last-child { grid-column: 1 / -1; }
+    .kassa-advance-modal .advance-section-heading p, .kassa-advance-modal .advance-detail-panel fieldset > p { display: none; }
+    .kassa-advance-modal .advance-bottom-panels { flex-wrap: nowrap; }
+    .kassa-advance-modal .advance-bottom-panels > div { width: 50%; }
+    .kassa-advance-modal .advance-payment-row { grid-template-columns: 1fr; gap: 2px; }
+    .kassa-advance-modal .advance-method-icon, .kassa-advance-modal .advance-detail-panel .advance-icon { display: none; }
+    .kassa-advance-modal .advance-results-scroll { height: clamp(65px, calc(100dvh - 590px), 180px); }
+    .kassa-advance-modal .modal-footer { flex-wrap: nowrap; }
+    .kassa-advance-modal .advance-total { flex-basis: auto; }
+    .kassa-advance-modal .advance-total .advance-icon { display: none; }
+    .kassa-advance-modal .modal-footer > .d-flex { width: auto; }
+    .kassa-advance-modal .modal-footer .btn { padding-inline: 10px; }
+}
+
+/* Other cash income and expense, using the same compact transaction layout. */
+.kassa-transaction-modal .modal-dialog { max-width: 700px; }
+.kassa-transaction-modal .modal-content { color: #132042; background: #fff; border-radius: 14px; }
+.kassa-transaction-modal .modal-header { padding: 18px 20px; gap: 18px; border-color: #e6ebf4; }
+.kassa-transaction-modal .modal-title { font-size: 25px !important; font-weight: 700; margin-bottom: 4px; }
+.kassa-transaction-modal .modal-header small { font-size: 15px; font-weight: 600; }
+.kassa-transaction-modal .btn-close { margin-left: auto; }
+.kassa-transaction-modal .transaction-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; border-radius: 9px; background: #e9f2ff; color: #0878ed; font-size: 27px; }
+.kassa-transaction-modal .transaction-title-icon { width: 60px; height: 60px; flex-basis: 60px; font-size: 34px; }
+.kassa-transaction-modal .modal-body { padding: 12px 20px; }
+.kassa-transaction-modal .advance-bottom-panels { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.kassa-transaction-modal .advance-bottom-panels > .col-md-6, .kassa-transaction-modal .advance-detail-panel { display: contents; }
+.kassa-transaction-modal .transaction-account, .kassa-transaction-modal .transaction-payments, .kassa-transaction-modal .transaction-note { padding: 12px; border: 1px solid #e5ebf5; border-radius: 8px; background: #fbfcff; }
+.kassa-transaction-modal .transaction-account { display: flex; align-items: flex-start; gap: 16px; order: 1; }
+.kassa-transaction-modal .transaction-account-fields { flex: 1; min-width: 0; }
+.kassa-transaction-modal .transaction-payments { order: 2; min-width: 0; }
+.kassa-transaction-modal .transaction-note { order: 3; display: grid; grid-template-columns: 44px 1fr; gap: 8px 16px; align-items: center; }
+.kassa-transaction-modal .transaction-note label { margin: 0 !important; }
+.kassa-transaction-modal .transaction-note textarea { grid-column: 1 / -1; height: 76px; min-height: 60px; }
+.kassa-transaction-modal .form-label, .kassa-transaction-modal legend { font-weight: 600; font-size: 15px !important; }
+.kassa-transaction-modal legend { float: none; width: auto; display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+.kassa-transaction-modal .transaction-payments > p { margin: 0 0 12px 60px; font-size: 12px; }
+.kassa-transaction-modal .transaction-wallet { color: #0a9c88; background: #e1f5f0; }
+.kassa-transaction-modal .advance-payment-row { display: grid; grid-template-columns: 44px minmax(100px, 1fr) minmax(160px, 1.3fr); gap: 16px; align-items: center; padding: 7px; margin-bottom: 6px !important; border: 1px solid #e8edf6; border-radius: 8px; }
+.kassa-transaction-modal .advance-payment-row:last-of-type { margin-bottom: 0 !important; }
+.kassa-transaction-modal .advance-payment-row label { margin: 0; font-size: 13px !important; }
+.kassa-transaction-modal .transaction-method-0 { background: #e2f5e7; color: #0b9d30; }
+.kassa-transaction-modal .transaction-method-2 { background: #f0e7ff; color: #9345ed; }
+.kassa-transaction-modal .form-control, .kassa-transaction-modal .form-select, .kassa-transaction-modal .input-group-text { min-height: 40px; border-color: #dfe6f1; font-size: 14px; }
+.kassa-transaction-modal .input-group-text { background: #f0f3f8; }
+.kassa-transaction-modal #income-account-description:empty, .kassa-transaction-modal #income-feedback:empty { display: none; }
+.kassa-transaction-modal .modal-footer { padding: 14px 20px; border-color: #e6ebf4; flex-wrap: nowrap; }
+.kassa-transaction-modal .advance-total { display: flex; align-items: center; gap: 14px; flex: 1; padding: 10px; border-radius: 8px; background: #edf5ff; }
+.kassa-transaction-modal .advance-total strong { font-size: 25px !important; color: #0878ed !important; white-space: nowrap; }
+.kassa-transaction-modal [data-expense="true"] .advance-total strong { color: #dc3545 !important; }
+.kassa-transaction-modal .modal-footer .btn { min-height: 44px; font-size: 13px; font-weight: 600; padding-inline: 14px; }
+@media (max-height: 760px) {
+    .kassa-transaction-modal .modal-header { padding: 10px 16px; }
+    .kassa-transaction-modal .transaction-title-icon { height: 44px; width: 44px; flex-basis: 44px; }
+    .kassa-transaction-modal .transaction-icon { height: 36px; }
+    .kassa-transaction-modal .transaction-account, .kassa-transaction-modal .transaction-payments, .kassa-transaction-modal .transaction-note { padding: 8px; }
+    .kassa-transaction-modal .transaction-note textarea { height: 60px; }
+    .kassa-transaction-modal .modal-footer { padding: 10px 16px; }
+}
+@media (max-width: 575.98px) {
+    .kassa-transaction-modal .modal-body { padding: 10px; }
+    .kassa-transaction-modal .advance-payment-row { grid-template-columns: 34px minmax(65px, 1fr) minmax(120px, 1.4fr); gap: 8px; }
+    .kassa-transaction-modal .transaction-method { width: 34px; font-size: 23px; }
+    .kassa-transaction-modal .modal-footer { flex-wrap: wrap; padding: 10px; }
+    .kassa-transaction-modal .advance-total { flex-basis: 100%; }
+    .kassa-transaction-modal .modal-footer > .d-flex { width: 100%; }
+    .kassa-transaction-modal .modal-footer .btn { flex: 1; }
+}

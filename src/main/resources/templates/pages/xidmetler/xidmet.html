@@ -3,9 +3,14 @@
       layout:decorate="~{layouts/main}">
 <body>
 <div layout:fragment="content">
+<link rel="stylesheet" th:href="@{/custom/css/service-catalog.css}">
+<div id="service-catalog">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div><h4 class="mb-1"><i class="ti ti-medical-cross text-primary me-2"></i><span th:text="#{services.title}">Xidmətlər</span></h4><p class="text-muted mb-0" th:text="#{services.subtitle}">Ümumi tibbi xidmət kataloqu</p></div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 catalog-actions">
+            <form class="catalog-search" method="get" th:action="@{/parXidmet}">
+<input type="hidden" name="qrupId" th:value="${selectedQrupId}"><input type="hidden" name="xidmetTipiId" th:value="${selectedXidmetTipiId}"><input type="hidden" name="muhasibatKoduId" th:value="${selectedMuhasibatKoduId}"><input type="hidden" name="status" th:value="${selectedStatus}"><input type="hidden" name="paketStatusu" th:value="${selectedPaketStatusu}">
+<input class="form-control" type="search" name="q" th:value="${q}" th:placeholder="#{services.kod_ad_ve_ya_beynelxalq_ad}" th:aria-label="#{services.axtaris}"><button class="btn" type="submit" th:aria-label="#{services.axtar}"><i class="ti ti-search" aria-hidden="true"></i></button></form>
             <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#xidmetFilter"><i class="ti ti-filter me-1"></i><span th:text="#{common.filter}">Filter</span><span th:if="${filterApplied}" class="badge bg-white text-primary ms-2" th:text="#{common.active}">Aktiv</span></button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newService"><i class="ti ti-plus me-1"></i><span th:text="#{services.new}">Yeni xidmət</span></button>
         </div>
@@ -28,10 +33,11 @@
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"><i class="ti ti-circle-check me-2"></i><span th:text="${successMessage}"></span><button class="btn-close" data-bs-dismiss="alert"></button></div>
     <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"><i class="ti ti-alert-circle me-2"></i><span th:text="${errorMessage}"></span><button class="btn-close" data-bs-dismiss="alert"></button></div>
 
-    <div class="row g-4 align-items-start">
+    <div class="row g-3 align-items-stretch catalog-layout">
     <div class="col-xl-3 col-lg-4">
         <div class="card border-0 shadow-sm service-group-panel">
-            <div class="card-header bg-white"><h6 class="mb-1"><i class="ti ti-hierarchy-2 text-primary me-2"></i><span th:text="#{services.groups}">Xidmət qrupları</span></h6><small class="text-muted" th:text="#{services.groupHint}">Siyahını qrupa görə seçin</small></div>
+            <div class="card-header bg-white"><h6 class="mb-1"><i class="ti ti-hierarchy-2 text-primary me-2"></i><span th:text="#{services.groups}">Xidmət qrupları</span></h6><a class="btn btn-sm btn-outline-primary" th:href="@{/xidmetQruplari}" th:aria-label="#{services.groups}"><i class="ti ti-plus" aria-hidden="true"></i></a></div>
+            <div class="catalog-group-search"><i class="ti ti-search" aria-hidden="true"></i><input id="catalog-group-search" class="form-control" type="search" th:placeholder="#{services.groupSearch}" th:aria-label="#{services.groupSearch}"></div>
             <div class="list-group list-group-flush py-2 service-group-scroll">
                 <a class="list-group-item list-group-item-action border-0 d-flex align-items-center gap-2 mx-2 rounded"
                    th:classappend="${selectedQrupId == null} ? ' active' : ''"
@@ -62,16 +68,17 @@
     <div class="col-xl-9 col-lg-8">
     <div class="card border-0 shadow-sm">
         <div class="card-header d-flex align-items-center justify-content-between gap-3"><div><h5 class="mb-1" th:text="${selectedQrup != null ? selectedQrup.ad : #messages.msg('services.all')}">Xidmət siyahısı</h5><small class="text-muted" th:text="#{services.count(${xidmetCount})}"></small></div><a th:if="${filterApplied}" class="btn btn-sm btn-light" th:href="@{/parXidmet(qrupId=${selectedQrupId})}"><i class="ti ti-x me-1"></i><span th:text="#{common.clear}">Təmizlə</span></a></div>
-        <div class="card-body p-0"><div class="table-responsive service-table-scroll"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3" th:text="#{services.kod}">Kod</th><th th:text="#{services.xidmet}">Xidmət</th><th th:text="#{services.qrup}">Qrup</th><th th:text="#{services.tip}">Tip</th><th th:text="#{services.muhasibat}">Mühasibat</th><th th:text="#{services.hesabat}">Hesabat</th><th th:text="#{services.status}">Status</th><th></th></tr></thead><tbody>
-        <tr th:each="x:${xidmetler}"><td class="ps-3"><span class="badge bg-light text-dark border" th:text="${x.kod}"></span></td><td><div class="d-flex gap-2 align-items-center"><span class="avatar avatar-sm rounded-circle" th:classappend="${x.paketXidmet}?'bg-primary-subtle text-primary':'bg-info-subtle text-info'"><i th:class="${x.paketXidmet}?'ti ti-package':'ti ti-stethoscope'"></i></span><div><div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${x.ad}"></span><span th:if="${x.paketXidmet}" class="badge bg-primary-subtle text-primary" th:text="#{services.paket}">Paket</span></div><small class="text-muted" th:text="${x.beynelxalqKod?:''}"></small></div></div></td><td th:text="${x.qrupAdi}"></td><td><span class="badge bg-primary-subtle text-primary" th:text="${x.tipAdi}"></span></td><td th:text="${x.muhasibatKoduAdi}"></td><td th:text="${x.hesabatNovuAdi?:'—'}"></td><td><span class="badge" th:classappend="${x.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${x.aktiv} ? #{common.aktiv} : #{common.passiv}"></span></td><td class="text-end pe-3"><div class="d-inline-flex gap-1"><button th:if="${x.paketXidmet}" type="button" class="btn btn-sm btn-outline-info js-package-open" data-bs-toggle="modal" data-bs-target="#packageContents" th:data-id="${x.id}" th:data-code="${x.kod}" th:data-name="${x.ad}" th:title="#{services.terkibi_idare_et}"><i class="ti ti-package-import"></i></button><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editX${x.id}|" title="Redaktə et" th:title="#{services.redakte_et}"><i class="ti ti-edit"></i></button></div></td></tr>
+        <div class="card-body p-0"><div class="table-responsive service-table-scroll"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3" th:text="#{services.kod}">Kod</th><th th:text="#{services.xidmet}">Xidmət</th><th th:text="#{services.qrup}">Qrup</th><th th:text="#{services.tip}">Tip</th><th th:text="#{services.muhasibat}">Mühasibat</th><th th:text="#{services.hesabat}">Hesabat</th><th th:text="#{services.status}">Status</th><th th:text="#{kassa.action}"></th></tr></thead><tbody>
+        <tr th:each="x:${xidmetler}"><td class="ps-3"><span class="badge bg-light text-dark border" th:text="${x.kod}"></span></td><td><div class="d-flex gap-2 align-items-center"><span class="avatar avatar-sm rounded-circle" th:classappend="${x.paketXidmet}?'bg-primary-subtle text-primary':'bg-info-subtle text-info'"><i th:class="${x.paketXidmet}?'ti ti-package':'ti ti-stethoscope'"></i></span><div><div class="d-flex align-items-center gap-2"><span class="fw-semibold" th:text="${x.ad}"></span><span th:if="${x.paketXidmet}" class="badge bg-primary-subtle text-primary" th:text="#{services.paket}">Paket</span></div><small class="text-muted" th:text="${x.beynelxalqKod?:''}"></small></div></div></td><td th:text="${x.qrupAdi}"></td><td><span class="badge bg-primary-subtle text-primary" th:text="${x.tipAdi}"></span></td><td><span class="catalog-account" th:text="${x.muhasibatKoduAdi}"></span></td><td th:text="${x.hesabatNovuAdi?:'—'}"></td><td><span class="badge" th:classappend="${x.aktiv}?'bg-success-subtle text-success':'bg-danger-subtle text-danger'" th:text="${x.aktiv} ? #{common.aktiv} : #{common.passiv}"></span></td><td class="text-end pe-3"><div class="d-inline-flex gap-1"><button th:if="${x.paketXidmet}" type="button" class="btn btn-sm btn-outline-info js-package-open" data-bs-toggle="modal" data-bs-target="#packageContents" th:data-id="${x.id}" th:data-code="${x.kod}" th:data-name="${x.ad}" th:title="#{services.terkibi_idare_et}"><i class="ti ti-package-import"></i></button><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="|#editX${x.id}|" title="Redaktə et" th:title="#{services.redakte_et}"><i class="ti ti-edit"></i></button></div></td></tr>
         <tr th:if="${#lists.isEmpty(xidmetler)}"><td colspan="8" class="text-center text-muted py-5"><i class="ti ti-medical-cross-off fs-2 d-block mb-2"></i><span th:text="${filterApplied} ? #{services.filter_no_result} : (${selectedQrupId != null} ? #{services.group_no_result} : #{services.no_result})"></span></td></tr>
         </tbody></table></div></div>
-        <div th:if="${totalPages > 1}" class="card-footer bg-white d-flex justify-content-between align-items-center gap-2">
-            <small class="text-muted" th:text="#{services.page_info(${page + 1},${totalPages})}"></small>
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center gap-2">
+            <small class="text-muted" th:text="#{services.catalogPage(${page + 1},${totalPages > 0 ? totalPages : 1})}"></small>
             <div class="btn-group">
                 <a class="btn btn-sm btn-outline-primary" th:classappend="${page == 0} ? ' disabled' : ''"
                    th:href="@{/parXidmet(qrupId=${selectedQrupId},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu},page=${page - 1})}"
                    th:text="#{common.evvelki}">Əvvəlki</a>
+<a th:if="${totalPages > 0}" th:each="p:${#numbers.sequence(T(java.lang.Math).max(0,page - 2),T(java.lang.Math).min(totalPages - 1,page + 2))}" class="btn btn-sm btn-outline-primary" th:classappend="${p == page} ? 'active'" th:attr="aria-current=${p == page ? 'page' : null}" th:href="@{/parXidmet(qrupId=${selectedQrupId},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu},page=${p})}" th:text="${p + 1}"></a>
                 <a class="btn btn-sm btn-outline-primary" th:classappend="${page + 1 >= totalPages} ? ' disabled' : ''"
                    th:href="@{/parXidmet(qrupId=${selectedQrupId},q=${q},xidmetTipiId=${selectedXidmetTipiId},muhasibatKoduId=${selectedMuhasibatKoduId},status=${selectedStatus},paketStatusu=${selectedPaketStatusu},page=${page + 1})}"
                    th:text="#{common.novbeti}">Növbəti</a>
@@ -193,8 +200,17 @@
                 return true;
             };
 
-            const render = () => nodes.forEach(node => {
-                node.hidden = !isVisible(node);
+            const groupSearch = document.getElementById('catalog-group-search');
+            const render = () => {
+                const query = groupSearch.value.trim().toLocaleLowerCase(document.documentElement.lang || 'az');
+                const matches = new Set();
+                if (query) nodes.forEach(node => {
+                    if (!node.querySelector('.service-group-link').textContent.toLocaleLowerCase(document.documentElement.lang || 'az').includes(query)) return;
+                    let current = node;
+                    while (current) { matches.add(current); current = byId.get(current.dataset.parentId); }
+                });
+                nodes.forEach(node => {
+                node.hidden = query ? !matches.has(node) : !isVisible(node);
                 const toggle = node.querySelector('.service-group-toggle');
                 if (!toggle) return;
                 const open = expanded.has(node.dataset.groupId);
@@ -203,6 +219,8 @@
                 toggle.querySelector('i').className = `ti ${open ? 'ti-chevron-down' : 'ti-chevron-right'}`;
             });
 
+            };
+            groupSearch.addEventListener('input', render);
             nodes.forEach(node => node.querySelector('.service-group-toggle')?.addEventListener('click', () => {
                 const id = node.dataset.groupId;
                 expanded.has(id) ? expanded.delete(id) : expanded.add(id);
@@ -315,6 +333,7 @@
             });
         });
     </script>
+</div>
 </div>
 </body>
 </html>

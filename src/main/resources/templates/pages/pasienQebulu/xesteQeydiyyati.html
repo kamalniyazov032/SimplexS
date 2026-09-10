@@ -7,7 +7,8 @@
   layout:decorate="~{layouts/main}"
 >
   <body>
-    <div id="patientListPage" class="patient-list-page" layout:fragment="content">
+    <div layout:fragment="content">
+    <div id="patientListPage" class="patient-list-page">
       <div
         class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
       >
@@ -363,6 +364,7 @@
         .patient-list-table .patient-avatar { width: 2.75rem; height: 2.75rem; flex: 0 0 2.75rem; font-size: 1rem; font-weight: 700; }
         .patient-list-table tbody tr { transition: background-color .15s ease; }
       </style>
+    </div>
     </div>
   </body>
 </html>

@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body>
 <th:block th:fragment="search">
-<section id="advance-search" class="mb-4" th:data-url="@{/kassa/avans/xesteler(kassaId=${cashId})}">
-<h3 class="fs-6" th:text="#{kassa.findAdvancePatient}"></h3>
-<p class="text-muted small" th:text="#{kassa.advanceSearchHint}"></p>
-<div class="row g-2 align-items-end">
+<section id="advance-search" class="advance-search-panel" th:data-url="@{/kassa/avans/xesteler(kassaId=${cashId})}">
+<div class="advance-section-heading"><span class="advance-icon"><i class="ti ti-search" aria-hidden="true"></i></span><div><h3 th:text="#{kassa.advanceStepSearch}"></h3><p th:text="#{kassa.advanceSearchHint}"></p></div></div>
+<div class="row g-3 align-items-end advance-search-filters">
 <div class="col-lg-4"><label for="advance-query" class="form-label small" th:text="#{kassa.advanceQuery}"></label><input id="advance-query" type="search" class="form-control" maxlength="200" th:placeholder="#{kassa.advanceQueryHint}"></div>
 <div class="col-lg-3"><label for="advance-card-type" class="form-label small" th:text="#{kassa.cardType}"></label><select id="advance-card-type" class="form-select select2" th:data-placeholder="#{kassa.allCardTypes}"><option value="" th:text="#{kassa.allCardTypes}"></option><option th:each="c:${advanceCardTypes}" th:value="${c.kod}" th:text="${c.ad}"></option></select></div>
 <div class="col-lg-2 col-6"><label for="advance-from" class="form-label small" th:text="#{kassa.visitFrom}"></label><input id="advance-from" type="date" class="form-control"></div>
 <div class="col-lg-2 col-6"><label for="advance-to" class="form-label small" th:text="#{kassa.visitTo}"></label><input id="advance-to" type="date" class="form-control"></div>
-<div class="col-lg-1"><button id="advance-search-button" type="button" class="btn btn-primary w-100" th:aria-label="#{kassa.search}"><i class="ti ti-search" aria-hidden="true"></i></button></div>
+<div class="col-lg-1"><button id="advance-search-button" type="button" class="btn btn-primary w-100" th:aria-label="#{kassa.search}"><i class="ti ti-search" aria-hidden="true"></i><span th:text="#{kassa.search}"></span></button></div>
 </div>
 <div id="advance-search-feedback" class="small mt-2" role="status" aria-live="polite"></div>
-<div id="advance-search-results" class="advance-results mt-3"></div>
+<div id="advance-search-results" class="advance-results mt-3"><th:block th:if="${!#maps.isEmpty(advanceSelected)}" th:with="advanceResults=${ {advanceSelected} },advancePage=1,advanceHasMore=false,advanceSearchError=${null}"><div th:replace="~{fragments/kassa-advance-search :: results}"></div></th:block></div>
 </section>
 <input id="advance-visit-id" type="hidden" name="visitId" th:value="${advanceSelected['gelis_id']}">
-<div id="advance-selected" class="alert alert-primary mb-4" th:classappend="${#maps.isEmpty(advanceSelected)} ? 'd-none'">
-<div class="d-flex align-items-center justify-content-between gap-2"><strong th:text="#{kassa.selectedAdvancePatient}"></strong><button id="advance-clear" type="button" class="btn btn-sm btn-outline-primary" th:text="#{kassa.changePatient}"></button></div>
+<div id="advance-selected" hidden>
 <div id="advance-selected-details" class="mt-2">
 <strong id="advance-selected-name" th:text="|${advanceSelected['ad'] ?: ''} ${advanceSelected['soyad'] ?: ''} ${advanceSelected['ata_adi'] ?: ''}|"></strong>
 <div class="small"><span th:text="#{kassa.patientCard}"></span>: <span id="advance-selected-card" th:text="${advanceSelected['l_kart']}"></span> · <span th:text="#{kassa.visitCard}"></span>: <span id="advance-selected-visit-card" th:text="${advanceSelected['gelis_karti']}"></span></div>
@@ -29,10 +27,11 @@
 
 <div th:if="${#lists.isEmpty(advanceResults) and advanceSearchError == null}" class="text-muted text-center py-3" th:text="#{kassa.noSearchResults}"></div>
 <div th:unless="${#lists.isEmpty(advanceResults)}" class="table-responsive advance-results-scroll" tabindex="0" role="region" th:aria-label="#{kassa.findAdvancePatient}">
+<div class="advance-results-heading"><strong th:text="#{kassa.advanceResults}"></strong><span class="advance-result-count" th:text="#{kassa.advanceResultCount(${#lists.size(advanceResults)})}"></span><i class="ti ti-adjustments-horizontal ms-auto" aria-hidden="true"></i></div>
 <table class="table table-sm align-middle mb-0"><thead><tr>
-<th th:text="#{kassa.patientCard}"></th><th th:text="#{kassa.visitCard}"></th><th th:text="#{kassa.cardType}"></th><th th:text="#{kassa.firstName}"></th><th th:text="#{kassa.lastName}"></th><th th:text="#{kassa.fatherName}"></th><th th:text="#{kassa.birthDate}"></th><th th:text="#{kassa.visitDate}"></th><th th:text="#{kassa.action}"></th>
-</tr></thead><tbody><tr th:each="r:${advanceResults}">
-<td th:text="${r.l_kart}"></td><td th:text="${r.gelis_karti}"></td><td th:text="${r.kart_novu_adi}"></td><td th:text="${r.ad}"></td><td th:text="${r.soyad}"></td><td th:text="${r.ata_adi}"></td><td th:text="${r.dogum_tarixi}"></td><td th:text="${r.gelis_tarixi}"></td>
+<th th:text="#{kassa.advanceRowNumber}"></th><th th:text="#{kassa.patientCard}"></th><th th:text="#{kassa.visitCard}"></th><th th:text="#{kassa.cardType}"></th><th th:text="#{kassa.firstName}"></th><th th:text="#{kassa.lastName}"></th><th th:text="#{kassa.fatherName}"></th><th th:text="#{kassa.birthDate}"></th><th th:text="#{kassa.visitDate}"></th><th th:text="#{kassa.action}"></th>
+</tr></thead><tbody><tr th:each="r, row:${advanceResults}">
+<td th:text="${row.count}"></td><td th:text="${r.l_kart}"></td><td th:text="${r.gelis_karti}"></td><td th:text="${r.kart_novu_adi}"></td><td th:text="${r.ad}"></td><td th:text="${r.soyad}"></td><td th:text="${r.ata_adi}"></td><td th:text="${r.dogum_tarixi}"></td><td th:text="${r.gelis_tarixi}"></td>
 <td><button type="button" class="btn btn-sm btn-outline-primary" data-select-advance
  th:data-visit-id="${r.gelis_id}" th:data-name="|${r.ad ?: ''} ${r.soyad ?: ''} ${r.ata_adi ?: ''}|"
  th:data-card="${r.l_kart}" th:data-visit-card="${r.gelis_karti}" th:data-dob="${r.dogum_tarixi}" th:data-date="${r.gelis_tarixi}" th:text="#{kassa.select}"></button></td>

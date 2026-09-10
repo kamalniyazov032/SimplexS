@@ -159,3 +159,23 @@ test('closing a changed popup allows navigation without the browser unsaved warn
     assert.equal(leaving(), true);
     assert.equal(page.submissions, 0);
 });
+
+test('advance selection stays in the table and switches directly to another patient', () => {
+    const page = income({ advance: true });
+    const makeButton = visitId => {
+        const classes = new Set();
+        const row = { classList: { toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); } } };
+        return { dataset: { visitId }, classes, classList: { toggle() {} }, setAttribute(name, value) { this[name] = value; }, closest: () => row };
+    };
+    const buttons = [makeButton('17'), makeButton('18')];
+    page.ids['advance-search-results'].querySelectorAll = () => buttons;
+    for (const button of buttons) {
+        page.ids['advance-search-results'].listeners.click({ target: { closest: selector => selector === '[data-select-advance]' ? button : null } });
+        assert.equal(page.ids['advance-visit-id'].value, button.dataset.visitId);
+        assert.equal(button['aria-pressed'], 'true');
+        assert.equal(button.classes.has('is-selected'), true);
+    }
+    assert.equal(buttons[0]['aria-pressed'], 'false');
+    assert.equal(buttons[0].classes.has('is-selected'), false);
+    assert.equal(page.ids['advance-clear'].listeners.click, undefined);
+});

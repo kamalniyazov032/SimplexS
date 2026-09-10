@@ -140,3 +140,24 @@ test('cash change updates when the service selection changes and preserves exact
     page.selectOne(0, false);
     assert.equal(page.ids['cash-change-total'].textContent, '0.20');
 });
+
+test('debt cash repayment shows change and records only the debt amount', () => {
+    const page = checkout({ debt: true, due: '27480.00', paid: ['27500.00'], cashIndex: 0 });
+    assert.equal(page.ids['cash-change-row'].hidden, false);
+    assert.equal(page.ids['cash-change-total'].textContent, '20.00');
+    assert.equal(page.ids['remaining-total'].textContent, '0.00');
+    page.submit();
+    assert.equal(page.dialog.open, true);
+    assert.equal(page.ids['confirm-cash-change-total'].textContent, '20.00');
+    assert.equal(page.ids['confirm-payment-total'].textContent, '27,480.00');
+    page.confirm();
+    assert.equal(page.submissions, 1);
+    assert.equal(page.amounts[0].value, '27480.00');
+});
+test('debt card overpayment cannot be returned as cash change', () => {
+    const page = checkout({ debt: true, due: '27480.00', paid: ['27500.00'] });
+    page.submit();
+    assert.equal(page.ids['cash-change-row'].hidden, true);
+    assert.equal(page.dialog.open, false);
+    assert.equal(page.ids['payment-feedback'].textContent, 'over');
+});
