@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.function.LongSupplier;
+import java.time.Duration;
+import java.util.Locale;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.context.MessageSource;
@@ -20,14 +24,24 @@ import org.springframework.web.context.request.RequestContextHolder;
 @Service("access")
 public class AccessService {
     private static final long ROUTE_CACHE_NANOS=30_000_000_000L;
+    private static final long MENU_CACHE_NANOS = Duration.ofMinutes(10).toNanos();
+    private static final int MAX_MENU_CACHE_ENTRIES = 512;
+    private final Map<MenuCacheKey, TimedValue<List<MenuSystem>>> menuCache = new LinkedHashMap<>();
+    private final LongSupplier nanoTime;
     private final NamedParameterJdbcTemplate jdbc;
     private final MessageSource messages;
     private final Map<String,TimedValue<Boolean>> registeredRouteCache=new ConcurrentHashMap<>();
     private final Map<String,TimedValue<String>> permissionCache=new ConcurrentHashMap<>();
 
+    @Autowired
     public AccessService(NamedParameterJdbcTemplate jdbc, MessageSource messages) {
+        this(jdbc, messages, System::nanoTime);
+    }
+
+    AccessService(NamedParameterJdbcTemplate jdbc, MessageSource messages, LongSupplier nanoTime) {
         this.jdbc=jdbc;
         this.messages=messages;
+        this.nanoTime=nanoTime;
     }
 
     public Long firstClinicId(Authentication authentication) {
@@ -67,6 +81,24 @@ public class AccessService {
 
     public List<MenuSystem> menuSystems(Authentication authentication, Long clinicId) {
         Long personalId=personalId(authentication); if(personalId==null||clinicId==null)return List.of();
+        var key = new MenuCacheKey(personalId, clinicId, LocaleContextHolder.getLocale());
+        synchronized (menuCache) {
+            long now = nanoTime.getAsLong();
+            var cached = menuCache.get(key);
+            if (cached != null && now < cached.expiresAt()) return cached.value();
+            menuCache.entrySet().removeIf(entry -> now >= entry.getValue().expiresAt());
+            var systems = List.copyOf(loadMenuSystems(personalId, clinicId));
+            if (menuCache.size() >= MAX_MENU_CACHE_ENTRIES) {
+                menuCache.remove(menuCache.keySet().iterator().next());
+            }
+            menuCache.put(key, new TimedValue<>(systems, nanoTime.getAsLong() + MENU_CACHE_NANOS));
+            return systems;
+        }
+    }
+
+    private record MenuCacheKey(Long personalId, Long clinicId, Locale locale) {}
+
+    private List<MenuSystem> loadMenuSystems(Long personalId, Long clinicId) {
         String dil=LocaleContextHolder.getLocale().getLanguage();
         List<MenuRow> rows=readWithConnectionRetry(() -> jdbc.query("""
                 SELECT menu.*, sistem.id AS sistem_id, sistem.kod AS sistem_kodu,
