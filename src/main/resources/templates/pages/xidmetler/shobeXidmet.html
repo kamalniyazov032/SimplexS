@@ -158,6 +158,8 @@
             <form class="service-toolbar" method="get" th:action="@{/parShobeXidmet}"><input type="hidden" name="sobeId"
                                                                                              th:value="${selectedSobeId}"><input
                     type="hidden" name="bagliQ" th:value="${bagliQ}">
+                <input type="hidden" name="bagliQrupId" th:value="${selectedBagliQrupId}">
+                <input type="hidden" name="bagliPage" th:value="${bagliPage}">
                 <div class="row g-2">
                     <div class="col-md-7">
                         <div class="input-group"><span class="input-group-text bg-white"><i
@@ -178,6 +180,12 @@
             </form>
             <form method="post" th:action="@{/parShobeXidmet/elave}" id="catalogForm"><input type="hidden" name="sobeId"
                                                                                              th:value="${selectedSobeId}">
+                <input type="hidden" name="qrupId" th:value="${selectedQrupId}">
+                <input type="hidden" name="q" th:value="${q}">
+                <input type="hidden" name="page" th:value="${page}">
+                <input type="hidden" name="bagliQrupId" th:value="${selectedBagliQrupId}">
+                <input type="hidden" name="bagliQ" th:value="${bagliQ}">
+                <input type="hidden" name="bagliPage" th:value="${bagliPage}">
                 <div class="table-responsive service-list">
                     <table class="table table-striped table-hover align-middle mb-0 service-table">
                         <thead>
@@ -211,11 +219,11 @@
                 <div class="card-footer bg-white panel-footer d-flex justify-content-between align-items-center gap-3">
                     <div class="d-flex align-items-center gap-2"><a class="btn btn-sm btn-light"
                                                                     th:classappend="${page<=0}?'disabled'"
-                                                                    th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page-1},bagliQ=${bagliQ},bagliPage=${bagliPage})}"><i
+                                                                    th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page-1},bagliQ=${bagliQ},bagliQrupId=${selectedBagliQrupId},bagliPage=${bagliPage})}"><i
                             class="ti ti-chevron-left"></i></a><span class="page-info"
                                                                      th:text="${availablePages==0?'0 səhifə':(page+1)+' / '+availablePages}"></span><a
                             class="btn btn-sm btn-light" th:classappend="${page+1>=availablePages}?'disabled'"
-                            th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page+1},bagliQ=${bagliQ},bagliPage=${bagliPage})}"><i
+                            th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page+1},bagliQ=${bagliQ},bagliQrupId=${selectedBagliQrupId},bagliPage=${bagliPage})}"><i
                             class="ti ti-chevron-right"></i></a></div>
                     <button class="btn btn-primary" id="catalogAdd" disabled><i class="ti ti-arrow-right me-1"></i><span
                             th:text="#{department_services.sobeye_elave_et}">Şöbəyə əlavə et </span><span
@@ -234,15 +242,32 @@
                                                                                              th:value="${selectedSobeId}"><input
                     type="hidden" name="q" th:value="${q}"><input type="hidden" name="qrupId"
                                                                   th:value="${selectedQrupId}">
-                <div class="input-group"><span class="input-group-text bg-white"><i
-                        class="ti ti-search"></i></span><input class="form-control" name="bagliQ" th:value="${bagliQ}"
-                                                               placeholder="Bağlı xidmətlərdə axtar..."
-                                                               th:placeholder="#{department_services.bagli_xidmetlerde_ax}">
+                <input type="hidden" name="page" th:value="${page}">
+                <div class="row g-2">
+                    <div class="col-md-7">
+                        <div class="input-group"><span class="input-group-text bg-white"><i
+                                class="ti ti-search"></i></span><input class="form-control" name="bagliQ" th:value="${bagliQ}"
+                                th:placeholder="#{department_services.bagli_xidmetlerde_ax}"></div>
+                    </div>
+                    <div class="col-md-5">
+                        <select class="form-select select2" name="bagliQrupId" onchange="this.form.submit()"
+                                th:data-placeholder="#{department_services.butun_xidmet_qruplar}">
+                            <option value="" th:text="#{department_services.butun_xidmet_qruplar}"></option>
+                            <option th:each="g:${xidmetQruplari}" th:value="${g.id}" th:selected="${g.id==selectedBagliQrupId}"
+                                    th:text="${#strings.repeat(' ',g.seviye)+(g.seviye > 0?'↳ ':'▰ ')+g.ad}"></option>
+                        </select>
+                    </div>
                 </div>
             </form>
             <form method="post" th:action="@{/parShobeXidmet/cixar}" id="assignedForm"><input type="hidden"
                                                                                               name="sobeId"
                                                                                               th:value="${selectedSobeId}">
+                <input type="hidden" name="qrupId" th:value="${selectedQrupId}">
+                <input type="hidden" name="q" th:value="${q}">
+                <input type="hidden" name="page" th:value="${page}">
+                <input type="hidden" name="bagliQrupId" th:value="${selectedBagliQrupId}">
+                <input type="hidden" name="bagliQ" th:value="${bagliQ}">
+                <input type="hidden" name="bagliPage" th:value="${bagliPage}">
                 <div class="table-responsive service-list">
                     <table class="table table-striped table-hover align-middle mb-0 service-table">
                         <thead>
@@ -275,11 +300,11 @@
                 <div class="card-footer bg-white panel-footer d-flex justify-content-between align-items-center gap-3">
                     <div class="d-flex align-items-center gap-2"><a class="btn btn-sm btn-light"
                                                                     th:classappend="${bagliPage<=0}?'disabled'"
-                                                                    th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page},bagliQ=${bagliQ},bagliPage=${bagliPage-1})}"><i
+                                                                    th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page},bagliQ=${bagliQ},bagliQrupId=${selectedBagliQrupId},bagliPage=${bagliPage-1})}"><i
                             class="ti ti-chevron-left"></i></a><span class="page-info"
                                                                      th:text="${assignedPages==0?'0 səhifə':(bagliPage+1)+' / '+assignedPages}"></span><a
                             class="btn btn-sm btn-light" th:classappend="${bagliPage+1>=assignedPages}?'disabled'"
-                            th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page},bagliQ=${bagliQ},bagliPage=${bagliPage+1})}"><i
+                            th:href="@{/parShobeXidmet(sobeId=${selectedSobeId},q=${q},qrupId=${selectedQrupId},page=${page},bagliQ=${bagliQ},bagliQrupId=${selectedBagliQrupId},bagliPage=${bagliPage+1})}"><i
                             class="ti ti-chevron-right"></i></a></div>
                     <button class="btn btn-outline-danger" id="assignedRemove" disabled><i class="ti ti-trash me-1"></i><span
                             th:text="#{department_services.sobeden_cixar}">Şöbədən çıxar </span><span

@@ -25,7 +25,7 @@ public class SobeXidmetController {
     }
 
     @GetMapping("/parShobeXidmet")
-    public String list(@RequestParam(required = false) Long sobeId, @RequestParam(required = false) Long qrupId, @RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String bagliQ, @RequestParam(defaultValue = "0") int bagliPage, Model m, HttpSession session) {
+    public String list(@RequestParam(required = false) Long sobeId, @RequestParam(required = false) Long qrupId, @RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String bagliQ, @RequestParam(required = false) Long bagliQrupId, @RequestParam(defaultValue = "0") int bagliPage, Model m, HttpSession session) {
         final int size = 100;
         Long klinikaId = (Long) session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         var sobeler = sobeRepo.findByKlinikaId(klinikaId).stream().filter(s -> Boolean.TRUE.equals(s.aktiv())).toList();
@@ -35,12 +35,12 @@ public class SobeXidmetController {
         page = Math.max(0, page);
         bagliPage = Math.max(0, bagliPage);
         long availableCount = xidmetRepo.countAvailableForDepartment(klinikaId, sobeId, qrupId, q);
-        long assignedCount = relationRepo.count(sobeId, bagliQ);
+        long assignedCount = relationRepo.count(sobeId, bagliQrupId, bagliQ);
         int availablePages = (int) Math.ceil(availableCount / (double) size), assignedPages = (int) Math.ceil(assignedCount / (double) size);
         if (page > 0 && page >= availablePages) page = Math.max(0, availablePages - 1);
         if (bagliPage > 0 && bagliPage >= assignedPages) bagliPage = Math.max(0, assignedPages - 1);
         var available = xidmetRepo.availableForDepartment(klinikaId, sobeId, qrupId, q, size, page * size);
-        var assigned = relationRepo.findPage(sobeId, bagliQ, size, bagliPage * size);
+        var assigned = relationRepo.findPage(sobeId, bagliQrupId, bagliQ, size, bagliPage * size);
         m.addAttribute("pageTitle", "Şöbə xidmətləri");
         m.addAttribute("activeMenuGroup", "adminPanel");
         m.addAttribute("activeMenu", "sobeXidmetleri");
@@ -52,6 +52,7 @@ public class SobeXidmetController {
         m.addAttribute("selectedQrupId", qrupId);
         m.addAttribute("q", q);
         m.addAttribute("bagliQ", bagliQ);
+        m.addAttribute("selectedBagliQrupId", bagliQrupId);
         m.addAttribute("availableCount", availableCount);
         m.addAttribute("assignedCount", assignedCount);
         m.addAttribute("page", page);
@@ -62,17 +63,41 @@ public class SobeXidmetController {
     }
 
     @PostMapping("/parShobeXidmet/elave")
-    public String add(@RequestParam Long sobeId, @RequestParam List<Long> xidmetIdleri, HttpSession s, RedirectAttributes a) {
+    public String add(@RequestParam Long sobeId, @RequestParam List<Long> xidmetIdleri, @RequestParam(required = false) Long qrupId,
+                      @RequestParam(required = false) String q,
+                      @RequestParam(defaultValue = "0") int page,
+                      @RequestParam(required = false) Long bagliQrupId,
+                      @RequestParam(required = false) String bagliQ,
+                      @RequestParam(defaultValue = "0") int bagliPage,
+                      HttpSession s, RedirectAttributes a) {
+        preserveFilters(a, qrupId, q, page, bagliQrupId, bagliQ, bagliPage);
         if (!belongs(sobeId, s)) return error(a, "Şöbə seçilmiş klinikaya aid deyil.", sobeId);
         flash(relationRepo.add(sobeId, xidmetIdleri), a, "Xidmətlər şöbəyə əlavə edildi.");
         return redirect(sobeId);
     }
 
     @PostMapping("/parShobeXidmet/cixar")
-    public String remove(@RequestParam Long sobeId, @RequestParam List<Long> xidmetIdleri, HttpSession s, RedirectAttributes a) {
+    public String remove(@RequestParam Long sobeId, @RequestParam List<Long> xidmetIdleri, @RequestParam(required = false) Long qrupId,
+                      @RequestParam(required = false) String q,
+                      @RequestParam(defaultValue = "0") int page,
+                      @RequestParam(required = false) Long bagliQrupId,
+                      @RequestParam(required = false) String bagliQ,
+                      @RequestParam(defaultValue = "0") int bagliPage,
+                      HttpSession s, RedirectAttributes a) {
+        preserveFilters(a, qrupId, q, page, bagliQrupId, bagliQ, bagliPage);
         if (!belongs(sobeId, s)) return error(a, "Şöbə seçilmiş klinikaya aid deyil.", sobeId);
         flash(relationRepo.remove(sobeId, xidmetIdleri), a, "Xidmətlər şöbədən çıxarıldı.");
         return redirect(sobeId);
+    }
+
+    private void preserveFilters(RedirectAttributes a, Long qrupId, String q, int page,
+                                 Long bagliQrupId, String bagliQ, int bagliPage) {
+        if (qrupId != null) a.addAttribute("qrupId", qrupId);
+        if (q != null) a.addAttribute("q", q);
+        a.addAttribute("page", Math.max(0, page));
+        if (bagliQrupId != null) a.addAttribute("bagliQrupId", bagliQrupId);
+        if (bagliQ != null) a.addAttribute("bagliQ", bagliQ);
+        a.addAttribute("bagliPage", Math.max(0, bagliPage));
     }
 
     private boolean belongs(Long id, HttpSession s) {
