@@ -42,9 +42,26 @@ public class VezifeRepository {
         );
     }
 
-    public void update(Long id, String ad, String aciqlama, boolean aktiv) {
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id).addValue("ad", ad.trim()).addValue("aciqlama", blank(aciqlama)).addValue("aktiv", aktiv);
-        jdbc.queryForList("SELECT * FROM public.fn_vezife_yenile(p_vezife_id=>:id,p_ad=>:ad,p_aciqlama=>:aciqlama,p_aciqlama_deyisdirilsin=>true,p_aktiv=>:aktiv)", params);
+    public String update(Long id, String ad, String aciqlama, boolean aktiv) {
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("ad", ad.trim())
+                .addValue("aciqlama", blank(aciqlama))
+                .addValue("aktiv", aktiv);
+
+        return jdbc.queryForObject("""
+            SELECT mesaj
+            FROM public.fn_vezife_yenile(
+                p_vezife_id => :id,
+                p_ad => :ad,
+                p_aciqlama => :aciqlama,
+                p_aktiv => :aktiv
+            )
+            """,
+                params,
+                String.class
+        );
     }
 
     private static String blank(String s) {

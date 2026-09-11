@@ -47,9 +47,17 @@ public class VezifeController {
     }
 
     @PostMapping("/vezifeler/yenile")
-    public String update(@RequestParam Long vezifeId, @RequestParam String ad, @RequestParam(required = false) String aciqlama, @RequestParam(defaultValue = "false") boolean aktiv, RedirectAttributes a) {
-        repo.update(vezifeId, ad, aciqlama, aktiv);
-        a.addFlashAttribute("successMessage", "Vəzifə yeniləndi.");
+    public String update(
+            @RequestParam Long vezifeId,
+            @RequestParam String ad,
+            @RequestParam(required = false) String aciqlama,
+            @RequestParam(defaultValue = "false") boolean aktiv,
+            RedirectAttributes a) {
+
+        String mesaj = repo.update(vezifeId, ad, aciqlama, aktiv);
+
+        a.addFlashAttribute("successMessage", mesaj);
+
         return "redirect:/vezifeler";
     }
 
