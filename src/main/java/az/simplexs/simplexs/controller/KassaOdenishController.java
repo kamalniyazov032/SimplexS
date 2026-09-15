@@ -156,8 +156,8 @@ public class KassaOdenishController {
         var source=print?paper:detail;
         var payments=receiptJson(source.get("odenisler"));var services=receiptJson(source.get("xidmetler"));
         model.addAttribute("receiptPayments",payments);model.addAttribute("receiptServices",services);
-        model.addAttribute("receiptPaymentTotal",payments.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add));
-        model.addAttribute("receiptServiceTotal",services.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add));
+        model.addAttribute("receiptPaymentTotal",payments.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,(left, right) -> left.add(right)));
+        model.addAttribute("receiptServiceTotal",services.stream().map(r->KassaEmeliyyatService.money(r,"mebleg")).reduce(BigDecimal.ZERO,(left, right) -> left.add(right)));
         boolean cancelPermission=Boolean.TRUE.equals(cash.get("islesin")) && service.canCancelReceipt(auth,clinic(session));
         model.addAttribute("cancelPermission",cancelPermission);
         boolean canCancel=cancelPermission && "TAMAMLANIB".equals(paper.get("status"));

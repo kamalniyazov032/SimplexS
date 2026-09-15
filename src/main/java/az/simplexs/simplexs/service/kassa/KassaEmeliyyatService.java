@@ -51,15 +51,15 @@ public class KassaEmeliyyatService {
     public Map<String,Object> refundAdvance(Authentication auth,Long clinic,Long cash,Long visit,Long advance,
             Long account,Long type,BigDecimal amount,String note) {
         requireCash(auth,clinic,cash,true);
-        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) fail("advanceRefundStale");
+        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) throw failure("advanceRefundStale");
         var row=repo.refundableAdvances(clinic,cash,visit).stream()
             .filter(r->Objects.equals(id(r,"avans_id"),advance) && Objects.equals(id(r,"gelis_id"),visit)
                 && money(r,"qalan_mebleg").signum()>0).findFirst().orElseThrow(()->new PaymentValidationException("advanceRefundStale"));
-        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) fail("invalidPayment");
-        if(amount.compareTo(money(row,"qalan_mebleg"))>0) fail("advanceRefundOver");
-        if(account==null || repo.accountingCodes(clinic,"AVANS_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
-        if(type==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),type))) fail("invalidPayment");
-        if(note!=null && note.length()>1000) fail("noteLong");
+        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) throw failure("invalidPayment");
+        if(amount.compareTo(money(row,"qalan_mebleg"))>0) throw failure("advanceRefundOver");
+        if(account==null || repo.accountingCodes(clinic,"AVANS_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
+        if(type==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),type))) throw failure("invalidPayment");
+        if(note!=null && note.length()>1000) throw failure("noteLong");
         return repo.refundAdvance(clinic,cash,personalId(auth),visit,advance,account,type,amount.setScale(2),note==null?null:note.trim());
     }
     @Transactional
@@ -69,21 +69,21 @@ public class KassaEmeliyyatService {
         var reason=receiptCancelReasons().stream().filter(r->Objects.equals(r.id(),reasonId)).findFirst()
             .orElseThrow(()->new PaymentValidationException("receiptCancelReasonSelect"));
         var detail=repo.receiptDetail(clinic,cash,receipt);
-        if(detail.isEmpty()) fail("receiptNotFound");
+        if(detail.isEmpty()) throw failure("receiptNotFound");
         var print=repo.receiptPrint(clinic,cash,receipt);
-        if(!"TAMAMLANIB".equals(print.get("status"))) fail("receiptNotCancelable");
+        if(!"TAMAMLANIB".equals(print.get("status"))) throw failure("receiptNotCancelable");
         return repo.cancelReceipt(clinic,cash,receipt,personalId(auth),reason.ad());
     }
     @Transactional
     public Map<String,Object> transfer(Authentication auth,Long clinic,Long cash,Long recipient,Long account,BigDecimal amount,String note) {
         requireCash(auth,clinic,cash,true);
         if(recipient==null || recipient.equals(cash) || repo.transferRecipients(clinic,cash).stream()
-                .noneMatch(r->Objects.equals(id(r,"kassa_id"),recipient))) fail("invalidTransferRecipient");
+                .noneMatch(r->Objects.equals(id(r,"kassa_id"),recipient))) throw failure("invalidTransferRecipient");
         if(account==null || repo.accountingCodes(clinic,"KASSA_TRANSFER").stream()
-                .noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
-        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) fail("invalidPayment");
-        if(note!=null && note.length()>1000) fail("noteLong");
-        if(amount.compareTo(money(repo.balance(clinic,cash),"cari_balans"))>0) fail("transferInsufficientBalance");
+                .noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
+        if(amount==null || amount.signum()<=0 || amount.compareTo(MAX_MONEY)>0 || amount.stripTrailingZeros().scale()>2) throw failure("invalidPayment");
+        if(note!=null && note.length()>1000) throw failure("noteLong");
+        if(amount.compareTo(money(repo.balance(clinic,cash),"cari_balans"))>0) throw failure("transferInsufficientBalance");
         return repo.transfer(clinic,cash,recipient,personalId(auth),account,amount.setScale(2),note==null?null:note.trim());
     }
     @Transactional
@@ -91,22 +91,22 @@ public class KassaEmeliyyatService {
             List<Long> selected, List<Long> types, List<BigDecimal> amounts, boolean borrow, String note) {
         requireCash(auth,clinic,cash,true);
         if (target==null || target<=0 || selected==null || selected.isEmpty() || selected.size()>1000
-                || new HashSet<>(selected).size()!=selected.size() || selected.stream().anyMatch(x->x==null || x<=0)) fail("selectServices");
-        if (types==null || amounts==null || types.size()!=amounts.size() || types.isEmpty() || types.size()>20) fail("invalidPayment");
-        if (note!=null && note.length()>1000) fail("noteLong");
+                || new HashSet<>(selected).size()!=selected.size() || selected.stream().anyMatch(x->x==null || x<=0)) throw failure("selectServices");
+        if (types==null || amounts==null || types.size()!=amounts.size() || types.isEmpty() || types.size()>20) throw failure("invalidPayment");
+        if (note!=null && note.length()>1000) throw failure("noteLong");
         if (borrow && (debt || !canBorrow(auth,clinic))) throw new AccessDeniedException("kassa.denied");
-        if (!repo.lockPatient(clinic,target,debt)) fail("staleServices");
+        if (!repo.lockPatient(clinic,target,debt)) throw failure("staleServices");
         var rows=debt ? repo.debtServices(clinic,cash,target) : repo.services(clinic,cash,target);
         String key=debt ? "borclandirma_xidmet_id" : "xeste_xidmet_id";
         Map<Long,BigDecimal> available=new HashMap<>();
         rows.stream().filter(r->selectable(r,debt)).forEach(r->available.put(id(r,key),money(r,debt?"qalan_borc":"qalan_mebleg")));
-        if (!available.keySet().containsAll(selected)) fail("staleServices");
+        if (!available.keySet().containsAll(selected)) throw failure("staleServices");
         var payments = validatePayments(types,amounts);
         BigDecimal total = payments.total();
-        BigDecimal due=selected.stream().map(available::get).reduce(BigDecimal.ZERO,BigDecimal::add);
-        if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) fail("invalidPayment");
-        if(total.compareTo(due)>0) fail("overpayment");
-        if(!debt && total.compareTo(due)<0 && !borrow) fail("borrowRequired");
+        BigDecimal due=selected.stream().map(available::get).reduce(BigDecimal.ZERO,(left, right) -> left.add(right));
+        if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) throw failure("invalidPayment");
+        if(total.compareTo(due)>0) throw failure("overpayment");
+        if(!debt && total.compareTo(due)<0 && !borrow) throw failure("borrowRequired");
         String serviceJson=selected.stream().map(x->"{\""+key+"\":"+x+"}").collect(Collectors.joining(",","[","]"));
         return repo.pay(clinic,cash,personalId(auth),target,debt,serviceJson,
                 payments.json(),borrow,note==null?null:note.trim());
@@ -115,9 +115,9 @@ public class KassaEmeliyyatService {
     public Map<String,Object> otherIncome(Authentication auth, Long clinic, Long cash, Long account,
             List<Long> types, List<BigDecimal> amounts, String note) {
         requireCash(auth,clinic,cash,true);
-        if (note!=null && note.length()>1000) fail("noteLong");
+        if (note!=null && note.length()>1000) throw failure("noteLong");
         if (account==null || repo.accountingCodes(clinic,"DIGER_GIRIS").stream()
-                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
         var payments=validatePayments(types,amounts);
         return repo.otherIncome(clinic,cash,personalId(auth),account,payments.json(),note==null?null:note.trim());
     }
@@ -125,9 +125,9 @@ public class KassaEmeliyyatService {
     public Map<String,Object> otherExpense(Authentication auth, Long clinic, Long cash, Long account,
             List<Long> types, List<BigDecimal> amounts, String note) {
         requireCash(auth,clinic,cash,true);
-        if (note!=null && note.length()>1000) fail("noteLong");
+        if (note!=null && note.length()>1000) throw failure("noteLong");
         if (account==null || repo.accountingCodes(clinic,"DIGER_CIXIS").stream()
-                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
+                .noneMatch(row -> Objects.equals(id(row,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
         var payments=validatePayments(types,amounts);
         return repo.otherExpense(clinic,cash,personalId(auth),account,payments.json(),note==null?null:note.trim());
     }
@@ -135,12 +135,12 @@ public class KassaEmeliyyatService {
     public Map<String,Object> advance(Authentication auth,Long clinic,Long cash,Long visit,Long account,
             List<Long> types,List<BigDecimal> amounts,String note) {
         requireCash(auth,clinic,cash,true);
-        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) fail("selectAdvancePatient");
+        if(visit==null || visit<=0 || !repo.lockPatient(clinic,visit,false)) throw failure("selectAdvancePatient");
         var patient=repo.advanceVisit(clinic,cash,visit);
-        if(id(patient,"xeste_id")==null) fail("selectAdvancePatient");
+        if(id(patient,"xeste_id")==null) throw failure("selectAdvancePatient");
         if(account==null || repo.accountingCodes(clinic,"AVANS_QEBUL").stream()
-                .noneMatch(row->Objects.equals(id(row,"muhasibat_kodu_id"),account))) fail("invalidAccount");
-        if(note!=null && note.length()>1000) fail("noteLong");
+                .noneMatch(row->Objects.equals(id(row,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
+        if(note!=null && note.length()>1000) throw failure("noteLong");
         var payments=validatePayments(types,amounts);
         return repo.advance(clinic,cash,personalId(auth),id(patient,"xeste_id"),visit,account,payments.json(),note==null?null:note.trim());
     }
@@ -149,27 +149,27 @@ public class KassaEmeliyyatService {
             Long account,Long paymentType,BigDecimal expectedTotal,String note) {
         requireCash(auth,clinic,cash,true);
         if(visit==null || visit<=0 || selected==null || selected.isEmpty() || selected.size()>1000
-                || selected.stream().anyMatch(id->id==null || id<=0) || new HashSet<>(selected).size()!=selected.size()) fail("selectRefundServices");
-        if(note!=null && note.length()>1000) fail("noteLong");
-        if(!repo.lockPatient(clinic,visit,false)) fail("refundStale");
+                || selected.stream().anyMatch(id->id==null || id<=0) || new HashSet<>(selected).size()!=selected.size()) throw failure("selectRefundServices");
+        if(note!=null && note.length()>1000) throw failure("noteLong");
+        if(!repo.lockPatient(clinic,visit,false)) throw failure("refundStale");
         var rows=repo.refundServices(clinic,cash,visit);
         var eligible=rows.stream().filter(r->Objects.equals(id(r,"gelis_id"),visit)
                 && "YENI".equals(r.get("status_kodu")) && money(r,"qaytarila_bilen_mebleg").signum()>0).toList();
         Map<Long,Map<String,Object>> byId=new HashMap<>();
         eligible.forEach(r->byId.put(id(r,"xeste_xidmet_id"),r));
-        if(!byId.keySet().containsAll(selected)) fail("refundStale");
+        if(!byId.keySet().containsAll(selected)) throw failure("refundStale");
         String protocol=(String)byId.get(selected.getFirst()).get("protokol_kodu");
-        if(protocol==null || protocol.isBlank() || selected.stream().anyMatch(id->!protocol.equals(byId.get(id).get("protokol_kodu")))) fail("refundStale");
-        BigDecimal total=selected.stream().map(id->money(byId.get(id),"qaytarila_bilen_mebleg")).reduce(BigDecimal.ZERO,BigDecimal::add);
-        if(expectedTotal==null || total.compareTo(expectedTotal)!=0 || total.compareTo(MAX_MONEY)>0) fail("refundAmountChanged");
-        if(account==null || repo.accountingCodes(clinic,"XESTE_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) fail("invalidAccount");
-        if(paymentType==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),paymentType))) fail("invalidPayment");
+        if(protocol==null || protocol.isBlank() || selected.stream().anyMatch(id->!protocol.equals(byId.get(id).get("protokol_kodu")))) throw failure("refundStale");
+        BigDecimal total=selected.stream().map(id->money(byId.get(id),"qaytarila_bilen_mebleg")).reduce(BigDecimal.ZERO,(left, right) -> left.add(right));
+        if(expectedTotal==null || total.compareTo(expectedTotal)!=0 || total.compareTo(MAX_MONEY)>0) throw failure("refundAmountChanged");
+        if(account==null || repo.accountingCodes(clinic,"XESTE_QAYTARMA").stream().noneMatch(r->Objects.equals(id(r,"muhasibat_kodu_id"),account))) throw failure("invalidAccount");
+        if(paymentType==null || repo.paymentTypes().stream().noneMatch(r->Objects.equals(id(r,"odenis_novu_id"),paymentType))) throw failure("invalidPayment");
         String json=selected.stream().map(id->"{\"xeste_xidmet_id\":"+id+"}").collect(Collectors.joining(",","[","]"));
         return repo.refund(clinic,cash,personalId(auth),protocol,account,json,paymentType,note==null?null:note.trim());
     }
     private record PaymentAmounts(BigDecimal total, String json) {}
     private PaymentAmounts validatePayments(List<Long> types,List<BigDecimal> amounts) {
-        if (types==null || amounts==null || types.size()!=amounts.size() || types.isEmpty() || types.size()>20) fail("invalidPayment");
+        if (types==null || amounts==null || types.size()!=amounts.size() || types.isEmpty() || types.size()>20) throw failure("invalidPayment");
         Set<Long> allowed=repo.paymentTypes().stream().map(r->id(r,"odenis_novu_id")).collect(Collectors.toSet());
         BigDecimal total=BigDecimal.ZERO;
         List<String> paymentJson=new ArrayList<>();
@@ -179,15 +179,16 @@ public class KassaEmeliyyatService {
             // Empty amounts let the user leave unused payment methods untouched.
             if(amount==null || amount.signum()==0) continue;
             if(!allowed.contains(types.get(i)) || !seen.add(types.get(i)) || amount.signum()<0
-                    || amount.stripTrailingZeros().scale()>2 || amount.compareTo(MAX_MONEY)>0) fail("invalidPayment");
+                    || amount.stripTrailingZeros().scale()>2 || amount.compareTo(MAX_MONEY)>0) throw failure("invalidPayment");
             total=total.add(amount);
             paymentJson.add("{\"odenis_novu_id\":"+types.get(i)+",\"mebleg\":"+amount.toPlainString()+"}");
         }
-        if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) fail("invalidPayment");
+        if(total.signum()<=0 || total.compareTo(MAX_MONEY)>0) throw failure("invalidPayment");
         return new PaymentAmounts(total,"["+String.join(",",paymentJson)+"]");
     }
-    private static void fail(String key) { throw new PaymentValidationException(key); }
+    private static PaymentValidationException failure(String key) { return new PaymentValidationException(key); }
     public static class PaymentValidationException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
         public PaymentValidationException(String key) { super("kassa."+key); }
     }
 }

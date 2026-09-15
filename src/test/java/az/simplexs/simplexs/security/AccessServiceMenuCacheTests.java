@@ -36,10 +36,10 @@ class AccessServiceMenuCacheTests {
         time.set(Duration.ofMinutes(9).toNanos());
         access.menuSystems(user, 2L);
         access.menu(user, 2L);
-        verify(jdbc, times(1)).query(anyString(), any(SqlParameterSource.class), any(RowMapper.class));
+        verify(jdbc, times(1)).query(anyString(), any(SqlParameterSource.class), org.mockito.ArgumentMatchers.<RowMapper<Object>>any());
         time.set(Duration.ofMinutes(10).toNanos());
         access.menuSystems(user, 2L);
-        verify(jdbc, times(2)).query(anyString(), any(SqlParameterSource.class), any(RowMapper.class));
+        verify(jdbc, times(2)).query(anyString(), any(SqlParameterSource.class), org.mockito.ArgumentMatchers.<RowMapper<Object>>any());
     }
 
     @Test
@@ -52,7 +52,15 @@ class AccessServiceMenuCacheTests {
         access.menuSystems(user(1), 2L);
         LocaleContextHolder.setLocale(Locale.forLanguageTag("az"));
         access.menuSystems(user(1), 2L);
-        verify(jdbc, times(4)).query(anyString(), any(SqlParameterSource.class), any(RowMapper.class));
+        verify(jdbc, times(4)).query(anyString(), any(SqlParameterSource.class), org.mockito.ArgumentMatchers.<RowMapper<Object>>any());
+    }
+
+    @Test
+    void moduleChangesInvalidateMenusImmediately() {
+        access.menuSystems(user(1), 2L);
+        access.invalidateModuleCaches();
+        access.menuSystems(user(1), 2L);
+        verify(jdbc, times(2)).query(anyString(), any(SqlParameterSource.class), org.mockito.ArgumentMatchers.<RowMapper<Object>>any());
     }
 
     @Test

@@ -1,4 +1,5 @@
 target/
+.java-build/
 *.log
 *.jar
 *.war

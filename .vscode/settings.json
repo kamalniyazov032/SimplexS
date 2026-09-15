@@ -11,6 +11,18 @@
         }
     ],
     "java.import.exclusions": [
-        "**/target/**"
-    ]
+        "**/target/**",
+        "**/.java-build/**"
+    ],
+    "files.watcherExclude": {
+        "**/.java-build/**": true
+    },
+    "files.exclude": {
+        "**/.java-build": true
+    },
+    "search.exclude": {
+        "**/.java-build/**": true
+    },
+    "java.server.launchMode": "Standard",
+    "java.autobuild.enabled": true
 }

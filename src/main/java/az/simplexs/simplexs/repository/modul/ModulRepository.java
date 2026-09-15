@@ -18,10 +18,11 @@ public class ModulRepository {
     public List<ModulListItem> findAll(){
         return jdbc.query("""
             WITH RECURSIVE tree AS (
-              SELECT m.*,0 AS seviyye,m.ad::text AS tam_yol,ARRAY[m.id] AS yol
+              SELECT m.*,0 AS seviyye,m.ad::text AS tam_yol,ARRAY[m.id] AS yol,ARRAY[coalesce(m.sira_no,2147483647)::bigint,m.id] AS siralama
               FROM public.rn_modullar m WHERE m.parent_id IS NULL
               UNION ALL
-              SELECT m.*,t.seviyye+1,(t.tam_yol||' / '||m.ad)::text,t.yol||m.id
+              SELECT m.*,t.seviyye+1,(t.tam_yol||' / '||m.ad)::text,t.yol||m.id,
+                     t.siralama||ARRAY[coalesce(m.sira_no,2147483647)::bigint,m.id]
               FROM public.rn_modullar m JOIN tree t ON m.parent_id=t.id
               WHERE NOT m.id=ANY(t.yol)
             )
@@ -29,7 +30,7 @@ public class ModulRepository {
                    t.id,t.parent_id,t.kod,t.ad,t.aciqlama,t.route,t.ikon,t.menyuda_gorunsun,
                    t.aktiv,t.sira_no,t.seviyye,t.tam_yol
             FROM tree t JOIN public.rn_sistemler s ON s.id=t.sistem_id
-            ORDER BY s.sira_no NULLS LAST,s.ad,t.yol
+            ORDER BY s.sira_no NULLS LAST,s.ad,t.siralama
             """,(rs,row)->new ModulListItem(rs.getObject("sistem_id",Long.class),
                 rs.getString("sistem_kodu"),rs.getString("sistem_adi"),rs.getString("sistem_ikonu"),
                 rs.getLong("id"),rs.getObject("parent_id",Long.class),
@@ -67,13 +68,13 @@ public class ModulRepository {
                 .addValue("ikon",ikon).addValue("siraNo",siraNo));
     }
 
-    public Map<String,Object> createGroup(Long sistemId,String kod,String ad,String aciqlama,
+    public Map<String,Object> createGroup(Long sistemId,Long parentId,String kod,String ad,String aciqlama,
             String ikon,Integer siraNo){
         return jdbc.queryForMap("""
-            SELECT status_kodu,modul_id,mesaj FROM public.kn_modul_qrupu_yarat(
-              CAST(:sistemId AS bigint),CAST(:kod AS varchar),CAST(:ad AS varchar),
+            SELECT status_kodu,modul_id,mesaj FROM public.kn_modul_qrupu_yarat_4(
+              CAST(:sistemId AS bigint),CAST(:parentId AS bigint),CAST(:kod AS varchar),CAST(:ad AS varchar),
               CAST(:aciqlama AS varchar),CAST(:ikon AS varchar),CAST(:siraNo AS integer))
-            """,new MapSqlParameterSource("sistemId",sistemId).addValue("kod",kod)
+            """,new MapSqlParameterSource("sistemId",sistemId).addValue("parentId",parentId).addValue("kod",kod)
                 .addValue("ad",ad).addValue("aciqlama",aciqlama)
                 .addValue("ikon",ikon).addValue("siraNo",siraNo));
     }

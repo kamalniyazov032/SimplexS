@@ -99,6 +99,12 @@ public class AccessService {
         }
     }
 
+    public void invalidateModuleCaches() {
+        synchronized (menuCache) { menuCache.clear(); }
+        registeredRouteCache.clear();
+        permissionCache.clear();
+    }
+
     private record MenuCacheKey(Long personalId, Long clinicId, Locale locale) {
     }
 

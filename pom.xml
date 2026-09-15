@@ -95,6 +95,20 @@
 
 
 
+	<profiles>
+		<!-- Keep the VS Code/Eclipse incremental compiler separate from Maven/IntelliJ.
+		     Sharing target/classes leaves JDT with missing types when another builder cleans it. -->
+		<profile>
+			<id>m2e-workspace</id>
+			<activation>
+				<property><name>m2e.version</name></property>
+			</activation>
+			<build>
+				<directory>${project.basedir}/.java-build</directory>
+			</build>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>

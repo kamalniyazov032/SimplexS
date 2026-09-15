@@ -1,6 +1,11 @@
 package az.simplexs.simplexs.controller;
 
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import az.simplexs.simplexs.security.ModuleHierarchy;
+import az.simplexs.simplexs.security.AccessService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,12 +19,16 @@ import az.simplexs.simplexs.repository.modul.ModulRepository;
 @Controller
 public class ModulController {
     private final ModulRepository repository;
-    public ModulController(ModulRepository repository){this.repository=repository;}
+    private final MessageSource messages;
+    private final AccessService access;
+    public ModulController(ModulRepository repository, MessageSource messages, AccessService access){this.repository=repository;this.messages=messages;this.access=access;}
 
     @GetMapping("/modullar")
     public String list(Model model){
         var modules=repository.findAll();
-        model.addAttribute("pageTitle","Modulların idarə edilməsi");
+        model.addAttribute("pageTitle",message("modules.modullarin_idare_edilmesi"));
+        model.addAttribute("parentOptions", modules.stream().collect(Collectors.toMap(m -> m.id(), m -> ModuleHierarchy.parents(modules, m.id()))));
+        model.addAttribute("newParentOptions", ModuleHierarchy.parents(modules, null));
         model.addAttribute("activeMenu","modullar");
         model.addAttribute("modullar",modules);
         model.addAttribute("sistemler",repository.findSystems());
@@ -49,12 +58,17 @@ public class ModulController {
     @PostMapping(value="/modullar/yenile",params="action=createGroup")
     public String createGroup(@RequestParam Long sistemId,@RequestParam String kod,@RequestParam String ad,
             @RequestParam(required=false)String aciqlama,@RequestParam(required=false)String ikon,
-            @RequestParam(required=false)Integer siraNo,RedirectAttributes attributes){
-        flash(repository.createGroup(sistemId,kod,ad,aciqlama,ikon,siraNo),attributes);return "redirect:/modullar";
+            @RequestParam(required=false)Integer siraNo,@RequestParam(required=false)Long parentId,RedirectAttributes attributes){
+        flash(repository.createGroup(sistemId,parentId,kod,ad,aciqlama,ikon,siraNo),attributes);return "redirect:/modullar";
+    }
+
+    private String message(String key){
+        return messages.getMessage(key,null,messages.getMessage("modules.save_error",null,LocaleContextHolder.getLocale()),LocaleContextHolder.getLocale());
     }
 
     private void flash(Map<String,Object> result,RedirectAttributes attributes){
         boolean success="UGURLU".equals(result.get("status_kodu"));
-        attributes.addFlashAttribute(success?"successMessage":"errorMessage",result.get("mesaj"));
+        if (success) access.invalidateModuleCaches();
+        attributes.addFlashAttribute(success?"successMessage":"errorMessage",message(success ? "modules.saved" : String.valueOf(result.get("mesaj"))));
     }
 }

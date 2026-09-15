@@ -26,7 +26,11 @@ class QiymetRepositoryTests {
         var status = mock(TransactionStatus.class);
         when(manager.getTransaction(any(TransactionDefinition.class))).thenReturn(status);
         var proxy = new ProxyFactory(new QiymetRepository(jdbc));
-        proxy.addAdvice(new TransactionInterceptor(manager, new AnnotationTransactionAttributeSource()));
+        var interceptor = new TransactionInterceptor();
+        interceptor.setTransactionManager(manager);
+        interceptor.setTransactionAttributeSource(new AnnotationTransactionAttributeSource());
+        interceptor.afterPropertiesSet();
+        proxy.addAdvice(interceptor);
         var repository = (QiymetRepository) proxy.getProxy();
         String json = "[{\"xidmet_id\":10,\"qiymet\":50,\"edv_aktivdir\":false,\"xeste_payi\":30,\"sigorta_payi\":70,\"xeste_endirim\":10,\"sigorta_endirim\":5}]";
         repository.qiymetleriSaxla(4L, json, 17L);

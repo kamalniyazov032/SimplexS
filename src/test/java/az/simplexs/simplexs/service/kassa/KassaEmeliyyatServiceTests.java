@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 
 class KassaEmeliyyatServiceTests {
     final KassaEmeliyyatRepository repo=mock(KassaEmeliyyatRepository.class);
@@ -32,6 +31,18 @@ class KassaEmeliyyatServiceTests {
     }
     private void pay(boolean debt,List<Long> ids,List<BigDecimal> amounts,boolean borrow) {
         service.pay(auth,1L,7L,17L,debt,ids,List.of(1L,2L),amounts,borrow," Test ");
+    }
+    @Test void rejectsNullPaymentInputsWithValidationMessages() {
+        assertThatThrownBy(() -> service.pay(auth,1L,7L,17L,false,null,List.of(1L),List.of(BigDecimal.ONE),false,null))
+                .isInstanceOf(KassaEmeliyyatService.PaymentValidationException.class).hasMessage("kassa.selectServices");
+        assertThatThrownBy(() -> service.pay(auth,1L,7L,17L,false,List.of(101L),null,List.of(BigDecimal.ONE),false,null))
+                .isInstanceOf(KassaEmeliyyatService.PaymentValidationException.class).hasMessage("kassa.invalidPayment");
+        assertThatThrownBy(() -> service.pay(auth,1L,7L,17L,false,List.of(101L),List.of(1L),null,false,null))
+                .isInstanceOf(KassaEmeliyyatService.PaymentValidationException.class).hasMessage("kassa.invalidPayment");
+        assertThatThrownBy(() -> service.refund(auth,1L,7L,17L,null,7L,1L,BigDecimal.ONE,null))
+                .isInstanceOf(KassaEmeliyyatService.PaymentValidationException.class).hasMessage("kassa.selectRefundServices");
+        verify(repo,never()).pay(any(),any(),any(),any(),anyBoolean(),any(),any(),anyBoolean(),any());
+        verify(repo,never()).lockPatient(any(),any(),anyBoolean());
     }
     @Test void paymentUsesAuthenticatedPersonalAndExactSplitAmounts() {
         pay(false,List.of(101L),List.of(new BigDecimal("5.10"),new BigDecimal("7.20")),false);

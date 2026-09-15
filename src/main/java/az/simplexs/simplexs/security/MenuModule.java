@@ -16,12 +16,14 @@ public class MenuModule {
         this.id=id; this.parentId=parentId; this.code=code; this.name=name; this.route=route; this.icon=icon;
     }
     public Long getId(){return id;} public Long getParentId(){return parentId;} public String getCode(){return code;}
-    public String getName(){return name;} public String getRoute(){return route;} public String getIcon(){return icon;}
+    public String getName(){return name;} public String getRoute(){return route == null && isInvoiceModule() ? "/eczaxana/qaimeler" : route;}
+    public boolean isInvoiceModule(){return "HIS_PHARMACY_INVOICES".equals(code);} public String getIcon(){return icon;}
     public List<MenuModule> getChildren(){return children;}
 
     public boolean containsRoute(String requestUri) {
         if (requestUri == null) return false;
-        if (route != null && (requestUri.equals(route) || requestUri.startsWith(route + "/"))) return true;
+        String destination = getRoute();
+        if (destination != null && (requestUri.equals(destination) || requestUri.startsWith(destination + "/"))) return true;
         return children.stream().anyMatch(child -> child.containsRoute(requestUri));
     }
 }
