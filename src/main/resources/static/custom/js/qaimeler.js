@@ -7,7 +7,15 @@
     const warehouse = $('qaimeWarehouse'), year = $('qaimeYear'), filter = $('qaimeFilterForm');
     const header = $('qaimeHeaderForm'), material = $('qaimeMaterialForm');
     const state = {epoch: 0, listRequest: 0, detailRequest: 0, catalogRequest: 0, page: 1, total: 0, rows: [], selected: null, details: [], options: {}, draft: [], edit: null, materialMode: null, materialItem: null, draftIndex: -1, filters: {}, editorScope: null, dirty: false, busy: false};
-    const editor = bootstrap.Offcanvas.getOrCreateInstance($('qaimeEditor'));
+    const editor = {
+        show() { root.classList.add('qaime-editing');$('qaimeEditor').classList.remove('d-none');$('qaimeBack').focus(); },
+        hide() { root.classList.remove('qaime-editing');$('qaimeEditor').classList.add('d-none');$('qaimeNew').focus(); }
+    };
+    function backToList() {
+        if(state.busy || (state.dirty && !window.confirm(t.confirmDiscard)))return;
+        state.catalogRequest++;state.dirty=false;editor.hide();
+    }
+    const materialHome = material.parentElement;
     const materialEditor = bootstrap.Modal.getOrCreateInstance($('qaimeMaterialEditor'));
     const filterPanel = bootstrap.Offcanvas.getOrCreateInstance($('qaimeFilter'));
     const number = value => value == null ? '—' : new Intl.NumberFormat(document.documentElement.lang || 'az', {maximumFractionDigits: 4}).format(Number(value));
@@ -108,7 +116,7 @@
                 action(operations,'trash',item.siline_biler?t.delete:t.locked,()=>removeMaterial(item),!item.siline_biler);
             });
             $('qaimePurchaseTotal').textContent=money(data.purchaseTotal);$('qaimeSaleTotal').textContent=money(data.saleTotal);$('qaimeAddMaterial').disabled=false;renderList();
-            if(scroll)$('qaimeDetails').scrollIntoView({behavior:'smooth',block:'nearest'});
+            if(scroll)$('qaimeDetails').querySelector('.qaime-table-scroll').scrollTop=0;
         }catch(e){if(epoch===state.epoch&&request===state.detailRequest){clearDetails();message('qaimeNotice',e.message);}}
     }
     async function changeWarehouse() {
@@ -132,8 +140,18 @@
         choices(field(header,'teslim_alan_personal_id'),state.options.receivers || []);
     }
     function renderDraft() {
-        const body=$('qaimeDraftRows');body.replaceChildren();if(!state.draft.length)empty(body,6,t.noMaterials);
-        state.draft.forEach((item,index)=>{const row=body.insertRow();cell(row,item.material_adi);['qutu_sayi','qutu_ici_miqdar','alis_qiymeti','satis_baza_qiymeti'].forEach(k=>cell(row,number(item[k])));const ops=row.insertCell();action(ops,'edit',t.edit,()=>openMaterial('draft',item,index));action(ops,'trash',t.delete,()=>{state.draft.splice(index,1);state.dirty=true;renderDraft();});});
+        const body=$('qaimeDraftRows');body.replaceChildren();if(!state.draft.length)empty(body,12,t.noMaterials);
+        let quantity=0,total=0;
+        state.draft.forEach((item,index)=>{
+            const row=body.insertRow(), amount=Number(item.qutu_sayi)*Number(item.qutu_ici_miqdar);
+            quantity+=amount;total+=amount*Number(item.alis_qiymeti);
+            cell(row,item.material_adi);cell(row,item.qrup_adi);cell(row,item.vahid_adi);
+            [item.qutu_sayi,item.qutu_ici_miqdar,amount,item.alis_qiymeti,item.satis_baza_qiymeti,item.satis_faizi].forEach(v=>cell(row,number(v)));
+            cell(row,date(item.son_istifade_tarixi));cell(row,item.seriya_no);
+            const ops=row.insertCell();action(ops,'edit',t.edit,()=>openMaterial('draft',item,index));
+            action(ops,'trash',t.delete,()=>{if(state.busy)return;state.draft.splice(index,1);state.dirty=true;renderDraft();if(state.draftIndex>=index)state.draftIndex--;});
+        });
+        $('qaimeDraftQuantity').textContent=number(quantity);$('qaimeDraftTotal').textContent=money(total);
     }
     function openInvoice(item=null) {
         if(!validScope()||state.busy)return;
@@ -143,12 +161,13 @@
         const min=start&&start.startsWith(year.value)?start:`${year.value}-01-01`;
         const dateInput=field(header,'qaime_tarixi');dateInput.min=min;dateInput.max=`${year.value}-12-31`;
         if(dateInput._flatpickr){dateInput._flatpickr.set('minDate',min);dateInput._flatpickr.set('maxDate',dateInput.max);}
-        fill(header,item || {qaime_tarixi:today().startsWith(year.value)?today():min,qaime_saati:new Date().toTimeString().slice(0,5)});
+        fill(header,item || {qaime_tarixi:today().startsWith(year.value)?today():min,qaime_saati:new Date().toTimeString().slice(0,5),sened_tarixi:today()});
         ['emeliyyat_novu_id','qaime_tarixi','qaime_saati'].forEach(k=>{const el=field(header,k);el.disabled=Boolean(item);if(el._flatpickr?.altInput)el._flatpickr.altInput.disabled=Boolean(item);});
-        $('qaimeDraftPanel').classList.toggle('d-none',Boolean(item));renderDraft();editor.show();
+        $('qaimeDraftPanel').classList.toggle('d-none',Boolean(item));renderDraft();editor.show();if(!item)openMaterial("draft");
     }
     async function loadCatalog(selected='') {
         const request=++state.catalogRequest,group=field(material,'mehsul_qrupu_id').value;
+        state.catalog=[];$('qaimeCatalogSearch').value='';
         const select=field(material,'material_id');select.disabled=true;choices(select,[],t.loading);
         if(!group){choices(select,[]);return;}
         try {
@@ -157,16 +176,27 @@
             state.catalog=rows;choices(select,rows,t.choose,'material_id','material_adi');select.disabled=false;select.value=String(selected);
         }catch(e){if(request===state.catalogRequest){choices(select,[]);message('qaimeMaterialError',e.message);}}
     }
+    function updateCalculation() {
+        const value=name=>Number(field(material,name).value)||0;
+        const quantity=value('qutu_sayi')*value('qutu_ici_miqdar');
+        $('qaimeCalcQuantity').textContent=number(quantity);
+        $('qaimeCalcPurchase').textContent=money(quantity*value('alis_qiymeti'));
+        $('qaimeCalcSale').textContent=number(value('satis_baza_qiymeti')*(1+value('satis_faizi')/100));
+    }
     async function openMaterial(mode,item=null,index=-1) {
+        if(state.busy)return;
+        if(mode==='draft')$('qaimeInlineMaterial').append(material);else materialHome.append(material);
         state.materialMode=mode;state.materialItem=item;state.draftIndex=index;state.catalogRequest++;
-        resetForm(material);message('qaimeMaterialError','');$('qaimeMaterialTitle').textContent=item?t.editMaterial:t.addMaterial;
+        $('qaimeMaterialSave').textContent=mode==='draft'?(item?t.save:t.stage):t.save;
+        resetForm(material);$('qaimeCatalogSearch').disabled=mode==='edit';message('qaimeMaterialError','');$('qaimeMaterialTitle').textContent=item?t.editMaterial:t.addMaterial;
         choices(field(material,'mehsul_qrupu_id'),state.options.groups || []);choices(field(material,'material_id'),[]);
-        fill(material,item || {qutu_sayi:'1',qutu_ici_miqdar:'1',alis_qiymeti:'0'});
+        fill(material,item || {qutu_sayi:'1',qutu_ici_miqdar:'1',alis_qiymeti:'0',satis_baza_qiymeti:'0',satis_faizi:'0'});
+        $('qaimeMaterialUnit').value=item?.vahid_adi || '';
         ['mehsul_qrupu_id','material_id'].forEach(k=>field(material,k).disabled=mode==='edit');
         if(mode==='edit') {
             choices(field(material,'material_id'),[{id:item.material_id,ad:item.material_adi}]);field(material,'material_id').value=String(item.material_id);
         }
-        materialEditor.show();if(mode!=='edit'&&item)await loadCatalog(item.material_id);
+        updateCalculation();if(mode!=='draft')materialEditor.show();if(mode!=='edit'&&item)await loadCatalog(item.material_id);
     }
     async function saveMaterial(event) {
         event.preventDefault();if(state.busy||!material.reportValidity())return;
@@ -178,6 +208,8 @@
                 const dateValue=field(header,'qaime_tarixi').value;
                 await api('/hazirla',{}, {...data,qaime_tarixi:dateValue},state.editorScope);
                 data.material_adi=field(material,'material_id').selectedOptions[0]?.textContent || '';
+                data.qrup_adi=field(material,'mehsul_qrupu_id').selectedOptions[0]?.textContent || '';
+                data.vahid_adi=$('qaimeMaterialUnit').value;
                 if(state.draftIndex<0)state.draft.push(data);else state.draft[state.draftIndex]=data;
                 state.dirty=true;renderDraft();
             }else {
@@ -185,7 +217,7 @@
                 const path=mode==='edit'?`/${id}/material/${state.materialItem.qaime_material_id}/yenile`:`/${id}/material/elave`;
                 await api(path,{},data);await loadDetails(id);message('qaimeNotice',t.saved,true);
             }
-            state.busy=false;materialEditor.hide();
+            state.busy=false;if(mode==='draft')openMaterial('draft');else materialEditor.hide();
         }catch(e){message('qaimeMaterialError',e.message);}finally{state.busy=false;$('qaimeMaterialSave').disabled=false;}
     }
     async function saveInvoice(event) {
@@ -212,14 +244,21 @@
     $('qaimeFilterClear').addEventListener('click',()=>{resetForm(filter);state.filters={};state.page=1;filterPanel.hide();clearDetails();loadList();});
     $('qaimePrevious').addEventListener('click',()=>{state.page--;loadList();});$('qaimeNext').addEventListener('click',()=>{state.page++;loadList();});
     $('qaimePageSize').addEventListener('change',()=>{state.page=1;loadList();});
-    $('qaimeDraftAdd').addEventListener('click',()=>{if(!field(header,'qaime_tarixi').reportValidity())return;openMaterial('draft');});
     $('qaimeAddMaterial').addEventListener('click',()=>{state.editorScope=scope();openMaterial('add');});
+    $('qaimeCatalogSearch').addEventListener('input',()=>{
+        const query=$('qaimeCatalogSearch').value.trim().toLocaleLowerCase();
+        const select=field(material,'material_id'),current=select.value;
+        choices(select,(state.catalog||[]).filter(row=>[row.material_adi,row.barkod_nomresi,row.material_id].some(v=>String(v??'').toLocaleLowerCase().includes(query))),t.choose,'material_id','material_adi');
+        select.value=current;
+    });
     field(material,'mehsul_qrupu_id').addEventListener('change',()=>loadCatalog());
-    field(material,'material_id').addEventListener('change',()=>{const chosen=state.catalog?.find(m=>String(m.material_id)===field(material,'material_id').value);if(chosen)field(material,'qutu_ici_miqdar').value=chosen.stok_boleni || '1';});
+    field(material,'material_id').addEventListener('change',()=>{const chosen=state.catalog?.find(m=>String(m.material_id)===field(material,'material_id').value);if(chosen){field(material,'qutu_ici_miqdar').value=chosen.stok_boleni || '1';$('qaimeMaterialUnit').value=chosen.vahid_adi || '';}else $('qaimeMaterialUnit').value='';updateCalculation();});
+    material.addEventListener('input',()=>{updateCalculation();if(state.materialMode==='draft')state.dirty=true;});
     material.addEventListener('submit',saveMaterial);header.addEventListener('submit',saveInvoice);header.addEventListener('input',()=>state.dirty=true);
-    $('qaimeEditor').addEventListener('hide.bs.offcanvas',event=>{if(state.busy||(state.dirty&&!window.confirm(t.confirmDiscard)))event.preventDefault();});
+    $('qaimeBack').addEventListener('click',backToList);
+    $('qaimeCancel').addEventListener('click',backToList);
+    $('qaimeMaterialReset').addEventListener('click',()=>{if(!state.busy)openMaterial(state.materialMode,state.materialMode==='edit'?state.materialItem:null);});
     $('qaimeMaterialEditor').addEventListener('hide.bs.modal',event=>{if(state.busy)event.preventDefault();});
-    choices(field(filter,'direction'),[{id:'G',ad:t.incoming},{id:'C',ad:t.outgoing}],t.all);choices(field(filter,'operation'),[],t.all);
     clearList();if(warehouse.options.length===1)message('qaimeNotice',t.noWarehouses);
     else {warehouse.selectedIndex=1;changeWarehouse();}
 })();
