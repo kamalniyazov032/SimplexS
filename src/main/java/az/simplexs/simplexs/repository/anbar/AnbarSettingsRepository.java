@@ -20,8 +20,11 @@ public class AnbarSettingsRepository {
     public List<Map<String,Object>> months(Long k,Long id,int year) {
         return jdbc.queryForList("SELECT * FROM public.fn_anbar_kilid_ay_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_anbar_id=>CAST(:id AS bigint),p_il=>CAST(:year AS integer))",params(k,id).addValue("year",year));
     }
-    public List<Map<String,Object>> units(Long k,Long id) {
-        return jdbc.queryForList("SELECT * FROM public.fn_material_vahid_siyahisi(p_klinika_id=>CAST(:k AS bigint),p_material_id=>CAST(:id AS bigint))",params(k,id));
+    public List<Map<String,Object>> units(Long id) {
+        return jdbc.queryForList(
+                "SELECT * FROM public.fn_material_vahid_siyahisi(p_material_id=>:id)",
+                new MapSqlParameterSource("id", id)
+        );
     }
     private Map<String,Object> save(String sql,MapSqlParameterSource params) {
         return jdbc.queryForMap(sql,params);

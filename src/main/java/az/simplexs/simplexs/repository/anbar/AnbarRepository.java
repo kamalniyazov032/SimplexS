@@ -36,10 +36,32 @@ public class AnbarRepository {
         return s == null || s.isBlank() ? null : s.trim();
     }
 
-    public List<Firma> firmalar(Boolean aktiv) {
-        return jdbc.query("SELECT * FROM public.fn_firma_siyahisi(p_aktiv=>CAST(:a AS boolean)) ORDER BY ad", p().addValue("a", aktiv), (r, i) -> new Firma(l(r, "firma_id"),  s(r, "ad"), s(r, "unvan"), s(r, "is_telefonu"), s(r, "faks_nomresi"), s(r, "email"), s(r, "qeyd"), s(r, "bank_adi"), s(r, "bank_hesab_nomresi"), s(r, "vergi_nomresi"), s(r, "vergi_idaresi"), b(r, "aktiv"), dt(r, "yaranma_tarixi"), dt(r, "yenilenme_tarixi")));
+    public List<Firma> firmalar(Long klinikaId, Boolean aktiv) {
+        return jdbc.query(
+                "SELECT * FROM public.fn_firma_siyahisi(" +
+                        "p_klinika_id=>:klinikaId, " +
+                        "p_aktiv=>CAST(:a AS boolean)) ORDER BY ad",
+                p()
+                        .addValue("klinikaId", klinikaId)
+                        .addValue("a", aktiv),
+                (r, i) -> new Firma(
+                        l(r, "firma_id"),
+                        s(r, "ad"),
+                        s(r, "unvan"),
+                        s(r, "is_telefonu"),
+                        s(r, "faks_nomresi"),
+                        s(r, "email"),
+                        s(r, "qeyd"),
+                        s(r, "bank_adi"),
+                        s(r, "bank_hesab_nomresi"),
+                        s(r, "vergi_nomresi"),
+                        s(r, "vergi_idaresi"),
+                        b(r, "aktiv"),
+                        dt(r, "yaranma_tarixi"),
+                        dt(r, "yenilenme_tarixi")
+                )
+        );
     }
-
     public Map<String, Object> firmaYarat(Long k, String ad, String unvan, String telefon, String faks, String email, String qeyd, String bank, String hesab, String vergi, String idare, Long personal) {
         return one("SELECT * FROM public.fn_firma_yarat(p_klinika_id=>CAST(:k AS bigint),p_ad=>:ad,p_unvan=>:u,p_is_telefonu=>:t,p_faks_nomresi=>:f,p_email=>:e,p_qeyd=>:q,p_bank_adi=>:b,p_bank_hesab_nomresi=>:h,p_vergi_nomresi=>:v,p_vergi_idaresi=>:i,p_yaradan_personal_id=>CAST(:p AS bigint))", p().addValue("k", k).addValue("ad", ad.trim()).addValue("u", n(unvan)).addValue("t", n(telefon)).addValue("f", n(faks)).addValue("e", n(email)).addValue("q", n(qeyd)).addValue("b", n(bank)).addValue("h", n(hesab)).addValue("v", n(vergi)).addValue("i", n(idare)).addValue("p", personal));
     }
@@ -48,8 +70,30 @@ public class AnbarRepository {
         return one("SELECT * FROM public.fn_firma_yenile(p_klinika_id=>CAST(:k AS bigint),p_firma_id=>CAST(:id AS bigint),p_ad=>:ad,p_unvan=>:u,p_unvan_deyisdirilsin=>true,p_is_telefonu=>:t,p_is_telefonu_deyisdirilsin=>true,p_faks_nomresi=>:f,p_faks_nomresi_deyisdirilsin=>true,p_email=>:e,p_email_deyisdirilsin=>true,p_qeyd=>:q,p_qeyd_deyisdirilsin=>true,p_bank_adi=>:b,p_bank_adi_deyisdirilsin=>true,p_bank_hesab_nomresi=>:h,p_bank_hesab_nomresi_deyisdirilsin=>true,p_vergi_nomresi=>:v,p_vergi_nomresi_deyisdirilsin=>true,p_vergi_idaresi=>:i,p_vergi_idaresi_deyisdirilsin=>true,p_aktiv=>:a,p_yenileyen_personal_id=>CAST(:p AS bigint))", p().addValue("k", k).addValue("id", id).addValue("ad", n(ad)).addValue("u", n(unvan)).addValue("t", n(telefon)).addValue("f", n(faks)).addValue("e", n(email)).addValue("q", n(qeyd)).addValue("b", n(bank)).addValue("h", n(hesab)).addValue("v", n(vergi)).addValue("i", n(idare)).addValue("a", aktiv).addValue("p", personal));
     }
 
-    public List<Vahid> vahidler(Boolean aktiv) {
-        return jdbc.query("SELECT * FROM public.fn_vahid_siyahisi(p_aktiv=>CAST(:a AS boolean)) ORDER BY sira_no NULLS LAST,ad", p().addValue("a", aktiv), (r, i) -> new Vahid(l(r, "vahid_id"), s(r, "ad"), l(r, "alt_vahid_id"), s(r, "alt_vahid_adi"), d(r, "vurma_emsali"), in(r, "sira_no"), b(r, "sifarisde_gorunsun"), b(r, "aktiv"), dt(r, "yaranma_tarixi"), dt(r, "yenilenme_tarixi")));
+    public List<Vahid> vahidler(Long klinikaId, Boolean aktiv, Boolean sifarisdeGorunsun) {
+        return jdbc.query(
+                "SELECT * FROM public.fn_vahid_siyahisi(" +
+                        "p_klinika_id=>:klinikaId, " +
+                        "p_aktiv=>CAST(:a AS boolean), " +
+                        "p_sifarisde_gorunsun=>CAST(:s AS boolean)) " +
+                        "ORDER BY sira_no NULLS LAST, ad",
+                p()
+                        .addValue("klinikaId", klinikaId)
+                        .addValue("a", aktiv)
+                        .addValue("s", sifarisdeGorunsun),
+                (r, i) -> new Vahid(
+                        l(r, "vahid_id"),
+                        s(r, "ad"),
+                        l(r, "alt_vahid_id"),
+                        s(r, "alt_vahid_adi"),
+                        d(r, "vurma_emsali"),
+                        in(r, "sira_no"),
+                        b(r, "sifarisde_gorunsun"),
+                        b(r, "aktiv"),
+                        dt(r, "yaranma_tarixi"),
+                        dt(r, "yenilenme_tarixi")
+                )
+        );
     }
 
     public Map<String, Object> vahidYarat(Long k, String ad, Long alt, java.math.BigDecimal emsal, boolean sifaris, Long personal) {
