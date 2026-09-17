@@ -195,12 +195,13 @@ public class PersonalRepository {
 
     public List<PersonalAnbar> anbarlar(Long klinikaId, Long personalId) {
         return jdbc.query("""
-                SELECT * FROM public.fn_personal_anbar_siyahisi(
+                SELECT anbar_id, anbar_adi, anbar_novu_id, anbar_novu_adi, secilib, izlesin, islesin, elaqe_aktiv
+                FROM public.fn_personal_anbar_siyahisi(
                     p_klinika_id=>CAST(:klinika AS bigint), p_personal_id=>CAST(:personal AS bigint))
                 ORDER BY anbar_adi
                 """, new MapSqlParameterSource("klinika", klinikaId).addValue("personal", personalId),
-                (r, n) -> new PersonalAnbar(l(r, "anbar_id"), r.getString("anbar_kodu"),
-                        r.getString("anbar_adi"), l(r, "anbar_novu_id"), r.getString("anbar_novu_kodu"),
+                (r, n) -> new PersonalAnbar(l(r, "anbar_id"),
+                        r.getString("anbar_adi"), l(r, "anbar_novu_id"),
                         r.getString("anbar_novu_adi"), r.getObject("secilib", Boolean.class),
                         r.getObject("izlesin", Boolean.class), r.getObject("islesin", Boolean.class),
                         r.getObject("elaqe_aktiv", Boolean.class)));

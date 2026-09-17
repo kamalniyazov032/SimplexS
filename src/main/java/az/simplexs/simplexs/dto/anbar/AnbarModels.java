@@ -8,7 +8,7 @@ public final class AnbarModels {
     private AnbarModels() {
     }
 
-    public record Firma(Long id, String musteriNomresi, String ad, String unvan, String isTelefonu, String faksNomresi,
+    public record Firma(Long id,String ad, String unvan, String isTelefonu, String faksNomresi,
                         String email, String qeyd, String bankAdi, String bankHesabNomresi, String vergiNomresi,
                         String vergiIdaresi,
                         Boolean aktiv, LocalDateTime yaranmaTarixi, LocalDateTime yenilenmeTarixi) {
@@ -37,7 +37,7 @@ public final class AnbarModels {
                            BigDecimal maksimumDoza,
                            Integer maksimumTelebMuddeti, BigDecimal maksimumTelebMiqdari, Integer yasAsagi,
                            Integer yasYuxari,
-                           BigDecimal bedenCekisi, Boolean avtomatikHekimTesdiqiOlmasin) {
+                           BigDecimal bedenCekisi, Boolean avtomatikHekimTesdiqiOlmasin, Boolean vahidDeyisdirileBiler) {
     }
 
     public record EmeliyyatKateqoriyasi(Long id, String kod, String ad, String istiqamet, String aciqlama,
@@ -57,6 +57,6 @@ public final class AnbarModels {
                         Boolean telebAnbaridir, Boolean telebdeStokGorunsun, Boolean dermanPaketi,
                         Boolean istehsalCixisi,
                         Boolean mehvCixisi, Integer cixisGunSayi, Integer geriyeMualiceGunSayi, LocalDate kilidBaslama,
-                        LocalDate kilidBitme, String krosAnbarKodu, Integer siraNo, Boolean aktiv) {
+                        LocalDate kilidBitme, String krosAnbarKodu, Integer siraNo, Boolean aktiv, LocalDate baslamaTarixi, String cixisUsulu, String effektivCixisUsulu) {
     }
 }
