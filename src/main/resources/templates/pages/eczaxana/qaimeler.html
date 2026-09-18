@@ -96,8 +96,8 @@
                     <th th:text="#{qaime.material}"></th>
                     <th th:text="#{qaime.barcode}"></th>
                     <th th:text="#{qaime.unit}"></th>
-                    <th th:text="#{qaime.boxes}"></th>
-                    <th th:text="#{qaime.perBox}"></th>
+                    <th th:text="#{qaime.quantity}"></th>
+                    <th th:text="#{qaime.unitFactor}"></th>
                     <th th:text="#{qaime.quantity}"></th>
                     <th th:text="#{qaime.purchasePrice}"></th>
                     <th th:text="#{qaime.vat}"></th>
@@ -213,63 +213,27 @@
                                                                      aria-hidden="true"></i></button>
                         <div class="collapse show" id="qaimeHeaderFields">
                             <form id="qaimeHeaderForm" class="p-3">
-                                <div class="row g-2 qaime-header-fields">
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
+<div class="row g-2 qaime-header-fields">
+<div class="col-md-4 col-xl-2"><label class="form-label"
                                                                           for="qaimeHeaderForm-emeliyyat_novu_id"
                                                                           th:text="#{qaime.operation}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-arrows-exchange" aria-hidden="true"></i></span><select
                                             id="qaimeHeaderForm-emeliyyat_novu_id" th:aria-label="#{qaime.operation}"
                                             class="form-select" name="emeliyyat_novu_id" required></select></div></div>
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
+<div class="col-md-4 col-xl-2"><label class="form-label"
                                                                           for="qaimeHeaderForm-qaime_tarixi"
                                                                           th:text="#{qaime.date}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-calendar" aria-hidden="true"></i></span><input
                                             id="qaimeHeaderForm-qaime_tarixi" th:aria-label="#{qaime.date}"
                                             class="form-control"
                                             name="qaime_tarixi" type="date" required></div></div>
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
+<div class="col-md-4 col-xl-2"><label class="form-label"
                                                                           for="qaimeHeaderForm-qaime_saati"
                                                                           th:text="#{qaime.time}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-clock" aria-hidden="true"></i></span><input
                                             id="qaimeHeaderForm-qaime_saati"
                                             th:aria-label="#{qaime.time}"
                                             class="form-control"
-                                            name="qaime_saati" type="time"></div>
+                                            name="qaime_saati" type="time" required></div>
                                     </div>
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
-                                                                          for="qaimeHeaderForm-sened_novu"
-                                                                          th:text="#{qaime.documentType}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-file-description" aria-hidden="true"></i></span><input
-                                            id="qaimeHeaderForm-sened_novu" th:aria-label="#{qaime.documentType}"
-                                            class="form-control"
-                                            name="sened_novu" type="text" maxlength="1000"></div></div>
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
-                                                                          for="qaimeHeaderForm-sened_no"
-                                                                          th:text="#{qaime.document}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-hash" aria-hidden="true"></i></span><input
-                                            id="qaimeHeaderForm-sened_no" th:aria-label="#{qaime.document}"
-                                            class="form-control"
-                                            name="sened_no" type="text" maxlength="1000"></div></div>
-                                    <div class="col-md-4 col-xl-2"><label class="form-label"
-                                                                          for="qaimeHeaderForm-sened_tarixi"
-                                                                          th:text="#{qaime.documentDate}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-calendar-event" aria-hidden="true"></i></span><input
-                                            id="qaimeHeaderForm-sened_tarixi" th:aria-label="#{qaime.documentDate}"
-                                            class="form-control"
-                                            name="sened_tarixi" type="date"></div></div>
-                                    <div class="col-md-6 col-xl-3"><label class="form-label"
-                                                                          for="qaimeHeaderForm-firma_id"
-                                                                          th:text="#{qaime.company}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-building" aria-hidden="true"></i></span><select
-                                            id="qaimeHeaderForm-firma_id" th:aria-label="#{qaime.company}"
-                                            class="form-select"
-                                            name="firma_id"></select></div></div>
-                                    <div class="col-md-6 col-xl-3"><label class="form-label"
-                                                                          for="qaimeHeaderForm-teslim_alan_personal_id"
-                                                                          th:text="#{qaime.receiver}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-user-check" aria-hidden="true"></i></span><select
-                                            id="qaimeHeaderForm-teslim_alan_personal_id"
-                                            th:aria-label="#{qaime.receiver}"
-                                            class="form-select" name="teslim_alan_personal_id"></select></div></div>
-                                    <div class="col-md-6 col-xl-3"><label class="form-label"
-                                                                          for="qaimeHeaderForm-teslim_eden"
-                                                                          th:text="#{qaime.sender}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-user-up" aria-hidden="true"></i></span><input
-                                            id="qaimeHeaderForm-teslim_eden" th:aria-label="#{qaime.sender}"
-                                            class="form-control"
-                                            name="teslim_eden" type="text" maxlength="1000"></div></div>
-                                    <div class="col-md-6 col-xl-3"><label class="form-label"
+<div class="col-md-6 col-xl-3"><label class="form-label"
                                                                           for="qaimeHeaderForm-aciqlama"
                                                                           th:text="#{qaime.note}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-notes" aria-hidden="true"></i></span><input
                                             id="qaimeHeaderForm-aciqlama"
@@ -277,53 +241,72 @@
                                             class="form-control"
                                             name="aciqlama" type="text"
                                             maxlength="1000"></div></div>
-                                </div>
+<div class="col-md-6 col-xl-3"><label class="form-label"
+                                                                          for="qaimeHeaderForm-firma_id"
+                                                                          th:text="#{qaime.company}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-building" aria-hidden="true"></i></span><select
+                                            id="qaimeHeaderForm-firma_id" th:aria-label="#{qaime.company}"
+                                            class="form-select"
+                                            name="firma_id"></select></div></div>
+<div class="col-md-6 col-xl-3"><label class="form-label"
+                                                                          for="qaimeHeaderForm-teslim_alan_personal_id"
+                                                                          th:text="#{qaime.receiver}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-user-check" aria-hidden="true"></i></span><select
+                                            id="qaimeHeaderForm-teslim_alan_personal_id"
+                                            th:aria-label="#{qaime.receiver}"
+                                            class="form-select" name="teslim_alan_personal_id"></select></div></div>
+<div class="col-md-6 col-xl-3"><label class="form-label"
+                                                                          for="qaimeHeaderForm-teslim_eden"
+                                                                          th:text="#{qaime.sender}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-user-up" aria-hidden="true"></i></span><input
+                                            id="qaimeHeaderForm-teslim_eden" th:aria-label="#{qaime.sender}"
+                                            class="form-control"
+                                            name="teslim_eden" type="text" maxlength="1000"></div></div>
+<div class="col-md-4 col-xl-2"><label class="form-label"
+                                                                          for="qaimeHeaderForm-sened_novu"
+                                                                          th:text="#{qaime.documentType}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-file-description" aria-hidden="true"></i></span><input
+                                            id="qaimeHeaderForm-sened_novu" th:aria-label="#{qaime.documentType}"
+                                            class="form-control"
+                                            name="sened_novu" type="text" maxlength="1000"></div></div>
+<div class="col-md-4 col-xl-2"><label class="form-label"
+                                                                          for="qaimeHeaderForm-sened_no"
+                                                                          th:text="#{qaime.document}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-hash" aria-hidden="true"></i></span><input
+                                            id="qaimeHeaderForm-sened_no" th:aria-label="#{qaime.document}"
+                                            class="form-control"
+                                            name="sened_no" type="text" maxlength="1000"></div></div>
+<div class="col-md-4 col-xl-2"><label class="form-label"
+                                                                          for="qaimeHeaderForm-sened_tarixi"
+                                                                          th:text="#{qaime.documentDate}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-calendar-event" aria-hidden="true"></i></span><input
+                                            id="qaimeHeaderForm-sened_tarixi" th:aria-label="#{qaime.documentDate}"
+                                            class="form-control"
+                                            name="sened_tarixi" type="date"></div></div>
+</div>
                             </form>
                         </div>
                     </section>
-                    <section id="qaimeDraftPanel" class="qaime-form-section mt-3">
-                        <button class="qaime-section-heading" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#qaimeDraftContent" aria-expanded="true"
-                                aria-controls="qaimeDraftContent"><i class="ti ti-box" aria-hidden="true"></i><span
-                                th:text="#{qaime.materials}"></span><i class="ti ti-chevron-down ms-auto"
-                                                                       aria-hidden="true"></i></button>
-                        <div class="collapse show" id="qaimeDraftContent">
-                            <div id="qaimeInlineMaterial"></div>
-                            <div class="table-responsive qaime-draft-table mx-3">
-                                <table class="table table-bordered mb-0">
-                                    <thead>
-                                    <tr>
-                                        <th th:text="#{qaime.material}"></th>
-                                        <th th:text="#{qaime.group}"></th>
-                                        <th th:text="#{qaime.unit}"></th>
-                                        <th th:text="#{qaime.boxes}"></th>
-                                        <th th:text="#{qaime.perBox}"></th>
-                                        <th th:text="#{qaime.quantity}"></th>
-                                        <th th:text="#{qaime.purchasePrice}"></th>
-                                        <th th:text="#{qaime.basePrice}"></th>
-                                        <th th:text="#{qaime.markup}"></th>
-                                        <th th:text="#{qaime.expiry}"></th>
-                                        <th th:text="#{qaime.lot}"></th>
-                                        <th th:text="#{qaime.actions}"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="qaimeDraftRows"></tbody>
-                                </table>
-                            </div>
-                            <div class="qaime-draft-totals"><span><span th:text="#{qaime.quantity}"></span>: <b
-                                    id="qaimeDraftQuantity">0</b></span><span><span
-                                    th:text="#{qaime.purchaseTotal}"></span>: <b id="qaimeDraftTotal">0.00</b></span>
+                    <section id="qaimeEntryPanel" class="qaime-form-section">
+                        <button class="qaime-section-heading" type="button" data-bs-toggle="collapse" data-bs-target="#qaimeInlineMaterial" aria-expanded="true" aria-controls="qaimeInlineMaterial"><i class="ti ti-package" aria-hidden="true"></i><span th:text="#{qaime.addMaterial}"></span><i class="ti ti-chevron-down ms-auto" aria-hidden="true"></i></button>
+                        <div id="qaimeInlineMaterial" class="collapse show"></div>
+                    </section>
+                    <section id="qaimeDraftPanel" class="qaime-form-section">
+                        <div class="qaime-section-heading"><i class="ti ti-box" aria-hidden="true"></i><span th:text="#{qaime.addedMaterials}"></span> (<span id="qaimeDraftCount">0</span>)
+                            <button type="button" id="qaimeClearDraft" class="btn btn-sm btn-outline-danger ms-auto"><i class="ti ti-trash me-1" aria-hidden="true"></i><span th:text="#{qaime.clearList}"></span></button>
+                        </div>
+                        <div id="qaimeDraftContent">
+                            <div class="table-responsive qaime-draft-table">
+                                <table class="table table-bordered align-middle mb-0"><thead><tr>
+<th th:text="#{qaime.material}"></th><th th:text="#{qaime.barcode}"></th><th th:text="#{qaime.unit}"></th><th th:text="#{qaime.quantity}"></th><th th:text="#{qaime.baseQuantity}"></th><th th:text="#{qaime.purchasePrice}"></th><th th:text="#{qaime.vat}"></th><th th:text="#{qaime.netTotal}"></th><th th:text="#{qaime.vatTotal}"></th><th th:text="#{qaime.purchaseTotal}"></th><th th:text="#{qaime.salePrice}"></th><th th:text="#{qaime.saleTotal}"></th><th th:text="#{qaime.expiry}"></th><th th:text="#{qaime.lot}"></th><th th:text="#{qaime.actions}"></th>
+                                </tr></thead><tbody id="qaimeDraftRows"></tbody></table>
                             </div>
                         </div>
                     </section>
                 </div>
-                <div class="qaime-editor-actions">
-                    <button type="button" class="btn btn-light" id="qaimeCancel"><i class="ti ti-x me-1"
-                                                                                           aria-hidden="true"></i><span
-                            th:text="#{qaime.cancel}"></span></button>
-                    <button class="btn btn-primary" id="qaimeSave" type="submit" form="qaimeHeaderForm"><i
-                            class="ti ti-device-floppy me-1" aria-hidden="true"></i><span
-                            th:text="#{qaime.save}"></span></button>
+                <div class="qaime-editor-footer">
+                    <div id="qaimeDraftSummary" class="qaime-draft-summary"><span id="qaimeDraftCountLabel"></span></div>
+                    <div id="qaimeDraftTotals" class="qaime-draft-totals">
+<div><span th:text="#{qaime.netTotal}"></span><strong id="qaimeDraftNet">0.00</strong></div><div><span th:text="#{qaime.vatTotal}"></span><strong id="qaimeDraftVat">0.00</strong></div><div><span th:text="#{qaime.purchaseTotal}"></span><strong id="qaimeDraftTotal">0.00</strong></div><div><span th:text="#{qaime.saleTotal}"></span><strong id="qaimeDraftSale">0.00</strong></div>
+                    </div>
+                    <div class="qaime-editor-actions">
+                        <button type="button" class="btn btn-sm btn-light" id="qaimeCancel"><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{qaime.cancel}"></span></button>
+                        <button class="btn btn-sm btn-primary" id="qaimeSave" type="submit" form="qaimeHeaderForm"><i class="ti ti-device-floppy me-1" aria-hidden="true"></i><span id="qaimeSaveLabel" th:text="#{qaime.create}"></span></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -336,56 +319,37 @@
                     <button class="btn-close" type="button" data-bs-dismiss="modal"
                             th:aria-label="#{qaime.close}"></button>
                 </div>
-                <form id="qaimeMaterialForm"><div class="modal-body">
+<form id="qaimeMaterialForm"><div class="modal-body">
 <div id="qaimeMaterialError" class="alert alert-danger d-none" role="alert"></div>
-<div class="qaime-material-entry"><div class="qaime-product-fields"><div class="qaime-material-field qaime-catalog-search"><label for="qaimeCatalogSearch" class="form-label" th:text="#{qaime.materialSearch}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-search" aria-hidden="true"></i></span><input id="qaimeCatalogSearch" class="form-control" type="search" th:placeholder="#{qaime.materialSearch}" autocomplete="off"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-mehsul_qrupu_id"
-                                                         th:text="#{qaime.group}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-category" aria-hidden="true"></i></span><select
-                                    id="qaimeMaterialForm-mehsul_qrupu_id" th:aria-label="#{qaime.group}"
-                                    class="form-select" name="mehsul_qrupu_id" required></select></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-material_id"
-                                                         th:text="#{qaime.material}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-package" aria-hidden="true"></i></span><select
-                                    id="qaimeMaterialForm-material_id" th:aria-label="#{qaime.material}"
-                                    class="form-select" name="material_id" required></select></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialUnit"
-                                                         th:text="#{qaime.unit}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-ruler" aria-hidden="true"></i></span><input id="qaimeMaterialUnit"
-                                                                                                class="form-control"
-                                                                                                readonly
-                                                                                                th:aria-label="#{qaime.unit}"></div>
-                            </div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-son_istifade_tarixi"
-                                                         th:text="#{qaime.expiry}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-calendar" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-son_istifade_tarixi" th:aria-label="#{qaime.expiry}"
-                                    class="form-control" name="son_istifade_tarixi" type="date"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-seriya_no"
-                                                         th:text="#{qaime.lot}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-barcode" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-seriya_no" th:aria-label="#{qaime.lot}" class="form-control"
-                                    name="seriya_no" type="text" maxlength="1000"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-aciqlama"
-                                                         th:text="#{qaime.note}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-notes" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-aciqlama" th:aria-label="#{qaime.note}" class="form-control"
-                                    name="aciqlama" type="text" maxlength="1000"></div></div></div><div class="qaime-price-fields"><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-qutu_sayi"
-                                                         th:text="#{qaime.boxes}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-box" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-qutu_sayi" th:aria-label="#{qaime.boxes}" class="form-control"
-                                    name="qutu_sayi" type="number" required step="0.0001" min="0"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-qutu_ici_miqdar"
-                                                         th:text="#{qaime.perBox}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-packages" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-qutu_ici_miqdar" th:aria-label="#{qaime.perBox}"
-                                    class="form-control" name="qutu_ici_miqdar" type="number" required step="0.0001"
-                                    min="0"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-alis_qiymeti"
-                                                         th:text="#{qaime.purchasePrice}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-currency-manat" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-alis_qiymeti" th:aria-label="#{qaime.purchasePrice}"
-                                    class="form-control" name="alis_qiymeti" type="number" required step="0.0001"
-                                    min="0"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-satis_baza_qiymeti"
-                                                         th:text="#{qaime.basePrice}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-tag" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-satis_baza_qiymeti" th:aria-label="#{qaime.basePrice}"
-                                    class="form-control" name="satis_baza_qiymeti" type="number" step="0.0001" min="0"></div>
-                            </div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-satis_faizi"
-                                                         th:text="#{qaime.markup}"></label><div class="input-group input-group-sm"><span class="input-group-text bg-light"><i class="ti ti-percentage" aria-hidden="true"></i></span><input
-                                    id="qaimeMaterialForm-satis_faizi" th:aria-label="#{qaime.markup}"
-                                    class="form-control" name="satis_faizi" type="number" step="0.0001" min="0"></div></div><div class="qaime-calculation-summary" aria-live="polite"><div><span th:text="#{qaime.quantity}"></span><strong id="qaimeCalcQuantity">0</strong></div><div><span th:text="#{qaime.netTotal}"></span><strong id="qaimeCalcPurchase">0</strong></div><div><span th:text="#{qaime.salePrice}"></span><strong id="qaimeCalcSale">0</strong></div></div></div></div></div>
-<div class="modal-footer">
-<button type="button" class="btn btn-light" data-bs-dismiss="modal" th:text="#{qaime.cancel}"></button>
-<button type="button" class="btn btn-light" id="qaimeMaterialReset"><i class="ti ti-refresh me-1" aria-hidden="true"></i><span th:text="#{qaime.clear}"></span></button>
-<button class="btn btn-primary" id="qaimeMaterialSave" th:text="#{qaime.stage}"></button></div>
+<div class="qaime-material-entry"><div class="qaime-product-fields">
+<div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-mehsul_qrupu_id" th:text="#{qaime.group}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-category" aria-hidden="true"></i></span><select id="qaimeMaterialForm-mehsul_qrupu_id" name="mehsul_qrupu_id" class="form-select" required></select></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeCatalogSearch" th:text="#{qaime.material}"></label><div class="input-group input-group-sm qaime-material-picker"><button id="qaimeCatalogOpen" class="btn btn-light" type="button" th:aria-label="#{qaime.search}" th:title="#{qaime.search}"><i class="ti ti-search" aria-hidden="true"></i></button><input id="qaimeCatalogSearch" class="form-control" type="text" th:placeholder="#{qaime.materialSearchPlaceholder}" autocomplete="off" required><input id="qaimeMaterialForm-material_id" name="material_id" type="hidden"></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-vahid_id" th:text="#{qaime.unit}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-ruler" aria-hidden="true"></i></span><select id="qaimeMaterialForm-vahid_id" name="vahid_id" class="form-select" required></select></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-miqdar" th:text="#{qaime.quantity}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-box" aria-hidden="true"></i></span><input id="qaimeMaterialForm-miqdar" name="miqdar" class="form-control" type="number" required step="0.0001" min="0" ></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeCalcQuantity" th:text="#{qaime.baseQuantity}"></label><input id="qaimeCalcQuantity" class="form-control form-control-sm" readonly></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-son_istifade_tarixi" th:text="#{qaime.expiry}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-calendar" aria-hidden="true"></i></span><input id="qaimeMaterialForm-son_istifade_tarixi" name="son_istifade_tarixi" class="form-control" type="date" ></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-seriya_no" th:text="#{qaime.lot}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-barcode" aria-hidden="true"></i></span><input id="qaimeMaterialForm-seriya_no" name="seriya_no" class="form-control" type="text" maxlength="1000"></div></div>
+</div><div class="qaime-price-fields">
+<div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-alis_qiymeti" th:text="#{qaime.purchasePrice}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-currency-manat" aria-hidden="true"></i></span><input id="qaimeMaterialForm-alis_qiymeti" name="alis_qiymeti" class="form-control" type="number" required step="0.0001" min="0" ></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-satis_baza_qiymeti" th:text="#{qaime.basePrice}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-tag" aria-hidden="true"></i></span><input id="qaimeMaterialForm-satis_baza_qiymeti" name="satis_baza_qiymeti" class="form-control" type="number" step="0.0001" min="0" ></div></div><div class="qaime-material-field"><label class="form-label" for="qaimeMaterialForm-satis_faizi" th:text="#{qaime.markup}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-percentage" aria-hidden="true"></i></span><input id="qaimeMaterialForm-satis_faizi" name="satis_faizi" class="form-control" type="number" step="0.0001" min="0" ></div></div><div class="qaime-calculation-summary" aria-live="polite"><div><span th:text="#{qaime.netTotal}"></span><strong id="qaimeCalcNet">—</strong></div><div><span th:text="#{qaime.vatTotal}"></span><strong id="qaimeCalcVat">—</strong></div><div><span th:text="#{qaime.purchaseTotal}"></span><strong id="qaimeCalcPurchase">—</strong></div><div><span th:text="#{qaime.salePrice}"></span><strong id="qaimeCalcSale">—</strong></div></div><button class="btn btn-sm btn-primary" id="qaimeMaterialSave" th:text="#{qaime.stage}"></button>
+</div></div></div>
+<div class="modal-footer"><button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal" th:text="#{qaime.cancel}"></button><button type="button" class="btn btn-sm btn-light" id="qaimeMaterialReset" th:text="#{qaime.clear}"></button></div>
 </form>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="qaimeMaterialPicker" tabindex="-1" aria-labelledby="qaimeMaterialPickerTitle">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <div class="modal-header py-2"><h5 class="modal-title" id="qaimeMaterialPickerTitle" th:text="#{qaime.materialSelection}"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{qaime.close}"></button></div>
+            <div class="modal-body p-3">
+                <form id="qaimeMaterialSearchForm" class="input-group input-group-sm mb-2">
+                    <input id="qaimeMaterialSearchText" class="form-control" type="text" autocomplete="off" th:placeholder="#{qaime.materialSearchPlaceholder}" th:aria-label="#{qaime.materialSearch}">
+                    <button class="btn btn-light" th:aria-label="#{qaime.search}"><i class="ti ti-search" aria-hidden="true"></i></button>
+                </form>
+                <div id="qaimeMaterialSearchError" class="alert alert-danger d-none" role="alert"></div>
+                <div class="qaime-material-results table-responsive"><table class="table table-sm table-bordered align-middle mb-0">
+                    <thead><tr><th th:text="#{qaime.material}"></th><th th:text="#{qaime.barcode}"></th><th th:text="#{qaime.baseUnit}"></th><th th:text="#{qaime.selectMaterial}"></th></tr></thead>
+                    <tbody id="qaimeMaterialSearchRows"></tbody>
+                </table></div>
+            </div>
+        </div></div>
+    </div>
     <script th:inline="javascript">window.QaimeI18n = {
+        selectMaterial: /*[[#{qaime.selectMaterial}]]*/ "",
+        selectMaterialRequired: /*[[#{qaime.selectMaterialRequired}]]*/ "",
         title: /*[[#{qaime.title}]]*/ "",
         subtitle: /*[[#{qaime.subtitle}]]*/ "",
         warehouse: /*[[#{qaime.warehouse}]]*/ "",
@@ -472,7 +436,11 @@
         locked: /*[[#{qaime.locked}]]*/ "",
         draft: /*[[#{qaime.draft}]]*/ "",
         netTotal: /*[[#{qaime.netTotal}]]*/ "",
-        vatTotal: /*[[#{qaime.vatTotal}]]*/ ""
+        vatTotal: /*[[#{qaime.vatTotal}]]*/ "",
+        totalMaterials: /*[[#{qaime.totalMaterials}]]*/ "",
+        create: /*[[#{qaime.create}]]*/ "",
+        confirmClear: /*[[#{qaime.confirmClear}]]*/ "",
+        createdSummary: /*[[#{qaime.createdSummary}]]*/ ""
     };</script>
     <script th:src="@{/custom/js/qaimeler.js}" defer></script>
 </div>
