@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import az.simplexs.simplexs.repository.anbar.AnbarRepository;
+import az.simplexs.simplexs.repository.eczaxana.AnbarKontekstRepository;
 import az.simplexs.simplexs.repository.anbar.AnbarSettingsRepository;
 import az.simplexs.simplexs.security.AuthenticatedPersonal;
 import jakarta.servlet.http.HttpSession;
@@ -25,12 +26,14 @@ public class AnbarSettingsController {
     private final AnbarSettingsRepository settings;
     private final MessageSource messages;
     private final ObjectMapper json;
+    private final AnbarKontekstRepository context;
 
-    public AnbarSettingsController(AnbarRepository catalog, AnbarSettingsRepository settings, MessageSource messages, ObjectMapper json) {
+    public AnbarSettingsController(AnbarRepository catalog, AnbarSettingsRepository settings, MessageSource messages, ObjectMapper json, AnbarKontekstRepository context) {
         this.catalog = catalog;
         this.settings = settings;
         this.messages = messages;
         this.json = json;
+        this.context = context;
     }
 
     private Long clinic(HttpSession s) {
@@ -59,19 +62,32 @@ public class AnbarSettingsController {
     }
 
     @GetMapping("/anbar/anbarlar/{id}/settings")
-    public String warehousePage(@PathVariable Long id, @RequestParam(required = false) Integer il, HttpSession session, Model model) {
+    public String warehousePage(@PathVariable Long id, @RequestParam(required = false) Integer il,
+                                @RequestParam(defaultValue = "groups") String section,
+                                @RequestParam(defaultValue = "false") boolean fragment, HttpSession session, Model model) {
         Long k = clinic(session);
-        warehouse(k, id);
-        int y = il == null ? Year.now().getValue() : il;
-        year(y);
-        model.addAttribute("pageTitle", text("warehouse.settings"));
+        var warehouse = catalog.anbarlar(k, null, null, null).stream().filter(x -> id.equals(x.id())).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        model.addAttribute("pageTitle", warehouse.ad());
         model.addAttribute("activeMenu", "anbar.anbarlar");
         model.addAttribute("id", id);
-        model.addAttribute("il", y);
-        model.addAttribute("groups", settings.groups(k, id));
-        model.addAttribute("people", settings.people(k, id));
-        model.addAttribute("months", settings.months(k, id, y));
-        return "pages/anbar/anbarSettings";
+        model.addAttribute("section", section);
+        model.addAttribute("fragment", fragment);
+        switch (section) {
+            case "groups" -> model.addAttribute("rows", settings.groups(id));
+            case "people" -> model.addAttribute("rows", settings.people(id));
+            case "months" -> {
+                var years = context.years(k, id);
+                Integer y = il == null ? years.stream().filter(x -> Boolean.TRUE.equals(x.cariIldir()))
+                        .map(AnbarKontekstRepository.Year::il).findFirst().orElse(null) : il;
+                if (y != null) year(y);
+                model.addAttribute("years", years);
+                model.addAttribute("il", y);
+                model.addAttribute("months", y == null ? List.of() : settings.months(id, y));
+            }
+            default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return fragment ? "pages/anbar/anbarSettings :: panel" : "pages/anbar/anbarSettings";
     }
 
     @PostMapping("/anbar/anbarlar/{id}/settings/{section}")
@@ -85,27 +101,28 @@ public class AnbarSettingsController {
         switch (section) {
             case "groups" -> {
                 List<Map<String, Object>> rows = new ArrayList<>();
-                for (var row : settings.groups(k, id))
+                for (var row : settings.groups(id))
                     if (form.containsKey("group_" + row.get("mehsul_qrupu_id")))
                         rows.add(Map.of("mehsul_qrupu_id", row.get("mehsul_qrupu_id")));
-                result = settings.saveGroups(k, id, json.writeValueAsString(rows), actor.personalId());
+                result = settings.saveGroups(id, json.writeValueAsString(rows), actor.personalId());
             }
             case "people" -> {
                 List<Long> ids = new ArrayList<>();
-                for (var row : settings.people(k, id))
+                for (var row : settings.people(id))
                     if (form.containsKey("person_" + row.get("personal_id")))
                         ids.add(((Number) row.get("personal_id")).longValue());
-                result = settings.savePeople(k, id, ids, actor.personalId());
+                result = settings.savePeople(id, ids, actor.personalId());
             }
             case "months" -> {
                 List<Map<String, Object>> rows = new ArrayList<>();
                 for (int m = 1; m <= 12; m++) rows.add(Map.of("ay", m, "kilidlidir", form.containsKey("month_" + m)));
-                result = settings.saveMonths(k, id, y, json.writeValueAsString(rows), actor.personalId());
+                result = settings.saveMonths(id, y, json.writeValueAsString(rows), actor.personalId());
             }
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         flash(result, attrs);
-        return "redirect:/anbar/anbarlar/" + id + "/settings?il=" + y;
+        return form.containsKey("modal") ? "redirect:/anbar/anbarlar"
+                : "redirect:/anbar/anbarlar/" + id + "/settings?section=" + section + "&il=" + y;
     }
 
     @PostMapping("/anbar/anbarlar/bulk-month")
@@ -180,7 +197,7 @@ public class AnbarSettingsController {
                 rows.add(row);
             }
         }
-        flash(settings.saveUnits(k, id, json.writeValueAsString(rows), actor.personalId()), attrs);
+        flash(settings.saveUnits(id, json.writeValueAsString(rows), actor.personalId()), attrs);
         return "redirect:/anbar/materiallar/" + id + "/vahidler";
     }
 }

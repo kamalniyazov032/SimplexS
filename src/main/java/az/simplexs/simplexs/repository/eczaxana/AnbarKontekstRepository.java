@@ -47,7 +47,7 @@ public class AnbarKontekstRepository {
     public List<Year> years(Long clinic, Long warehouse) {
         return jdbc.query("""
                         SELECT il,cari_ildir,baslama_tarixi FROM public.fn_anbar_kontekst_il_siyahisi(
-                            p_klinika_id=>:clinic,p_anbar_id=>:warehouse)
+                            p_anbar_id=>:warehouse)
                         """, new MapSqlParameterSource("clinic", clinic).addValue("warehouse", warehouse),
                 (r, n) -> new Year(r.getObject("il", Integer.class), r.getObject("cari_ildir", Boolean.class), r.getObject("baslama_tarixi", LocalDate.class)));
     }

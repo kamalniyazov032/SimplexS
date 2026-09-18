@@ -79,8 +79,8 @@ public class QaimeRepository {
     public Map<String, Object> options(Long clinic, Long warehouse) {
         var p = context(clinic, warehouse);
         return Map.of("operations", rows("SELECT emeliyyat_novu_id id,ad,istiqamet FROM public.fn_anbar_emeliyyat_novu_siyahisi(:clinic,NULL,true)", p),
-                "groups", rows("SELECT mehsul_qrupu_id id,qrup_adi ad FROM public.fn_anbar_mehsul_qrup_siyahisi(:clinic,:warehouse) WHERE secilib", p),
-                "companies", rows("SELECT firma_id id,ad FROM public.fn_firma_siyahisi(p_aktiv=>true) ORDER BY ad", p),
+                "groups", rows("SELECT mehsul_qrupu_id id,qrup_adi ad FROM public.fn_anbar_mehsul_qrup_siyahisi(:warehouse) WHERE secilib", p),
+                "companies", rows("SELECT firma_id id,ad FROM public.fn_firma_siyahisi(p_klinika_id=>:clinic,p_aktiv=>true) ORDER BY ad", p),
                 "receivers", rows("SELECT p.id,trim(coalesce(p.ad,'')||' '||coalesce(p.soyad,'')) ad FROM public.rn_anbar_mesul_sexsler m JOIN public.rn_personallar p ON p.id=m.personal_id AND p.aktiv WHERE m.klinika_id=:clinic AND m.anbar_id=:warehouse AND m.aktiv ORDER BY ad", p));
     }
 

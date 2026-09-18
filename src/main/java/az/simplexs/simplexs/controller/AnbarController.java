@@ -35,7 +35,7 @@ public class AnbarController {
 
     @GetMapping("/anbar/{tab}")
     public String page(@PathVariable String tab, @RequestParam(defaultValue = "aktiv") String status,
-                       @RequestParam(required = false) String axtaris, @RequestParam(required = false) String istiqamet, Model model, HttpSession session) {
+                       @RequestParam(required = false) String axtaris, @RequestParam(required = false) String istiqamet, @RequestParam(required = false) Long qrupNovuId, Model model, HttpSession session) {
         if (!java.util.Set.of("anbarlar", "firmalar", "vahidler", "qruplar", "materiallar", "emeliyyatlar").contains(tab))
             return "redirect:/anbar/anbarlar";
         Long k = clinic(session);
@@ -45,7 +45,7 @@ public class AnbarController {
         model.addAttribute("tab", tab);
         model.addAttribute("status", status);
         model.addAttribute("axtaris", axtaris);
-        model.addAttribute("filterApplied", (axtaris != null && !axtaris.isBlank()) || !"aktiv".equals(status));
+        model.addAttribute("filterApplied", (axtaris != null && !axtaris.isBlank()) || !"aktiv".equals(status) || ("qruplar".equals(tab) && qrupNovuId != null));
         model.addAttribute("firmalar", java.util.List.of());
         model.addAttribute("vahidler", java.util.List.of());
         model.addAttribute("qrupNovleri", java.util.List.of());
@@ -56,6 +56,7 @@ public class AnbarController {
         model.addAttribute("anbarNovleri", java.util.List.of());
         model.addAttribute("anbarlar", java.util.List.of());
         model.addAttribute("istiqamet", istiqamet);
+        model.addAttribute("qrupNovuId", qrupNovuId);
         switch (tab) {
             case "firmalar" ->
                     model.addAttribute("firmalar", repository.firmalar(k, aktiv).stream().filter(x -> matches(axtaris, x.ad(), x.unvan(), x.email())).toList());
@@ -63,10 +64,10 @@ public class AnbarController {
                     model.addAttribute("vahidler", repository.vahidler(k, aktiv, null).stream().filter(x -> matches(axtaris, x.ad(), x.altVahidAdi())).toList());
             case "qruplar" -> {
                 model.addAttribute("qrupNovleri", repository.qrupNovleri());
-                model.addAttribute("qruplar", repository.qruplar(k, aktiv).stream().filter(x -> matches(axtaris, x.ad(), x.aciqlama())).toList());
+                model.addAttribute("qruplar", repository.qruplar(k, aktiv, qrupNovuId).stream().filter(x -> matches(axtaris, x.ad(), x.aciqlama())).toList());
             }
             case "materiallar" -> {
-                model.addAttribute("qruplar", repository.qruplar(k, true));
+                model.addAttribute("qruplar", repository.qruplar(k, true, null));
                 model.addAttribute("vahidler", repository.vahidler(k, aktiv, null));
                 model.addAttribute("materiallar", repository.materiallar(k, null, aktiv, axtaris));
             }
@@ -85,14 +86,14 @@ public class AnbarController {
     @PostMapping("/parametrler/anbar/firma")
     public String firma(@RequestParam Map<String, String> f, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes a) {
         Long id = L(f, "id");
-        flash(id == null ? repository.firmaYarat(clinic(s), f.get("ad"), f.get("unvan"), f.get("telefon"), f.get("faks"), f.get("email"), f.get("qeyd"), f.get("bankAdi"), f.get("bankHesabi"), f.get("vergiNomresi"), f.get("vergiIdaresi"), p.personalId()) : repository.firmaYenile(clinic(s), id, f.get("ad"), f.get("unvan"), f.get("telefon"), f.get("faks"), f.get("email"), f.get("qeyd"), f.get("bankAdi"), f.get("bankHesabi"), f.get("vergiNomresi"), f.get("vergiIdaresi"), B(f, "aktiv"), p.personalId()), a);
+        flash(id == null ? repository.firmaYarat(clinic(s), f.get("ad"), f.get("unvan"), f.get("telefon"), f.get("faks"), f.get("email"), f.get("qeyd"), f.get("bankAdi"), f.get("bankHesabi"), f.get("vergiNomresi"), f.get("vergiIdaresi"), p.personalId()) : repository.firmaYenile(id, f.get("ad"), f.get("unvan"), f.get("telefon"), f.get("faks"), f.get("email"), f.get("qeyd"), f.get("bankAdi"), f.get("bankHesabi"), f.get("vergiNomresi"), f.get("vergiIdaresi"), B(f, "aktiv"), p.personalId()), a);
         return back("firmalar");
     }
 
     @PostMapping("/parametrler/anbar/vahid")
     public String vahid(@RequestParam Map<String, String> f, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes a) {
         Long id = L(f, "id");
-        flash(id == null ? repository.vahidYarat(clinic(s), f.get("ad"), L(f, "altVahidId"), D(f, "vurmaEmsali"), B(f, "sifarisdeGorunsun"), p.personalId()) : repository.vahidYenile(clinic(s), id, f.get("ad"), L(f, "altVahidId"), D(f, "vurmaEmsali"), B(f, "sifarisdeGorunsun"), B(f, "aktiv"), p.personalId()), a);
+        flash(id == null ? repository.vahidYarat(clinic(s), f.get("ad"), L(f, "altVahidId"), D(f, "vurmaEmsali"), B(f, "sifarisdeGorunsun"), p.personalId()) : repository.vahidYenile(id, f.get("ad"), L(f, "altVahidId"), D(f, "vurmaEmsali"), B(f, "sifarisdeGorunsun"), B(f, "aktiv"), p.personalId()), a);
         return back("vahidler");
     }
 
@@ -106,7 +107,7 @@ public class AnbarController {
     @PostMapping("/parametrler/anbar/material")
     public String material(@RequestParam Map<String, String> f, HttpSession s, @AuthenticationPrincipal AuthenticatedPersonal p, RedirectAttributes a) {
         Long id = L(f, "id");
-        flash(repository.materialYaddaSaxla(id == null, id, clinic(s), L(f, "qrupId"), L(f, "vahidId"), f.get("ad"), f.get("qisaAd"), f.get("barkod"), D(f, "minimumMiqdar"), D(f, "maksimumMiqdar"), B(f, "mehvEdileBiler"), B(f, "paketdenKenar"), B(f, "aktiv"), f.get("farmasevtikMelumat"), f.get("istifadeQaydasi"), f, p.personalId()), a);
+        flash(repository.materialYaddaSaxla(id == null, id, clinic(s), L(f, "qrupId"), L(f, "anaVahidId"), f.get("ad"), f.get("qisaAd"), f.get("barkod"), D(f, "minimumMiqdar"), D(f, "maksimumMiqdar"), B(f, "mehvEdileBiler"), B(f, "paketdenKenar"), B(f, "aktiv"), f.get("farmasevtikMelumat"), f.get("istifadeQaydasi"), f, p.personalId()), a);
         return back("materiallar");
     }
 

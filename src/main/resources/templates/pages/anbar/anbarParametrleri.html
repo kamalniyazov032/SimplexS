@@ -2,7 +2,7 @@
 <html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" th:classappend="${tab=='anbarlar'}?'warehouse-list-page'">
     <style>.warehouse-editor .warehouse-section-title {
         display: flex;
         align-items: center;
@@ -83,9 +83,27 @@
         .warehouse-editor .warehouse-option-grid {
             grid-template-columns:1fr
         }
-    }</style>
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
+    }
+    .page-wrapper .content.warehouse-list-page {display: flex; flex-direction: column; min-height: calc(100dvh - var(--topbar-height) - 1px)}
+    .warehouse-list-page .warehouse-list-header {padding: 4px 4px 8px}
+    .warehouse-list-page .warehouse-list-icon {font-size: 52px; line-height: 1}
+    .warehouse-list-page .warehouse-table {border: 1px solid var(--bs-border-color); border-radius: 10px; flex: 1; margin-bottom: 0}
+    .warehouse-list-page .warehouse-table .table-responsive {flex: 1; overflow: visible; max-height: none}
+    .warehouse-list-page .warehouse-table table {width: 100%; min-width: 0}
+    .warehouse-list-page .warehouse-table th {background: var(--bs-body-bg); padding: 14px 12px; white-space: normal}
+    .warehouse-list-page .warehouse-table td {padding: 16px 12px; border-color: var(--bs-border-color)}
+    .warehouse-list-page .warehouse-table th:nth-child(n+4), .warehouse-list-page .warehouse-table td:nth-child(n+4) {border-left: 1px solid var(--bs-border-color)}
+    .warehouse-list-page .warehouse-table td:nth-child(5) .badge {min-width: 76px}
+    .warehouse-list-page .warehouse-table td:last-child .btn {width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-color: var(--bs-primary-border-subtle); border-radius: 7px; font-size: 20px; margin-left: 3px}
+    .warehouse-list-page .warehouse-summary {display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 13px}
+    .warehouse-list-page .warehouse-summary i {font-size: 21px; vertical-align: middle; margin-right: 6px}
+    </style>
+    <div class="warehouse-list-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div th:if="${tab=='anbarlar'}" class="d-flex align-items-center gap-3">
+            <i class="warehouse-list-icon ti ti-building-warehouse text-primary"></i>
+            <div><h2 class="mb-1" th:text="#{warehouse.tab.anbarlar}"></h2><p class="text-muted mb-0" th:text="#{warehouse.page.anbarlar}"></p></div>
+        </div>
+        <div th:unless="${tab=='anbarlar'}">
             <h4 class="mb-1">
                 <i class="ti ti-building-warehouse text-primary me-2">
                 </i>
@@ -94,7 +112,8 @@
             <p class="text-muted mb-0" th:text="#{|warehouse.page.${tab}|}">Anbar məlumatlarının idarə edilməsi</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#warehouseFilter">
+            <button th:if="${tab=='anbarlar'}" class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#warehouseBulkModal"><i class="ti ti-lock me-1"></i><span th:text="#{warehouse.bulkTitle}"></span></button>
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#warehouseFilter">
                 <i class="ti ti-filter me-1">
                 </i>
                 <span th:text="#{common.filter}">Filter</span>
@@ -126,7 +145,7 @@
         <div class="offcanvas-body py-3">
             <form method="get" th:action="@{|/anbar/${tab}|}">
                 <div class="row g-2 align-items-end">
-                    <div class="col-xl-6 col-md-6">
+                    <div th:class="${tab=='qruplar'} ? 'col-xl-4 col-md-6' : 'col-xl-6 col-md-6'">
                         <label class="form-label small text-muted" th:text="#{common.axtaris}">Axtarış</label>
                         <div class="input-group">
 <span class="input-group-text bg-light">
@@ -136,6 +155,13 @@
                             <input class="form-control" name="axtaris" th:value="${axtaris}"
                                    th:placeholder="#{warehouse.search_placeholder}">
                         </div>
+                    </div>
+                    <div class="col-xl-2 col-md-6" th:if="${tab=='qruplar'}">
+                        <label class="form-label small text-muted" th:text="#{warehouse.group_type}"></label>
+                        <select class="form-select" name="qrupNovuId">
+                            <option value="" th:text="#{common.hamisi}"></option>
+                            <option th:each="n:${qrupNovleri}" th:value="${n.id}" th:text="${n.ad}" th:selected="${n.id==qrupNovuId}"></option>
+                        </select>
                     </div>
                     <div class="col-xl-2 col-md-6">
                         <label class="form-label small text-muted" th:text="#{common.status}">Status</label>
@@ -162,8 +188,8 @@
             </form>
         </div>
     </div>
-    <div class="card border-0 shadow-sm">
-        <div class="card-header d-flex align-items-center justify-content-between gap-3">
+    <div class="card border-0 shadow-sm" th:classappend="${tab=='anbarlar'}?'warehouse-table'">
+        <div th:if="${tab!='anbarlar'}" class="card-header d-flex align-items-center justify-content-between gap-3">
             <div>
                 <h5 class="mb-1" th:text="#{|warehouse.tab.${tab}|}">
                 </h5>
@@ -181,12 +207,13 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                 <tr th:if="${tab=='anbarlar'}">
-                    <th th:text="#{warehouse.warehouse}">Anbar</th>
-                    <th th:text="#{warehouse.warehouse_type}">Anbar növü</th>
-                    <th th:text="#{warehouse.settings}">Anbar seçimləri</th>
-                    <th th:text="#{common.status}">Status</th>
-                    <th class="pe-3">
-                    </th>
+                    <th class="ps-3" th:text="#{warehouse.rowNumber}"></th>
+                    <th th:text="#{warehouse.warehouse}"></th>
+                    <th th:text="#{warehouse.warehouse_type}"></th>
+                    <th th:text="#{warehouse.summary}"></th>
+                    <th th:text="#{common.status}"></th>
+                    <th th:text="#{common.yaranma_tarixi}"></th>
+                    <th class="text-end pe-3" th:text="#{warehouse.actions}"></th>
                 </tr>
                 <tr th:if="${tab=='firmalar'}">
                     <th class="ps-3" th:text="#{warehouse.company}">Firma</th>
@@ -383,9 +410,9 @@
                                                         th:text="#{warehouse.unit}"></span></label>
                                                 <div class="input-group"><span class="input-group-text"><i
                                                         class="ti ti-ruler-measure"></i></span><select
-                                                        class="form-select" name="vahidId" required th:disabled="${!x.vahidDeyisdirileBiler}">
+                                                        class="form-select" name="anaVahidId" required th:disabled="${!x.vahidDeyisdirileBiler}">
                                                     <option th:each="v:${vahidler}" th:value="${v.id}" th:text="${v.ad}"
-                                                            th:selected="${v.id==x.vahidId}">
+                                                            th:selected="${v.id==x.anaVahidId}">
                                                     </option>
                                                 </select></div>
                                             </div>
@@ -429,7 +456,7 @@
                                                 <input class="form-control" type="number" step="any"
                                                        name="maksimumMiqdar" th:value="${x.maksimumMiqdar}">
                                             </div>
-                                            <div class="col-md-6"><label class="form-label" th:text="#{warehouse.minimum_doza}"></label><input class="form-control" type="number" min="0" step="any" name="minimum_doza"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.maksimum_doza}"></label><input class="form-control" type="number" min="0" step="any" name="maksimum_doza"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.xeste_ucun_maksimum_teleb_muddeti}"></label><input class="form-control" type="number" min="0" step="1" name="xeste_ucun_maksimum_teleb_muddeti"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.xeste_ucun_maksimum_teleb_miqdari}"></label><input class="form-control" type="number" min="0" step="any" name="xeste_ucun_maksimum_teleb_miqdari"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.yas_asagi_heddi}"></label><input class="form-control" type="number" min="0" step="1" name="yas_asagi_heddi"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.yas_yuxari_heddi}"></label><input class="form-control" type="number" min="0" step="1" name="yas_yuxari_heddi"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.beden_cekisi}"></label><input class="form-control" type="number" min="0" step="any" name="beden_cekisi"></div><div class="col-12"><label class="form-check"><input class="form-check-input" type="checkbox" name="avtomatik_hekim_tesdiqi_olmasin" value="true"><span class="form-check-label" th:text="#{warehouse.noAutoApproval}"></span></label></div><div class="col-12"><label class="form-check"><input class="form-check-input" type="checkbox" name="farmasevtikDeyisdirilsin" value="true"><span class="form-check-label" th:text="#{warehouse.replaceClinical}"></span></label></div><div class="col-md-6">
+                                            <div class="col-md-6"><label class="form-label" th:text="#{warehouse.minimum_doza}"></label><input class="form-control" type="number" min="0" step="any" name="minimum_doza" th:value="${x.minimumDoza}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.maksimum_doza}"></label><input class="form-control" type="number" min="0" step="any" name="maksimum_doza" th:value="${x.maksimumDoza}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.xeste_ucun_maksimum_teleb_muddeti}"></label><input class="form-control" type="number" min="0" step="1" name="xeste_ucun_maksimum_teleb_muddeti" th:value="${x.maksimumTelebMuddeti}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.xeste_ucun_maksimum_teleb_miqdari}"></label><input class="form-control" type="number" min="0" step="any" name="xeste_ucun_maksimum_teleb_miqdari" th:value="${x.maksimumTelebMiqdari}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.yas_asagi_heddi}"></label><input class="form-control" type="number" min="0" step="1" name="yas_asagi_heddi" th:value="${x.yasAsagi}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.yas_yuxari_heddi}"></label><input class="form-control" type="number" min="0" step="1" name="yas_yuxari_heddi" th:value="${x.yasYuxari}"></div><div class="col-md-6"><label class="form-label" th:text="#{warehouse.beden_cekisi}"></label><input class="form-control" type="number" min="0" step="any" name="beden_cekisi" th:value="${x.bedenCekisi}"></div><div class="col-12"><label class="form-check"><input class="form-check-input" type="checkbox" name="avtomatik_hekim_tesdiqi_olmasin" value="true" th:checked="${x.avtomatikHekimTesdiqiOlmasin}"><span class="form-check-label" th:text="#{warehouse.noAutoApproval}"></span></label></div><div class="col-12"><label class="form-check"><input class="form-check-input" type="checkbox" name="farmasevtikDeyisdirilsin" value="true"><span class="form-check-label" th:text="#{warehouse.replaceClinical}"></span></label></div><div class="col-md-6">
                                                 <label class="form-label"><i
                                                         class="ti ti-pill text-primary me-1"></i><span
                                                         th:text="#{warehouse.pharmaceutical_info}"></span></label>
@@ -563,11 +590,12 @@
                 </th:block>
 
                 <th:block th:if="${tab=='anbarlar'}">
-                    <tr th:each="x:${anbarlar}">
+                    <tr class="warehouse-list-row" th:each="x, row:${anbarlar}">
+                        <td class="ps-3 text-muted" th:text="${row.count}"></td>
 
                         <td>
-                            <div class="d-flex align-items-center gap-2">
-<span class="avatar avatar-sm bg-primary-subtle text-primary rounded-circle">
+                            <div class="d-flex align-items-center gap-3">
+<span class="avatar avatar-md bg-primary-subtle text-primary rounded">
 <i class="ti ti-building-warehouse">
 </i>
 </span>
@@ -580,47 +608,19 @@
                             </div>
                         </td>
                         <td>
-<span class="badge bg-info-subtle text-info" th:text="${x.novAdi}">
+<span class="badge bg-primary-subtle text-primary" th:text="${x.novAdi}">
 </span>
                         </td>
                         <td>
-                            <div class="d-flex flex-wrap gap-1">
-<span class="badge bg-primary-subtle text-primary" th:if="${x.telebAnbaridir}">
-<i class="ti ti-clipboard-check me-1">
-</i>
-<span th:text="#{warehouse.demand_warehouse}">
-</span>
-</span>
-                                <span class="badge bg-primary-subtle text-primary" th:if="${x.telebdeStokGorunsun}">
-<i class="ti ti-clipboard-list me-1">
-</i>
-<span th:text="#{warehouse.show_stock}">
-</span>
-</span>
-                                <span class="badge bg-primary-subtle text-primary" th:if="${x.dermanPaketi}">
-<i class="ti ti-pill me-1">
-</i>
-<span th:text="#{warehouse.apply_drug_package}">
-</span>
-</span>
-                                <span class="badge bg-primary-subtle text-primary" th:if="${x.istehsalCixisi}">
-<i class="ti ti-building-factory me-1">
-</i>
-<span th:text="#{warehouse.production_issue}">
-</span>
-</span>
-                                <span class="badge bg-primary-subtle text-primary" th:if="${x.mehvCixisi}">
-<i class="ti ti-trash me-1">
-</i>
-<span th:text="#{warehouse.destruction_issue}">
-</span>
-</span>
-                                <span class="text-muted"
-                                      th:if="${x.telebAnbaridir != true and x.telebdeStokGorunsun != true and x.dermanPaketi != true and x.istehsalCixisi != true and x.mehvCixisi != true}">—</span>
+                            <div class="warehouse-summary text-muted" th:title="#{warehouse.countUnavailable}">
+                                <span><i class="ti ti-box"></i>— <span th:text="#{warehouse.groupCountLabel}"></span></span>
+                                <span><i class="ti ti-users text-primary"></i>— <span th:text="#{warehouse.peopleCountLabel}"></span></span>
+                                <span><i class="ti ti-lock"></i>— <span th:text="#{warehouse.monthCountLabel}"></span></span>
                             </div>
                         </td>
                         <td th:replace="~{::status(${x.aktiv})}">
                         </td>
+                        <td class="text-nowrap text-muted" th:text="${x.yaranmaTarixi!=null?#temporals.format(x.yaranmaTarixi,'dd.MM.yyyy'):'—'}"></td>
                         <td th:replace="~{::edit('anbarlar',${x.id})}">
                         </td>
                     </tr>
@@ -750,7 +750,7 @@
                         <td th:text="${x.qrupAdi ?: '—'}">
                         </td>
                         <td>
-                            <div th:text="${x.vahidAdi ?: '—'}">
+                            <div th:text="${x.anaVahidAdi ?: '—'}">
                             </div>
                             <small class="text-muted"
                                    th:text="|${x.minimumMiqdar ?: '—'} / ${x.maksimumMiqdar ?: '—'}|">
@@ -793,7 +793,7 @@
                     </tr>
                 </th:block>
                 <tr th:if="${(tab=='anbarlar' and #lists.isEmpty(anbarlar)) or (tab=='firmalar' and #lists.isEmpty(firmalar)) or (tab=='vahidler' and #lists.isEmpty(vahidler)) or (tab=='qruplar' and #lists.isEmpty(qruplar)) or (tab=='materiallar' and #lists.isEmpty(materiallar)) or (tab=='emeliyyatlar' and #lists.isEmpty(emeliyyatlar))}">
-                    <td th:colspan="${tab=='qruplar'?4:(tab=='materiallar' or tab=='vahidler'?6:5)}" class="text-center text-muted py-5">
+                    <td th:colspan="${tab=='anbarlar'?7:(tab=='qruplar'?4:(tab=='materiallar' or tab=='vahidler'?6:5))}" class="text-center text-muted py-5">
 <span class="avatar avatar-lg bg-light text-muted rounded-circle mb-2">
 <i class="ti ti-database-off fs-3">
 </i>
@@ -806,6 +806,14 @@
                 </tbody>
             </table>
         </div>
+        <div th:if="${tab=='anbarlar'}" class="card-footer bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+            <small class="text-muted" id="warehouseRange" th:data-pattern="#{warehouse.listRange('{total}','{start}','{end}')}"></small>
+            <div class="d-flex gap-2 align-items-center">
+                <button id="warehousePrevious" class="btn btn-sm btn-outline-primary" type="button" th:aria-label="#{warehouse.previousPage}"><i class="ti ti-chevron-left"></i></button>
+                <span id="warehousePage" class="btn btn-sm btn-primary" aria-current="page">1</span>
+                <button id="warehouseNext" class="btn btn-sm btn-outline-primary" type="button" th:aria-label="#{warehouse.nextPage}"><i class="ti ti-chevron-right"></i></button>
+            </div>
+        </div>
     </div>
 
     <template>
@@ -817,7 +825,10 @@
             </td>
         </th:block>
         <th:block th:fragment="edit(kind,id)">
-            <td class="text-end pe-3"><a th:if="${kind=='anbarlar'}" class="btn btn-sm btn-outline-primary" th:href="@{/anbar/anbarlar/{id}/settings(id=${id})}" th:title="#{warehouse.settings}" th:aria-label="#{warehouse.settings}"><i class="ti ti-settings"></i></a><a th:if="${kind=='materiallar'}" class="btn btn-sm btn-outline-primary" th:href="@{/anbar/materiallar/{id}/vahidler(id=${id})}" th:title="#{warehouse.materialUnits}" th:aria-label="#{warehouse.materialUnits}"><i class="ti ti-ruler-measure"></i></a>
+            <td class="text-end pe-3 text-nowrap">
+                <th:block th:if="${kind=='anbarlar'}">
+                    <button th:each="part:${ {'groups','people','months'} }" type="button" class="btn btn-sm btn-outline-primary" th:data-settings-url="@{/anbar/anbarlar/{id}/settings(id=${id},section=${part},fragment=true)}" th:title="${part=='months'}?#{warehouse.monthButtons}:#{|warehouse.panel.${part}|}" th:aria-label="${part=='months'}?#{warehouse.monthButtons}:#{|warehouse.panel.${part}|}"><i th:class="${part=='groups'}?'ti ti-box':(${part=='people'}?'ti ti-users':'ti ti-calendar')"></i></button>
+                </th:block><a th:if="${kind=='materiallar'}" class="btn btn-sm btn-outline-primary" th:href="@{/anbar/materiallar/{id}/vahidler(id=${id})}" th:title="#{warehouse.materialUnits}" th:aria-label="#{warehouse.materialUnits}"><i class="ti ti-ruler-measure"></i></a>
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                         th:data-bs-target="|#edit-${kind}-${id}|" th:title="#{common.redakte_et}"
                         th:aria-label="#{common.redakte_et}">
@@ -828,6 +839,24 @@
         </th:block>
     </template>
 
+    <th:block th:if="${tab=='anbarlar'}">
+        <div class="modal fade" id="warehouseSettingsModal" tabindex="-1" th:aria-label="#{warehouse.settings}">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"></div></div>
+        </div>
+        <div class="modal fade" id="warehouseBulkModal" tabindex="-1" aria-labelledby="warehouseBulkTitle">
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+                <div class="modal-header border-0"><h5 id="warehouseBulkTitle" class="modal-title"><i class="ti ti-lock text-danger me-2"></i><span th:text="#{warehouse.bulkTitle}"></span></h5><button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button></div>
+                <form method="post" th:action="@{/anbar/anbarlar/bulk-month}" th:data-confirm="#{warehouse.bulkConfirm}">
+                    <div class="modal-body pt-0"><div class="row g-3">
+                        <div class="col-6"><label for="bulkYear" class="form-label" th:text="#{qaime.year}"></label><input id="bulkYear" class="form-control" type="number" name="il" min="1900" max="9999" th:value="${#temporals.year(#temporals.createNow())}" required></div>
+                        <div class="col-6"><label for="bulkMonth" class="form-label" th:text="#{warehouse.month}"></label><select id="bulkMonth" class="form-select" name="ay"><option th:each="month:${#numbers.sequence(1,12)}" th:value="${month}" th:text="#{|warehouse.month.${month}|}"></option></select></div>
+                        <div class="col-12"><label for="bulkStatus" class="form-label" th:text="#{common.status}"></label><select id="bulkStatus" class="form-select" name="kilidlidir"><option value="true" th:text="#{warehouse.lock}"></option><option value="false" th:text="#{warehouse.unlock}"></option></select></div>
+                    </div></div>
+                    <div class="modal-footer border-0"><button type="button" class="btn btn-light border" data-bs-dismiss="modal" th:text="#{warehouse.cancel}"></button><button class="btn btn-primary" th:text="#{qaime.save}"></button></div>
+                </form>
+            </div></div>
+        </div>
+    </th:block>
     <th:block th:if="${tab=='anbarlar'}" th:each="x:${anbarlar}">
         <div class="modal fade warehouse-editor" th:id="|edit-anbarlar-${x.id}|" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -1430,7 +1459,7 @@
                                                     th:text="#{warehouse.unit}"></span></label>
                                             <div class="input-group"><span class="input-group-text"><i
                                                     class="ti ti-ruler-measure"></i></span><select class="form-select"
-                                                                                                   name="vahidId"
+                                                                                                   name="anaVahidId"
                                                                                                    required>
                                                 <option th:each="v:${vahidler}" th:value="${v.id}" th:text="${v.ad}">
                                                 </option>
@@ -1667,17 +1696,55 @@
             </label>
         </th:block>
     </template>
-</div>
-<th:block layout:fragment="scripts">
+<th:block>
+    <script th:if="${tab=='anbarlar'}" th:replace="~{pages/anbar/anbarSettings :: settingsScript}"></script>
     <script th:inline="javascript">
-        const warehouseData = {
-            anbarlar:/*[[${anbarlar}]]*/[],
-            firmalar:/*[[${firmalar}]]*/[],
-            vahidler:/*[[${vahidler}]]*/[],
-            qruplar:/*[[${qruplar}]]*/[],
-            materiallar:/*[[${materiallar}]]*/[],
-            emeliyyatlar:/*[[${emeliyyatlar}]]*/[]
+        const warehouseRange = document.getElementById('warehouseRange');
+        if (warehouseRange) {
+            const rows = [...document.querySelectorAll('.warehouse-list-row')];
+            const previous = document.getElementById('warehousePrevious'), next = document.getElementById('warehouseNext');
+            let page = 0;
+            const renderPage = () => {
+                rows.forEach((row, index) => row.hidden = index < page * 10 || index >= (page + 1) * 10);
+                warehouseRange.textContent = warehouseRange.dataset.pattern.replace('{total}', rows.length).replace('{start}', rows.length ? page * 10 + 1 : 0).replace('{end}', Math.min((page + 1) * 10, rows.length));
+                document.getElementById('warehousePage').textContent = page + 1;
+                previous.disabled = page === 0;
+                next.disabled = (page + 1) * 10 >= rows.length;
+            };
+            previous.addEventListener('click', () => { page--; renderPage(); });
+            next.addEventListener('click', () => { page++; renderPage(); });
+            renderPage();
+        }
+        const settingsModal = document.getElementById('warehouseSettingsModal');
+        const loadWarehouseSettings = async url => {
+            const content = settingsModal.querySelector('.modal-content');
+            content.replaceChildren();
+            const header = document.createElement('div');
+            header.className = 'modal-header';
+            const state = document.createElement('span');
+            state.textContent = /*[[#{qaime.loading}]]*/ '';
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'btn-close';
+            close.dataset.bsDismiss = 'modal';
+            close.setAttribute('aria-label', /*[[#{common.bagla}]]*/ '');
+            header.append(state, close);
+            content.append(header);
+            try {
+                const response = await fetch(url);
+                if (!response.ok || response.redirected) throw new Error();
+                const html = await response.text();
+                content.innerHTML = html;
+                initWarehouseSettings(content);
+            } catch (error) {
+                state.textContent = /*[[#{common.emeliyyati_yerine_yetirmek_mumkun}]]*/ '';
+                state.className = 'text-danger';
+            }
         };
+        document.querySelectorAll('[data-settings-url]').forEach(button => button.addEventListener('click', () => {
+            bootstrap.Modal.getOrCreateInstance(settingsModal).show();
+            loadWarehouseSettings(button.dataset.settingsUrl);
+        }));
         const setModalMode = (modal, editing) => {
             modal.querySelector('.modal-mode-title').textContent = editing ? modal.dataset.editTitle : modal.dataset.createTitle;
             modal.querySelector('.modal-mode-hint').textContent = editing ? modal.dataset.editHint : modal.dataset.createHint;
@@ -1688,27 +1755,6 @@
             const actionIcon = modal.querySelector('.modal-action-icon');
             actionIcon.className = `modal-action-icon ti ${editing ? 'ti-device-floppy' : 'ti-plus'} me-1`;
         };
-        document.querySelectorAll('[data-edit-kind]').forEach(button => button.addEventListener('click', () => {
-            const kind = button.dataset.editKind,
-                item = (warehouseData[kind] || []).find(x => String(x.id) === button.dataset.editId),
-                form = document.getElementById(kind + 'Form'), modal = document.getElementById(kind + 'Modal');
-            if (!item || !form || !modal) return;
-            form.reset();
-            const values = {
-                ...item,
-                anbarNovuId: item.novId ?? item.anbarNovuId,
-                telefon: item.isTelefonu ?? item.telefon,
-                faks: item.faksNomresi ?? item.faks,
-                bankHesabi: item.bankHesabNomresi ?? item.bankHesabi
-            };
-            Object.entries(values).forEach(([key, value]) => {
-                const el = form.elements.namedItem(key);
-                if (!el) return;
-                if (el.type === 'checkbox') el.checked = value === true; else el.value = value ?? ''
-            });
-            form.querySelector('.warehouse-active')?.classList.remove('d-none');
-            setModalMode(modal, true)
-        }));
         document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('hidden.bs.modal', () => {
             const form = modal.querySelector('form');
             form?.reset();
@@ -1718,5 +1764,6 @@
         }));
     </script>
 </th:block>
+</div>
 </body>
 </html>

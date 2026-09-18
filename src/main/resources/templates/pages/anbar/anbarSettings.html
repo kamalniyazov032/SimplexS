@@ -1,5 +1,116 @@
-<!DOCTYPE html><html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}"><body><div layout:fragment="content" class="content">
-<div class="d-flex align-items-center gap-3 mb-3"><a class="btn btn-light" th:href="@{/anbar/anbarlar}" th:text="#{warehouse.back}"></a><h4 class="mb-0" th:text="${pageTitle}"></h4></div>
-<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div><section class="card"><div class="card-body"><h5 th:text="#{warehouse.groups}"></h5><form method="post" th:action="@{/anbar/anbarlar/{id}/settings/groups(id=${id})}"><input type="hidden" name="il" th:value="${il}"><div class="row g-2"><div class="col-md-4" th:each="row:${groups}"><label class="form-check"><input class="form-check-input" type="checkbox" th:name="'group_'+${row.mehsul_qrupu_id}" value="true" th:checked="${row.secilib}"><span class="form-check-label" th:text="${row.qrup_adi}"></span></label></div></div><button class="btn btn-primary mt-3" th:text="#{qaime.save}"></button></form></div></section><section class="card"><div class="card-body"><h5 th:text="#{warehouse.responsible}"></h5><form method="post" th:action="@{/anbar/anbarlar/{id}/settings/people(id=${id})}"><input type="hidden" name="il" th:value="${il}"><div class="row g-2"><div class="col-md-4" th:each="row:${people}"><label class="form-check"><input class="form-check-input" type="checkbox" th:name="'person_'+${row.personal_id}" value="true" th:checked="${row.secilib}"><span class="form-check-label" th:text="${row.personal_adi}"></span></label></div></div><button class="btn btn-primary mt-3" th:text="#{qaime.save}"></button></form></div></section><section class="card"><div class="card-body"><h5 th:text="#{warehouse.monthLocks}"></h5><form method="get" class="d-flex gap-2 mb-3"><label class="form-label" th:text="#{qaime.year}"></label><input class="form-control w-auto" type="number" min="1900" max="9999" name="il" th:value="${il}" required><button class="btn btn-light" th:text="#{qaime.search}"></button></form>
-<form method="post" th:action="@{/anbar/anbarlar/{id}/settings/months(id=${id})}"><input type="hidden" name="il" th:value="${il}"><div class="row g-2"><div class="col-md-3" th:each="row:${months}"><label class="form-check"><input class="form-check-input" type="checkbox" th:name="'month_'+${row.ay}" value="true" th:checked="${row.kilidlidir}"><span class="form-check-label" th:text="${row.ay_adi}"></span></label></div></div><button class="btn btn-primary mt-3" th:text="#{qaime.save}"></button></form></div></section>
-<section class="card"><div class="card-body"><h5 th:text="#{warehouse.bulkLocks}"></h5><form method="post" th:action="@{/anbar/anbarlar/bulk-month}" th:data-confirm="#{warehouse.bulkConfirm}"><div class="row g-2"><div class="col-md-3"><label class="form-label" th:text="#{qaime.year}"></label><input class="form-control" type="number" name="il" min="1900" max="9999" th:value="${il}" required></div><div class="col-md-3"><label class="form-label" th:text="#{warehouse.month}"></label><select class="form-select" name="ay"><option th:each="row:${months}" th:value="${row.ay}" th:text="${row.ay_adi}"></option></select></div><div class="col-md-3"><label class="form-label" th:text="#{common.status}"></label><select class="form-select" name="kilidlidir"><option value="true" th:text="#{warehouse.lock}"></option><option value="false" th:text="#{warehouse.unlock}"></option></select></div></div><button class="btn btn-primary mt-3" th:text="#{qaime.save}"></button></form></div></section></div></body></html>
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body>
+<div layout:fragment="content" class="content">
+    <a class="btn btn-light mb-3" th:href="@{/anbar/anbarlar}" th:text="#{warehouse.back}"></a>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <nav class="nav nav-pills gap-2 mb-3">
+        <a th:each="part:${ {'groups','people','months'} }" class="nav-link" th:classappend="${section==part}?'active'" th:href="@{/anbar/anbarlar/{id}/settings(id=${id},section=${part})}" th:text="#{|warehouse.panel.${part}|}"></a>
+    </nav>
+    <div class="card">
+    <th:block th:fragment="panel">
+        <div class="modal-header border-0 pb-2">
+            <div class="d-flex align-items-center gap-3">
+                <span class="avatar avatar-lg bg-primary-subtle text-primary rounded-circle"><i class="fs-24" th:classappend="${section=='groups'}?'ti ti-box':(${section=='people'}?'ti ti-users':'ti ti-calendar')"></i></span>
+                <div><h5 class="mb-1" th:text="#{|warehouse.panel.${section}|}"></h5><small class="text-muted" th:text="${section=='groups'}?#{warehouse.groupsHint(${pageTitle})}:${pageTitle}"></small></div>
+            </div>
+            <button th:if="${fragment}" type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.bagla}"></button>
+        </div>
+        <form class="warehouse-settings-form d-flex flex-column overflow-hidden" method="post" th:action="@{/anbar/anbarlar/{id}/settings/{section}(id=${id},section=${section})}">
+            <input th:if="${fragment}" type="hidden" name="modal" value="true">
+            <div class="modal-body pt-2">
+                <th:block th:if="${section!='months'}">
+                    <div class="input-group mb-3"><span class="input-group-text bg-white"><i class="ti ti-search"></i></span><input type="search" class="form-control warehouse-choice-search" th:placeholder="#{|warehouse.search.${section}|}" th:aria-label="#{|warehouse.search.${section}|}"></div>
+                    <div class="row g-3">
+                        <div class="col-sm-7"><div class="border rounded p-2 overflow-auto" th:style="${section=='groups'}?'height:320px':'height:260px'">
+                            <label th:each="row:${rows}" class="warehouse-choice d-flex align-items-center gap-2 p-2 rounded" th:with="label=${section=='groups'?row.qrup_adi:row.personal_adi}">
+                                <input class="form-check-input m-0" type="checkbox" th:name="${section=='groups'?'group_'+row.mehsul_qrupu_id:'person_'+row.personal_id}" value="true" th:checked="${row.secilib}" th:data-label="${label}">
+                                <span th:if="${section=='people'}" class="avatar avatar-xs bg-primary-subtle text-primary rounded-circle"><i class="ti ti-user"></i></span>
+                                <span th:text="${label}"></span>
+                            </label>
+                        </div></div>
+                        <div class="col-sm-5" th:classappend="${section=='groups'}?'border-start'"><div class="border rounded bg-light p-2" th:classappend="${section!='groups'}?'h-100'">
+                            <div class="fw-semibold small mb-2"><span th:text="#{|warehouse.selected.${section}|}"></span> (<span class="warehouse-selected-count">0</span>)</div>
+                            <div class="warehouse-selected d-flex flex-wrap align-content-start gap-2" th:classappend="${section=='groups'}?'flex-column align-items-start'"></div>
+                        </div></div>
+                    </div>
+                    <div th:if="${section=='groups'}" class="text-primary fw-semibold mt-3"><strong class="warehouse-selected-count">0</strong> <span th:text="#{warehouse.groupsSelected}"></span></div>
+                    <div th:unless="${section=='groups'}" class="text-primary small mt-3"><span th:text="#{warehouse.selectedCount}"></span>: <strong class="warehouse-selected-count">0</strong></div>
+                </th:block>
+                <th:block th:if="${section=='months'}">
+                    <div class="d-flex align-items-center gap-3 mb-3"><label class="form-label mb-0" for="warehouseYear" th:text="#{qaime.year}"></label>
+                        <select id="warehouseYear" class="form-select w-auto warehouse-year" name="il" required th:disabled="${#lists.isEmpty(years)}" th:data-url="@{/anbar/anbarlar/{id}/settings(id=${id},section='months',fragment=${fragment})}">
+                            <option th:each="y:${years}" th:value="${y.il}" th:text="${y.il}" th:selected="${y.il==il}"></option>
+                        </select>
+                    </div>
+                    <p th:if="${#lists.isEmpty(years)}" class="text-muted" th:text="#{warehouse.noYears}"></p>
+                    <div class="row g-2">
+                        <div class="col-6 col-sm-3" th:each="row:${months}">
+                            <label class="warehouse-month d-block border rounded text-center p-2" th:classappend="${row.kilidlidir}?'bg-danger-subtle border-danger-subtle':'bg-white border-success-subtle'">
+                                <span class="d-block small fw-semibold mb-2" th:text="${row.ay_adi}"></span>
+                                <input class="form-check-input me-1" type="checkbox" th:name="'month_'+${row.ay}" value="true" th:checked="${row.kilidlidir}" th:aria-label="${row.ay_adi}">
+                                <span class="warehouse-month-status badge" th:classappend="${row.kilidlidir}?'bg-danger-subtle text-danger':'bg-success-subtle text-success'" th:text="${row.kilidlidir}?#{warehouse.closed}:#{warehouse.open}" th:data-open="#{warehouse.open}" th:data-closed="#{warehouse.closed}"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div th:unless="${#lists.isEmpty(years)}" class="alert alert-primary d-flex gap-2 mt-3 mb-0 small"><i class="ti ti-info-circle fs-20"></i><span th:text="#{warehouse.monthHint}"></span></div>
+                </th:block>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button th:if="${fragment}" type="button" class="btn btn-light border" data-bs-dismiss="modal" th:text="#{warehouse.cancel}"></button>
+                <a th:unless="${fragment}" class="btn btn-light border" th:href="@{/anbar/anbarlar}" th:text="#{warehouse.cancel}"></a>
+                <button class="btn btn-primary" th:disabled="${section=='months' and #lists.isEmpty(years)}" th:text="#{qaime.save}"></button>
+            </div>
+        </form>
+    </th:block>
+    </div>
+    <script th:replace="~{::settingsScript}"></script>
+</div>
+<script th:fragment="settingsScript">
+    const initWarehouseSettings = root => {
+        const form = root.querySelector('.warehouse-settings-form');
+        if (!form) return;
+        const choices = [...form.querySelectorAll('.warehouse-choice input')];
+        const selected = form.querySelector('.warehouse-selected');
+        const updateSelected = () => {
+            if (!selected) return;
+            selected.replaceChildren();
+            choices.filter(input => input.checked).forEach(input => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'badge border-0 bg-primary-subtle text-primary d-flex align-items-center gap-2';
+                if (selected.classList.contains('flex-column')) button.classList.add('fs-14', 'fw-normal', 'px-3', 'py-2');
+                button.textContent = input.dataset.label;
+                const icon = document.createElement('i');
+                icon.className = 'ti ti-x';
+                button.append(icon);
+                button.addEventListener('click', () => { input.checked = false; updateSelected(); });
+                selected.append(button);
+            });
+            form.querySelectorAll('.warehouse-selected-count').forEach(el => el.textContent = choices.filter(input => input.checked).length);
+        };
+        choices.forEach(input => input.addEventListener('change', updateSelected));
+        form.querySelector('.warehouse-choice-search')?.addEventListener('input', event => {
+            const query = event.target.value.toLocaleLowerCase();
+            choices.forEach(input => input.closest('label').classList.toggle('d-none', !input.dataset.label.toLocaleLowerCase().includes(query)));
+        });
+        updateSelected();
+        form.querySelectorAll('.warehouse-month input').forEach(input => input.addEventListener('change', () => {
+            const card = input.closest('label'), status = card.querySelector('.warehouse-month-status');
+            card.classList.toggle('bg-danger-subtle', input.checked);
+            card.classList.toggle('border-danger-subtle', input.checked);
+            card.classList.toggle('bg-white', !input.checked);
+            card.classList.toggle('border-success-subtle', !input.checked);
+            status.className = 'warehouse-month-status badge ' + (input.checked ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success');
+            status.textContent = input.checked ? status.dataset.closed : status.dataset.open;
+        }));
+        form.querySelector('.warehouse-year')?.addEventListener('change', event => {
+            const url = new URL(event.target.dataset.url, location.origin);
+            url.searchParams.set('il', event.target.value);
+            if (form.closest('.modal')) loadWarehouseSettings(url); else location.assign(url);
+        });
+    };
+    initWarehouseSettings(document);
+</script>
+</body></html>
