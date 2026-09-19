@@ -360,7 +360,9 @@ public class QaimeController {
                 .status(db ? 503 : 400)
                 .body(Map.of(
                         "message",
-                        message(db ? "loadFailed" : "invalidInput")
+                        db
+                                ? ((DataAccessException) e).getMostSpecificCause().getMessage()
+                                : message("invalidInput")
                 ));
     }
 }
