@@ -64,3 +64,11 @@
 - Mövcud işləyən yanaşmanı yalnız real texniki zərurət olduqda dəyiş. Belə zərurət yaranarsa, özbaşına dəyişmə; əvvəl istifadəçiyə bildir.
 
 Əsas qayda: Layihədə həmin iş necə görülürsə, eyni formada davam et. Sadə işi mürəkkəbləşdirmə. Minimum kod yaz.
+
+
+## Standart filter UI qaydası
+
+- “Filter hazırla”, “filter əlavə et”, “ətraflı filter” və ya “standart filter” tapşırıqlarında `/ambulatorQebul/siyahi` səhifəsindəki “Ambulator müraciətlər üzrə ətraflı axtarış” filterinin mövcud HTML/CSS/JS implementasiyası nümunə götürülməlidir.
+- Canvas-ın açılması, yerləşməsi, ölçüsü, davranışı, başlıq, input/select, düymələr və spacing həmin nümunəyə uyğun olmalıdır; ayrıca filter dizaynı yaradılmamalıdır.
+- Əsas hissədə yalnız səhifə üçün vacib əsas seçimlər və Filter düyməsi saxlanılmalı, digər filter sahələri canvas-a keçirilməlidir. Tapşırıqda saxlanılması istənilən Axtar düyməsi qorunmalıdır.
+- Funksional məntiq və DB sorğuları səbəbsiz dəyişdirilməməlidir.

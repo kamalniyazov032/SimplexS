@@ -29,99 +29,145 @@ public class AmbulatorRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<AmbulatorPatient> xesteAxtar(Long klinika,Boolean aktiv,String q,Long cursor,int limit){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi_sehifeli(CAST(:k AS bigint),CAST(:a AS boolean),CAST(:q AS varchar),NULL,CAST(:cursor AS bigint),:limit)",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",blankToNull(q)).addValue("cursor",cursor).addValue("limit",limit),this::mapAmbulatorPatient);}
-    public long xesteAxtarSayi(Long klinika,Boolean aktiv,String q){Long count=jdbcTemplate.queryForObject("SELECT count(*) FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),CAST(:a AS boolean),CAST(:q AS varchar))",new MapSqlParameterSource("k",klinika).addValue("a",aktiv).addValue("q",q.trim()),Long.class);return count==null?0:count;}
-    public AmbulatorPatient xeste(Long klinika,Long id){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),NULL,NULL) WHERE xeste_id=:id",new MapSqlParameterSource("k",klinika).addValue("id",id),this::mapAmbulatorPatient).stream().findFirst().orElseThrow();}
-    public List<GelisOption> gelisNovleri(){return jdbcTemplate.query("SELECT id,kod,ad,NULL::text meta FROM public.rn_xeste_gelis_novleri WHERE aktiv ORDER BY id",(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),null,null));}
-    public List<GelisOption> teskilatlar(Long klinika){return jdbcTemplate.query("SELECT teskilat_id id,teskilat_tipi_kodu kod,ad,NULL::text meta FROM public.fn_teskilat_siyahisi(CAST(:k AS bigint),true) ORDER BY ad",new MapSqlParameterSource("k",klinika),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),null,null));}
-    public List<GelisOption> teskilatQiymetQruplari(Long klinika,Long teskilat){return jdbcTemplate.query("SELECT qiymet_qrupu_id id,qiymet_qrupu_adi ad,qiymet_basligi_adi meta FROM public.fn_teskilat_qiymet_qruplari_siyahisi(CAST(:k AS bigint),CAST(:t AS bigint)) ORDER BY qiymet_qrupu_adi",new MapSqlParameterSource("k",klinika).addValue("t",teskilat),(r,n)->new GelisOption(toLong(r.getObject("id")),null,r.getString("ad"),r.getString("meta"),teskilat));}
-    public List<GelisOption> hekimler(Long klinika){return jdbcTemplate.query("SELECT personal_id id,personal_kodu kod,tam_ad ad,vezife_adi meta FROM public.fn_personal_siyahisi(CAST(:k AS bigint),true) WHERE hekimdir ORDER BY tam_ad",new MapSqlParameterSource("k",klinika),(r,n)->new GelisOption(toLong(r.getObject("id")),r.getString("kod"),r.getString("ad"),r.getString("meta"),null));}
-    public List<Gelis> gelisler(Long klinika,Long xeste,Long nov,Long teskilat,java.time.LocalDate baslama,java.time.LocalDate bitme,Boolean randevu,Boolean aktiv,String q,Long cursor,int limit){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),CAST(:x AS bigint),CAST(:n AS bigint),CAST(:t AS bigint),CAST(:b AS date),CAST(:bt AS date),CAST(:r AS boolean),CAST(:a AS boolean),CAST(:q AS varchar),CAST(:cursor AS bigint),:limit)",new MapSqlParameterSource("k",klinika).addValue("x",xeste).addValue("n",nov).addValue("t",teskilat).addValue("b",baslama).addValue("bt",bitme).addValue("r",randevu).addValue("a",aktiv).addValue("q",blankToNull(q)).addValue("cursor",cursor).addValue("limit",limit),this::mapGelis);}
-    public long gelisSayi(Long klinika,Long xeste,Long nov,Long teskilat,java.time.LocalDate baslama,java.time.LocalDate bitme,Boolean randevu,Boolean aktiv,String q){Long count=jdbcTemplate.queryForObject("""
-        SELECT count(*)
-          FROM public.rn_xeste_gelisleri g
-          JOIN public.rn_xesteler x ON x.id=g.xeste_id AND x.klinika_id=g.klinika_id
-         WHERE g.klinika_id=:k
-           AND (CAST(:x AS bigint) IS NULL OR g.xeste_id=CAST(:x AS bigint))
-           AND (CAST(:n AS bigint) IS NULL OR g.gelis_novu_id=CAST(:n AS bigint))
-           AND (CAST(:t AS bigint) IS NULL OR g.teskilat_id=CAST(:t AS bigint))
-           AND (CAST(:b AS date) IS NULL OR g.gelis_tarixi>=CAST(:b AS date))
-           AND (CAST(:bt AS date) IS NULL OR g.gelis_tarixi<=CAST(:bt AS date))
-           AND (CAST(:r AS boolean) IS NULL OR g.randevudur=CAST(:r AS boolean))
-           AND (CAST(:a AS boolean) IS NULL OR g.aktiv=CAST(:a AS boolean))
-           AND (CAST(:q AS varchar) IS NULL OR g.protokol_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR x.kod ILIKE '%'||CAST(:q AS varchar)||'%' OR x.fin_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR x.sexsiyyet_vesiqesi_nomresi ILIKE '%'||CAST(:q AS varchar)||'%' OR x.ad ILIKE '%'||CAST(:q AS varchar)||'%' OR x.soyad ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(x.ata_adi,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(x.mobil_nomre,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR (x.ad||' '||x.soyad||' '||coalesce(x.ata_adi,'')) ILIKE '%'||CAST(:q AS varchar)||'%')
-        """,new MapSqlParameterSource("k",klinika).addValue("x",xeste).addValue("n",nov).addValue("t",teskilat).addValue("b",baslama).addValue("bt",bitme).addValue("r",randevu).addValue("a",aktiv).addValue("q",blankToNull(q)),Long.class);return count==null?0:count;}
-    public GelisStatistikasi bugunkuGelisStatistikasi(Long klinika){return jdbcTemplate.queryForObject("""
-        SELECT COUNT(*) umumi,
-               COUNT(*) FILTER (WHERE gn.kod='KONTROL_MUAYINE') tekrar_muayine,
-               COUNT(*) FILTER (WHERE gn.kod='HEKIM_MUAYINESI') hekim_muayinesi,
-               COUNT(*) FILTER (WHERE gn.kod='DIAQNOSTIK_MUAYINE') diaqnostik_muayine
-          FROM public.rn_xeste_gelisleri g
-          JOIN public.rn_xeste_gelis_novleri gn ON gn.id=g.gelis_novu_id
-         WHERE g.klinika_id=:k AND g.gelis_tarixi=CURRENT_DATE AND g.aktiv
-        """,new MapSqlParameterSource("k",klinika),(r,n)->new GelisStatistikasi(r.getLong("umumi"),r.getLong("tekrar_muayine"),r.getLong("hekim_muayinesi"),r.getLong("diaqnostik_muayine")));}
-    public Gelis gelis(Long klinika,Long id){return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL) WHERE gelis_id=:id",new MapSqlParameterSource("k",klinika).addValue("id",id),this::mapGelis).stream().findFirst().orElseThrow();}
-    public Map<String,Object> gelisYarat(Long klinika,GelisForm f,Long personal){return one("SELECT * FROM public.fn_xeste_gelisi_yarat(p_klinika_id=>:k,p_xeste_id=>:x,p_gelis_novu_id=>:n,p_teskilat_id=>:t,p_qiymet_qrupu_id=>:qg,p_gelis_tarixi=>:d,p_gelis_saati=>:s,p_randevudur=>:r,p_gonderen_hekim_id=>:h,p_mesaj=>:m,p_aciqlama=>:ac,p_yaradan_personal_id=>:p)",gelisParams(f).addValue("k",klinika).addValue("x",f.xesteId).addValue("p",personal));}
-    public Map<String,Object> gelisYenile(Long klinika,GelisForm f,Long personal){return one("SELECT * FROM public.fn_xeste_gelisi_yenile(p_gelis_id=>:id,p_klinika_id=>:k,p_gelis_novu_id=>:n,p_teskilat_id=>:t,p_qiymet_qrupu_id=>:qg,p_qiymet_qrupu_deyisdirilsin=>true,p_qiymet_qrupu_cari_xidmetlere_tesir_etsin=>:cariXidmetler,p_gelis_tarixi=>:d,p_gelis_saati=>:s,p_randevudur=>:r,p_gonderen_hekim_id=>:h,p_gonderen_hekim_deyisdirilsin=>true,p_mesaj=>:m,p_mesaj_deyisdirilsin=>true,p_aciqlama=>:ac,p_aciqlama_deyisdirilsin=>true,p_aktiv=>:a,p_yenileyen_personal_id=>:p)",gelisParams(f).addValue("cariXidmetler",f.qiymetQrupuCariXidmetlereTesirEtsin).addValue("id",f.gelisId).addValue("k",klinika).addValue("a",f.aktiv).addValue("p",personal));}
-    private MapSqlParameterSource gelisParams(GelisForm f){return new MapSqlParameterSource("n",f.gelisNovuId).addValue("t",f.teskilatId).addValue("qg",f.qiymetQrupuId).addValue("d",f.gelisTarixi).addValue("s",f.gelisSaati).addValue("r",f.randevudur).addValue("h",f.gonderenHekimId).addValue("m",blankToNull(f.mesaj)).addValue("ac",blankToNull(f.aciqlama));}
-    private Map<String,Object> one(String sql,MapSqlParameterSource p){var rows=jdbcTemplate.queryForList(sql,p);return rows.isEmpty()?Map.of():rows.getFirst();}
-    private Gelis mapGelis(ResultSet r,int n)throws SQLException{return new Gelis(toLong(r.getObject("gelis_id")),toLong(r.getObject("xeste_id")),r.getString("xeste_kodu"),r.getString("xeste_ad"),r.getString("xeste_soyad"),r.getString("xeste_ata_adi"),r.getString("fin_kodu"),r.getString("sexsiyyet_vesiqesi_nomresi"),r.getString("mobil_nomre"),toLong(r.getObject("gelis_novu_id")),r.getString("gelis_novu_kodu"),r.getString("gelis_novu_adi"),toLong(r.getObject("teskilat_id")),r.getString("teskilat_adi"),toLong(r.getObject("qiymet_qrupu_id")),r.getString("qiymet_qrupu_adi"),r.getString("protokol_kodu"),r.getObject("gelis_tarixi",java.time.LocalDate.class),r.getObject("gelis_saati",java.time.LocalTime.class),r.getObject("randevudur",Boolean.class),toLong(r.getObject("gonderen_hekim_id")),String.join(" ",java.util.stream.Stream.of(r.getString("gonderen_hekim_ad"),r.getString("gonderen_hekim_soyad"),r.getString("gonderen_hekim_ata_adi")).filter(x->x!=null&&!x.isBlank()).toList()),r.getString("mesaj"),r.getString("aciqlama"),r.getObject("aktiv",Boolean.class));}
-    private AmbulatorPatient mapAmbulatorPatient(ResultSet r,int n)throws SQLException{return new AmbulatorPatient(toLong(r.getObject("xeste_id")),r.getString("xeste_kodu"),String.join(" ",java.util.stream.Stream.of(r.getString("ad"),r.getString("soyad"),r.getString("ata_adi")).filter(x->x!=null&&!x.isBlank()).toList()),String.join(" · ",java.util.stream.Stream.of(r.getString("fin_kodu"),r.getString("mobil_nomre"),r.getString("sexsiyyet_vesiqesi_nomresi")).filter(x->x!=null&&!x.isBlank()).toList()),toLong(r.getObject("default_teskilat_id")),r.getString("default_teskilat_adi"),r.getString("sexsiyyet_vesiqesi_nomresi"),r.getObject("dogum_tarixi",java.time.LocalDate.class),r.getString("cins_adi"),r.getString("qan_qrupu_adi"),r.getString("mobil_nomre"),r.getString("sosial_kart_nomresi"),r.getString("unvan"),r.getObject("aktiv",Boolean.class));}
+    public List<AmbulatorPatient> xesteAxtar(Long klinika, Boolean aktiv, String q, Long cursor, int limit) {
+        if (blankToNull(q) == null) {
+            return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi_sehifeli(CAST(:k AS bigint),CAST(:a AS boolean),NULL,CAST(:cursor AS bigint),:limit)", new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("cursor", cursor).addValue("limit", limit), this::mapAmbulatorPatient);
+        }
+        return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),CAST(:a AS boolean)) WHERE (CAST(:q AS varchar) IS NULL OR lower(coalesce(xeste_kodu, '') || ' ' || coalesce(fin_kodu, '') || ' ' || coalesce(sexsiyyet_vesiqesi_nomresi, '') || ' ' || coalesce(ad, '') || ' ' || coalesce(soyad, '') || ' ' || coalesce(ata_adi, '') || ' ' || coalesce(mobil_nomre, '') || ' ' || coalesce(ikinci_mobil_nomre, '') || ' ' || coalesce(sosial_kart_nomresi, '') || ' ' || coalesce(is_yeri, '') || ' ' || coalesce(vezifesi, '') || ' ' || coalesce(pesesi, '')) LIKE '%' || lower(CAST(:q AS varchar)) || '%') AND (CAST(:cursor AS bigint) IS NULL OR xeste_id<:cursor) ORDER BY xeste_id DESC LIMIT :limit", new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blankToNull(q)).addValue("cursor", cursor).addValue("limit", limit), this::mapAmbulatorPatient);
+    }
+
+    public long xesteAxtarSayi(Long klinika, Boolean aktiv, String q) {
+        Long count = jdbcTemplate.queryForObject("SELECT count(*) FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),CAST(:a AS boolean)) WHERE (CAST(:q AS varchar) IS NULL OR lower(coalesce(xeste_kodu, '') || ' ' || coalesce(fin_kodu, '') || ' ' || coalesce(sexsiyyet_vesiqesi_nomresi, '') || ' ' || coalesce(ad, '') || ' ' || coalesce(soyad, '') || ' ' || coalesce(ata_adi, '') || ' ' || coalesce(mobil_nomre, '') || ' ' || coalesce(ikinci_mobil_nomre, '') || ' ' || coalesce(sosial_kart_nomresi, '') || ' ' || coalesce(is_yeri, '') || ' ' || coalesce(vezifesi, '') || ' ' || coalesce(pesesi, '')) LIKE '%' || lower(CAST(:q AS varchar)) || '%')", new MapSqlParameterSource("k", klinika).addValue("a", aktiv).addValue("q", blankToNull(q)), Long.class);
+        return count == null ? 0 : count;
+    }
+
+    public AmbulatorPatient xeste(Long klinika, Long id) {
+        return jdbcTemplate.query("SELECT * FROM public.fn_xeste_siyahisi(CAST(:k AS bigint),NULL) WHERE xeste_id=:id", new MapSqlParameterSource("k", klinika).addValue("id", id), this::mapAmbulatorPatient).stream().findFirst().orElseThrow();
+    }
+
+    public List<GelisOption> gelisNovleri() {
+        return jdbcTemplate.query("SELECT id,kod,ad,NULL::text meta FROM public.rn_xeste_gelis_novleri WHERE aktiv ORDER BY id", (r, n) -> new GelisOption(toLong(r.getObject("id")), r.getString("kod"), r.getString("ad"), null, null));
+    }
+
+    public List<GelisOption> teskilatlar(Long klinika) {
+        return jdbcTemplate.query("SELECT teskilat_id id,teskilat_tipi_kodu kod,ad,NULL::text meta FROM public.fn_teskilat_siyahisi(CAST(:k AS bigint),true) ORDER BY ad", new MapSqlParameterSource("k", klinika), (r, n) -> new GelisOption(toLong(r.getObject("id")), r.getString("kod"), r.getString("ad"), null, null));
+    }
+
+    public List<GelisOption> teskilatQiymetQruplari(Long klinika, Long teskilat) {
+        return jdbcTemplate.query("SELECT qiymet_qrupu_id id,qiymet_qrupu_adi ad,qiymet_basligi_adi meta FROM public.fn_teskilat_qiymet_qruplari_siyahisi(CAST(:k AS bigint),CAST(:t AS bigint)) ORDER BY qiymet_qrupu_adi", new MapSqlParameterSource("k", klinika).addValue("t", teskilat), (r, n) -> new GelisOption(toLong(r.getObject("id")), null, r.getString("ad"), r.getString("meta"), teskilat));
+    }
+
+    public List<GelisOption> hekimler(Long klinika) {
+        return jdbcTemplate.query("SELECT personal_id id,personal_kodu kod,tam_ad ad,vezife_adi meta FROM public.fn_personal_siyahisi(CAST(:k AS bigint),true) WHERE hekimdir ORDER BY tam_ad", new MapSqlParameterSource("k", klinika), (r, n) -> new GelisOption(toLong(r.getObject("id")), r.getString("kod"), r.getString("ad"), r.getString("meta"), null));
+    }
+
+    public List<Gelis> gelisler(Long klinika, Long xeste, Long nov, Long teskilat, java.time.LocalDate baslama, java.time.LocalDate bitme, Boolean randevu, Boolean aktiv, String q, Long cursor, int limit) {
+        if (blankToNull(q) == null) {
+            return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),CAST(:x AS bigint),CAST(:n AS bigint),CAST(:t AS bigint),CAST(:b AS date),CAST(:bt AS date),CAST(:r AS boolean),CAST(:a AS boolean),CAST(:cursor AS bigint),:limit)", new MapSqlParameterSource("k", klinika).addValue("x", xeste).addValue("n", nov).addValue("t", teskilat).addValue("b", baslama).addValue("bt", bitme).addValue("r", randevu).addValue("a", aktiv).addValue("cursor", cursor).addValue("limit", limit), this::mapGelis);
+        }
+        return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),CAST(:x AS bigint),CAST(:n AS bigint),CAST(:t AS bigint),CAST(:b AS date),CAST(:bt AS date),CAST(:r AS boolean),CAST(:a AS boolean)) WHERE (CAST(:q AS varchar) IS NULL OR protokol_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR fin_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR sexsiyyet_vesiqesi_nomresi ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_ad ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_soyad ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(xeste_ata_adi,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(mobil_nomre,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR (xeste_ad||' '||xeste_soyad||' '||coalesce(xeste_ata_adi,'')) ILIKE '%'||CAST(:q AS varchar)||'%') AND (CAST(:cursor AS bigint) IS NULL OR gelis_id<:cursor) ORDER BY gelis_id DESC LIMIT :limit", new MapSqlParameterSource("k", klinika).addValue("x", xeste).addValue("n", nov).addValue("t", teskilat).addValue("b", baslama).addValue("bt", bitme).addValue("r", randevu).addValue("a", aktiv).addValue("q", blankToNull(q)).addValue("cursor", cursor).addValue("limit", limit), this::mapGelis);
+    }
+
+    public long gelisSayi(Long klinika, Long xeste, Long nov, Long teskilat, java.time.LocalDate baslama, java.time.LocalDate bitme, Boolean randevu, Boolean aktiv, String q) {
+        Long count = jdbcTemplate.queryForObject("SELECT count(*) FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),CAST(:x AS bigint),CAST(:n AS bigint),CAST(:t AS bigint),CAST(:b AS date),CAST(:bt AS date),CAST(:r AS boolean),CAST(:a AS boolean)) WHERE (CAST(:q AS varchar) IS NULL OR protokol_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR fin_kodu ILIKE '%'||CAST(:q AS varchar)||'%' OR sexsiyyet_vesiqesi_nomresi ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_ad ILIKE '%'||CAST(:q AS varchar)||'%' OR xeste_soyad ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(xeste_ata_adi,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR coalesce(mobil_nomre,'') ILIKE '%'||CAST(:q AS varchar)||'%' OR (xeste_ad||' '||xeste_soyad||' '||coalesce(xeste_ata_adi,'')) ILIKE '%'||CAST(:q AS varchar)||'%')", new MapSqlParameterSource("k", klinika).addValue("x", xeste).addValue("n", nov).addValue("t", teskilat).addValue("b", baslama).addValue("bt", bitme).addValue("r", randevu).addValue("a", aktiv).addValue("q", blankToNull(q)), Long.class);
+        return count == null ? 0 : count;
+    }
+
+    public GelisStatistikasi bugunkuGelisStatistikasi(Long klinika) {
+        return jdbcTemplate.queryForObject("""
+                SELECT COUNT(*) umumi,
+                       COUNT(*) FILTER (WHERE gn.kod='KONTROL_MUAYINE') tekrar_muayine,
+                       COUNT(*) FILTER (WHERE gn.kod='HEKIM_MUAYINESI') hekim_muayinesi,
+                       COUNT(*) FILTER (WHERE gn.kod='DIAQNOSTIK_MUAYINE') diaqnostik_muayine
+                  FROM public.rn_xeste_gelisleri g
+                  JOIN public.rn_xeste_gelis_novleri gn ON gn.id=g.gelis_novu_id
+                 WHERE g.klinika_id=:k AND g.gelis_tarixi=CURRENT_DATE AND g.aktiv
+                """, new MapSqlParameterSource("k", klinika), (r, n) -> new GelisStatistikasi(r.getLong("umumi"), r.getLong("tekrar_muayine"), r.getLong("hekim_muayinesi"), r.getLong("diaqnostik_muayine")));
+    }
+
+    public Gelis gelis(Long klinika, Long id) {
+        return jdbcTemplate.query("SELECT * FROM public.fn_xeste_gelisi_siyahisi(CAST(:k AS bigint),NULL,NULL,NULL,NULL,NULL,NULL,NULL) WHERE gelis_id=:id", new MapSqlParameterSource("k", klinika).addValue("id", id), this::mapGelis).stream().findFirst().orElseThrow();
+    }
+
+    public Map<String, Object> gelisYarat(Long klinika, GelisForm f, Long personal) {
+        return one("SELECT * FROM public.fn_xeste_gelisi_yarat(p_klinika_id=>:k,p_xeste_id=>:x,p_gelis_novu_id=>:n,p_teskilat_id=>:t,p_qiymet_qrupu_id=>:qg,p_gelis_tarixi=>:d,p_gelis_saati=>:s,p_randevudur=>:r,p_gonderen_hekim_id=>:h,p_mesaj=>:m,p_aciqlama=>:ac,p_yaradan_personal_id=>:p)", gelisParams(f).addValue("k", klinika).addValue("x", f.xesteId).addValue("p", personal));
+    }
+
+    public Map<String, Object> gelisYenile(Long klinika, GelisForm f, Long personal) {
+        return one("SELECT * FROM public.fn_xeste_gelisi_yenile(p_gelis_id=>:id,p_klinika_id=>:k,p_gelis_novu_id=>:n,p_teskilat_id=>:t,p_qiymet_qrupu_id=>:qg,p_qiymet_qrupu_deyisdirilsin=>true,p_qiymet_qrupu_cari_xidmetlere_tesir_etsin=>:cariXidmetler,p_gelis_tarixi=>:d,p_gelis_saati=>:s,p_randevudur=>:r,p_gonderen_hekim_id=>:h,p_gonderen_hekim_deyisdirilsin=>true,p_mesaj=>:m,p_mesaj_deyisdirilsin=>true,p_aciqlama=>:ac,p_aciqlama_deyisdirilsin=>true,p_aktiv=>:a,p_yenileyen_personal_id=>:p)", gelisParams(f).addValue("cariXidmetler", f.qiymetQrupuCariXidmetlereTesirEtsin).addValue("id", f.gelisId).addValue("k", klinika).addValue("a", f.aktiv).addValue("p", personal));
+    }
+
+    private MapSqlParameterSource gelisParams(GelisForm f) {
+        return new MapSqlParameterSource("n", f.gelisNovuId).addValue("t", f.teskilatId).addValue("qg", f.qiymetQrupuId).addValue("d", f.gelisTarixi).addValue("s", f.gelisSaati).addValue("r", f.randevudur).addValue("h", f.gonderenHekimId).addValue("m", blankToNull(f.mesaj)).addValue("ac", blankToNull(f.aciqlama));
+    }
+
+    private Map<String, Object> one(String sql, MapSqlParameterSource p) {
+        var rows = jdbcTemplate.queryForList(sql, p);
+        return rows.isEmpty() ? Map.of() : rows.getFirst();
+    }
+
+    private Gelis mapGelis(ResultSet r, int n) throws SQLException {
+        return new Gelis(toLong(r.getObject("gelis_id")), toLong(r.getObject("xeste_id")), r.getString("xeste_kodu"), r.getString("xeste_ad"), r.getString("xeste_soyad"), r.getString("xeste_ata_adi"), r.getString("fin_kodu"), r.getString("sexsiyyet_vesiqesi_nomresi"), r.getString("mobil_nomre"), toLong(r.getObject("gelis_novu_id")), r.getString("gelis_novu_kodu"), r.getString("gelis_novu_adi"), toLong(r.getObject("teskilat_id")), r.getString("teskilat_adi"), toLong(r.getObject("qiymet_qrupu_id")), r.getString("qiymet_qrupu_adi"), r.getString("protokol_kodu"), r.getObject("gelis_tarixi", java.time.LocalDate.class), r.getObject("gelis_saati", java.time.LocalTime.class), r.getObject("randevudur", Boolean.class), toLong(r.getObject("gonderen_hekim_id")), String.join(" ", java.util.stream.Stream.of(r.getString("gonderen_hekim_ad"), r.getString("gonderen_hekim_soyad"), r.getString("gonderen_hekim_ata_adi")).filter(x -> x != null && !x.isBlank()).toList()), r.getString("mesaj"), r.getString("aciqlama"), r.getObject("aktiv", Boolean.class));
+    }
+
+    private AmbulatorPatient mapAmbulatorPatient(ResultSet r, int n) throws SQLException {
+        return new AmbulatorPatient(toLong(r.getObject("xeste_id")), r.getString("xeste_kodu"), String.join(" ", java.util.stream.Stream.of(r.getString("ad"), r.getString("soyad"), r.getString("ata_adi")).filter(x -> x != null && !x.isBlank()).toList()), String.join(" · ", java.util.stream.Stream.of(r.getString("fin_kodu"), r.getString("mobil_nomre"), r.getString("sexsiyyet_vesiqesi_nomresi")).filter(x -> x != null && !x.isBlank()).toList()), toLong(r.getObject("default_teskilat_id")), r.getString("default_teskilat_adi"), r.getString("sexsiyyet_vesiqesi_nomresi"), r.getObject("dogum_tarixi", java.time.LocalDate.class), r.getString("cins_adi"), r.getString("qan_qrupu_adi"), r.getString("mobil_nomre"), r.getString("sosial_kart_nomresi"), r.getString("unvan"), r.getObject("aktiv", Boolean.class));
+    }
 
     public AmbulatorLookups getLookups() {
         return new AmbulatorLookups(
-            queryLookup("SELECT rb.id, NULL AS code, rb.name, NULL AS short_name, NULL AS country_id FROM public.rn_buildings rb WHERE rb.is_active IS TRUE ORDER BY rb.id"),
-            queryLookup("SELECT ro.id, NULL AS code, ro.name, ro.short_name, NULL AS country_id FROM public.rn_organizations ro WHERE ro.is_active IS TRUE ORDER BY ro.id"),
-            queryLookup("SELECT rit.id, rit.code, rit.name, NULL AS short_name, NULL AS country_id FROM public.rn_id_types rit WHERE rit.is_active IS TRUE ORDER BY rit.id"),
-            queryLookup("SELECT rg.id, rg.code, rg.name, NULL AS short_name, NULL AS country_id FROM public.rn_genders rg WHERE rg.is_active IS TRUE ORDER BY rg.id"),
-            queryLookup("SELECT rc.id, rc.code, rc.name, NULL AS short_name, NULL AS country_id FROM public.rn_countries rc WHERE rc.is_active IS TRUE ORDER BY rc.id"),
-            queryLookup("SELECT rc.id, rc.code, rc.name, NULL AS short_name, rc.country_id FROM public.rn_cities rc WHERE rc.is_active IS TRUE ORDER BY rc.id"),
-            queryLookup("SELECT rbg.id, rbg.code, rbg.name, NULL AS short_name, NULL AS country_id FROM public.rn_blood_groups rbg WHERE rbg.is_active IS TRUE ORDER BY rbg.id"),
-            queryLookup("SELECT rms.id, rms.code, rms.name, NULL AS short_name, NULL AS country_id FROM public.rn_marital_statuses rms WHERE rms.is_active IS TRUE ORDER BY rms.id"),
-            queryLookup("SELECT rn.id, rn.code, rn.name, NULL AS short_name, NULL AS country_id FROM public.rn_nationalities rn WHERE rn.is_active IS TRUE ORDER BY rn.id"),
-            queryLookup("SELECT re.id, re.code, re.name, NULL AS short_name, NULL AS country_id FROM public.rn_educations re WHERE re.is_active IS TRUE ORDER BY re.id")
+                queryLookup("SELECT rb.id, NULL AS code, rb.name, NULL AS short_name, NULL AS country_id FROM public.rn_buildings rb WHERE rb.is_active IS TRUE ORDER BY rb.id"),
+                queryLookup("SELECT ro.id, NULL AS code, ro.name, ro.short_name, NULL AS country_id FROM public.rn_organizations ro WHERE ro.is_active IS TRUE ORDER BY ro.id"),
+                queryLookup("SELECT rit.id, rit.code, rit.name, NULL AS short_name, NULL AS country_id FROM public.rn_id_types rit WHERE rit.is_active IS TRUE ORDER BY rit.id"),
+                queryLookup("SELECT rg.id, rg.code, rg.name, NULL AS short_name, NULL AS country_id FROM public.rn_genders rg WHERE rg.is_active IS TRUE ORDER BY rg.id"),
+                queryLookup("SELECT rc.id, rc.code, rc.name, NULL AS short_name, NULL AS country_id FROM public.rn_countries rc WHERE rc.is_active IS TRUE ORDER BY rc.id"),
+                queryLookup("SELECT rc.id, rc.code, rc.name, NULL AS short_name, rc.country_id FROM public.rn_cities rc WHERE rc.is_active IS TRUE ORDER BY rc.id"),
+                queryLookup("SELECT rbg.id, rbg.code, rbg.name, NULL AS short_name, NULL AS country_id FROM public.rn_blood_groups rbg WHERE rbg.is_active IS TRUE ORDER BY rbg.id"),
+                queryLookup("SELECT rms.id, rms.code, rms.name, NULL AS short_name, NULL AS country_id FROM public.rn_marital_statuses rms WHERE rms.is_active IS TRUE ORDER BY rms.id"),
+                queryLookup("SELECT rn.id, rn.code, rn.name, NULL AS short_name, NULL AS country_id FROM public.rn_nationalities rn WHERE rn.is_active IS TRUE ORDER BY rn.id"),
+                queryLookup("SELECT re.id, re.code, re.name, NULL AS short_name, NULL AS country_id FROM public.rn_educations re WHERE re.is_active IS TRUE ORDER BY re.id")
         );
     }
 
     public List<PatientDocumentListItem> getPatientDocuments(PatientDocumentFilter filter) {
         PatientDocumentFilter safeFilter = filter == null ? new PatientDocumentFilter() : filter;
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("limit", safeFilter.getLimit());
+                .addValue("limit", safeFilter.getLimit());
 
         StringBuilder sql = new StringBuilder("""
-            SELECT
-                pd.id,
-                pd.patient_code,
-                pd.id_number,
-                pd.fin_code,
-                pd.first_name,
-                pd.last_name,
-                pd.father_name,
-                pd.birth_date,
-                pd.mobile_phone,
-                pd.workplace
-            FROM public.rn_patient_documents pd
-            WHERE pd.is_active IS TRUE
-            """);
+                SELECT
+                    pd.id,
+                    pd.patient_code,
+                    pd.id_number,
+                    pd.fin_code,
+                    pd.first_name,
+                    pd.last_name,
+                    pd.father_name,
+                    pd.birth_date,
+                    pd.mobile_phone,
+                    pd.workplace
+                FROM public.rn_patient_documents pd
+                WHERE pd.is_active IS TRUE
+                """);
 
         addFilters(sql, params, safeFilter);
 
         sql.append("""
-            ORDER BY pd.created_at DESC NULLS LAST, pd.id DESC
-            LIMIT :limit
-            """);
+                ORDER BY pd.created_at DESC NULLS LAST, pd.id DESC
+                LIMIT :limit
+                """);
 
         return jdbcTemplate.query(sql.toString(), params, (rs, rowNum) -> new PatientDocumentListItem(
-            toLong(rs.getObject("id")),
-            rs.getString("patient_code"),
-            rs.getString("id_number"),
-            rs.getString("fin_code"),
-            rs.getString("first_name"),
-            rs.getString("last_name"),
-            rs.getString("father_name"),
-            rs.getObject("birth_date", java.time.LocalDate.class),
-            rs.getString("mobile_phone"),
-            rs.getString("workplace")
+                toLong(rs.getObject("id")),
+                rs.getString("patient_code"),
+                rs.getString("id_number"),
+                rs.getString("fin_code"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("father_name"),
+                rs.getObject("birth_date", java.time.LocalDate.class),
+                rs.getString("mobile_phone"),
+                rs.getString("workplace")
         ));
     }
 
@@ -130,18 +176,18 @@ public class AmbulatorRepository {
         if (!q.isBlank()) {
             params.addValue("q", containsPattern(q));
             sql.append("""
-                AND (
-                    pd.patient_code ILIKE :q
-                    OR pd.id_number ILIKE :q
-                    OR pd.fin_code ILIKE :q
-                    OR pd.first_name ILIKE :q
-                    OR pd.last_name ILIKE :q
-                    OR pd.father_name ILIKE :q
-                    OR CONCAT_WS(' ', pd.first_name, pd.last_name, pd.father_name) ILIKE :q
-                    OR pd.mobile_phone ILIKE :q
-                    OR pd.workplace ILIKE :q
-                )
-                """);
+                    AND (
+                        pd.patient_code ILIKE :q
+                        OR pd.id_number ILIKE :q
+                        OR pd.fin_code ILIKE :q
+                        OR pd.first_name ILIKE :q
+                        OR pd.last_name ILIKE :q
+                        OR pd.father_name ILIKE :q
+                        OR CONCAT_WS(' ', pd.first_name, pd.last_name, pd.father_name) ILIKE :q
+                        OR pd.mobile_phone ILIKE :q
+                        OR pd.workplace ILIKE :q
+                    )
+                    """);
         }
 
         addContainsFilter(sql, params, "idNumber", "pd.id_number", filter.normalizedIdNumber());
@@ -150,11 +196,11 @@ public class AmbulatorRepository {
     }
 
     private void addContainsFilter(
-        StringBuilder sql,
-        MapSqlParameterSource params,
-        String paramName,
-        String columnName,
-        String value
+            StringBuilder sql,
+            MapSqlParameterSource params,
+            String paramName,
+            String columnName,
+            String value
     ) {
         if (value.isBlank()) {
             return;
@@ -175,94 +221,94 @@ public class AmbulatorRepository {
 
     public int countTodayPatientDocuments() {
         String sql = """
-            SELECT COUNT(*)
-            FROM public.rn_patient_documents
-            WHERE is_active IS TRUE
-              AND created_at::date = CURRENT_DATE
-            """;
+                SELECT COUNT(*)
+                FROM public.rn_patient_documents
+                WHERE is_active IS TRUE
+                  AND created_at::date = CURRENT_DATE
+                """;
         Integer count = jdbcTemplate.getJdbcTemplate().queryForObject(sql, Integer.class);
         return count == null ? 0 : count;
     }
 
     public boolean patientDocumentExists(Long patientDocumentId) {
         String sql = """
-            SELECT EXISTS (
-                SELECT 1
-                FROM public.rn_patient_documents
-                WHERE id = :patientDocumentId
-                  AND is_active IS TRUE
-            )
-            """;
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM public.rn_patient_documents
+                    WHERE id = :patientDocumentId
+                      AND is_active IS TRUE
+                )
+                """;
         Boolean exists = jdbcTemplate.queryForObject(
-            sql,
-            new MapSqlParameterSource("patientDocumentId", patientDocumentId),
-            Boolean.class
+                sql,
+                new MapSqlParameterSource("patientDocumentId", patientDocumentId),
+                Boolean.class
         );
         return Boolean.TRUE.equals(exists);
     }
 
     public List<Map<String, Object>> createPatientDocument(PatientDocumentForm form, String createdBy) {
         String sql = """
-            SELECT *
-            FROM public.fn_create_patient_document(
-                :buildingId,
-                :organizationId,
-                :idTypeId,
-                :idNumber,
-                :finCode,
-                :firstName,
-                :lastName,
-                :fatherName,
-                :genderId,
-                :birthDate,
-                :birthPlace,
-                :birthCountryId,
-                :birthCityId,
-                :bloodGroupId,
-                :livingCountryId,
-                :address,
-                :homePhone,
-                :mobilePhone,
-                :workPhone,
-                :socialSecurityNumber,
-                :maritalStatusId,
-                :nationalityId,
-                :educationId,
-                :occupation,
-                :workplace,
-                :position,
-                :createdBy
-            )
-            """;
+                SELECT *
+                FROM public.fn_create_patient_document(
+                    :buildingId,
+                    :organizationId,
+                    :idTypeId,
+                    :idNumber,
+                    :finCode,
+                    :firstName,
+                    :lastName,
+                    :fatherName,
+                    :genderId,
+                    :birthDate,
+                    :birthPlace,
+                    :birthCountryId,
+                    :birthCityId,
+                    :bloodGroupId,
+                    :livingCountryId,
+                    :address,
+                    :homePhone,
+                    :mobilePhone,
+                    :workPhone,
+                    :socialSecurityNumber,
+                    :maritalStatusId,
+                    :nationalityId,
+                    :educationId,
+                    :occupation,
+                    :workplace,
+                    :position,
+                    :createdBy
+                )
+                """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("buildingId", form.getBuildingId())
-            .addValue("organizationId", form.getOrganizationId())
-            .addValue("idTypeId", form.getIdTypeId())
-            .addValue("idNumber", blankToNull(form.getIdNumber()))
-            .addValue("finCode", blankToNull(form.getFinCode()))
-            .addValue("firstName", blankToNull(form.getFirstName()))
-            .addValue("lastName", blankToNull(form.getLastName()))
-            .addValue("fatherName", blankToNull(form.getFatherName()))
-            .addValue("genderId", form.getGenderId())
-            .addValue("birthDate", form.getBirthDate() == null ? null : Date.valueOf(form.getBirthDate()))
-            .addValue("birthPlace", blankToNull(form.getBirthPlace()))
-            .addValue("birthCountryId", form.getBirthCountryId())
-            .addValue("birthCityId", form.getBirthCityId())
-            .addValue("bloodGroupId", form.getBloodGroupId())
-            .addValue("livingCountryId", form.getLivingCountryId())
-            .addValue("address", blankToNull(form.getAddress()))
-            .addValue("homePhone", blankToNull(form.getHomePhone()))
-            .addValue("mobilePhone", normalizeMobilePhone(form.getMobilePhone()))
-            .addValue("workPhone", blankToNull(form.getWorkPhone()))
-            .addValue("socialSecurityNumber", blankToNull(form.getSocialSecurityNumber()))
-            .addValue("maritalStatusId", form.getMaritalStatusId())
-            .addValue("nationalityId", form.getNationalityId())
-            .addValue("educationId", form.getEducationId())
-            .addValue("occupation", blankToNull(form.getOccupation()))
-            .addValue("workplace", blankToNull(form.getWorkplace()))
-            .addValue("position", blankToNull(form.getPosition()))
-            .addValue("createdBy", createdBy);
+                .addValue("buildingId", form.getBuildingId())
+                .addValue("organizationId", form.getOrganizationId())
+                .addValue("idTypeId", form.getIdTypeId())
+                .addValue("idNumber", blankToNull(form.getIdNumber()))
+                .addValue("finCode", blankToNull(form.getFinCode()))
+                .addValue("firstName", blankToNull(form.getFirstName()))
+                .addValue("lastName", blankToNull(form.getLastName()))
+                .addValue("fatherName", blankToNull(form.getFatherName()))
+                .addValue("genderId", form.getGenderId())
+                .addValue("birthDate", form.getBirthDate() == null ? null : Date.valueOf(form.getBirthDate()))
+                .addValue("birthPlace", blankToNull(form.getBirthPlace()))
+                .addValue("birthCountryId", form.getBirthCountryId())
+                .addValue("birthCityId", form.getBirthCityId())
+                .addValue("bloodGroupId", form.getBloodGroupId())
+                .addValue("livingCountryId", form.getLivingCountryId())
+                .addValue("address", blankToNull(form.getAddress()))
+                .addValue("homePhone", blankToNull(form.getHomePhone()))
+                .addValue("mobilePhone", normalizeMobilePhone(form.getMobilePhone()))
+                .addValue("workPhone", blankToNull(form.getWorkPhone()))
+                .addValue("socialSecurityNumber", blankToNull(form.getSocialSecurityNumber()))
+                .addValue("maritalStatusId", form.getMaritalStatusId())
+                .addValue("nationalityId", form.getNationalityId())
+                .addValue("educationId", form.getEducationId())
+                .addValue("occupation", blankToNull(form.getOccupation()))
+                .addValue("workplace", blankToNull(form.getWorkplace()))
+                .addValue("position", blankToNull(form.getPosition()))
+                .addValue("createdBy", createdBy);
 
         return jdbcTemplate.queryForList(sql, params);
     }
@@ -273,11 +319,11 @@ public class AmbulatorRepository {
 
     private LookupOption mapLookup(ResultSet rs) throws SQLException {
         return new LookupOption(
-            toInteger(rs.getObject("id")),
-            rs.getString("code"),
-            rs.getString("name"),
-            rs.getString("short_name"),
-            toInteger(rs.getObject("country_id"))
+                toInteger(rs.getObject("id")),
+                rs.getString("code"),
+                rs.getString("name"),
+                rs.getString("short_name"),
+                toInteger(rs.getObject("country_id"))
         );
     }
 

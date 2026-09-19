@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="az" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<body><div layout:fragment="content" id="telebPage" th:data-base="@{/eczaxana/telebler}" th:data-side="${side}" th:data-editor="${editor}" th:data-edit-id="${editId}" th:data-warehouse="${warehouseId}">
+<link rel="stylesheet" th:href="@{/custom/css/telebler.css}">
+<input type="hidden" id="telebCsrf" th:value="${_csrf.token}" th:data-header="${_csrf.headerName}">
+<div id="telebNotice" class="alert d-none mb-0" role="status"></div>
+<div id="telebListView" th:classappend="${editor} ? 'd-none' : ''">
+<div class="teleb-heading"><h4 class="mb-0"><i class="ti ti-file-description me-2 text-primary" aria-hidden="true"></i><span th:text="#{teleb.title}"></span></h4>
+<div id="telebToolbar" class="d-flex gap-2 align-items-end">
+<div id="telebWarehouseField" class="teleb-field"><label for="telebWarehouse" class="form-label" th:text="#{qaime.warehouse}"></label><select id="telebWarehouse" class="form-select form-select-sm"><option value="" th:text="#{qaime.chooseWarehouse}"></option><option th:each="w:${warehouses}" th:value="${w.anbarId}" th:text="${w.anbarAdi}"></option></select></div>
+<div class="teleb-field"><label for="telebYear" class="form-label" th:text="#{qaime.year}"></label><select id="telebYear" class="form-select form-select-sm" disabled></select></div><button type="button" id="telebSearch" class="btn btn-sm btn-primary" ><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{qaime.search}"></span></button><button type="button" id="telebFilterButton" class="btn btn-sm btn-light" data-bs-toggle="offcanvas" data-bs-target="#telebFilter"><i class="ti ti-filter me-1" aria-hidden="true"></i><span th:text="#{qaime.filter}"></span></button><button type="button" id="telebNew" class="btn btn-sm btn-primary" th:if="${canSent}" disabled><i class="ti ti-plus me-1" aria-hidden="true"></i><span th:text="#{teleb.new}"></span></button>
+</div></div>
+<div class="nav nav-tabs teleb-tabs" role="tablist"><button type="button" id="telebSentTab" class="btn btn-sm nav-link" th:if="${canSent}" role="tab"><i class="ti ti-send me-1" aria-hidden="true"></i><span th:text="#{teleb.mine}"></span></button><button type="button" id="telebIncomingTab" class="btn btn-sm nav-link" th:if="${canIncoming}" role="tab"><i class="ti ti-box me-1" aria-hidden="true"></i><span th:text="#{teleb.incoming}"></span></button></div>
+<div id="telebIncomingFilters" class="teleb-incoming-filters d-none"><div id="telebIncomingWarehouse"></div>
+<button type="button" id="telebIncomingSearch" class="btn btn-sm btn-primary" ><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{qaime.search}"></span></button><button type="button" class="btn btn-sm btn-light" data-bs-toggle="offcanvas" data-bs-target="#telebIncomingFilter" aria-controls="telebIncomingFilter"><i class="ti ti-filter me-1" aria-hidden="true"></i><span th:text="#{qaime.filter}"></span></button></div>
+<section class="card teleb-list-card"><div class="card-header"><h6 class="mb-0"><i class="ti ti-box me-2" aria-hidden="true"></i><span id="telebListTitle" th:text="#{teleb.list}"></span> (<span id="telebCount">0</span>)</h6></div>
+<div class="table-responsive teleb-scroll"><table class="table table-bordered align-middle mb-0"><thead><tr><th>#</th><th th:text="#{teleb.number}"></th><th th:text="#{qaime.date}"></th><th th:text="#{qaime.time}"></th><th id="telebCounterpartTitle" th:text="#{teleb.target}"></th><th th:text="#{teleb.materialCount}"></th><th th:text="#{teleb.totalQuantity}"></th><th th:text="#{teleb.status}"></th><th th:text="#{qaime.note}"></th><th class="teleb-created" th:text="#{teleb.createdAt}"></th><th th:text="#{qaime.actions}"></th></tr></thead><tbody id="telebRows"></tbody></table></div>
+<div class="card-footer d-flex align-items-center justify-content-between gap-2"><span id="telebPagination"></span><div><button type="button" id="telebPrevious" class="btn btn-sm btn-light" ><i class="ti ti-chevron-left me-1" aria-hidden="true"></i><span th:text="#{qaime.previous}"></span></button><button type="button" id="telebNext" class="btn btn-sm btn-light" ><i class="ti ti-chevron-right me-1" aria-hidden="true"></i><span th:text="#{qaime.next}"></span></button></div><div class="d-flex align-items-center gap-2"><label for="telebPageSize" th:text="#{qaime.pageSize}"></label><select id="telebPageSize" class="form-select form-select-sm"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></div></div></section>
+<section class="card teleb-detail-card"><div class="card-header"><h6 class="mb-0"><i class="ti ti-eye me-2" aria-hidden="true"></i><span th:text="#{teleb.details}"></span> <span id="telebSelected"></span></h6></div>
+<form id="telebFulfillForm" class="teleb-detail-content"><div class="table-responsive teleb-scroll">
+<table class="table table-bordered align-middle mb-0"><thead><tr><th>#</th><th th:text="#{qaime.material}"></th><th th:text="#{qaime.barcode}"></th><th th:text="#{qaime.unit}"></th><th th:text="#{teleb.quantity}"></th><th th:text="#{teleb.fulfilled}"></th><th th:text="#{teleb.remaining}"></th><th th:text="#{teleb.status}"></th><th th:text="#{qaime.note}"></th></tr></thead><tbody id="telebDetailRows"></tbody></table></div><div id="telebFulfillActions" class="teleb-actions d-none"><button type="button" id="telebFulfillCancel" class="btn btn-sm btn-light" ><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{qaime.cancel}"></span></button><button class="btn btn-sm btn-primary" id="telebConfirm" disabled><i class="ti ti-check me-1" aria-hidden="true"></i><span th:text="#{teleb.confirm}"></span></button></div></form></section>
+</div>
+<div id="telebEditor" th:classappend="${!editor} ? 'd-none' : ''"><div class="teleb-editor-heading"><button type="button" id="telebBack" class="btn btn-sm btn-light" ><i class="ti ti-arrow-left me-1" aria-hidden="true"></i><span th:text="#{teleb.back}"></span></button><h4 class="mb-0"><i class="ti ti-file-plus me-2 text-primary" aria-hidden="true"></i><span id="telebEditorTitle" th:text="#{teleb.new}"></span></h4></div>
+<section class="card"><div class="card-header"><h6 class="mb-0"><i class="ti ti-file-description me-2" aria-hidden="true"></i><span th:text="#{teleb.header}"></span></h6></div><form id="telebHeader" class="teleb-header-fields">
+<div class="teleb-field"><label for="telebMyWarehouse" class="form-label" th:text="#{teleb.myWarehouse}"></label><select id="telebMyWarehouse" class="form-select form-select-sm" required><option value="" th:text="#{qaime.chooseWarehouse}"></option><option th:each="w:${warehouses}" th:value="${w.anbarId}" th:text="${w.anbarAdi}"></option></select></div>
+<div class="teleb-field"><label for="telebTarget" class="form-label" th:text="#{teleb.target}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-building-warehouse" aria-hidden="true"></i></span><select id="telebTarget" name="qarsilayan_anbar_id" class="form-select form-select-sm" required></select></div></div><div class="teleb-field"><label for="telebDate" class="form-label" th:text="#{qaime.date}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-calendar" aria-hidden="true"></i></span><input id="telebDate" name="teleb_tarixi" class="form-control form-control-sm" type="date" required></div></div><div class="teleb-field"><label for="telebNote" class="form-label" th:text="#{qaime.note}"></label><input id="telebNote" name="aciqlama" class="form-control form-control-sm" type="text" ></div></form></section>
+<section class="card"><div class="card-header"><h6 class="mb-0"><i class="ti ti-package me-2" aria-hidden="true"></i><span th:text="#{qaime.addMaterial}"></span></h6></div><form id="telebMaterialForm" class="teleb-material-fields">
+<div class="teleb-field"><label for="telebGroup" class="form-label" th:text="#{qaime.group}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-category" aria-hidden="true"></i></span><select id="telebGroup" class="form-select form-select-sm" required></select></div></div><div class="teleb-field"><label for="telebMaterialName" class="form-label" th:text="#{qaime.material}"></label><div class="input-group input-group-sm"><button type="button" id="telebMaterialSearch" class="btn btn-light" th:aria-label="#{qaime.search}"><i class="ti ti-search" aria-hidden="true"></i></button><input id="telebMaterialName" class="form-control" type="text" th:placeholder="#{qaime.materialSearchPlaceholder}" autocomplete="off" required></div></div>
+<div class="teleb-field"><label for="telebUnit" class="form-label" th:text="#{qaime.unit}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-ruler" aria-hidden="true"></i></span><select id="telebUnit" class="form-select form-select-sm" required></select></div></div><div class="teleb-field"><label for="telebStock" class="form-label" th:text="#{teleb.stock}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-box" aria-hidden="true"></i></span><input id="telebStock" class="form-control form-control-sm" type="text" readonly></div></div><div class="teleb-field"><label for="telebQuantity" class="form-label" th:text="#{teleb.quantity}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-box" aria-hidden="true"></i></span><input id="telebQuantity" class="form-control form-control-sm" type="number" required min="0.001" step="0.001"></div></div><div class="teleb-field"><label for="telebMaterialNote" class="form-label" th:text="#{qaime.note}"></label><div class="input-group input-group-sm"><span class="input-group-text"><i class="ti ti-notes" aria-hidden="true"></i></span><input id="telebMaterialNote" class="form-control form-control-sm" type="text" ></div></div><button class="btn btn-sm btn-primary" id="telebStage"><i class="ti ti-plus me-1" aria-hidden="true"></i><span th:text="#{qaime.stage}"></span></button></form></section>
+<section class="card teleb-draft-card"><div class="card-header d-flex align-items-center justify-content-between"><h6 class="mb-0"><i class="ti ti-box me-2" aria-hidden="true"></i><span th:text="#{teleb.materials}"></span> (<span id="telebDraftCount">0</span>)</h6><button type="button" id="telebClearDraft" class="btn btn-sm btn-danger" ><i class="ti ti-trash me-1" aria-hidden="true"></i><span th:text="#{teleb.clearList}"></span></button></div><div class="table-responsive teleb-scroll"><table class="table table-bordered align-middle mb-0"><thead><tr><th>#</th><th th:text="#{qaime.material}"></th><th th:text="#{qaime.barcode}"></th><th th:text="#{qaime.unit}"></th><th th:text="#{teleb.stock}"></th><th th:text="#{teleb.quantity}"></th><th th:text="#{qaime.note}"></th><th th:text="#{qaime.actions}"></th></tr></thead><tbody id="telebDraftRows"></tbody></table></div><div class="teleb-summary"><div id="telebTotalCount" class="teleb-count"></div><div class="teleb-total"><span th:text="#{teleb.quantity}"></span><strong id="telebQuantityTotal">0.00</strong></div><div class="teleb-total"><span th:text="#{teleb.stockTotal}"></span><strong id="telebStockTotal">—</strong></div><div class="teleb-actions ms-auto"><button type="button" id="telebCancel" class="btn btn-sm btn-light" ><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{qaime.cancel}"></span></button><button class="btn btn-sm btn-primary" id="telebSave" type="submit" form="telebHeader"><i class="ti ti-send me-1" aria-hidden="true"></i><span id="telebSaveLabel" th:text="#{teleb.create}"></span></button></div></div></section>
+</div>
+<div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="telebFilter" aria-labelledby="telebFilterTitle"><div class="offcanvas-header border-bottom bg-light py-3"><h5 class="mb-0 fw-bold text-primary" id="telebFilterTitle"><i class="ti ti-filter me-2" aria-hidden="true"></i><span th:text="#{teleb.detailedSearch}"></span></h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:aria-label="#{qaime.close}"></button></div><div class="offcanvas-body py-3"><form id="telebFilterForm" class="row g-2 align-items-end"><div class="col-xl-3 col-md-6"><label for="telebFilterNumber" class="form-label small text-muted" th:text="#{teleb.number}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-search" aria-hidden="true"></i></span><input id="telebFilterNumber" name="nomre" class="form-control" type="text"></div></div><div class="col-xl-3 col-md-6"><label for="telebFilterWarehouse" class="form-label small text-muted" th:text="#{teleb.target}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-building-warehouse" aria-hidden="true"></i></span><select id="telebFilterWarehouse" name="qarsiAnbarId" class="form-select"><option value="" th:text="#{qaime.all}"></option></select></div></div><div class="col-xl-3 col-md-6"><label for="telebFilterFrom" class="form-label small text-muted" th:text="#{qaime.from}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-calendar" aria-hidden="true"></i></span><input id="telebFilterFrom" name="from" class="form-control" type="date" ></div></div><div class="col-xl-3 col-md-6"><label for="telebFilterTo" class="form-label small text-muted" th:text="#{qaime.to}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-calendar" aria-hidden="true"></i></span><input id="telebFilterTo" name="to" class="form-control" type="date" ></div></div><div class="col-xl-3 col-md-6"><label for="telebFilterStatus" class="form-label small text-muted" th:text="#{teleb.status}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-list-check" aria-hidden="true"></i></span><select id="telebFilterStatus" name="status" class="form-select"><option value="" th:text="#{qaime.all}"></option><option value="GOZLEYIR" th:text="#{teleb.GOZLEYIR}"></option><option value="ANBARDA_YOXDUR" th:text="#{teleb.ANBARDA_YOXDUR}"></option><option value="REDD_EDILDI" th:text="#{teleb.REDD_EDILDI}"></option><option value="QISMEN_VERILDI" th:text="#{teleb.QISMEN_VERILDI}"></option><option value="TAM_QARSILANDI" th:text="#{teleb.TAM_QARSILANDI}"></option></select></div></div><div class="col-xl-3 col-md-6"><div class="d-flex gap-2"><button type="submit" class="btn btn-primary flex-fill"><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{qaime.apply}"></span></button><button type="button" id="telebFilterClear" class="btn btn-light flex-fill" ><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{qaime.clear}"></span></button></div></div></form></div></div>
+<div class="offcanvas offcanvas-top offcanvas-top_ka shadow-lg" tabindex="-1" id="telebIncomingFilter" aria-labelledby="telebIncomingFilterTitle"><div class="offcanvas-header border-bottom bg-light py-3"><h5 class="mb-0 fw-bold text-primary" id="telebIncomingFilterTitle"><i class="ti ti-filter me-2" aria-hidden="true"></i><span th:text="#{teleb.incomingDetailedSearch}"></span></h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" th:aria-label="#{qaime.close}"></button></div><div class="offcanvas-body py-3"><form id="telebIncomingFilterForm" class="row g-2 align-items-end"><div class="col-xl-4 col-md-6"><label for="telebRange" class="form-label small text-muted" th:text="#{teleb.dateRange}"></label><div class="input-group"><span class="input-group-text bg-light"><i class="ti ti-calendar" aria-hidden="true"></i></span><input id="telebRange" class="form-control" data-provider="flatpickr" data-range-date="true" th:aria-label="#{teleb.dateRange}"></div><input id="telebFrom" type="hidden"><input id="telebTo" type="hidden"></div><div class="col-xl-3 col-md-6"><label for="telebStatus" class="form-label small text-muted" th:text="#{teleb.status}"></label><select id="telebStatus" class="form-select"><option value="" th:text="#{qaime.all}"></option><option value="GOZLEYIR" th:text="#{teleb.GOZLEYIR}"></option><option value="ANBARDA_YOXDUR" th:text="#{teleb.ANBARDA_YOXDUR}"></option><option value="REDD_EDILDI" th:text="#{teleb.REDD_EDILDI}"></option><option value="QISMEN_VERILDI" th:text="#{teleb.QISMEN_VERILDI}"></option><option value="TAM_QARSILANDI" th:text="#{teleb.TAM_QARSILANDI}"></option></select></div><div class="col-xl-3 col-md-6"><div class="d-flex gap-2"><button type="submit" class="btn btn-primary flex-fill"><i class="ti ti-search me-1" aria-hidden="true"></i><span th:text="#{qaime.search}"></span></button><button type="button" id="telebIncomingClear" class="btn btn-light flex-fill" ><i class="ti ti-x me-1" aria-hidden="true"></i><span th:text="#{qaime.clear}"></span></button></div></div></form></div></div>
+<div class="modal fade" id="telebPicker" tabindex="-1" aria-labelledby="telebPickerTitle"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="telebPickerTitle" th:text="#{teleb.selection}"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{qaime.close}"></button></div><div class="modal-body"><form id="telebPickerForm" class="input-group input-group-sm mb-2"><input id="telebPickerQuery" class="form-control" th:aria-label="#{qaime.materialSearch}" autocomplete="off"><button class="btn btn-light" th:aria-label="#{qaime.search}"><i class="ti ti-search" aria-hidden="true"></i></button></form><div id="telebPickerError" class="alert alert-danger d-none" role="alert"></div><div class="table-responsive teleb-picker-scroll"><table class="table table-bordered align-middle mb-0"><thead><tr><th>#</th><th th:text="#{qaime.material}"></th><th th:text="#{qaime.barcode}"></th><th th:text="#{qaime.baseUnit}"></th><th th:text="#{teleb.stock}"></th><th th:text="#{teleb.select}"></th></tr></thead><tbody id="telebPickerRows"></tbody></table></div></div></div></div></div>
+<script th:inline="javascript">window.TelebI18n={
+title: /*[[#{teleb.title}]]*/ "",
+mine: /*[[#{teleb.mine}]]*/ "",
+incoming: /*[[#{teleb.incoming}]]*/ "",
+edit: /*[[#{teleb.edit}]]*/ "",
+back: /*[[#{teleb.back}]]*/ "",
+header: /*[[#{teleb.header}]]*/ "",
+myWarehouse: /*[[#{teleb.myWarehouse}]]*/ "",
+target: /*[[#{teleb.target}]]*/ "",
+requester: /*[[#{teleb.requester}]]*/ "",
+list: /*[[#{teleb.list}]]*/ "",
+incomingList: /*[[#{teleb.incomingList}]]*/ "",
+details: /*[[#{teleb.details}]]*/ "",
+number: /*[[#{teleb.number}]]*/ "",
+materialCount: /*[[#{teleb.materialCount}]]*/ "",
+totalQuantity: /*[[#{teleb.totalQuantity}]]*/ "",
+status: /*[[#{teleb.status}]]*/ "",
+createdAt: /*[[#{teleb.createdAt}]]*/ "",
+stock: /*[[#{teleb.stock}]]*/ "",
+stockTotal: /*[[#{teleb.stockTotal}]]*/ "",
+quantity: /*[[#{teleb.quantity}]]*/ "",
+fulfilled: /*[[#{teleb.fulfilled}]]*/ "",
+remaining: /*[[#{teleb.remaining}]]*/ "",
+create: /*[[#{teleb.create}]]*/ "",
+confirm: /*[[#{teleb.confirm}]]*/ "",
+materials: /*[[#{teleb.materials}]]*/ "",
+selection: /*[[#{teleb.selection}]]*/ "",
+select: /*[[#{teleb.select}]]*/ "",
+selectRequired: /*[[#{teleb.selectRequired}]]*/ "",
+noContext: /*[[#{teleb.noContext}]]*/ "",
+empty: /*[[#{teleb.empty}]]*/ "",
+chooseDetail: /*[[#{teleb.chooseDetail}]]*/ "",
+noMaterials: /*[[#{teleb.noMaterials}]]*/ "",
+clearList: /*[[#{teleb.clearList}]]*/ "",
+confirmClear: /*[[#{teleb.confirmClear}]]*/ "",
+discard: /*[[#{teleb.discard}]]*/ "",
+changeTarget: /*[[#{teleb.changeTarget}]]*/ "",
+totalMaterials: /*[[#{teleb.totalMaterials}]]*/ "",
+saved: /*[[#{teleb.saved}]]*/ "",
+loading: /*[[#{teleb.loading}]]*/ "",
+loadFailed: /*[[#{teleb.loadFailed}]]*/ "",
+saveFailed: /*[[#{teleb.saveFailed}]]*/ "",
+invalidInput: /*[[#{teleb.invalidInput}]]*/ "",
+invalidDate: /*[[#{teleb.invalidDate}]]*/ "",
+denied: /*[[#{teleb.denied}]]*/ "",
+notFound: /*[[#{teleb.notFound}]]*/ "",
+editLocked: /*[[#{teleb.editLocked}]]*/ "",
+materialsRequired: /*[[#{teleb.materialsRequired}]]*/ "",
+decisionsRequired: /*[[#{teleb.decisionsRequired}]]*/ "",
+duplicate: /*[[#{teleb.duplicate}]]*/ "",
+stockAvailable: /*[[#{teleb.stockAvailable}]]*/ "",
+GOZLEYIR: /*[[#{teleb.GOZLEYIR}]]*/ "",
+ANBARDA_YOXDUR: /*[[#{teleb.ANBARDA_YOXDUR}]]*/ "",
+REDD_EDILDI: /*[[#{teleb.REDD_EDILDI}]]*/ "",
+QISMEN_VERILDI: /*[[#{teleb.QISMEN_VERILDI}]]*/ "",
+TAM_QARSILANDI: /*[[#{teleb.TAM_QARSILANDI}]]*/ "",
+QISMEN_QARSILANDI: /*[[#{teleb.QISMEN_QARSILANDI}]]*/ "",
+QARSILANDI: /*[[#{teleb.QARSILANDI}]]*/ "",
+noWarehouses: /*[[#{teleb.noWarehouses}]]*/ "",
+newTitle: /*[[#{teleb.new}]]*/ "",
+choose: /*[[#{qaime.choose}]]*/ "",
+chooseYear: /*[[#{qaime.chooseYear}]]*/ "",
+all: /*[[#{qaime.all}]]*/ "",
+search: /*[[#{qaime.search}]]*/ "",
+view: /*[[#{qaime.view}]]*/ "",
+delete: /*[[#{qaime.delete}]]*/ "",
+save: /*[[#{qaime.save}]]*/ "",
+results: /*[[#{qaime.results}]]*/ "",
+page: /*[[#{qaime.page}]]*/ "",
+chooseWarehouse: /*[[#{qaime.chooseWarehouse}]]*/ ""
+};</script><script th:src="@{/custom/js/telebler.js}" defer></script>
+</div></body></html>

@@ -16,7 +16,13 @@ public class MenuModule {
         this.id=id; this.parentId=parentId; this.code=code; this.name=name; this.route=route; this.icon=icon;
     }
     public Long getId(){return id;} public Long getParentId(){return parentId;} public String getCode(){return code;}
-    public String getName(){return name;} public String getRoute(){return route == null && isInvoiceModule() ? "/eczaxana/qaimeler" : route;}
+    public String getName(){return name;} public String getRoute(){
+        if(route != null)return route;
+        if(isInvoiceModule())return "/eczaxana/qaimeler";
+        if("HIS_PHARMACY_REQUESTS_SENT".equals(code))return "/eczaxana/telebler";
+        if("HIS_PHARMACY_REQUESTS_INCOMING".equals(code))return "/eczaxana/telebler/qarsilama";
+        return null;
+    }
     public boolean isInvoiceModule(){return "HIS_PHARMACY_INVOICES".equals(code);} public String getIcon(){return icon;}
     public List<MenuModule> getChildren(){return children;}
 
