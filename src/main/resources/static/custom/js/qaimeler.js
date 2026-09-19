@@ -139,7 +139,7 @@
     function resetForm(form) { form.reset(); form.querySelectorAll('input').forEach(el=>el._flatpickr?.clear()); }
     function fill(form,data) { [...form.elements].forEach(el=>{if(el.name){const value=data[el.name] ?? '';if(el._flatpickr)el._flatpickr.setDate(value,false);else el.value=value;}}); }
     function populateHeader() {
-        choices(field(header,'emeliyyat_novu_id'),(state.options.operations || []).filter(o=>state.edit || o.istiqamet==='G'));
+        choices(field(header,'emeliyyat_novu_id'), state.options.operations || []);
         choices(field(header,'firma_id'),state.options.companies || []);
         choices(field(header,'teslim_alan_personal_id'),state.options.receivers || []);
     }
