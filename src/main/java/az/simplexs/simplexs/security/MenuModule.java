@@ -18,6 +18,7 @@ public class MenuModule {
     public Long getId(){return id;} public Long getParentId(){return parentId;} public String getCode(){return code;}
     public String getName(){return name;} public String getRoute(){
         if(route != null)return route;
+        if("HIS_PHARMACY_TRANSFER".equals(code))return "/eczaxana/birbasa-transfer";
         if(isInvoiceModule())return "/eczaxana/qaimeler";
         if("HIS_PHARMACY_REQUESTS_SENT".equals(code))return "/eczaxana/telebler";
         if("HIS_PHARMACY_REQUESTS_INCOMING".equals(code))return "/eczaxana/telebler/qarsilama";

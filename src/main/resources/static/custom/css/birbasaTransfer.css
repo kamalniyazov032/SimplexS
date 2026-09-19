@@ -1,0 +1,18 @@
+#transferPage{color:#101b4a}
+#transferPage .card{border:1px solid #dce9f9;border-radius:7px;margin-bottom:16px;box-shadow:0 2px 8px #1674cc08}
+#transferPage .card-header{background:linear-gradient(110deg,#f0f7ff,#f8fbff);border-bottom:1px solid #dce9f9;padding:14px 16px}
+#transferPage .card-body{padding:16px}
+#transferPage .form-label{font-weight:600;font-size:13px}
+#transferPage .input-group-text{background:#f3f7fc;border-color:#dce3ef;color:#101b4a}
+#transferPage .transfer-header{display:grid;grid-template-columns:1.1fr 1fr 1fr 1.35fr;gap:16px}
+#transferPage .transfer-material{display:grid;grid-template-columns:2.1fr .85fr 1fr 1fr 1.15fr auto;gap:14px;align-items:end}
+#transferPage .transfer-material>div,#transferPage .transfer-header>div{min-width:0}
+#transferPage .table th{background:#f1f7fd;font-size:13px;white-space:nowrap}
+#transferPage .table td{font-size:13px;padding:12px}
+#transferPage .table{border-color:#dce6f3}
+#transferPage .transfer-list{min-height:300px}
+#transferComplete{padding:14px 28px;font-size:17px}
+#transferPage .transfer-picker-scroll{max-height:45vh;overflow:auto}
+#transferPage input[readonly]{background:#f3f6fa}
+@media(max-width:1200px){#transferPage .transfer-material{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:767px){#transferPage .transfer-header,#transferPage .transfer-material{grid-template-columns:1fr}}
