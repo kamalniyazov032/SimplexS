@@ -11,7 +11,7 @@ public class TelebRepository {
     public TelebRepository(NamedParameterJdbcTemplate jdbc) { this.jdbc = jdbc; }
 
     public List<String> modules(Long clinic, Long personal) {
-        return jdbc.queryForList("SELECT modul_kodu FROM public.fn_personal_modul_siyahisi(:personal,:clinic) WHERE modul_kodu IN ('HIS_PHARMACY_REQUESTS_SENT','HIS_PHARMACY_REQUESTS_INCOMING')",
+        return jdbc.queryForList("SELECT modul_kodu FROM public.fn_personal_modul_siyahisi(:personal,:clinic) WHERE modul_kodu='HIS_PHARMACY_REQUESTS_SENT'",
                 new MapSqlParameterSource("clinic", clinic).addValue("personal", personal), String.class);
     }
 

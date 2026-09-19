@@ -38,7 +38,7 @@ public class TelebController {
         Long clinic=(Long)session.getAttribute(KlinikaController.SELECTED_KLINIKA_ID);
         if(auth==null || !(auth.getPrincipal() instanceof AuthenticatedPersonal personal) || clinic==null || !access.hasClinic(auth,clinic))throw new Rejected(403,"denied");
         if(!Set.of("GONDERILEN","GELEN").contains(side))throw new Rejected(400,"invalidInput");
-        String code=side.equals("GELEN")?"HIS_PHARMACY_REQUESTS_INCOMING":"HIS_PHARMACY_REQUESTS_SENT";
+        String code="HIS_PHARMACY_REQUESTS_SENT";
         if(!repo.modules(clinic,personal.personalId()).contains(code))throw new Rejected(403,"denied");
         if(warehouse!=null && context.warehouses(clinic,personal.personalId()).stream().noneMatch(w->Objects.equals(w.anbarId(),warehouse)))throw new Rejected(403,"denied");
         return new Scope(clinic,personal.personalId(),warehouse);
@@ -65,7 +65,7 @@ public class TelebController {
         model.addAttribute("pageTitle",messages.getMessage("teleb.title",null,LocaleContextHolder.getLocale()));
         model.addAttribute("warehouses",context.warehouses(s.clinic(),s.personal()));
         model.addAttribute("canSent",modules.contains("HIS_PHARMACY_REQUESTS_SENT"));
-        model.addAttribute("canIncoming",modules.contains("HIS_PHARMACY_REQUESTS_INCOMING"));
+        model.addAttribute("canIncoming",modules.contains("HIS_PHARMACY_REQUESTS_SENT"));
         model.addAttribute("side",side);
         model.addAttribute("editor",id!=null || request.getServletPath().endsWith("/yeni"));
         model.addAttribute("editId",id);

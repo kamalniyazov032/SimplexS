@@ -21,7 +21,6 @@ public class MenuModule {
         if("HIS_PHARMACY_TRANSFER".equals(code))return "/eczaxana/birbasa-transfer";
         if(isInvoiceModule())return "/eczaxana/qaimeler";
         if("HIS_PHARMACY_REQUESTS_SENT".equals(code))return "/eczaxana/telebler";
-        if("HIS_PHARMACY_REQUESTS_INCOMING".equals(code))return "/eczaxana/telebler/qarsilama";
         return null;
     }
     public boolean isInvoiceModule(){return "HIS_PHARMACY_INVOICES".equals(code);} public String getIcon(){return icon;}

@@ -1,6 +1,14 @@
 package az.simplexs.simplexs.controller;
 
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.sql.SQLTimeoutException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -12,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -106,31 +115,100 @@ public class ApplicationExceptionHandler {
     }
 
     private void logException(String errorCode, String type, Throwable error, HttpServletRequest request) {
-        Throwable root = rootCause(error);
-        ApplicationLocation location = applicationLocation(error);
+        Throwable finalCause = rootCause(error);
+        List<Throwable> chain = new ArrayList<>();
+        List<Throwable> additionalTraces = new ArrayList<>();
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        var pending = new ArrayDeque<Throwable>();
+        pending.push(error);
+        while (!pending.isEmpty()) {
+            Throwable current = pending.pop();
+            if (!visited.add(current)) continue;
+            chain.add(current);
+            if (current.getCause() != null) pending.push(current.getCause());
+            if (current instanceof SQLException sql && sql.getNextException() != null) {
+                pending.push(sql.getNextException());
+                additionalTraces.add(sql.getNextException());
+            }
+            for (Throwable suppressed : current.getSuppressed()) pending.push(suppressed);
+            if (current instanceof TransactionSystemException transaction
+                    && transaction.getApplicationException() != null) {
+                pending.push(transaction.getApplicationException());
+                additionalTraces.add(transaction.getApplicationException());
+            }
+        }
+        Throwable primary = finalCause;
+        Throwable timeout = null;
+        Throwable connection = null;
+        Throwable sqlCause = null;
+        boolean database = false;
+        StringBuilder exceptionChain = new StringBuilder();
+        for (Throwable cause : chain) {
+            if (!exceptionChain.isEmpty()) exceptionChain.append("\n-> ");
+            exceptionChain.append(cause.getClass().getSimpleName());
+            if (cause.getMessage() != null) exceptionChain.append(": ").append(safe(cause.getMessage()));
+            String message = cause.getMessage() == null ? "" : cause.getMessage().toLowerCase(Locale.ROOT);
+            if (cause instanceof DataAccessException || cause instanceof SQLException) database = true;
+            if (cause instanceof SocketTimeoutException || cause instanceof SQLTimeoutException
+                    || cause instanceof org.springframework.dao.QueryTimeoutException
+                    || cause instanceof SQLException && (message.contains("statement timeout") || message.contains("read timed out"))) timeout = cause;
+            if (cause instanceof SocketException || cause instanceof SQLException sql
+                    && ((sql.getSQLState() != null && sql.getSQLState().startsWith("08"))
+                        || message.contains("connection is closed"))) connection = cause;
+            if (cause instanceof SQLException) sqlCause = cause;
+        }
+        String category = "SYSTEM_ERROR";
+        if (database && timeout != null) { category = "DB_TIMEOUT"; primary = timeout; }
+        else if (database && connection != null) { category = "DB_CONNECTION"; primary = connection; }
+        else if (database) { category = "DB_SQL"; if (sqlCause != null) primary = sqlCause; }
+        ApplicationLocation location = applicationLocation(primary);
+        if ("UNKNOWN".equals(location.className())) location = applicationLocation(error);
         String requestId = requestId(request);
+        StringWriter stackTrace = new StringWriter();
+        PrintWriter writer = new PrintWriter(stackTrace);
+        error.printStackTrace(writer);
+        Set<Throwable> printed = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Throwable additional : additionalTraces) {
+            if (additional != error && printed.add(additional)) {
+                writer.println("Additional original/SQL exception:");
+                additional.printStackTrace(writer);
+            }
+        }
         String summary = """
                 ==================================================
-                ERROR_CODE : %s
-                REQUEST_ID : %s
-                METHOD     : %s
-                PATH       : %s
-                USER       : %s
-                TYPE       : %s
-                CLASS      : %s
-                FUNCTION   : %s
-                EXCEPTION  : %s
-                ROOT_CAUSE : %s
+                ERROR_CODE      : %s
+                REQUEST_ID      : %s
+                METHOD          : %s
+                PATH            : %s
+                USER            : %s
+                TYPE            : %s
+
+                CATEGORY        : %s
+                CLASS           : %s
+                FUNCTION        : %s
+                LINE            : %s
+
+                EXCEPTION       : %s
+                PRIMARY_CAUSE   : %s
+                FINAL_CAUSE     : %s
+
+                EXCEPTION_CHAIN :
+                %s
+
+                STACK_TRACE:
+                %s
                 ==================================================
                 """.formatted(
                     safe(errorCode), safe(requestId), safe(request.getMethod()), safe(request.getRequestURI()),
-                    safe(username()), safe(type), safe(location.className()), safe(location.methodName()),
-                    safe(error.getClass().getName()), safe(rootMessage(root)));
+                    safe(username()), safe(type), category, safe(location.className()), safe(location.methodName()),
+                    location.line() > 0 ? location.line() : "UNKNOWN", error.getClass().getSimpleName(),
+                    primary.getClass().getSimpleName() + ": " + safe(rootMessage(primary)),
+                    finalCause.getClass().getSimpleName() + ": " + safe(rootMessage(finalCause)), exceptionChain, stackTrace);
 
         String previousRequestId = MDC.get(RequestCorrelationFilter.MDC_KEY);
         if (previousRequestId == null) MDC.put(RequestCorrelationFilter.MDC_KEY, requestId);
         try (MDC.MDCCloseable ignored = MDC.putCloseable(ERROR_CODE_MDC_KEY, errorCode)) {
-            log.error(summary, error);
+            log.error(summary);
         } finally {
             if (previousRequestId == null) MDC.remove(RequestCorrelationFilter.MDC_KEY);
         }
@@ -165,17 +243,24 @@ public class ApplicationExceptionHandler {
 
     static ApplicationLocation applicationLocation(Throwable error) {
         Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        ApplicationLocation fallback = new ApplicationLocation("UNKNOWN", "UNKNOWN", -1);
         for (Throwable current = error; current != null && visited.add(current); current = current.getCause()) {
             for (StackTraceElement frame : current.getStackTrace()) {
                 String className = frame.getClassName();
                 if (className.startsWith(APPLICATION_PACKAGE)
                         && !className.equals(ApplicationExceptionHandler.class.getName())) {
                     int separator = className.lastIndexOf('.');
-                    return new ApplicationLocation(className.substring(separator + 1), frame.getMethodName());
+                    String simpleName = className.substring(separator + 1).split("\\$\\$", 2)[0];
+                    if (className.contains("$$") || frame.getLineNumber() < 0) {
+                        if ("UNKNOWN".equals(fallback.className()))
+                            fallback = new ApplicationLocation(simpleName, frame.getMethodName(), -1);
+                        continue;
+                    }
+                    return new ApplicationLocation(simpleName, frame.getMethodName(), frame.getLineNumber());
                 }
             }
         }
-        return new ApplicationLocation("UNKNOWN", "UNKNOWN");
+        return fallback;
     }
 
     private String requestId(HttpServletRequest request) {
@@ -201,5 +286,5 @@ public class ApplicationExceptionHandler {
         return sanitized.length() <= 2000 ? sanitized : sanitized.substring(0, 2000) + "…";
     }
 
-    record ApplicationLocation(String className, String methodName) {}
+    record ApplicationLocation(String className, String methodName, int line) {}
 }

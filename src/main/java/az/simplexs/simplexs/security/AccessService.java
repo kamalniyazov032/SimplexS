@@ -120,6 +120,7 @@ public class AccessService {
                         LEFT JOIN public.kn_diller dil ON dil.kod=:dil AND dil.aktiv
                         LEFT JOIN public.kn_melumat_tercumeleri mt ON mt.melumat_novu='MODUL'
                              AND mt.menbe_id=menu.modul_id AND mt.saha='ad' AND mt.dil_id=dil.id
+                        WHERE menu.modul_kodu NOT IN ('HIS_PHARMACY_REQUESTS','HIS_PHARMACY_REQUESTS_INCOMING')
                         ORDER BY sistem.sira_no NULLS LAST, menu.sira_no NULLS LAST, menu.modul_adi
                         """,
                 new MapSqlParameterSource("pid", personalId).addValue("kid", clinicId).addValue("dil", dil),
