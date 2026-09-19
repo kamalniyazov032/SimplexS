@@ -80,15 +80,6 @@ public class QaimeService {
     }
 
     @Transactional
-    public Map<String, Object> prepare(Scope s, Map<String, Object> input) {
-        validate(s);
-        validateDate(input, s.year());
-
-        var values = values(s, input);
-        return check(repo.prepare(values), true);
-    }
-
-    @Transactional
     public Map<String, Object> create(Scope s, Map<String, Object> input) {
         validate(s);
         validateDate(input, s.year());
@@ -101,7 +92,7 @@ public class QaimeService {
         var values = values(s, input);
         values.put("materiallar", json.writeValueAsString(materials));
 
-        return check(repo.create(values), false);
+        return check(repo.create(values));
     }
 
     @Transactional
@@ -114,7 +105,7 @@ public class QaimeService {
 
         changeFlags(values, input, false);
 
-        return check(repo.update(values), false);
+        return check(repo.update(values));
     }
 
     @Transactional
@@ -125,7 +116,7 @@ public class QaimeService {
         var values = values(s, input);
         values.put("qaime_id", qaimeId);
 
-        return check(repo.addMaterial(values), false);
+        return check(repo.addMaterial(values));
     }
 
     @Transactional
@@ -142,7 +133,7 @@ public class QaimeService {
 
         changeFlags(values, input, true);
 
-        return check(repo.updateMaterial(values), false);
+        return check(repo.updateMaterial(values));
     }
 
     @Transactional
@@ -158,8 +149,7 @@ public class QaimeService {
                         qaimeMaterialId,
                         s.warehouse(),
                         s.personal()
-                ),
-                false
+                )
         );
     }
 
@@ -239,11 +229,9 @@ public class QaimeService {
                 input.containsKey("aciqlama"));
     }
 
-    private Map<String, Object> check(Map<String, Object> result,
-                                      boolean prepare) {
+    private Map<String, Object> check(Map<String, Object> result) {
 
-        if (!"UGURLU".equals(result.get("status_kodu"))
-                || (prepare && !Boolean.TRUE.equals(result.get("ugurlu")))) {
+        if (!"UGURLU".equals(result.get("status_kodu"))) {
 
             var e = new Rejected(
                     422,

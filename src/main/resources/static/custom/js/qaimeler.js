@@ -122,7 +122,10 @@
     }
     async function changeWarehouse() {
         const epoch=++state.epoch;clearList();year.disabled=true;choices(year,[],t.chooseYear);$('qaimeSearch').disabled=true;$('qaimeNew').disabled=true;message('qaimeNotice','');
-        state.options={};state.filters={};resetForm(filter);
+        state.options={};state.years=[];state.filters={};state.editorScope=null;resetForm(filter);
+        state.catalogRequest++;state.unitRequest++;state.catalogSelection=null;state.units=[];
+        populateHeader();choices(field(filter,'operation'),[],t.all);choices(field(material,'mehsul_qrupu_id'),[]);choices(field(material,'vahid_id'),[]);
+        field(material,'material_id').value='';$('qaimeCatalogSearch').value='';$('qaimeLoading').textContent='';
         if(!warehouse.value)return;
         try {
             const [years,options]=await Promise.all([api('/iller'),api('/secimler')]);
@@ -158,9 +161,17 @@
         $('qaimeDraftTotal').textContent=money(totals.alis_meblegi);$('qaimeDraftSale').textContent=money(totals.satis_meblegi);
         $('qaimeClearDraft').disabled=!state.draft.length;
     }
-    function openInvoice(item=null) {
+    async function openInvoice(item=null) {
         if(!validScope()||state.busy)return;
-        state.edit=item;state.draft=[];state.editorScope=scope();state.dirty=false;resetForm(header);populateHeader();
+        const currentScope=scope(),epoch=state.epoch;
+        state.busy=true;$('qaimeNew').disabled=true;message('qaimeNotice','');
+        try {
+            const options=await api('/secimler',{},undefined,currentScope);
+            if(epoch!==state.epoch || currentScope.anbarId!==warehouse.value || currentScope.il!==year.value)return;
+            state.options=options;
+        }catch(e){if(epoch===state.epoch)message('qaimeNotice',e.message);return;}
+        finally{state.busy=false;if(epoch===state.epoch)$('qaimeNew').disabled=!validScope();}
+        state.edit=item;state.draft=[];state.editorScope=currentScope;state.dirty=false;resetForm(header);populateHeader();
         $('qaimeEditorTitle').textContent=item?t.editInvoice:t.new;message('qaimeEditorError','');
         const start=state.years?.find(y=>String(y.il)===year.value)?.baslamaTarixi;
         const min=start&&start.startsWith(year.value)?start:`${year.value}-01-01`;
@@ -173,13 +184,13 @@
     async function loadCatalog() {
         const request=++state.catalogRequest,group=field(material,'mehsul_qrupu_id').value;
         const query=$('qaimeMaterialSearchText').value.trim().toLocaleLowerCase();
-        const body=$('qaimeMaterialSearchRows');empty(body,4,t.loading);message('qaimeMaterialSearchError','');
+        const body=$('qaimeMaterialSearchRows');empty(body,5,t.loading);message('qaimeMaterialSearchError','');
         try {
             const rows=await api('/materiallar',{qrupId:group},undefined,state.editorScope || scope());
             if(request!==state.catalogRequest || group!==field(material,'mehsul_qrupu_id').value)return;
             body.replaceChildren();
             rows.filter(row=>[row.material_adi,row.barkod_nomresi,row.material_id].some(v=>String(v??'').toLocaleLowerCase().includes(query))).forEach(item=>{
-                const row=body.insertRow();cell(row,item.material_adi);cell(row,item.barkod_nomresi);cell(row,item.ana_vahid_adi);
+                const row=body.insertRow();cell(row,item.material_id);cell(row,item.material_adi);cell(row,item.barkod_nomresi);cell(row,item.ana_vahid_adi);
                 const button=document.createElement('button');button.type='button';button.className='btn btn-sm btn-primary';button.textContent=t.selectMaterial;
                 button.addEventListener('click',()=>{
                     if(state.busy)return;
@@ -188,8 +199,8 @@
                     message('qaimeMaterialError','');materialPicker.hide();loadUnits();
                 });row.insertCell().append(button);
             });
-            if(!body.rows.length)empty(body,4,t.noMaterials);
-        }catch(e){if(request===state.catalogRequest){empty(body,4,t.noMaterials);message('qaimeMaterialSearchError',e.message);}}
+            if(!body.rows.length)empty(body,5,t.noMaterials);
+        }catch(e){if(request===state.catalogRequest){empty(body,5,t.noMaterials);message('qaimeMaterialSearchError',e.message);}}
     }
     async function loadUnits(selected='') {
         const request=++state.unitRequest,materialId=field(material,'material_id').value;
@@ -207,27 +218,32 @@
     function updateCalculation() {
         const value=name=>Number(field(material,name).value)||0;
         const unit=state.units?.find(u=>String(u.vahid_id)===field(material,'vahid_id').value);
-        const vatText=state.options.vat?.[0]?.text_deyer?.trim().replace(',','.');
-        const vat=vatText && /^\d+(\.\d+)?$/.test(vatText)?Number(vatText):null;
+        const vat=field(material,'edv_faizi').value===''?null:value('edv_faizi');
         const round=(v,d=4)=>Math.round((v+Number.EPSILON)*10**d)/10**d;
         const quantity=unit?round(value('miqdar')*Number(unit.ana_vahide_emsal),3):null;
-        const net=quantity==null?null:round(quantity*value('alis_qiymeti'));
+        const net=quantity==null?null:round(value('miqdar')*value('alis_qiymeti'));
         const tax=vat==null || net==null?null:round(net*vat/100);
-        const sale=field(material,'satis_baza_qiymeti').value===''?null:round(value('satis_baza_qiymeti')*(1+value('satis_faizi')/100));
-        const result={ana_miqdar:quantity,edv_faizi:vat,edvsiz_mebleg:net,edv_meblegi:tax,alis_meblegi:tax==null?null:round(net+tax),satis_qiymeti:sale,satis_meblegi:sale==null||quantity==null?null:round(quantity*sale)};
+        const saleInput=field(material,'satis_baza_qiymeti'),markup=value('satis_faizi');
+        saleInput.required=true;saleInput.readOnly=markup>0;
+        if(markup>0)saleInput.value=vat==null || field(material,'alis_qiymeti').value===''?'':round(value('alis_qiymeti')*(1+vat/100)*(1+markup/100));
+        const sale=saleInput.value===''?null:round(value('satis_baza_qiymeti'));
+        const result={ana_miqdar:quantity,edv_faizi:vat,edvsiz_mebleg:net,edv_meblegi:tax,alis_meblegi:tax==null?null:round(net+tax),satis_qiymeti:sale,satis_meblegi:sale==null||quantity==null?null:round(value('miqdar')*sale)};
+        $('qaimeCalcUnit').textContent=state.catalogSelection?.ana_vahid_adi || '';
         $('qaimeCalcQuantity').value=number(quantity);$('qaimeCalcNet').textContent=money(net);$('qaimeCalcVat').textContent=money(tax);
-        $('qaimeCalcPurchase').textContent=money(result.alis_meblegi);$('qaimeCalcSale').textContent=money(sale);
+        $('qaimeCalcPurchase').textContent=money(result.alis_meblegi);
+        $('qaimeCalcSaleTotal').textContent=money(result.satis_meblegi);
         return result;
     }
     async function openMaterial(mode,item=null,index=-1) {
         if(state.busy)return;
+        state.editorScope=scope();
         if(mode==='draft')$('qaimeInlineMaterial').append(material);else materialHome.append(material);
         state.materialMode=mode;state.materialItem=item;state.draftIndex=index;state.catalogRequest++;state.unitRequest++;state.units=[];state.catalogSelection=item?{material_id:item.material_id,material_adi:item.material_adi,barkod_nomresi:item.material_barkod_no,ana_vahid_id:item.ana_vahid_id,ana_vahid_adi:item.ana_vahid_adi}:null;
         $('qaimeMaterialSave').textContent=mode==='draft'?(item?t.save:t.stage):t.save;
         resetForm(material);$('qaimeCatalogSearch').disabled=mode==='edit';$('qaimeCatalogOpen').disabled=mode==='edit';$('qaimeCatalogSearch').value=item?.material_adi || '';message('qaimeMaterialError','');$('qaimeMaterialTitle').textContent=item?t.editMaterial:t.addMaterial;
         choices(field(material,'mehsul_qrupu_id'),state.options.groups || []);
         choices(field(material,'vahid_id'),[]);field(material,'vahid_id').disabled=false;
-        fill(material,item ? {...item,miqdar:mode==='edit'?item.secilen_vahid_miqdari:item.miqdar} : {miqdar:'1',alis_qiymeti:'0',satis_baza_qiymeti:'0',satis_faizi:'0'});
+        fill(material,item ? {...item,satis_faizi:item.satis_faizi ?? 0,miqdar:mode==='edit'?item.secilen_vahid_miqdari:item.miqdar} : {miqdar:'1',alis_qiymeti:'0',satis_baza_qiymeti:'0',satis_faizi:'0'});
         ['mehsul_qrupu_id','material_id'].forEach(k=>field(material,k).disabled=mode==='edit');
         if(mode==='edit') {
             field(material,'material_id').value=String(item.material_id);
@@ -240,17 +256,17 @@
         const data=formData(material),mode=state.materialMode;
         if(mode!=='edit'&&(!data.material_id || String(state.catalogSelection?.material_id)!==data.material_id)){message('qaimeMaterialError',t.selectMaterialRequired);return;}
         data.aciqlama=state.materialItem?.aciqlama || null;
-        if(!data.vahid_id||Number(data.miqdar)<=0){message('qaimeMaterialError',t.invalidInput);return;}
+        if(!data.vahid_id||Number(data.miqdar)<=0||data.satis_baza_qiymeti==null){message('qaimeMaterialError',t.invalidInput);return;}
+        data.satis_faizi=Number(data.satis_faizi || 0);
+        ['material_id','vahid_id','miqdar','alis_qiymeti','edv_faizi','satis_baza_qiymeti'].forEach(key=>{if(data[key]!=null)data[key]=Number(data[key]);});
         state.busy=true;$('qaimeMaterialSave').disabled=true;
         try {
             if(mode==='draft') {
-                const dateValue=field(header,'qaime_tarixi').value;
                 data.material_adi=state.catalogSelection.material_adi;
                 data.material_barkod_no=state.catalogSelection.barkod_nomresi;
                 data.ana_vahid_id=state.catalogSelection.ana_vahid_id;data.ana_vahid_adi=state.catalogSelection.ana_vahid_adi;
                 data.secilen_vahid_adi=field(material,'vahid_id').selectedOptions[0]?.textContent || '';
                 Object.assign(data,updateCalculation());
-                await api('/hazirla',{}, {...data,qaime_tarixi:dateValue},state.editorScope);
                 if(state.draftIndex<0)state.draft.push(data);else state.draft[state.draftIndex]=data;
                 state.dirty=true;renderDraft();
             }else {
@@ -258,7 +274,11 @@
                 const path=mode==='edit'?`/${id}/material/${state.materialItem.qaime_material_id}/yenile`:`/${id}/material/elave`;
                 const result=await api(path,{},data);await loadDetails(id);message('qaimeNotice',result.mesaj || t.saved,true);
             }
-            state.busy=false;if(mode==='draft')openMaterial('draft');else materialEditor.hide();
+            state.busy=false;
+            if(mode==='draft'){
+                await openMaterial('draft');
+                field(material,'mehsul_qrupu_id').value=data.mehsul_qrupu_id;
+            }else materialEditor.hide();
         }catch(e){message('qaimeMaterialError',e.message);}finally{state.busy=false;$('qaimeMaterialSave').disabled=false;}
     }
     async function saveInvoice(event) {
@@ -266,7 +286,7 @@
         if(!state.edit&&!state.draft.length){message('qaimeEditorError',t.materialsRequired);return;}
         state.busy=true;$('qaimeSave').disabled=true;
         try {
-            const data=formData(header);if(!state.edit)data.materiallar=state.draft.map(item=>Object.fromEntries(['material_id','vahid_id','miqdar','alis_qiymeti','satis_baza_qiymeti','satis_faizi','son_istifade_tarixi','seriya_no','aciqlama'].map(key=>[key,item[key] ?? null])));
+            const data=formData(header);if(!state.edit)data.materiallar=state.draft.map(item=>Object.fromEntries(['material_id','vahid_id','miqdar','alis_qiymeti','edv_faizi','satis_baza_qiymeti','satis_faizi','son_istifade_tarixi','seriya_no','aciqlama'].map(key=>[key,key==='satis_faizi'?Number(item[key] || 0):item[key] ?? null])));
             const result=await api(state.edit?`/${state.edit.qaime_id}/yenile`:'/yeni',{},data,state.editorScope);
             state.dirty=false;state.busy=false;editor.hide();await loadList();await loadDetails(result.qaime_id);message('qaimeNotice',state.edit?(result.mesaj || t.saved):t.createdSummary.replace('{0}',result.mesaj || t.saved).replace('{1}',result.elave_olunan_material_sayi).replace('{2}',money(result.alis_yekun_mebleg)).replace('{3}',money(result.satis_yekun_mebleg)),true);
         }catch(e){message('qaimeEditorError',e.message);}finally{state.busy=false;$('qaimeSave').disabled=false;}

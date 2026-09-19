@@ -235,20 +235,6 @@ public class QaimeController {
         );
     }
 
-    @PostMapping("/hazirla")
-    @ResponseBody
-    public Object prepare(@RequestParam Long anbarId,
-                          @RequestParam int il,
-                          @RequestBody Map<String, Object> data,
-                          Authentication auth,
-                          HttpSession session) {
-
-        return success(service.prepare(
-                scope(auth, session, anbarId, il),
-                data
-        ));
-    }
-
     @PostMapping("/yeni")
     @ResponseBody
     public Object create(@RequestParam Long anbarId,

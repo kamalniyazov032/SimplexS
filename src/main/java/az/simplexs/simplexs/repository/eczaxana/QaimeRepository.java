@@ -154,26 +154,6 @@ public class QaimeRepository {
         );
     }
 
-    public Map<String, Object> prepare(Map<String, Object> v) {
-        return query("""
-                SELECT *
-                FROM public.fn_anbar_qaime_material_hazirla(
-                    p_anbar_id=>CAST(:anbar_id AS bigint),
-                    p_qaime_tarixi=>CAST(:qaime_tarixi AS date),
-                    p_mehsul_qrupu_id=>CAST(:mehsul_qrupu_id AS bigint),
-                    p_material_id=>CAST(:material_id AS bigint),
-                    p_vahid_id=>CAST(:vahid_id AS bigint),
-                    p_miqdar=>CAST(:miqdar AS numeric),
-                    p_alis_qiymeti=>CAST(:alis_qiymeti AS numeric),
-                    p_satis_baza_qiymeti=>CAST(:satis_baza_qiymeti AS numeric),
-                    p_satis_faizi=>CAST(:satis_faizi AS numeric),
-                    p_son_istifade_tarixi=>CAST(:son_istifade_tarixi AS date),
-                    p_seriya_no=>CAST(:seriya_no AS varchar),
-                    p_aciqlama=>CAST(:aciqlama AS text)
-                )
-                """, v);
-    }
-
     public Map<String, Object> create(Map<String, Object> v) {
         return query("""
                 SELECT *
@@ -239,6 +219,7 @@ public class QaimeRepository {
                     p_vahid_id=>CAST(:vahid_id AS bigint),
                     p_miqdar=>CAST(:miqdar AS numeric),
                     p_alis_qiymeti=>CAST(:alis_qiymeti AS numeric),
+                    p_edv_faizi=>CAST(:edv_faizi AS numeric),
                     p_satis_baza_qiymeti=>CAST(:satis_baza_qiymeti AS numeric),
                     p_satis_faizi=>CAST(:satis_faizi AS numeric),
                     p_son_istifade_tarixi=>CAST(:son_istifade_tarixi AS date),
@@ -260,6 +241,7 @@ public class QaimeRepository {
                     p_miqdar=>CAST(:miqdar AS numeric),
 
                     p_alis_qiymeti=>CAST(:alis_qiymeti AS numeric),
+                    p_edv_faizi=>CAST(:edv_faizi AS numeric),
                     p_satis_baza_qiymeti=>CAST(:satis_baza_qiymeti AS numeric),
                     p_satis_faizi=>CAST(:satis_faizi AS numeric),
 
